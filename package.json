@@ -1,0 +1,30 @@
+{
+  "name": "mathdefendergame",
+  "version": "0.0.1",
+  "description": "The player defends a base from falling meteors containing math expressions by typing the correct answer and pressing Enter. The game features a progression system, difficulty levels, and a persistent leaderboard.",
+  "license": "ISC",
+  "author": "Stanislav Spuzyak",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "tsc && vite build",
+    "electron:build": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "phaser": "^4.2.0"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.3",
+    "electron": "^42.5.0",
+    "electron-builder": "^26.15.3",
+    "typescript": "^6.0.3",
+    "vite": "^8.1.0",
+    "wait-on": "^9.0.10"
+  },
+  "build": {
+    "appId": "com.iwestpole.mathdefendergame",
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
