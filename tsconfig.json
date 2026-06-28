@@ -9,6 +9,8 @@
       "DOM.Iterable"
     ],
     "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
     "strict": true,
     "noEmit": true,
     "skipLibCheck": true

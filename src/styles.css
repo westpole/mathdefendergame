@@ -1,106 +1,40 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;600;700&display=swap');
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   font-family: 'Roboto', sans-serif;
   overflow: hidden;
   background-color: #1a1a2e;
   color: #fff;
   user-select: none;
-}
-
-.pixel-font {
-  font-family: 'Press Start 2P', cursive;
-}
-
-#game-canvas {
-  background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-}
-
-.overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  background: rgba(0, 0, 0, 0.9);
-  z-index: 10;
-  transition: opacity 0.3s;
+  width: 100vw;
+  height: 100vh;
 }
 
-.hidden {
-  display: none !important;
-}
-
-@keyframes shake {
-  0% {
-    transform: translate(1px, 1px) rotate(0deg);
-  }
-
-  10% {
-    transform: translate(-1px, -2px) rotate(-1deg);
-  }
-
-  20% {
-    transform: translate(-3px, 0px) rotate(1deg);
-  }
-
-  30% {
-    transform: translate(3px, 2px) rotate(0deg);
-  }
-
-  40% {
-    transform: translate(1px, -1px) rotate(1deg);
-  }
-
-  50% {
-    transform: translate(-1px, 2px) rotate(-1deg);
-  }
-
-  60% {
-    transform: translate(-3px, 1px) rotate(0deg);
-  }
-
-  70% {
-    transform: translate(3px, 1px) rotate(-1deg);
-  }
-
-  80% {
-    transform: translate(-1px, -1px) rotate(1deg);
-  }
-
-  90% {
-    transform: translate(1px, 2px) rotate(0deg);
-  }
-
-  100% {
-    transform: translate(1px, -2px) rotate(-1deg);
-  }
-}
-
-.shake {
-  animation: shake 0.5s;
-  animation-iteration-count: 1;
-}
-
-#answer-input {
-  opacity: 0;
-  position: absolute;
-  z-index: -1;
-}
-
-.tab-btn {
-  background-color: #374151;
-  color: #9ca3af;
+#name-input {
+  position: fixed;
+  display: none;
+  z-index: 100;
+  background: #374151;
   border: 1px solid #4b5563;
+  border-radius: 4px;
+  padding: 8px 12px;
+  color: white;
+  font-size: 16px;
+  font-family: 'Roboto', sans-serif;
+  width: 200px;
+  text-align: center;
 }
 
-.tab-btn.active {
-  background-color: #2563eb;
-  color: white;
-  border-color: #3b82f6;
+#name-input:focus {
+  outline: none;
+  border-color: #facc15;
 }

@@ -2,6 +2,9 @@ import type { Meteor, Particle, Difficulty, GameState } from './types';
 import { GAME_CONFIG } from './config';
 import { MathGen } from './mathGen';
 
+export const CANVAS_WIDTH = 500;
+export const CANVAS_HEIGHT = 700;
+
 export interface GameCallbacks {
   onHUDUpdate: () => void;
   onFinishStage: (success: boolean) => void;
@@ -37,10 +40,8 @@ export class Game {
   private lastStageSuccess: boolean = true;
 
   private readonly cb: GameCallbacks;
-  private readonly canvas: HTMLCanvasElement;
 
-  constructor(canvas: HTMLCanvasElement, callbacks: GameCallbacks) {
-    this.canvas = canvas;
+  constructor(callbacks: GameCallbacks) {
     this.cb = callbacks;
   }
 
@@ -66,7 +67,7 @@ export class Game {
     const speedMod = 1 + this.stage * 0.05;
 
     this.meteors.push({
-      x: Math.random() * (this.canvas.width - 120) + 60,
+      x: Math.random() * (CANVAS_WIDTH - 120) + 60,
       y: -50,
       text: expr.text,
       answer: expr.answer,
@@ -91,12 +92,12 @@ export class Game {
   createConfetti(): void {
     for (let i = 0; i < 50; i++) {
       this.particles.push({
-        x: this.canvas.width / 2,
-        y: this.canvas.height / 2,
+        x: CANVAS_WIDTH / 2,
+        y: CANVAS_HEIGHT / 2,
         vx: (Math.random() - 0.5) * 15,
         vy: (Math.random() - 0.5) * 15,
         life: 2.0,
-        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        color: '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0'),
       });
     }
   }
@@ -167,7 +168,11 @@ export class Game {
       this.livesAtStageStart = this.lives;
 
       if (this.stage > 28) {
-        this.gameOver(true);
+        // Pre-calculate final score; let continueFromMessage handle the transition
+        const total = this.correctCount + this.incorrectCount;
+        const accuracy = total > 0 ? (this.correctCount / total) * 100 : 0;
+        this.finalPerfScore = parseFloat(accuracy.toFixed(2));
+        this.state = 'gameover';
       }
     } else {
       this.cb.onFinishStage(false);
@@ -214,7 +219,7 @@ export class Game {
       this.lastSpawn = Date.now();
     }
 
-    const dangerY = this.canvas.height - GAME_CONFIG.dangerZone;
+    const dangerY = CANVAS_HEIGHT - GAME_CONFIG.dangerZone;
 
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const m = this.meteors[i];
