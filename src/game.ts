@@ -1,6 +1,7 @@
 import type { Meteor, Particle, Difficulty, GameState } from './types';
 import { GAME_CONFIG } from './config';
 import { MathGen } from './mathGen';
+import { gameStore } from './store/useGameStore';
 
 export const CANVAS_WIDTH = 500;
 export const CANVAS_HEIGHT = 700;
@@ -38,6 +39,7 @@ export class Game {
 
   // Tracks whether the last stage transition was a success (used by resumeFromMessage)
   private lastStageSuccess: boolean = true;
+  private pendingGameOver: boolean = false;
 
   private readonly cb: GameCallbacks;
 
@@ -59,6 +61,10 @@ export class Game {
     this.inputBuffer = '';
     this.scoreAtStageStart = 0;
     this.livesAtStageStart = GAME_CONFIG.initialLives;
+    this.lastStageSuccess = true;
+    this.pendingGameOver = false;
+    this.state = 'start';
+    this.syncStore();
   }
 
   spawnMeteor(): void {
@@ -130,11 +136,13 @@ export class Game {
     }
 
     this.cb.onHUDUpdate();
+    this.syncStore();
   }
 
   hitBase(): void {
     this.shield--;
     this.cb.onHUDUpdate();
+    this.syncStore();
     if (this.shield <= 0) {
       this.failStage();
     }
@@ -143,6 +151,7 @@ export class Game {
   failStage(): void {
     this.lives--;
     this.cb.onHUDUpdate();
+    this.syncStore();
     if (this.lives <= 0) {
       this.gameOver();
     } else {
@@ -161,6 +170,7 @@ export class Game {
       }
       // Notify UI (game.stage still points to the cleared stage at this moment)
       this.cb.onFinishStage(true);
+      this.syncStore();
 
       // Commit progress checkpoints
       this.stage++;
@@ -172,14 +182,21 @@ export class Game {
         const total = this.correctCount + this.incorrectCount;
         const accuracy = total > 0 ? (this.correctCount / total) * 100 : 0;
         this.finalPerfScore = parseFloat(accuracy.toFixed(2));
-        this.state = 'gameover';
+        this.pendingGameOver = true;
       }
     } else {
       this.cb.onFinishStage(false);
+      this.syncStore();
     }
   }
 
   resumeFromMessage(): void {
+    if (this.pendingGameOver) {
+      this.pendingGameOver = false;
+      this.gameOver(true);
+      return;
+    }
+
     if (this.state === 'gameover') return;
 
     this.meteors = [];
@@ -198,6 +215,7 @@ export class Game {
 
     this.state = 'playing';
     this.cb.onHUDUpdate();
+    this.syncStore();
   }
 
   gameOver(win = false): void {
@@ -208,6 +226,7 @@ export class Game {
     const accuracy = total > 0 ? (this.correctCount / total) * 100 : 0;
     this.finalPerfScore = parseFloat(accuracy.toFixed(2));
 
+    this.syncStore();
     this.cb.onGameOver();
   }
 
@@ -238,5 +257,19 @@ export class Game {
       p.life -= 0.05;
       if (p.life <= 0) this.particles.splice(i, 1);
     }
+  }
+
+  private syncStore(): void {
+    gameStore.getState().syncHUD({
+      difficulty: this.difficulty,
+      score: this.score,
+      lives: this.lives,
+      shield: this.shield,
+      stage: this.stage,
+      stageScore: this.stageScore,
+      correctCount: this.correctCount,
+      incorrectCount: this.incorrectCount,
+      finalPerfScore: this.finalPerfScore,
+    });
   }
 }

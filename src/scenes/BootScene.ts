@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { gameStore } from '../store/useGameStore';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -8,7 +9,7 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     // Wait for web fonts (Press Start 2P, Roboto) to load before rendering menu
     document.fonts.ready.then(() => {
-      this.scene.start('MainMenuScene');
+      gameStore.getState().markBootReady();
     });
   }
 }
