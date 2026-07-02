@@ -36,5 +36,7 @@ You are an expert full-stack game developer. Follow these architectural patterns
     /stories      # Storybook files (*.stories.tsx)
   /utils          # Helper functions
   /tests          # Jest unit and integration tests
-  main.ts         # Phaser Game initialization
+  App.tsx         # React shell that hosts Phaser and the UI overlay
+  main.tsx        # React application bootstrap
+  phaserGame.ts   # Phaser game initialization and lifecycle helpers
 ```

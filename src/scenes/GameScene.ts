@@ -18,6 +18,29 @@ export class GameScene extends Phaser.Scene {
   private meteorTexts: Map<number, Phaser.GameObjects.Text> = new Map();
   private particleGraphics!: Phaser.GameObjects.Graphics;
   private inputEchoText!: Phaser.GameObjects.Text;
+  private readonly handleKeyDown = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape') {
+      this.cleanupAndGoMenu();
+      return;
+    }
+    if (this.gameLogic.state !== 'playing') return;
+
+    if (e.key === 'Backspace') {
+      this.gameLogic.inputBuffer = this.gameLogic.inputBuffer.slice(0, -1);
+      this.updateHUD();
+      return;
+    }
+    if ((e.key >= '0' && e.key <= '9') || e.key === '-') {
+      if (this.gameLogic.inputBuffer.length < 5) {
+        this.gameLogic.inputBuffer += e.key;
+        this.updateHUD();
+      }
+      return;
+    }
+    if (e.key === 'Enter' && this.gameLogic.inputBuffer.length > 0) {
+      this.gameLogic.checkAnswer();
+    }
+  };
 
   constructor() {
     super({ key: 'GameScene' });
@@ -39,6 +62,7 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     this.meteorTexts = new Map();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleShutdown, this);
 
     // ── Static background elements ────────────────────────────────────────────
     const staticGfx = this.add.graphics().setDepth(0);
@@ -69,29 +93,8 @@ export class GameScene extends Phaser.Scene {
     }).setOrigin(0.5, 0.5).setDepth(51);
 
     // ── Keyboard input ────────────────────────────────────────────────────────
-    this.input.keyboard!.on('keydown', (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        this.cleanupAndGoMenu();
-        return;
-      }
-      if (this.gameLogic.state !== 'playing') return;
-
-      if (e.key === 'Backspace') {
-        this.gameLogic.inputBuffer = this.gameLogic.inputBuffer.slice(0, -1);
-        this.updateHUD();
-        return;
-      }
-      if ((e.key >= '0' && e.key <= '9') || e.key === '-') {
-        if (this.gameLogic.inputBuffer.length < 5) {
-          this.gameLogic.inputBuffer += e.key;
-          this.updateHUD();
-        }
-        return;
-      }
-      if (e.key === 'Enter' && this.gameLogic.inputBuffer.length > 0) {
-        this.gameLogic.checkAnswer();
-      }
-    });
+    this.input.keyboard?.off('keydown', this.handleKeyDown, this);
+    this.input.keyboard?.on('keydown', this.handleKeyDown, this);
 
     // Initial HUD paint
     this.updateHUD();
@@ -178,6 +181,11 @@ export class GameScene extends Phaser.Scene {
     this.clearTransientRenderables();
     gameStore.getState().returnToMenu();
     this.scene.stop();
+  }
+
+  private handleShutdown(): void {
+    this.input.keyboard?.off('keydown', this.handleKeyDown, this);
+    this.clearTransientRenderables();
   }
 
   private clearTransientRenderables(): void {
