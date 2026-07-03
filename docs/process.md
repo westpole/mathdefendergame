@@ -13,9 +13,11 @@
   [] how to manage tickets
 
 2. [Done] Use React for UI on top of Phaser canvas
-3. Introduce StoryBook for React UI
+3. [Done] Introduce StoryBook for React UI
   3.1 Do we have test coverage for stories
   3.2 Create a workflow to change UI
+  3.3 Exclude "stories" folder from build process
+  3.4 It has MCP addon and prompt suggestions (Once Storybook runs, it creates an endpoint (e.g., http://localhost:6006/mcp) for your coding assistant (like Claude Code, Cursor, or VS Code Copilot) to connect to). You install it using npm install -D @storybook/addon-mcp and add it via npx storybook add @storybook/addon-mcp
 4. Run test with a new build
 5. Introduce Jest for Phaser unit tests`
   5.1 Mock data for scenarious
@@ -26,6 +28,12 @@
 8. Build process
 9. [Done] Add Zustand for UI and game
 10. Connect Snyk
+11. Prepare project for a public github repository
+  11.1 What are required paragraphs?
+  11.2 What license should I set for a project?
+  11.3 Any responsibilities?
+  11.4 Determine that it is a test project and do not promise fast response
+  11.5 Read only and allow to fork
 
 ### ------------------
 
