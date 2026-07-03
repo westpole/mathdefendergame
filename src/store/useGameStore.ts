@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import type { Difficulty } from '../types';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import type { Difficulty, ScoreEntry } from '../types';
 
 type OverlayPhase = 'booting' | 'start' | 'playing' | 'stage-message' | 'gameover';
 
@@ -24,6 +25,7 @@ interface GameStoreState {
   incorrectCount: number;
   finalPerfScore: number;
   stageMessage: StageMessageState | null;
+  leaderboard: Record<Difficulty, ScoreEntry[]>;
   markBootReady: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
   syncHUD: (payload: Partial<Pick<GameStoreState, 'difficulty' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>>) => void;
@@ -31,6 +33,29 @@ interface GameStoreState {
   showGameOver: (payload: Pick<GameStoreState, 'difficulty' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   startPlaying: () => void;
   returnToMenu: () => void;
+  saveScore: (name: string, score: number, perfScore: number, difficulty: Difficulty) => void;
+  getScores: (difficultyFilter?: Difficulty | null) => ScoreEntry[];
+}
+
+const difficultyOrder: Difficulty[] = ['child', 'student', 'adult'];
+const leaderboardStorageKey = 'math-defender-game-store';
+
+function createEmptyLeaderboard(): Record<Difficulty, ScoreEntry[]> {
+  return {
+    child: [],
+    student: [],
+    adult: [],
+  };
+}
+
+function sortAndTrimScores(scores: ScoreEntry[]): ScoreEntry[] {
+  return [...scores]
+    .sort((left, right) => right.combined - left.combined || right.date - left.date)
+    .slice(0, 10);
+}
+
+function flattenLeaderboard(leaderboard: Record<Difficulty, ScoreEntry[]>): ScoreEntry[] {
+  return difficultyOrder.flatMap((difficulty) => leaderboard[difficulty]);
 }
 
 const initialState = {
@@ -46,18 +71,59 @@ const initialState = {
   incorrectCount: 0,
   finalPerfScore: 0,
   stageMessage: null,
+  leaderboard: createEmptyLeaderboard(),
 };
 
-export const useGameStore = create<GameStoreState>((set) => ({
-  ...initialState,
-  markBootReady: () => set({ bootReady: true, phase: 'start' }),
-  setDifficulty: (difficulty) => set({ difficulty }),
-  syncHUD: (payload) => set(payload),
-  showStageMessage: (stageMessage) => set({ phase: 'stage-message', stageMessage }),
-  showGameOver: (payload) => set({ phase: 'gameover', stageMessage: null, ...payload }),
-  startPlaying: () => set({ phase: 'playing', stageMessage: null }),
-  returnToMenu: () => set({ ...initialState, bootReady: true, phase: 'start' }),
-}));
+export const useGameStore = create<GameStoreState>()(
+  persist(
+    (set, get) => ({
+      ...initialState,
+      markBootReady: () => set({ bootReady: true, phase: 'start' }),
+      setDifficulty: (difficulty) => set({ difficulty }),
+      syncHUD: (payload) => set(payload),
+      showStageMessage: (stageMessage) => set({ phase: 'stage-message', stageMessage }),
+      showGameOver: (payload) => set({ phase: 'gameover', stageMessage: null, ...payload }),
+      startPlaying: () => set({ phase: 'playing', stageMessage: null }),
+      returnToMenu: () => set({ ...initialState, bootReady: true, phase: 'start', leaderboard: get().leaderboard }),
+      saveScore: (name, score, perfScore, difficulty) => {
+        const entry: ScoreEntry = {
+          key: `leaderboard_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`,
+          name,
+          score,
+          perfScore,
+          combined: score + perfScore,
+          difficulty,
+          date: Date.now(),
+        };
+
+        set((state) => ({
+          leaderboard: {
+            ...state.leaderboard,
+            [difficulty]: sortAndTrimScores([...state.leaderboard[difficulty], entry]),
+          },
+        }));
+      },
+      getScores: (difficultyFilter = null) => {
+        const { leaderboard } = get();
+
+        if (difficultyFilter) {
+          return leaderboard[difficultyFilter];
+        }
+
+        return flattenLeaderboard(leaderboard).sort(
+          (left, right) => right.combined - left.combined || right.date - left.date,
+        );
+      },
+    }),
+    {
+      name: leaderboardStorageKey,
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        leaderboard: state.leaderboard,
+      }),
+    },
+  ),
+);
 
 export const gameStore = useGameStore;
 export type { OverlayPhase, StageMessageState };

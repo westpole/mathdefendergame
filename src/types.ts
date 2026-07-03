@@ -29,7 +29,7 @@ export interface ScoreEntry {
   score: number;
   perfScore: number;
   combined: number;
-  difficulty: string;
+  difficulty: Difficulty;
   date: number;
 }
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CookieManager } from '../../cookieManager';
+import { useGameStore } from '../../store/useGameStore';
 import type { Difficulty } from '../../types';
 
 interface LeaderboardProps {
@@ -11,12 +11,12 @@ const tabs: Difficulty[] = ['child', 'student', 'adult'];
 
 export function Leaderboard({ initialDifficulty, limit }: LeaderboardProps) {
   const [activeTab, setActiveTab] = useState<Difficulty>(initialDifficulty);
+  const difficultyScores = useGameStore((state) => state.leaderboard[activeTab]);
+  const scores = difficultyScores.slice(0, limit);
 
   useEffect(() => {
     setActiveTab(initialDifficulty);
   }, [initialDifficulty]);
-
-  const scores = CookieManager.getScores(activeTab).slice(0, limit);
 
   return (
     <div className="board-card">

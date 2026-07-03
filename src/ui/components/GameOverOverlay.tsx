@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { CookieManager } from '../../cookieManager';
 import { returnToMenu } from '../../phaserGame';
 import { useGameStore } from '../../store/useGameStore';
 import { Leaderboard } from './Leaderboard';
@@ -10,10 +9,11 @@ export function GameOverOverlay() {
   const correctCount = useGameStore((state) => state.correctCount);
   const incorrectCount = useGameStore((state) => state.incorrectCount);
   const finalPerfScore = useGameStore((state) => state.finalPerfScore);
+  const saveScore = useGameStore((state) => state.saveScore);
   const [name, setName] = useState('');
 
   const saveAndReturn = () => {
-    CookieManager.saveScore(name.trim() || 'Anonymous', score, finalPerfScore, difficulty);
+    saveScore(name.trim() || 'Anonymous', score, finalPerfScore, difficulty);
     returnToMenu();
   };
 
