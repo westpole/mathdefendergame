@@ -5,6 +5,7 @@ import { GameOverOverlay } from './ui/components/GameOverOverlay';
 import { HUDOverlay } from './ui/components/HUDOverlay';
 import { MainMenuOverlay } from './ui/components/MainMenuOverlay';
 import { StageMessageOverlay } from './ui/components/StageMessageOverlay';
+import { Loading } from './ui/components/Loading';
 
 export function App() {
   const phase = useGameStore((state) => state.phase);
@@ -22,14 +23,7 @@ export function App() {
     <div id="app-shell">
       <div id="game-container" />
       <div id="ui-overlay">
-        {!bootReady && (
-          <div className="overlay-screen">
-            <div className="overlay-panel">
-              <h1>MATH DEFENDER</h1>
-              <p>Loading game assets and fonts…</p>
-            </div>
-          </div>
-        )}
+        {!bootReady && <Loading />}
         {bootReady && phase === 'start' && <MainMenuOverlay />}
         {bootReady && phase === 'playing' && <HUDOverlay />}
         {bootReady && phase === 'stage-message' && <StageMessageOverlay />}
