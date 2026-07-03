@@ -5,7 +5,7 @@ import "../../../styles.css";
 import { Loading } from ".";
 
 const meta = {
-  title: "UI/Loading",
+  title: "Screens/Loading",
   component: Loading,
   parameters: {
     layout: "fullscreen",
