@@ -3,7 +3,7 @@ export function Loading() {
     <div className="overlay-screen">
       <div className="overlay-panel">
         <h1>MATH DEFENDER</h1>
-        <p>Loading game assets and fonts…</p>
+        <p>Loading game…</p>
       </div>
     </div>
   );
