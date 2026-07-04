@@ -3,6 +3,7 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import type { Difficulty, ScoreEntry } from '../types';
 
 type OverlayPhase = 'booting' | 'start' | 'playing' | 'stage-message' | 'gameover';
+type MenuView = 'home' | 'high-score' | 'rules';
 
 interface StageMessageState {
   success: boolean;
@@ -14,6 +15,7 @@ interface StageMessageState {
 
 interface GameStoreState {
   phase: OverlayPhase;
+  menuView: MenuView;
   bootReady: boolean;
   difficulty: Difficulty;
   score: number;
@@ -33,6 +35,7 @@ interface GameStoreState {
   showGameOver: (payload: Pick<GameStoreState, 'difficulty' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   startPlaying: () => void;
   returnToMenu: () => void;
+  openMenuView: (menuView: MenuView) => void;
   saveScore: (name: string, score: number, perfScore: number, difficulty: Difficulty) => void;
   getScores: (difficultyFilter?: Difficulty | null) => ScoreEntry[];
 }
@@ -60,6 +63,7 @@ function flattenLeaderboard(leaderboard: Record<Difficulty, ScoreEntry[]>): Scor
 
 const initialState = {
   phase: 'booting' as OverlayPhase,
+  menuView: 'home' as MenuView,
   bootReady: false,
   difficulty: 'child' as Difficulty,
   score: 0,
@@ -85,6 +89,7 @@ export const useGameStore = create<GameStoreState>()(
       showGameOver: (payload) => set({ phase: 'gameover', stageMessage: null, ...payload }),
       startPlaying: () => set({ phase: 'playing', stageMessage: null }),
       returnToMenu: () => set({ ...initialState, bootReady: true, phase: 'start', leaderboard: get().leaderboard }),
+      openMenuView: (menuView) => set({ ...initialState, bootReady: true, phase: 'start', menuView, leaderboard: get().leaderboard }),
       saveScore: (name, score, perfScore, difficulty) => {
         const entry: ScoreEntry = {
           key: `leaderboard_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`,
@@ -126,4 +131,4 @@ export const useGameStore = create<GameStoreState>()(
 );
 
 export const gameStore = useGameStore;
-export type { OverlayPhase, StageMessageState };
+export type { MenuView, OverlayPhase, StageMessageState };

@@ -6,7 +6,7 @@
   "author": "Stanislav Spuzyak",
   "main": "electron/main.js",
   "scripts": {
-    "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron . --dev\"",
     "build": "tsc && vite build",
     "electron:build": "npm run build && electron-builder",
     "storybook": "storybook dev -p 6006",

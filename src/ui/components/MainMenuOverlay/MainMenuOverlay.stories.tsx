@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { Loading } from ".";
+import { MainMenuOverlay } from ".";
 
 const meta = {
-  title: "Screens/Loading",
-  component: Loading,
+  title: "Screens/MainMenuOverlay",
+  component: MainMenuOverlay,
   parameters: {
     layout: "fullscreen",
   },
@@ -22,7 +22,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof Loading>;
+} satisfies Meta<typeof MainMenuOverlay>;
 
 export default meta;
 

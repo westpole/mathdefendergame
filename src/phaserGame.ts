@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
 import { GameScene } from './scenes/GameScene';
 import { gameStore } from './store/useGameStore';
+import type { MenuView } from './store/useGameStore';
 import type { Difficulty } from './types';
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -73,6 +74,16 @@ export function returnToMenu(): void {
   }
 
   gameStore.getState().returnToMenu();
+}
+
+export function openMenuView(menuView: MenuView): void {
+  const game = ensurePhaserGame();
+
+  if (game.scene.isActive('GameScene') || game.scene.isPaused('GameScene')) {
+    game.scene.stop('GameScene');
+  }
+
+  gameStore.getState().openMenuView(menuView);
 }
 
 function getGameScene(): GameScene | null {

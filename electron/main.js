@@ -1,7 +1,48 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
-const isDev = !app.isPackaged;
+const isDev = !app.isPackaged && process.argv.includes('--dev');
+
+function sendMenuAction(win, view) {
+  if (!win || win.isDestroyed()) {
+    return;
+  }
+
+  win.webContents.executeJavaScript(
+    `window.dispatchEvent(new CustomEvent('electron-menu-action', { detail: ${JSON.stringify({ view })} }));`,
+  );
+}
+
+function buildMenu(win) {
+  const template = [
+    {
+      label: 'Play Game',
+      click: () => sendMenuAction(win, 'home'),
+    },
+    {
+      label: 'High Score',
+      click: () => sendMenuAction(win, 'high-score'),
+    },
+    {
+      label: 'Rules',
+      click: () => sendMenuAction(win, 'rules'),
+    },
+  ];
+
+  if (isDev) {
+    template.push({
+      label: 'Developer',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { role: 'togglefullscreen', label: 'Toggle Full Screen F11', accelerator: 'F11' },
+      ],
+    });
+  }
+
+  return Menu.buildFromTemplate(template);
+}
 
 function createWindow() {
   const win = new BrowserWindow({
@@ -16,6 +57,8 @@ function createWindow() {
     title: 'Math Defender',
     backgroundColor: '#1a1a2e',
   });
+
+  Menu.setApplicationMenu(buildMenu(win));
 
   if (isDev) {
     win.loadURL('http://localhost:5173');
