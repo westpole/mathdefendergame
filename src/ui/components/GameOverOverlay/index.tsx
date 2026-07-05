@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { returnToMenu } from '../../../phaserGame';
 import { useGameStore } from '../../../store/useGameStore';
-import { Leaderboard } from '../Leaderboard';
 
 export function GameOverOverlay() {
   const difficulty = useGameStore((state) => state.difficulty);
@@ -51,11 +50,6 @@ export function GameOverOverlay() {
               Save & Menu
             </button>
           </div>
-        </section>
-
-        <section className="overlay-panel gameover-board">
-          <h2>High Scores</h2>
-          <Leaderboard initialDifficulty={difficulty} limit={14} />
         </section>
       </div>
     </div>
