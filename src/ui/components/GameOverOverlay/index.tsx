@@ -33,7 +33,7 @@ export function GameOverOverlay() {
             <span>Accuracy</span>
             <strong>{finalPerfScore.toFixed(2)}%</strong>
           </div>
-          <label className="field-label" htmlFor="leaderboard-name">Name for leaderboard</label>
+          <label className="field-label" htmlFor="leaderboard-name">Save result</label>
           <input
             id="leaderboard-name"
             className="text-input"
@@ -44,10 +44,10 @@ export function GameOverOverlay() {
           />
           <div className="action-row">
             <button className="secondary-button" onClick={returnToMenu} type="button">
-              Menu (No Save)
+              Cancel
             </button>
             <button className="primary-button" onClick={saveAndReturn} type="button">
-              Save & Menu
+              Save
             </button>
           </div>
         </section>

@@ -1,0 +1,21 @@
+{
+  "difficulty": "student",
+  "score": 33,
+  "lives": 0,
+  "shield": 5,
+  "stage": 3,
+  "stageScore": 125,
+  "correctCount": 16,
+  "incorrectCount": 4,
+  "finalPerfScore": 75,
+  "leaderboard": {
+    "child": [],
+    "student": [
+      {
+        "name": "Student player",
+        "score": 33
+      }
+    ],
+    "adult": []
+  }
+}

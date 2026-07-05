@@ -8,9 +8,11 @@ import {
   GameStoreState,
   StageMessageState,
 } from "../../../store/useGameStore";
-import { Difficulty } from "../../../types";
 
 import { GameOverOverlay } from ".";
+import childMock from "./__mocks__/child.json";
+import studentMock from "./__mocks__/student.json";
+import adultMock from "./__mocks__/adult.json";
 
 const reusableInitialState: Partial<GameStoreState> = {
   phase: 'gameover' as OverlayPhase,
@@ -68,20 +70,7 @@ export const Child: Story = {
   args: {
     initialState: {
       ...reusableInitialState,
-      difficulty: 'child' as Difficulty,
-      score: 33,
-      lives: 0,
-      shield: 5,
-      stage: 3,
-      stageScore: 125,
-      correctCount: 16,
-      incorrectCount: 4,
-      finalPerfScore: 75,
-      leaderboard: {
-        child: [{ name: 'Child player', score: 33 }],
-        student: [],
-        adult: [],
-      },
+      ...childMock,
     }
   },
 };
@@ -91,20 +80,7 @@ export const Student: Story = {
   args: {
     initialState: {
       ...reusableInitialState,
-      difficulty: 'student' as Difficulty,
-      score: 33,
-      lives: 0,
-      shield: 5,
-      stage: 3,
-      stageScore: 125,
-      correctCount: 16,
-      incorrectCount: 4,
-      finalPerfScore: 75,
-      leaderboard: {
-        child: [],
-        student: [{ name: 'Student player', score: 33 }],
-        adult: [],
-      },
+      ...studentMock,
     }
   },
 };
@@ -114,20 +90,7 @@ export const Adult: Story = {
   args: {
     initialState: {
       ...reusableInitialState,
-      difficulty: 'adult' as Difficulty,
-      score: 33,
-      lives: 0,
-      shield: 5,
-      stage: 3,
-      stageScore: 125,
-      correctCount: 16,
-      incorrectCount: 4,
-      finalPerfScore: 75,
-      leaderboard: {
-        child: [],
-        student: [],
-        adult: [{ name: 'Adult player', score: 33 }],
-      },
+      ...adultMock,
     }
   },
 };
