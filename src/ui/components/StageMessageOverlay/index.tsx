@@ -1,5 +1,5 @@
-import { continueGame } from '../../phaserGame';
-import { useGameStore } from '../../store/useGameStore';
+import { continueGame } from '../../../phaserGame';
+import { useGameStore } from '../../../store/useGameStore';
 
 export function StageMessageOverlay() {
   const stageMessage = useGameStore((state) => state.stageMessage);

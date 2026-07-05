@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { returnToMenu } from '../../phaserGame';
-import { useGameStore } from '../../store/useGameStore';
-import { Leaderboard } from './Leaderboard';
+import { returnToMenu } from '../../../phaserGame';
+import { useGameStore } from '../../../store/useGameStore';
+import { Leaderboard } from '../Leaderboard';
 
 export function GameOverOverlay() {
   const difficulty = useGameStore((state) => state.difficulty);

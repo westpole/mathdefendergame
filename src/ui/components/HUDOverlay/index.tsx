@@ -1,5 +1,5 @@
-import { GAME_CONFIG } from '../../config';
-import { useGameStore } from '../../store/useGameStore';
+import { GAME_CONFIG } from '../../../config';
+import { useGameStore } from '../../../store/useGameStore';
 
 export function HUDOverlay() {
   const difficulty = useGameStore((state) => state.difficulty);
