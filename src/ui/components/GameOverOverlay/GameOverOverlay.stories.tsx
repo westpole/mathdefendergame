@@ -45,18 +45,7 @@ const meta = {
         syncHUD((context.args as StoryArgs).initialState);
       }, [syncHUD, (context.args as StoryArgs)?.initialState]);
 
-      return (
-        <div
-          style={{
-            position: "relative",
-            minHeight: "100vh",
-            background:
-              "radial-gradient(circle at top, #1e293b 0%, #020617 55%, #000000 100%)",
-          }}
-        >
-          <Story />
-        </div>
-      );
+      return <Story />;
     },
   ],
 } satisfies Meta<typeof GameOverOverlay>;

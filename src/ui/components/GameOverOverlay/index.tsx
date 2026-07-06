@@ -17,8 +17,8 @@ export function GameOverOverlay() {
   };
 
   return (
-    <div className="overlay-screen overlay-screen--interactive overlay-screen--dimmed">
-      <div className="gameover-layout">
+    <div className="grid-container">
+      <div className="contentBox">
         <section className="overlay-panel gameover-panel accent-danger">
           <h2>Game Over</h2>
           <div className="stats-grid">

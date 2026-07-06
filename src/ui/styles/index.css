@@ -26,6 +26,8 @@ body {
   height: 100%;
 }
 
+/* App shell */
+
 #app-shell {
   position: relative;
   width: min(100vw, calc(100vh * 5 / 7));
@@ -52,6 +54,8 @@ body {
     */
   pointer-events: none;
 }
+
+/* Overlay primitives */
 
 .overlay-screen {
   position: absolute;
@@ -101,6 +105,8 @@ body {
   line-height: 1.5;
   color: #d1d5db;
 }
+
+/* Check if we still need menu-* styles */
 
 .menu-layout,
 .menu-page-layout,
@@ -212,6 +218,8 @@ body {
   margin-top: 16px;
 }
 
+/* Board? */
+
 .board-card {
   margin-top: 16px;
 }
@@ -245,6 +253,8 @@ body {
   color: #93c5fd;
 }
 
+/* HUD? */
+
 .hud-layer {
   position: absolute;
   inset: 0;
@@ -272,6 +282,8 @@ body {
 .hud-panel--right {
   align-items: flex-end;
 }
+
+/* Game */
 
 .shield-row {
   display: flex;
@@ -334,10 +346,13 @@ body {
   border-color: rgba(248, 113, 113, 0.5);
 }
 
+/* High Score? */
+
 .stats-grid {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 1fr;
   gap: 10px 18px;
+  margin: 2em 1em;
 }
 
 .text-input {
@@ -354,6 +369,33 @@ body {
   outline: none;
   border-color: #facc15;
 }
+
+/* UI layout: one column in the middle */
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center; /* Centers contentBox horizontally */
+  width: 100%;
+}
+
+.contentBox {
+  display: grid;
+  align-items: center;    /* Aligns internal text/content vertically in the middle */
+  justify-items: center;  /* Aligns internal text/content horizontally in the middle */
+  width: 60vw;            /* Desktop width */
+  height: 100vh;          /* Keeps height at 100vh */
+}
+
+@media (max-width: 768px) {
+  .contentBox {
+    width: 100vw;       /* Sets contentBox width to 100vw on mobile */
+    margin: 0;          /* Optional: removes margins on mobile to ensure full-bleed if desired */
+    padding: 1.5rem;
+  }
+}
+
+/* Responsive */
 
 @media (max-width: 720px) {
   .menu-layout,
