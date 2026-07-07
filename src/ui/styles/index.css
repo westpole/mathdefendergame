@@ -158,17 +158,58 @@ body {
 }
 
 .menu-actions,
-.action-row,
-.board-tabs {
+.action-row {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 }
 
+/* UI: Tabs view */
+
+.view-tabs {
+  display: flex;
+  list-style: none;
+  width: 100%;
+}
+
+.view-tab {
+  padding: 8px 20px;
+  background-color: #111827;
+  border: 1px solid #ccc;
+  border-bottom: none; /* Open at the bottom to merge with content pane */
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  text-transform: uppercase;
+  color: #aaa;
+  transition: background-color 0.2s ease;
+  width: 10em;
+
+  /* Keeps text from being highlighted on accidental double-clicks */
+  user-select: none;
+}
+
+.view-tab:hover {
+  background-color: #eaeaea;
+  color: #111;
+}
+
+.view-tab.is-active {
+  background: #2563eb;
+  color: #fff;
+  font-weight: 600;
+  position: relative;
+  z-index: 2; /* Sits on top of the content border */
+  border-color: #ccc;
+}
+
+/* Buttons */
+
 .menu-button,
 .primary-button,
-.secondary-button,
-.board-tab {
+.secondary-button {
   border: 0;
   border-radius: 12px;
   padding: 12px 16px;
@@ -199,10 +240,6 @@ body {
   background: #374151;
 }
 
-.board-tab.is-active {
-  background: #2563eb;
-}
-
 .rules-list {
   margin: 16px 0 0;
   padding-left: 18px;
@@ -218,38 +255,56 @@ body {
   margin-top: 16px;
 }
 
-/* Board? */
+/* UI: table, global styles */
 
-.board-card {
-  margin-top: 16px;
+.table-wrapper {
+  display: flex;
+  flex-direction: column;
+  border: solid 1px #ccc;
+  height: 40vh;
+  overflow: hidden;
 }
 
-.board-table {
-  margin-top: 14px;
-  display: grid;
-  gap: 8px;
+.table-header {
+  font-size: 0.9em;
+  color: #9ca3af;
+  border-bottom: 1px solid #4b5563;
 }
 
-.board-row {
+.table-body {
+  overflow-y: auto;
+  height: 100%;
+}
+
+.table-row {
   display: grid;
   grid-template-columns: 1.5fr 0.8fr 0.7fr;
-  gap: 12px;
-  font-size: 14px;
+  font-size: 1em;
+  line-height: 1.4;
   color: #d1d5db;
+  padding: 0.3em 1em;
 }
 
-.board-row--header,
+.board-empty {
+  border: solid 1px #ccc;
+  margin: 0;
+  height: 40vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .board-empty,
 .hud-label,
 .field-label {
   color: #9ca3af;
 }
 
-.board-score {
+.table-cell.score {
   color: #facc15;
 }
 
-.board-accuracy {
+.table-cell.accuracy {
   color: #93c5fd;
 }
 

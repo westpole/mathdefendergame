@@ -19,36 +19,37 @@ export function Leaderboard({ initialDifficulty, limit }: LeaderboardProps) {
   }, [initialDifficulty]);
 
   return (
-    <div className="board-card">
-      <div className="board-tabs">
+    <div className="overlay-panel">
+      <ul className="view-tabs">
         {tabs.map((tab) => (
-          <button
+          <li
             key={tab}
-            className={tab === activeTab ? 'board-tab is-active' : 'board-tab'}
+            className={tab === activeTab ? 'view-tab is-active' : 'view-tab'}
             onClick={() => setActiveTab(tab)}
-            type="button"
-          >
-            {tab}
-          </button>
+          >{tab}</li>
         ))}
-      </div>
+      </ul>
 
       {scores.length === 0 ? (
-        <p className="board-empty">No scores yet.</p>
+        <div className="board-empty">No scores yet.</div>
       ) : (
-        <div className="board-table">
-          <div className="board-row board-row--header">
-            <span>Name</span>
-            <span>Score</span>
-            <span>Acc%</span>
-          </div>
-          {scores.map((entry) => (
-            <div className="board-row" key={entry.key}>
-              <span>{entry.name.slice(0, 12)}</span>
-              <span className="board-score">{entry.score}</span>
-              <span className="board-accuracy">{entry.perfScore}%</span>
+        <div className="table-wrapper">
+          <div className="table-header">
+            <div className="table-row">
+              <span>Name</span>
+              <span>Score</span>
+              <span>Acc%</span>
             </div>
-          ))}
+          </div>
+          <div className="table-body">
+            {scores.map((entry) => (
+              <div className="table-row" key={entry.key}>
+                <span className="table-cell name">{entry.name.slice(0, 12)}</span>
+                <span className="table-cell score">{entry.score ?? 0}</span>
+                <span className="table-cell accuracy">{entry.perfScore ? `${entry.perfScore}%` : 'N/A'}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

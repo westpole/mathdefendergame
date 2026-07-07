@@ -1,0 +1,74 @@
+{
+  "difficulty": "adult",
+  "score": 75,
+  "lives": 0,
+  "shield": 5,
+  "stage": 3,
+  "stageScore": 125,
+  "correctCount": 25,
+  "incorrectCount": 2,
+  "finalPerfScore": 85,
+  "leaderboard": {
+    "child": [
+      {
+        "name": "John Connor",
+        "score": 15,
+        "perfScore": 21
+      }
+    ],
+    "student": [
+      {
+        "name": "John Connor",
+        "score": 128,
+        "perfScore": 77
+      },
+      {
+        "name": "Sarah Connor",
+        "score": 64,
+        "perfScore": 72
+      },
+      {
+        "name": "Terminator T800",
+        "score": 50,
+        "perfScore": 39
+      },
+      {
+        "name": "Sarah Connor",
+        "score": 64,
+        "perfScore": 72
+      },
+      {
+        "name": "Terminator T800",
+        "score": 50,
+        "perfScore": 39
+      },
+      {
+        "name": "Sarah Connor",
+        "score": 64,
+        "perfScore": 72
+      },
+      {
+        "name": "Terminator T800",
+        "score": 50,
+        "perfScore": 39
+      }
+    ],
+    "adult": [
+      {
+        "name": "John Connor",
+        "score": 75,
+        "perfScore": 85
+      },
+      {
+        "name": "Sarah Connor",
+        "score": 64,
+        "perfScore": 72
+      },
+      {
+        "name": "Terminator T800",
+        "score": 50,
+        "perfScore": 39
+      }
+    ]
+  }
+}

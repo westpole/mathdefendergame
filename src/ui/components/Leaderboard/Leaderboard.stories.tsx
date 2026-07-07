@@ -1,30 +1,32 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useEffect } from "react";
 
+import { GameStoreState, useGameStore } from "../../../store/useGameStore";
+
+import emptyMock from "./__mocks__/empty.json";
+import withDataMock from "./__mocks__/withData.json";
 import { Leaderboard } from ".";
+
+interface StoryArgs {
+  initialState: Partial<GameStoreState>;
+}
 
 const meta = {
   title: "Screens/Leaderboard",
   component: Leaderboard,
-  args: {
-    initialDifficulty: "student",
-    limit: 5,
-  },
   parameters: {
     layout: "fullscreen",
   },
   decorators: [
-    (Story) => (
-      <div
-        style={{
-          position: "relative",
-          minHeight: "100vh",
-          background:
-            "radial-gradient(circle at top, #1e293b 0%, #020617 55%, #000000 100%)",
-        }}
-      >
-        <Story />
-      </div>
-    ),
+    (Story, context) => {
+      const syncHUD = useGameStore((state) => state.syncHUD);
+
+      useEffect(() => {
+        syncHUD((context.parameters as unknown as StoryArgs).initialState);
+      }, [syncHUD, (context.parameters as unknown as StoryArgs)?.initialState]);
+
+      return <Story />;
+    },
   ],
 } satisfies Meta<typeof Leaderboard>;
 
@@ -32,4 +34,28 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const Default: Story = {
+  name: 'Empty',
+  args: {
+    initialDifficulty: "child",
+    limit: 5,
+  },
+  parameters: {
+    initialState: {
+      ...emptyMock,
+    },
+  },
+};
+
+export const WithData: Story = {
+  name: 'With Data',
+  args: {
+    initialDifficulty: "adult",
+    limit: 10,
+  },
+  parameters: {
+    initialState: {
+      ...withDataMock,
+    },
+  },
+};
