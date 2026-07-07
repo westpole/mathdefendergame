@@ -12,9 +12,9 @@ export function StageMessageOverlay() {
   const accentClass = stageMessage.success ? 'accent-success' : 'accent-danger';
 
   return (
-    <div className="overlay-screen overlay-screen--interactive overlay-screen--dimmed">
+    <div className="overlay-screen">
       <div className={`overlay-panel modal-panel ${accentClass}`}>
-        <h2>{title}</h2>
+        <h1>{title}</h1>
         <p>
           {stageMessage.success
             ? `Score: ${stageMessage.score} | Lives: ${stageMessage.lives}`

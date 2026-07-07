@@ -10,18 +10,16 @@ const rules = [
 
 export function RulesOverlay() {
   return (
-    <div className="overlay-screen overlay-screen--interactive">
-      <div className="menu-page-layout">
-        <section className="overlay-panel menu-page-panel">
-          <div className="menu-page-header">
-            <h1>RULES</h1>
-          </div>
-          <ul className="rules-list rules-list--page">
-            {rules.map((rule) => (
-              <li key={rule}>{rule}</li>
-            ))}
-          </ul>
-        </section>
+    <div className="overlay-screen">
+      <div className="overlay-panel">
+        <div className="menu-page-header">
+          <h1>RULES</h1>
+        </div>
+        <ul className="rules-list rules-list--page">
+          {rules.map((rule) => (
+            <li key={rule}>{rule}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );
