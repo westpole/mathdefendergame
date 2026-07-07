@@ -8,24 +8,22 @@ const difficulties = [
 
 export function MainMenuOverlay() {
   return (
-    <div className="overlay-screen overlay-screen--interactive">
-      <div className="menu-layout">
-        <section className="overlay-panel menu-hero">
-          <h1>MATH DEFENDER</h1>
-          <h4 className="menu-subtitle">Defend your base from the meteor storm by solving math problems!</h4>
-          <div className="menu-actions">
-            {difficulties.map((difficulty) => (
-              <button
-                key={difficulty.key}
-                className={difficulty.className}
-                onClick={() => startGame(difficulty.key)}
-                type="button"
-              >
-                {difficulty.label}
-              </button>
-            ))}
-          </div>
-        </section>
+    <div className="overlay-screen">
+      <div className="overlay-panel">
+        <h1>MATH DEFENDER</h1>
+        <h4 className="menu-subtitle">Defend your base from the meteor storm by solving math problems!</h4>
+        <div className="menu-actions">
+          {difficulties.map((difficulty) => (
+            <button
+              key={difficulty.key}
+              className={difficulty.className}
+              onClick={() => startGame(difficulty.key)}
+              type="button"
+            >
+              {difficulty.label}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

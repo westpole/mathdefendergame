@@ -178,6 +178,14 @@ body {
   flex-wrap: wrap;
 }
 
+.menu-actions {
+  justify-content: center;
+}
+
+.menu-actions button {
+  flex: 1 1 120px;
+}
+
 /* UI: Tabs view */
 
 .view-tabs {
