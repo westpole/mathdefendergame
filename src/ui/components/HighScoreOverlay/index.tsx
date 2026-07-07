@@ -5,7 +5,7 @@ export function HighScoreOverlay() {
     <div className="grid-container">
       <div className="contentBox">
         <section className="overlay-panel menu-page-panel">
-          <div className="menu-page-header">
+          <div className="overlay-header">
             <h1>HIGH SCORES</h1>
           </div>
           <Leaderboard initialDifficulty="child" limit={10} />

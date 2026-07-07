@@ -20,7 +20,10 @@ export function GameOverOverlay() {
     <div className="grid-container">
       <div className="contentBox">
         <section className="overlay-panel gameover-panel accent-danger">
-          <h2>Game Over</h2>
+          <div className="overlay-header">
+            <h1>Game Over</h1>
+          </div>
+
           <div className="stats-grid">
             <span>Difficulty</span>
             <strong>{difficulty}</strong>
@@ -33,7 +36,7 @@ export function GameOverOverlay() {
             <span>Accuracy</span>
             <strong>{finalPerfScore.toFixed(2)}%</strong>
           </div>
-          <label className="field-label" htmlFor="leaderboard-name">Save result</label>
+          <label className="field-label" htmlFor="leaderboard-name">Save your result:</label>
           <input
             id="leaderboard-name"
             className="text-input"

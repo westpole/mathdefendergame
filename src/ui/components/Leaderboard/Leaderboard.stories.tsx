@@ -25,7 +25,11 @@ const meta = {
         syncHUD((context.parameters as unknown as StoryArgs).initialState);
       }, [syncHUD, (context.parameters as unknown as StoryArgs)?.initialState]);
 
-      return <Story />;
+      return <article style={{ width: "100vw", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <section style={{ width: "40vw", height: "40vh" }}>
+          <Story />
+        </section>
+      </article>;
     },
   ],
 } satisfies Meta<typeof Leaderboard>;

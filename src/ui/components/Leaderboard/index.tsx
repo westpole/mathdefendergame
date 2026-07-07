@@ -19,7 +19,7 @@ export function Leaderboard({ initialDifficulty, limit }: LeaderboardProps) {
   }, [initialDifficulty]);
 
   return (
-    <div className="overlay-panel">
+    <div className="overlay-content">
       <ul className="view-tabs">
         {tabs.map((tab) => (
           <li
