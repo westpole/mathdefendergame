@@ -1,0 +1,16 @@
+{
+  "difficulty": "adult",
+  "score": 0,
+  "lives": 10,
+  "shield": 5,
+  "stage": 1,
+  "stageScore": 0,
+  "correctCount": 0,
+  "incorrectCount": 0,
+  "finalPerfScore": 0,
+  "leaderboard": {
+    "child": [],
+    "student": [],
+    "adult": []
+  }
+}
