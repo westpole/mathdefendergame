@@ -13,6 +13,7 @@ import { GameOverOverlay } from ".";
 import childMock from "./__mocks__/child.json";
 import studentMock from "./__mocks__/student.json";
 import adultMock from "./__mocks__/adult.json";
+import GameCanvas from "../__mocks__/GameCanvas";
 
 const reusableInitialState: Partial<GameStoreState> = {
   phase: 'gameover' as OverlayPhase,
@@ -45,7 +46,11 @@ const meta = {
         syncHUD((context.args as StoryArgs).initialState);
       }, [syncHUD, (context.args as StoryArgs)?.initialState]);
 
-      return <Story />;
+      return (
+        <GameCanvas>
+          <Story />
+        </GameCanvas>
+      );
     },
   ],
 } satisfies Meta<typeof GameOverOverlay>;

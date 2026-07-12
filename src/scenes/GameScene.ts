@@ -4,9 +4,7 @@ import { GAME_CONFIG } from '../config';
 import { gameStore } from '../store/useGameStore';
 import type { Difficulty } from '../types';
 
-const CANVAS_W = 500;
-const CANVAS_H = 700;
-const DANGER_Y = CANVAS_H - GAME_CONFIG.dangerZone; // 600
+const DANGER_Y = GAME_CONFIG.CANVAS_HEIGHT - GAME_CONFIG.dangerZone; // 600
 
 function colorToInt(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
@@ -17,7 +15,6 @@ export class GameScene extends Phaser.Scene {
 
   private meteorTexts: Map<number, Phaser.GameObjects.Text> = new Map();
   private particleGraphics!: Phaser.GameObjects.Graphics;
-  private inputEchoText!: Phaser.GameObjects.Text;
   private readonly handleKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape') {
       this.cleanupAndGoMenu();
@@ -64,33 +61,18 @@ export class GameScene extends Phaser.Scene {
     this.meteorTexts = new Map();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleShutdown, this);
 
-    // ── Static background elements ────────────────────────────────────────────
+    // ── @todo: remove Static background elements ────────────────────────────────────────────
     const staticGfx = this.add.graphics().setDepth(0);
 
     // Danger line (dashed)
     staticGfx.lineStyle(2, 0xef4444, 1);
     const dashLen = 10, gapLen = 5;
-    for (let x = 0; x < CANVAS_W; x += dashLen + gapLen) {
-      staticGfx.lineBetween(x, DANGER_Y, Math.min(x + dashLen, CANVAS_W), DANGER_Y);
+    for (let x = 0; x < GAME_CONFIG.CANVAS_WIDTH; x += dashLen + gapLen) {
+      staticGfx.lineBetween(x, DANGER_Y, Math.min(x + dashLen, GAME_CONFIG.CANVAS_WIDTH), DANGER_Y);
     }
-
-    // Base station
-    staticGfx.fillStyle(0x444444);
-    staticGfx.fillRect(CANVAS_W / 2 - 30, CANVAS_H - 40, 60, 40);
-    staticGfx.fillStyle(0x666666);
-    staticGfx.fillRect(CANVAS_W / 2 - 10, CANVAS_H - 60, 20, 20);
 
     // ── Dynamic graphics ──────────────────────────────────────────────────────
     this.particleGraphics = this.add.graphics().setDepth(6);
-
-    // Input echo at bottom
-    this.inputEchoText = this.add.text(CANVAS_W / 2, CANVAS_H - 48, '', {
-      fontFamily: 'Roboto',
-      fontSize: '30px',
-      fontStyle: 'bold',
-      color: '#facc15',
-      shadow: { offsetX: 1, offsetY: 1, color: '#000000', blur: 2, fill: true },
-    }).setOrigin(0.5, 0.5).setDepth(51);
 
     // ── Keyboard input ────────────────────────────────────────────────────────
     this.input.keyboard?.off('keydown', this.handleKeyDown, this);
@@ -142,7 +124,9 @@ export class GameScene extends Phaser.Scene {
 
   // ── HUD update ────────────────────────────────────────────────────────────
   updateHUD(): void {
-    this.inputEchoText.setText(this.gameLogic.inputBuffer);
+    gameStore.getState().syncHUD({
+      inputBuffer: this.gameLogic.inputBuffer,
+    });
   }
 
   // ── Stage finish ──────────────────────────────────────────────────────────

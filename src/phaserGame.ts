@@ -4,11 +4,12 @@ import { GameScene } from './scenes/GameScene';
 import { gameStore } from './store/useGameStore';
 import type { MenuView } from './store/useGameStore';
 import type { Difficulty } from './types';
+import { GAME_CONFIG } from './config';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 500,
-  height: 700,
+  width: GAME_CONFIG.CANVAS_WIDTH,
+  height: GAME_CONFIG.CANVAS_HEIGHT,
   backgroundColor: '#1a1a2e',
   parent: 'game-container',
   scene: [BootScene, GameScene],

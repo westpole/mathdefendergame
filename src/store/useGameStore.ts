@@ -23,6 +23,7 @@ export interface GameStoreState {
   shield: number;
   stage: number;
   stageScore: number;
+  inputBuffer: string;
   correctCount: number;
   incorrectCount: number;
   finalPerfScore: number;
@@ -30,7 +31,7 @@ export interface GameStoreState {
   leaderboard: Record<Difficulty, ScoreEntry[]>;
   markBootReady: () => void;
   setDifficulty: (difficulty: Difficulty) => void;
-  syncHUD: (payload: Partial<Pick<GameStoreState, 'difficulty' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>>) => void;
+  syncHUD: (payload: Partial<Pick<GameStoreState, 'difficulty' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'inputBuffer' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>>) => void;
   showStageMessage: (payload: StageMessageState) => void;
   showGameOver: (payload: Pick<GameStoreState, 'difficulty' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   startPlaying: () => void;
@@ -71,6 +72,7 @@ const initialState = {
   shield: 5,
   stage: 1,
   stageScore: 0,
+  inputBuffer: '',
   correctCount: 0,
   incorrectCount: 0,
   finalPerfScore: 0,

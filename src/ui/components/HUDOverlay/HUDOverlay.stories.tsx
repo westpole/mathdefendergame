@@ -4,6 +4,7 @@ import { HUDOverlay } from ".";
 
 import startGameMock from './__mocks__/start.json';
 import inProgressGameMock from './__mocks__/inProgress.json';
+import GameCanvas from "../__mocks__/GameCanvas";
 import { useEffect } from "react";
 
 interface StoryArgs {
@@ -24,7 +25,11 @@ const meta = {
         syncHUD((context.args as StoryArgs).initialState);
       }, [syncHUD, (context.args as StoryArgs)?.initialState]);
 
-      return <Story />;
+      return (
+        <GameCanvas>
+          <Story />
+        </GameCanvas>
+      );
     },
   ],
 } satisfies Meta<typeof HUDOverlay>;
@@ -32,13 +37,6 @@ const meta = {
 export default meta;
 
 type Story = StoryObj<typeof meta>;
-
-// @todo: revisit count of lives and shield blocks to ensure they are consistent with the game config and the mock data.
-// How to deal with extra lives?
-// 10 lives each stage that will be reduced by incorrect answer.
-// 5 shields each stage that will be reduced by meteor hiting the base.
-// if player has 0 lives, game over.
-// If player has 0 shields, base is destroyed and game over.
 
 export const Default: Story = {
   name: 'HUD overlay on start',

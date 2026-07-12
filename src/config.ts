@@ -22,4 +22,7 @@ export const GAME_CONFIG = {
   dangerZone: 100, // px from bottom
   initialLives: 10,
   stageShieldMax: 5,
+
+  CANVAS_WIDTH: 700,
+  CANVAS_HEIGHT: 700,
 };

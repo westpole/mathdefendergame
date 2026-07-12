@@ -8,7 +8,7 @@ const difficulties = [
 
 export function MainMenuOverlay() {
   return (
-    <div className="overlay-screen">
+    <div className="overlay-screen overlay-screen--interactive">
       <div className="overlay-panel">
         <h1>MATH DEFENDER</h1>
         <h4 className="menu-subtitle">Defend your base from the meteor storm by solving math problems!</h4>

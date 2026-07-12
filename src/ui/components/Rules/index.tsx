@@ -10,7 +10,7 @@ const rules = [
 
 export function RulesOverlay() {
   return (
-    <div className="overlay-screen">
+    <div className="overlay-screen overlay-screen--interactive">
       <div className="overlay-panel">
         <div className="menu-page-header">
           <h1>RULES</h1>

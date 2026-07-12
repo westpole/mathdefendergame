@@ -3,9 +3,6 @@ import { GAME_CONFIG } from './config';
 import { MathGen } from './mathGen';
 import { gameStore } from './store/useGameStore';
 
-export const CANVAS_WIDTH = 500;
-export const CANVAS_HEIGHT = 700;
-
 export interface GameCallbacks {
   onHUDUpdate: () => void;
   onFinishStage: (success: boolean) => void;
@@ -73,7 +70,7 @@ export class Game {
     const speedMod = 1 + this.stage * 0.05;
 
     this.meteors.push({
-      x: Math.random() * (CANVAS_WIDTH - 120) + 60,
+      x: Math.random() * (GAME_CONFIG.CANVAS_WIDTH - 120) + 60,
       y: -50,
       text: expr.text,
       answer: expr.answer,
@@ -98,8 +95,8 @@ export class Game {
   createConfetti(): void {
     for (let i = 0; i < 50; i++) {
       this.particles.push({
-        x: CANVAS_WIDTH / 2,
-        y: CANVAS_HEIGHT / 2,
+        x: GAME_CONFIG.CANVAS_WIDTH / 2,
+        y: GAME_CONFIG.CANVAS_HEIGHT / 2,
         vx: (Math.random() - 0.5) * 15,
         vy: (Math.random() - 0.5) * 15,
         life: 2.0,
@@ -238,7 +235,7 @@ export class Game {
       this.lastSpawn = Date.now();
     }
 
-    const dangerY = CANVAS_HEIGHT - GAME_CONFIG.dangerZone;
+    const dangerY = GAME_CONFIG.CANVAS_HEIGHT - GAME_CONFIG.dangerZone;
 
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const m = this.meteors[i];
@@ -267,6 +264,7 @@ export class Game {
       shield: this.shield,
       stage: this.stage,
       stageScore: this.stageScore,
+      inputBuffer: this.inputBuffer,
       correctCount: this.correctCount,
       incorrectCount: this.incorrectCount,
       finalPerfScore: this.finalPerfScore,

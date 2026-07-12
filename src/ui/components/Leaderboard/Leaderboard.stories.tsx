@@ -3,6 +3,7 @@ import { useEffect } from "react";
 
 import { GameStoreState, useGameStore } from "../../../store/useGameStore";
 
+import GameCanvas from "../__mocks__/GameCanvas";
 import emptyMock from "./__mocks__/empty.json";
 import withDataMock from "./__mocks__/withData.json";
 import { Leaderboard } from ".";
@@ -25,11 +26,17 @@ const meta = {
         syncHUD((context.parameters as unknown as StoryArgs).initialState);
       }, [syncHUD, (context.parameters as unknown as StoryArgs)?.initialState]);
 
-      return <article style={{ width: "100vw", height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <section style={{ width: "40vw", height: "40vh" }}>
-          <Story />
-        </section>
-      </article>;
+      return (
+        <GameCanvas>
+          <section style={{
+            width: "80%",
+            height: "240px",
+            margin: "3em auto"
+          }}>
+            <Story />
+          </section>
+        </GameCanvas>
+      );
     },
   ],
 } satisfies Meta<typeof Leaderboard>;

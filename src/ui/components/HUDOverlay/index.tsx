@@ -8,6 +8,7 @@ export function HUDOverlay() {
   const shield = useGameStore((state) => state.shield);
   const stage = useGameStore((state) => state.stage);
   const stageScore = useGameStore((state) => state.stageScore);
+  const inputBuffer = useGameStore((state) => state.inputBuffer);
 
   const livesPct = Math.max(0, Math.min(100, (lives / GAME_CONFIG.initialLives) * 100));
   const livesTone = lives > 6 ? 'good' : lives > 3 ? 'warn' : 'danger';
@@ -22,8 +23,14 @@ export function HUDOverlay() {
       </section>
 
       <section className="hud-panel hud-panel--center">
-        <span className="hud-label">Base Shield</span>
+        <div className="input-preview">
+          {inputBuffer}
+        </div>
+      </section>
+
+      <section className="hud-panel hud-panel--right">
         <div className="shield-row">
+          <span className="hud-label">Base Shield</span>
           {Array.from({ length: GAME_CONFIG.stageShieldMax }, (_, index) => (
             <span
               key={index}
@@ -31,12 +38,9 @@ export function HUDOverlay() {
             />
           ))}
         </div>
-      </section>
 
-      <section className="hud-panel hud-panel--right">
-        <strong>Lives: {lives}</strong>
-        <span>ESC to Exit</span>
         <div className="lives-track">
+          <strong>Lives: {lives}</strong>
           <div className={`lives-fill lives-fill--${livesTone}`} style={{ width: `${livesPct}%` }} />
         </div>
       </section>

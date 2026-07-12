@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect } from "react";
 
+import GameCanvas from "../__mocks__/GameCanvas";
 import { useGameStore } from "../../../store/useGameStore";
 import { StageMessageOverlay } from ".";
 
@@ -25,16 +26,9 @@ const meta = {
       }, [showStageMessage]);
 
       return (
-        <div
-          style={{
-            position: "relative",
-            minHeight: "100vh",
-            background:
-              "radial-gradient(circle at top, #1e293b 0%, #020617 55%, #000000 100%)",
-          }}
-        >
+        <GameCanvas>
           <Story />
-        </div>
+        </GameCanvas>
       );
     },
   ],
