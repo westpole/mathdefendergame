@@ -13,7 +13,7 @@
     "build-storybook": "storybook build",
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
     "git:commit": "git add . && git commit -m \"build: bump up to a new version\"",
-    "git:push": "git push origin main && git push --tags",
+    "git:push": "git push origin master && git push --tags",
     "which:version": "npx conventional-recommended-bump -p conventionalcommits",
     "release:commit": "npm run changelog && npm run git:commit && npm run git:push",
     "release:major": "npm version major && npm run release:commit",
