@@ -1,6 +1,6 @@
 {
   "name": "mathdefendergame",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "The player defends a base from falling meteors containing math expressions by typing the correct answer and pressing Enter. The game features a progression system, difficulty levels, and a persistent leaderboard.",
   "license": "ISC",
   "author": "Stanislav Spuzyak",
