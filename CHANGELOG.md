@@ -1,12 +1,15 @@
 
-## 0.0.1 (2026-07-13)
+## [0.1.1](https://github.com/westpole/mathdefendergame/compare/v0.1.0...v0.1.1) (2026-07-13)
 
 ### Bug Fixes
 
-* create scope for styles files ([208afa3](https://github.com/westpole/mathdefendergame/commit/208afa35e9cfbd3dda3fc9a5d29ae7b23f51f6cd))
+* update git push command to use master branch ([75e983d](https://github.com/westpole/mathdefendergame/commit/75e983dad8e89a5dc9d6c09e40531f9a723a31d2))
+
+## [0.1.0](https://github.com/westpole/mathdefendergame/compare/58eb709e361bad482f6237fdf03ead62f04fbbfb...v0.1.0) (2026-07-13)
 
 ### Features
 
+* add changelog generation and release scripts to package.json ([239b071](https://github.com/westpole/mathdefendergame/commit/239b0712250e88d42f4f2dba15f43e4666db6039))
 * add Loading component Storybook stories ([aa89f99](https://github.com/westpole/mathdefendergame/commit/aa89f996fe437dfc376086bbbe58d9be04cf5dc2))
 * add mock data for game start and in-progress scenarios in HUDOverlay stories ([19e81ec](https://github.com/westpole/mathdefendergame/commit/19e81ec7dca1f34814ccf5fe9e2db3bec39843eb))
 * add process documentation and project findings for development workflow and architecture alignment ([f109686](https://github.com/westpole/mathdefendergame/commit/f109686af86ca21f8e0e2bde43a6bab8a129192d))
@@ -27,3 +30,7 @@
 * **storybook:** move example to the Docs folder ([0ce1c70](https://github.com/westpole/mathdefendergame/commit/0ce1c70090dc9983e666bb15b28855f06b120b71))
 * update instructions to include skills ([e1e7e9d](https://github.com/westpole/mathdefendergame/commit/e1e7e9ddb8639ab95756b449bb61f92ebba6ba68))
 * update process documentation with StoryBook and repository preparation details ([3d4f547](https://github.com/westpole/mathdefendergame/commit/3d4f54745001ff81d55e008dc7d960f89c1d6f4c))
+
+### Bug Fixes
+
+* create scope for styles files ([208afa3](https://github.com/westpole/mathdefendergame/commit/208afa35e9cfbd3dda3fc9a5d29ae7b23f51f6cd))
