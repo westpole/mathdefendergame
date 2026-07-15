@@ -13,7 +13,7 @@ export default defineConfig({
   base: './',
   // Required for Electron file:// protocol in production
   build: {
-    outDir: 'dist'
+    outDir: 'build'
   },
   server: {
     port: 5173

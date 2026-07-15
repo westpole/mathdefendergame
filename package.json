@@ -7,8 +7,10 @@
   "main": "electron/main.js",
   "scripts": {
     "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron . --dev\"",
-    "build": "tsc && vite build",
-    "electron:build": "npm run build && electron-builder",
+    "build:web": "tsc && vite build",
+    "build:win": "npm run build:web && electron-builder",
+    "start:prod": "electron .",
+    "start:debug": "electron . --inspect",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 0",
@@ -55,6 +57,12 @@
     "appId": "com.iwestpole.mathdefendergame",
     "win": {
       "target": "nsis"
-    }
+    },
+    "files": [
+      "build/**/*",
+      "!build/README.md",
+      "electron/**/*",
+      "package.json"
+    ]
   }
 }

@@ -2,6 +2,7 @@ const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
 const isDev = !app.isPackaged && process.argv.includes('--dev');
+const isDebug = process.argv.includes('--inspect');
 
 function sendMenuAction(win, view) {
   if (!win || win.isDestroyed()) {
@@ -29,7 +30,7 @@ function buildMenu(win) {
     },
   ];
 
-  if (isDev) {
+  if (isDev || isDebug) {
     template.push({
       label: 'Developer',
       submenu: [
@@ -45,6 +46,8 @@ function buildMenu(win) {
 }
 
 function createWindow() {
+  // @todo: review window size.
+  // game defaults are 700 x 700
   const win = new BrowserWindow({
     width: 900,
     height: 900,
@@ -63,7 +66,12 @@ function createWindow() {
   if (isDev) {
     win.loadURL('http://localhost:5173');
   } else {
-    win.loadFile(path.join(__dirname, '../dist/index.html'));
+    win.loadFile(path.join(__dirname, '../build/index.html'));
+  }
+
+  // Open DevTools in debug mode (localhost only, not in packaged app)
+  if (isDebug && !app.isPackaged) {
+    win.webContents.openDevTools();
   }
 }
 
