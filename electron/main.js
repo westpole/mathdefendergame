@@ -46,12 +46,10 @@ function buildMenu(win) {
 }
 
 function createWindow() {
-  // @todo: review window size.
-  // game defaults are 700 x 700
   const win = new BrowserWindow({
     width: 900,
     height: 900,
-    minWidth: 600,
+    minWidth: 700,
     minHeight: 700,
     webPreferences: {
       nodeIntegration: false,
