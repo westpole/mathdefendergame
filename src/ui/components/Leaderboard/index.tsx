@@ -15,7 +15,9 @@ export function Leaderboard({ initialDifficulty, limit }: LeaderboardProps) {
   const scores = difficultyScores.slice(0, limit);
 
   useEffect(() => {
-    setActiveTab(initialDifficulty);
+    (async () => {
+      await setActiveTab(initialDifficulty);
+    })();
   }, [initialDifficulty]);
 
   return (

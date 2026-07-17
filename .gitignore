@@ -1,5 +1,6 @@
 node_modules
 dist
 build
+reports
 *storybook.log
 storybook-static

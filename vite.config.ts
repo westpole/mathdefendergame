@@ -13,7 +13,18 @@ export default defineConfig({
   base: './',
   // Required for Electron file:// protocol in production
   build: {
-    outDir: 'build'
+    outDir: 'build',
+    rollupOptions: {
+      // Exclude specific files from the bundle
+      external: [
+        // Excludes all files inside any __mocks__ folder
+        /.*\/__mocks__\/.*/,
+        // Excludes all files inside any __tests__ folder
+        /.*\/__tests__\/.*/,
+        // Excludes all Storybook files (e.g., button.stories.tsx)
+        /.*\.stories\..*/,
+      ],
+    },
   },
   server: {
     port: 5173

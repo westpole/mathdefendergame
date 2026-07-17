@@ -21,10 +21,11 @@ const meta = {
   decorators: [
     (Story, context) => {
       const syncHUD = useGameStore((state) => state.syncHUD);
+      const initialState = (context.parameters as unknown as StoryArgs).initialState;
 
       useEffect(() => {
-        syncHUD((context.parameters as unknown as StoryArgs).initialState);
-      }, [syncHUD, (context.parameters as unknown as StoryArgs)?.initialState]);
+        syncHUD(initialState);
+      }, [syncHUD, initialState]);
 
       return (
         <GameCanvas>
