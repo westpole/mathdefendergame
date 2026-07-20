@@ -1,4 +1,4 @@
-import { continueGame } from '../../../phaserGame';
+import { continueGame } from '../../../scenes/UIScene';
 import { useGameStore } from '../../../store/useGameStore';
 
 export function StageMessageOverlay() {

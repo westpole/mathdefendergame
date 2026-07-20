@@ -1,4 +1,4 @@
-import { startGame } from '../../../phaserGame';
+import { startGame } from '../../../scenes/UIScene';
 
 const difficulties = [
   { key: 'child', label: 'Child', className: 'menu-button menu-button--child' },

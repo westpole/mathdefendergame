@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { destroyPhaserGame, ensurePhaserGame, openMenuView } from './phaserGame';
+import { destroyGame, ensurePhaserGame, openMenuView } from './scenes/UIScene';
 import type { MenuView } from './store/useGameStore';
 import { useGameStore } from './store/useGameStore';
 import { GameOverOverlay } from './ui/components/GameOverOverlay';
@@ -23,7 +23,7 @@ export function App() {
     const game = ensurePhaserGame();
 
     return () => {
-      destroyPhaserGame(game);
+      destroyGame(game);
     };
   }, []);
 

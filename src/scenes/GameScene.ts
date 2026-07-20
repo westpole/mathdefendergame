@@ -1,3 +1,10 @@
+/**
+ * Phaser Game Scene Module
+ *
+ * This module defines the main game scene for the Phaser game.
+ * It handles the game logic, rendering, and user input during gameplay.
+ * It also manages the HUD and transitions between different game states.
+ */
 import Phaser from 'phaser';
 import { Game } from '../game';
 import { GAME_CONFIG } from '../config';

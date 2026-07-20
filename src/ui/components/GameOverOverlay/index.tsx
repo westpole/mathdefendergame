@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { returnToMenu } from '../../../phaserGame';
+import { returnToMenu } from '../../../scenes/UIScene';
 import { useGameStore } from '../../../store/useGameStore';
 
 export function GameOverOverlay() {

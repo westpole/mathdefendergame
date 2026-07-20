@@ -1,6 +1,13 @@
+/**
+ * Phaser Game Module
+ *
+ * This module initializes and manages the Phaser game instance.
+ * It provides functions to start, continue, and return to the game menu.
+ * It also handles scene transitions and game state management.
+ */
 import type { Meteor, Particle, Difficulty, GameState } from './types';
 import { GAME_CONFIG } from './config';
-import { MathGen } from './mathGen';
+import { generateMath } from './utilities/mathGen';
 import { gameStore } from './store/useGameStore';
 
 export interface GameCallbacks {
@@ -65,7 +72,7 @@ export class Game {
   }
 
   spawnMeteor(): void {
-    const expr = MathGen.generate(this.stage);
+    const expr = generateMath(this.stage);
     const settings = GAME_CONFIG.difficulties[this.difficulty];
     const speedMod = 1 + this.stage * 0.05;
 

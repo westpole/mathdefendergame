@@ -1,10 +1,18 @@
+/**
+ * Phaser Game UI Module
+ *
+ * This module initializes and manages the Phaser game instance.
+ * It provides functions to start, continue, and return to the game menu.
+ * It also handles scene transitions and game state management.
+ */
+
 import Phaser from 'phaser';
-import { BootScene } from './scenes/BootScene';
-import { GameScene } from './scenes/GameScene';
-import { gameStore } from './store/useGameStore';
-import type { MenuView } from './store/useGameStore';
-import type { Difficulty } from './types';
-import { GAME_CONFIG } from './config';
+import { BootScene } from './BootScene';
+import { GameScene } from './GameScene';
+import { gameStore } from '../store/useGameStore';
+import type { MenuView } from '../store/useGameStore';
+import type { Difficulty } from '../types';
+import { GAME_CONFIG } from '../config';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
@@ -37,7 +45,7 @@ export function ensurePhaserGame(): Phaser.Game {
   return phaserGame;
 }
 
-export function destroyPhaserGame(game: Phaser.Game): void {
+export function destroyGame(game: Phaser.Game): void {
   if (phaserGame !== game) {
     return;
   }
