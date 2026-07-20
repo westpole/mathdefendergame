@@ -14,9 +14,14 @@
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "noEmit": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ]
   },
   "include": [
-    "src"
+    "src",
+    "electron"
   ]
 }

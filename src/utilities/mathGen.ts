@@ -10,7 +10,7 @@
 
 import type { MathExpression } from '../types';
 
-function getOperationForStage(stage: number): string[] {
+export function getOperationForStage(stage: number): string[] {
   if (stage <= 4) return ['+'];
   if (stage <= 8) return ['-'];
   if (stage <= 12) return ['+', '-'];
