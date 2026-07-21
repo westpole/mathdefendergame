@@ -129,7 +129,7 @@ describe('Game', () => {
     it('should destroy meteor on correct answer', () => {
       const meteor = game.meteors[0];
       game.inputBuffer = meteor.answer.toString();
-      
+
       game.checkAnswer();
 
       expect(game.meteors.length).toBe(0);
@@ -142,7 +142,7 @@ describe('Game', () => {
     it('should create particles on correct answer', () => {
       const meteor = game.meteors[0];
       game.inputBuffer = meteor.answer.toString();
-      
+
       game.checkAnswer();
 
       expect(game.particles.length).toBeGreaterThan(0);
@@ -150,7 +150,7 @@ describe('Game', () => {
 
     it('should increment incorrect count on wrong answer', () => {
       game.inputBuffer = '99999';
-      
+
       game.checkAnswer();
 
       expect(game.incorrectCount).toBe(1);
@@ -162,7 +162,7 @@ describe('Game', () => {
     it('should not process NaN input', () => {
       game.inputBuffer = 'abc';
       const initialMeteors = game.meteors.length;
-      
+
       game.checkAnswer();
 
       expect(game.meteors.length).toBe(initialMeteors);
@@ -173,7 +173,7 @@ describe('Game', () => {
       const meteor = game.meteors[0];
       game.inputBuffer = meteor.answer.toString();
       game.stageScore = 190;
-      
+
       game.checkAnswer();
 
       expect(mockCallbacks.onFinishStage).toHaveBeenCalledWith(true);
@@ -182,7 +182,7 @@ describe('Game', () => {
 
     it('should call onHUDUpdate callback', () => {
       game.inputBuffer = '99999';
-      
+
       game.checkAnswer();
 
       expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
@@ -192,7 +192,7 @@ describe('Game', () => {
   describe('hitBase', () => {
     it('should decrease shield', () => {
       const initialShield = game.shield;
-      
+
       game.hitBase();
 
       expect(game.shield).toBe(initialShield - 1);
@@ -201,7 +201,7 @@ describe('Game', () => {
 
     it('should fail stage when shield reaches 0', () => {
       game.shield = 1;
-      
+
       game.hitBase();
 
       expect(game.shield).toBe(0);
@@ -211,7 +211,7 @@ describe('Game', () => {
     it('should not fail stage when shield is above 0', () => {
       game.shield = 5;
       const initialLives = game.lives;
-      
+
       game.hitBase();
 
       expect(game.lives).toBe(initialLives);
@@ -221,7 +221,7 @@ describe('Game', () => {
   describe('failStage', () => {
     it('should decrease lives', () => {
       const initialLives = game.lives;
-      
+
       game.failStage();
 
       expect(game.lives).toBe(initialLives - 1);
@@ -230,7 +230,7 @@ describe('Game', () => {
 
     it('should trigger game over when lives reach 0', () => {
       game.lives = 1;
-      
+
       game.failStage();
 
       expect(game.lives).toBe(0);
@@ -240,7 +240,7 @@ describe('Game', () => {
 
     it('should finish stage with failure when lives remain', () => {
       game.lives = 5;
-      
+
       game.failStage();
 
       expect(game.state).toBe('message');
@@ -262,7 +262,7 @@ describe('Game', () => {
     it('should award bonus life for perfect stage', () => {
       game.stageIncorrect = 0;
       const initialLives = game.lives;
-      
+
       game.finishStage(true);
 
       expect(game.lives).toBe(initialLives + 1);
@@ -271,7 +271,7 @@ describe('Game', () => {
     it('should not award bonus life when stage has errors', () => {
       game.stageIncorrect = 2;
       const initialLives = game.lives;
-      
+
       game.finishStage(true);
 
       expect(game.lives).toBe(initialLives);
@@ -279,7 +279,7 @@ describe('Game', () => {
 
     it('should increment stage on success', () => {
       const initialStage = game.stage;
-      
+
       game.finishStage(true);
 
       expect(game.stage).toBe(initialStage + 1);
@@ -288,7 +288,7 @@ describe('Game', () => {
     it('should update checkpoints on success', () => {
       game.score = 100;
       game.lives = 8;
-      
+
       game.finishStage(true);
 
       expect(game.scoreAtStageStart).toBe(100);
@@ -299,7 +299,7 @@ describe('Game', () => {
       game.stage = 28;
       game.correctCount = 50;
       game.incorrectCount = 10;
-      
+
       game.finishStage(true);
 
       expect(game.stage).toBe(29);
@@ -358,7 +358,7 @@ describe('Game', () => {
       game.scoreAtStageStart = 100;
       game.lives = 8;
       game.finishStage(false);
-      
+
       game.resumeFromMessage();
 
       expect(game.score).toBe(100);
@@ -369,7 +369,7 @@ describe('Game', () => {
       game.score = 150;
       game.scoreAtStageStart = 100;
       game.finishStage(true);
-      
+
       game.resumeFromMessage();
 
       expect(game.score).toBe(150);
@@ -380,7 +380,7 @@ describe('Game', () => {
       game.correctCount = 100;
       game.incorrectCount = 20;
       game.finishStage(true);
-      
+
       game.resumeFromMessage();
 
       expect(game.state).toBe('gameover');
@@ -390,7 +390,7 @@ describe('Game', () => {
     it('should not resume if already in gameover state', () => {
       game.state = 'gameover';
       const initialMeteors = game.meteors.length;
-      
+
       game.resumeFromMessage();
 
       expect(game.meteors.length).toBe(initialMeteors);
@@ -413,7 +413,7 @@ describe('Game', () => {
     it('should calculate final accuracy', () => {
       game.correctCount = 80;
       game.incorrectCount = 20;
-      
+
       game.gameOver();
 
       expect(game.finalPerfScore).toBe(80.0);
@@ -422,7 +422,7 @@ describe('Game', () => {
     it('should handle zero answers gracefully', () => {
       game.correctCount = 0;
       game.incorrectCount = 0;
-      
+
       game.gameOver();
 
       expect(game.finalPerfScore).toBe(0);
@@ -454,7 +454,7 @@ describe('Game', () => {
     it('should spawn meteors at spawn rate', () => {
       game.lastSpawn = 0;
       vi.setSystemTime(3000);
-      
+
       game.update(16);
 
       expect(game.meteors.length).toBeGreaterThan(0);
@@ -463,7 +463,7 @@ describe('Game', () => {
     it('should update meteor positions', () => {
       game.spawnMeteor();
       const initialY = game.meteors[0].y;
-      
+
       game.update(16);
 
       expect(game.meteors[0].y).toBeGreaterThan(initialY);
@@ -475,10 +475,10 @@ describe('Game', () => {
       meteor.y = 601; // Past danger zone (CANVAS_HEIGHT - dangerZone = 700 - 100 = 600)
       meteor.speed = 0.1; // Small speed to ensure it stays past danger zone
       const initialShield = game.shield;
-      
+
       // Set lastSpawn to prevent new meteors from spawning during update
       game.lastSpawn = Date.now();
-      
+
       game.update(16);
 
       expect(game.shield).toBe(initialShield - 1);
@@ -489,7 +489,7 @@ describe('Game', () => {
       game.createExplosion(100, 100, '#fff');
       const particle = game.particles[0];
       const initialX = particle.x;
-      
+
       game.update(16);
 
       expect(particle.x).not.toBe(initialX);
@@ -497,7 +497,7 @@ describe('Game', () => {
 
     it('should remove expired particles', () => {
       game.particles.push({ x: 100, y: 100, vx: 0, vy: 0, life: 0.01, color: '#fff' });
-      
+
       game.update(16);
 
       expect(game.particles.length).toBe(0);
@@ -506,7 +506,7 @@ describe('Game', () => {
     it('should decrease particle life', () => {
       game.createExplosion(100, 100, '#fff');
       const initialLife = game.particles[0].life;
-      
+
       game.update(16);
 
       expect(game.particles[0].life).toBeLessThan(initialLife);
@@ -567,7 +567,7 @@ describe('Game', () => {
       game.spawnMeteor();
       const initialCount = game.meteors.length;
       game.inputBuffer = '99999';
-      
+
       game.checkAnswer();
 
       expect(game.meteors.length).toBe(initialCount);
