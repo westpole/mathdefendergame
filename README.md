@@ -6,9 +6,7 @@ The player defends a base from falling meteors containing math expressions by ty
 
 * Development:
   - [General information](/docs/general.md)
-  - [Integration tests](/docs/integration-test.md)
-  - [Unit tests](/docs/unit-test.md)
-  - [Component tests](/docs/component-test.md)
+  - [Tests (unit and components)](/docs/tests.md)
   - [Eslint and TypeScript](/docs/lint.md)
 * Project config:
   - [Build process](/docs/build.md)

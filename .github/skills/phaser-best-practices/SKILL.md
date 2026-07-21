@@ -56,6 +56,13 @@ Use these defaults unless the task clearly calls for something else:
 
 ### 4. Output expectations
 
+Include file's title that includes "Phaser" and short description to each file.
+For example:
+```ts
+// Phaser Game Module
+// Initializes and manages the Phaser game instance
+```
+
 For new games, provide:
 
 - The recommended folder structure
