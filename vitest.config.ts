@@ -17,7 +17,7 @@ export default defineConfig({
       'html',
     ],
     outputFile: {
-      html: './reports/vitest-coverage/index.html',
+      html: './reports/index.html',
     },
 
     // 1. GLOBAL COVERAGE MANAGEMENT
@@ -25,7 +25,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       enabled: true,
-      reportsDirectory: './reports/vitest-coverage',
+      reportsDirectory: './reports/coverage',
       reporter: [
         'text',             // Prints a compact table directly to the console
         'json',             // Outputs data for CI tools (SonarQube, etc.)
