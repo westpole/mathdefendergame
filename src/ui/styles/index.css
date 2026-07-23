@@ -12,7 +12,7 @@
 body {
   font-family: 'Roboto', sans-serif;
   overflow: hidden;
-  background-color: #1a1a2e;
+  background-color: #1e2326;
   color: #fff;
   user-select: none;
   display: flex;
@@ -43,8 +43,14 @@ body {
   inset: 0;
 }
 
+#game-container {
+  z-index: 5;
+  background: transparent;
+}
+
 #game-container canvas {
   display: block;
+  background: transparent;
 }
 
 #ui-overlay {
@@ -55,6 +61,16 @@ body {
     * is displayed, the 'overlay-screen--interactive' class is added to enable pointer events.
     */
   pointer-events: none;
+}
+
+.city-background-layer {
+  position: absolute;
+  z-index: 1;
+  bottom: 0;
+  width: 100%;
+  height: 300px;
+  background: url('../../assets/math-defender-city-bg.png') repeat-x top;
+  background-size: cover;
 }
 
 /* Overlay primitives */
@@ -73,10 +89,6 @@ body {
     * It is applied when the overlay is interactive (e.g., a modal or menu).
     */
   pointer-events: auto;
-}
-
-.overlay-screen--dimmed {
-  background: rgba(0, 0, 0, 0.72);
 }
 
 .overlay-panel {
@@ -103,8 +115,8 @@ body {
 }
 
 .overlay-panel p {
-  margin-top: 16px;
-  line-height: 1.5;
+  margin: 1.5em 0;
+  line-height: 1.5em;
   color: #d1d5db;
 }
 
@@ -336,6 +348,7 @@ body {
 
 .hud-layer {
   position: absolute;
+  z-index: 200;
   bottom: 0;
   display: grid;
   grid-template-columns: 1fr auto 1fr;

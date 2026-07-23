@@ -11,8 +11,6 @@ import { GAME_CONFIG } from '../config';
 import { gameStore } from '../store/useGameStore';
 import type { Difficulty } from '../types';
 
-const DANGER_Y = GAME_CONFIG.CANVAS_HEIGHT - GAME_CONFIG.dangerZone; // 600
-
 function colorToInt(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
 }
@@ -68,22 +66,16 @@ export class GameScene extends Phaser.Scene {
     this.meteorTexts = new Map();
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleShutdown, this);
 
-    // ── @todo: remove Static background elements ────────────────────────────────────────────
-    const staticGfx = this.add.graphics().setDepth(0);
-
-    // Danger line (dashed)
-    staticGfx.lineStyle(2, 0xef4444, 1);
-    const dashLen = 10, gapLen = 5;
-    for (let x = 0; x < GAME_CONFIG.CANVAS_WIDTH; x += dashLen + gapLen) {
-      staticGfx.lineBetween(x, DANGER_Y, Math.min(x + dashLen, GAME_CONFIG.CANVAS_WIDTH), DANGER_Y);
-    }
-
     // ── Dynamic graphics ──────────────────────────────────────────────────────
     this.particleGraphics = this.add.graphics().setDepth(6);
 
     // ── Keyboard input ────────────────────────────────────────────────────────
     this.input.keyboard?.off('keydown', this.handleKeyDown, this);
     this.input.keyboard?.on('keydown', this.handleKeyDown, this);
+
+    // ── Window resize listener ────────────────────────────────────────────────
+    this.scale.on('resize', this.handleResize, this);
+    this.gameLogic.setCanvasHeight(this.scale.height);
 
     // Initial HUD paint
     this.updateHUD();
@@ -174,8 +166,13 @@ export class GameScene extends Phaser.Scene {
     this.scene.stop();
   }
 
+  private handleResize(gameSize: Phaser.Structs.Size): void {
+    this.gameLogic.setCanvasHeight(gameSize.height);
+  }
+
   private handleShutdown(): void {
     this.input.keyboard?.off('keydown', this.handleKeyDown, this);
+    this.scale.off('resize', this.handleResize, this);
     this.clearTransientRenderables();
   }
 

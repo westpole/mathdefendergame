@@ -9,6 +9,7 @@ import { StageMessageOverlay } from './ui/components/StageMessageOverlay';
 import { Loading } from './ui/components/Loading';
 import { HighScoreOverlay } from './ui/components/HighScoreOverlay';
 import { RulesOverlay } from './ui/components/Rules';
+import { CitySceneLayout } from './ui/components/CitySceneLayout';
 
 interface ElectronMenuEventDetail {
   view: MenuView;
@@ -44,6 +45,7 @@ export function App() {
   return (
     <div id="app-shell">
       <div id="game-container" />
+      <CitySceneLayout />
       <div id="ui-overlay">
         {!bootReady && <Loading />}
         {bootReady && phase === 'start' && menuView === 'home' && <MainMenuOverlay />}

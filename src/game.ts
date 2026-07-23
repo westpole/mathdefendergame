@@ -27,6 +27,7 @@ export class Game {
   stageScore: number = 0;
 
   difficulty: Difficulty = 'child';
+  canvasHeight: number = GAME_CONFIG.CANVAS_HEIGHT;
 
   meteors: Meteor[] = [];
   particles: Particle[] = [];
@@ -67,8 +68,13 @@ export class Game {
     this.livesAtStageStart = GAME_CONFIG.initialLives;
     this.lastStageSuccess = true;
     this.pendingGameOver = false;
+    this.canvasHeight = GAME_CONFIG.CANVAS_HEIGHT;
     this.state = 'start';
     this.syncStore();
+  }
+
+  setCanvasHeight(height: number): void {
+    this.canvasHeight = height;
   }
 
   spawnMeteor(): void {
@@ -242,7 +248,7 @@ export class Game {
       this.lastSpawn = Date.now();
     }
 
-    const dangerY = GAME_CONFIG.CANVAS_HEIGHT - GAME_CONFIG.dangerZone;
+    const dangerY = this.canvasHeight - GAME_CONFIG.dangerZone;
 
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const m = this.meteors[i];

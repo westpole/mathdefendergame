@@ -18,7 +18,8 @@ const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   width: GAME_CONFIG.CANVAS_WIDTH,
   height: GAME_CONFIG.CANVAS_HEIGHT,
-  backgroundColor: '#1a1a2e',
+  transparent: true,
+  backgroundColor: 'rgba(0, 0, 0, 0)',
   parent: 'game-container',
   scene: [BootScene, GameScene],
   scale: {

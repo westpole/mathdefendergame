@@ -3,7 +3,7 @@ export default function GameCanvas({ children }: { children: React.ReactNode }) 
     <article id="app-shell" style={{
       width: '700px',
       height: '700px',
-      backgroundColor: '#000',
+      backgroundColor: '#1e2326',
     }}>
       {children}
     </article>

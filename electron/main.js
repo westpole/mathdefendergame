@@ -56,7 +56,7 @@ function createWindow() {
       contextIsolation: true,
     },
     title: 'Math Defender',
-    backgroundColor: '#1a1a2e',
+    backgroundColor: '#1e2326',
   });
 
   Menu.setApplicationMenu(buildMenu(win));
