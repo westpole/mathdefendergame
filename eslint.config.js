@@ -83,9 +83,9 @@ export default tseslint.config(
     },
   },
 
-  // Phaser-specific adjustments (game.ts, scenes/, etc.)
+  // Phaser-specific adjustments
   {
-    files: ['src/game.ts', 'src/scenes/**/*.ts', 'src/phaserGame.ts'],
+    files: ['src/game/**/*.ts'],
     rules: {
       // Phaser often uses classes with public fields
       '@typescript-eslint/no-unused-vars': [

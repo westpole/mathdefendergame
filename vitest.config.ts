@@ -39,16 +39,16 @@ const defaultCoverageThresholds = {
     functions: 100,
     statements: 100
   },
-  'src/scenes/**/*.ts': {
+  'src/game/**/*.ts': {
+    branches: 90,
+    functions: 100,
+    statements: 100
+  },
+  'src/game/scenes/**/*.ts': {
     lines: 20,
     branches: 20,
     functions: 20,
     statements: 20,
-  },
-  'src/game.ts': {
-    branches: 90,
-    functions: 100,
-    statements: 100
   },
 
   // Target: Electron main process (Critical for app stability, high coverage required)
@@ -123,7 +123,10 @@ export default defineConfig({
           environment: 'happy-dom',
           // deps: { inline: [/react/, /@testing-library/] },
           setupFiles: ['./vitest-react.setup.ts'],
-          include: ['src/components/**/*.{test,spec}.{ts,tsx}'],
+          include: [
+            'src/ui/**/*.{test,spec}.{ts,tsx}',
+            'src/store/**/*.test.ts',
+          ],
           // alias: {
           //   '@': path.resolve(__dirname, './src'),
           // },
@@ -136,9 +139,7 @@ export default defineConfig({
           environment: 'jsdom', // Canvas mock required (handled in setup)
           setupFiles: ['./vitest-phaser.setup.ts'],
           include: [
-            'src/scenes/**/*.test.ts',
-            'src/utilities/**/*.test.ts',
-            'src/__tests__/game.test.ts',
+            'src/game/**/*.test.ts',
           ],
           // alias: {
           //   '@': path.resolve(__dirname, './src'),

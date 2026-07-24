@@ -1,4 +1,4 @@
-import type { Difficulty } from './types';
+import type { Difficulty } from '../types';
 
 interface DifficultyConfig {
   speed: number;

@@ -3,7 +3,7 @@
  * Tests core gameplay mechanics without Phaser rendering
  */
 
-import { Game } from '../game';
+import { Game } from '../main';
 
 describe('Game', () => {
   let game: Game;

@@ -38,7 +38,7 @@ vi.mock('phaser', () => ({
   },
 }));
 
-vi.mock('../../store/useGameStore', () => ({
+vi.mock('../../../store/useGameStore', () => ({
   gameStore: {
     getState: mockState.getState,
   },

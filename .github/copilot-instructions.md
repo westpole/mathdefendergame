@@ -20,9 +20,9 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 
 ## Code Ownership
 
-- `src/game.ts` owns gameplay rules and mutable game state: score, lives, shield, stages, meteors, answer checking, stage transitions, and final accuracy.
-- `src/scenes/GameScene.ts` owns Phaser rendering and keyboard input, and bridges gameplay events into the store.
-- `src/scenes/BootScene.ts` waits for fonts, then marks the UI ready.
+- `src/game/main.ts` owns gameplay rules and mutable game state: score, lives, shield, stages, meteors, answer checking, stage transitions, and final accuracy.
+- `src/game/scenes/GameScene.ts` owns Phaser rendering and keyboard input, and bridges gameplay events into the store.
+- `src/game/scenes/BootScene.ts` waits for fonts, then marks the UI ready.
 - `src/store/useGameStore.ts` is the single shared app store. Only the leaderboard is persisted to `localStorage`.
 - `src/App.tsx` mounts the Phaser container and React overlays, switching UI by store `phase` and `menuView`.
 - `src/phaserGame.ts` manages the singleton Phaser instance and menu/start/continue transitions.
@@ -31,7 +31,7 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 ## Repo-Specific Patterns
 
 - Phaser owns the canvas. React owns menu, HUD, stage-message, game-over, rules, high-score, and loading overlays.
-- Put gameplay rule changes in `src/game.ts`; keep `GameScene` focused on rendering, input, and store synchronization.
+- Put gameplay rule changes in `src/game/main.ts`; keep `GameScene` focused on rendering, input, and store synchronization.
 - Treat Zustand as the integration boundary between Phaser and React. Avoid duplicate state or parallel sources of truth.
 - Overlay flow is driven by `phase` (`booting | start | playing | stage-message | gameover`) and `menuView` (`home | high-score | rules`).
 - Stories live beside components in `src/ui/components/**`; use the Storybook skill instead of inventing a new store-mocking pattern.

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { returnToMenu } from '../../../scenes/UIScene';
+import { returnToMenu } from '../../../game/scenes/UIScene';
 import { useGameStore } from '../../../store/useGameStore';
 
 export function GameOverOverlay() {

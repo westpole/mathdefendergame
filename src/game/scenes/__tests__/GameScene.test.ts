@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import type { GameCallbacks } from '../../game';
-import { gameStore } from '../../store/useGameStore';
+import type { GameCallbacks } from '../../main';
+import { gameStore } from '../../../store/useGameStore';
 import { GameScene } from '../GameScene';
 
 const mockGameState = vi.hoisted(() => ({
@@ -42,7 +42,7 @@ type MockParticle = {
   color: string;
 };
 
-vi.mock('../../game', () => ({
+vi.mock('../../main', () => ({
   Game: class {
     state = 'start';
     difficulty = 'child';

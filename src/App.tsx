@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { destroyGame, ensurePhaserGame, openMenuView } from './scenes/UIScene';
+import { destroyGame, ensurePhaserGame, openMenuView } from './game/scenes/UIScene';
 import type { MenuView } from './store/useGameStore';
 import { useGameStore } from './store/useGameStore';
 import { GameOverOverlay } from './ui/components/GameOverOverlay';

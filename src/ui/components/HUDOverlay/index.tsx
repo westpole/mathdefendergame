@@ -1,4 +1,3 @@
-import { GAME_CONFIG } from '../../../config';
 import { useGameStore } from '../../../store/useGameStore';
 
 export function HUDOverlay() {
@@ -10,7 +9,11 @@ export function HUDOverlay() {
   const stageScore = useGameStore((state) => state.stageScore);
   const inputBuffer = useGameStore((state) => state.inputBuffer);
 
-  const livesPct = Math.max(0, Math.min(100, (lives / GAME_CONFIG.initialLives) * 100));
+  // these should be shared with Phaser game
+  const initialLives = 10; // ??? initialLives should come from store
+  const stageShieldMax = 5; // ??? should come from store
+
+  const livesPct = Math.max(0, Math.min(100, (lives / initialLives) * 100));
   const livesTone = lives > 6 ? 'good' : lives > 3 ? 'warn' : 'danger';
 
   return (
@@ -31,7 +34,7 @@ export function HUDOverlay() {
       <section className="hud-panel hud-panel--right">
         <div className="shield-row">
           <span className="hud-label">Base Shield</span>
-          {Array.from({ length: GAME_CONFIG.stageShieldMax }, (_, index) => (
+          {Array.from({ length: stageShieldMax }, (_, index) => (
             <span
               key={index}
               className={index < shield ? 'shield-block is-filled' : 'shield-block'}

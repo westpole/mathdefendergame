@@ -6,10 +6,10 @@
  * It also manages the HUD and transitions between different game states.
  */
 import Phaser from 'phaser';
-import { Game } from '../game';
+import { Game } from '../main';
 import { GAME_CONFIG } from '../config';
-import { gameStore } from '../store/useGameStore';
-import type { Difficulty } from '../types';
+import { gameStore } from '../../store/useGameStore';
+import type { Difficulty } from '../../types';
 
 function colorToInt(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);

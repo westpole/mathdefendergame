@@ -1,4 +1,4 @@
-import { continueGame } from '../../../scenes/UIScene';
+import { continueGame } from '../../../game/scenes/UIScene';
 import { useGameStore } from '../../../store/useGameStore';
 
 export function StageMessageOverlay() {

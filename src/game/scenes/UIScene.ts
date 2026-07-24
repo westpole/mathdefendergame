@@ -9,9 +9,9 @@
 import Phaser from 'phaser';
 import { BootScene } from './BootScene';
 import { GameScene } from './GameScene';
-import { gameStore } from '../store/useGameStore';
-import type { MenuView } from '../store/useGameStore';
-import type { Difficulty } from '../types';
+import { gameStore } from '../../store/useGameStore';
+import type { MenuView } from '../../store/useGameStore';
+import type { Difficulty } from '../../types';
 import { GAME_CONFIG } from '../config';
 
 const config: Phaser.Types.Core.GameConfig = {
