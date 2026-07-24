@@ -54,7 +54,6 @@ function buildMenu(win, options = {}) {
 }
 
 function createWindow(options = {}) {
-  console.error('[electron-main] createWindow');
   const { electron, argv } = getRuntimeContext(options);
   const { app, BrowserWindow, Menu } = electron;
   const isDev = !app.isPackaged && argv.includes('--dev');
@@ -89,11 +88,9 @@ function createWindow(options = {}) {
 }
 
 function initializeApp(options = {}) {
-  console.error('[electron-main] initializeApp');
   const { electron, platform } = getRuntimeContext(options);
   const { app, BrowserWindow } = electron;
   app.whenReady().then(() => {
-    console.error('[electron-main] whenReady');
     createWindow(options);
   });
 
@@ -105,14 +102,6 @@ function initializeApp(options = {}) {
     if (BrowserWindow.getAllWindows().length === 0) createWindow(options);
   });
 }
-
-/* c8 ignore next 3 */
-console.error('[electron-main]', {
-  processType: process.type,
-  defaultApp: process.defaultApp,
-  requireMain: require.main && require.main.filename,
-  moduleFile: module.filename,
-});
 
 /* c8 ignore next 3 */
 if (process.type === 'browser') {
