@@ -7,6 +7,70 @@ import { playwright } from '@vitest/browser-playwright';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+const isElectronOnlyRun = process.argv.some((arg, index, argv) => {
+  return arg === '--project=electron' || (arg === '--project' && argv[index + 1] === 'electron');
+});
+
+const defaultCoverageThresholds = {
+  // Global fallback thresholds if files don't match specific globs below
+  statements: 60,
+  branches: 60,
+  functions: 60,
+  lines: 60,
+
+  // Target: React UI components (High coverage requirement)
+  'src/ui/**': {
+    statements: 90,
+    branches: 85,
+    functions: 90,
+    lines: 90,
+  },
+  'src/App.tsx': {
+    statements: 90,
+    branches: 85,
+    functions: 90,
+    lines: 90,
+  },
+
+  // Target: Phaser game architecture (Typically harder to mock, lower threshold acceptable)
+  'src/utilities/**/*.ts': {
+    lines: 100,
+    branches: 100,
+    functions: 100,
+    statements: 100
+  },
+  'src/scenes/**/*.ts': {
+    lines: 20,
+    branches: 20,
+    functions: 20,
+    statements: 20,
+  },
+  'src/game.ts': {
+    branches: 90,
+    functions: 100,
+    statements: 100
+  },
+
+  // Target: Electron main process (Critical for app stability, high coverage required)
+  'electron/**/*.js': {
+    lines: 90,
+    branches: 90,
+    functions: 90,
+    statements: 90
+  },
+
+  // Zustand store coverage (State management logic, should be well-tested)
+  'src/store/**/*.ts': {
+    branches: 90,
+  },
+};
+
+const electronCoverageThresholds = {
+  statements: 90,
+  branches: 90,
+  functions: 90,
+  lines: 90,
+};
 
 export default defineConfig({
   test: {
@@ -24,79 +88,28 @@ export default defineConfig({
     // Configured here because Vitest aggregates coverage globally across projects.
     coverage: {
       provider: 'v8',
-      enabled: true,
+      enabled: false,
       reportsDirectory: './reports/coverage',
       reporter: [
         'text',             // Prints a compact table directly to the console
         'json',             // Outputs data for CI tools (SonarQube, etc.)
         'html',             // Generates an interactive local browser report
       ],
-      include: ['src/**'],
+      include: isElectronOnlyRun ? ['electron/**'] : ['src/**', 'electron/**'],
       exclude: [
         'src/**/*.d.ts',
         '**/*.stories.{ts,tsx}',
         '**/.storybook/**',
         '**/__tests__/**',
         '**/__mocks__/**',
+        'electron/__tests__/**',
         'src/config.ts',
         'src/types.ts',
         'src/main.tsx',
         'src/**/*.css',
       ],
 
-      thresholds: {
-        // Global fallback thresholds if files don't match specific globs below
-        statements: 60,
-        branches: 60,
-        functions: 60,
-        lines: 60,
-
-        // Target: React UI components (High coverage requirement)
-        'src/ui/**': {
-          statements: 90,
-          branches: 85,
-          functions: 90,
-          lines: 90,
-        },
-        'src/App.tsx': {
-          statements: 90,
-          branches: 85,
-          functions: 90,
-          lines: 90,
-        },
-
-        // Target: Phaser game architecture (Typically harder to mock, lower threshold acceptable)
-        'src/utilities/**/*.ts': {
-          lines: 100,
-          branches: 100,
-          functions: 100,
-          statements: 100
-        },
-        'src/scenes/**/*.ts': {
-          lines: 20,
-          branches: 20,
-          functions: 20,
-          statements: 20,
-        },
-        'src/game.ts': {
-          branches: 90,
-          functions: 100,
-          statements: 100
-        },
-
-        // Target: Electron main process (Critical for app stability, high coverage required)
-        'electron/**/*.js': {
-          lines: 90,
-          branches: 90,
-          functions: 90,
-          statements: 90
-        },
-
-        // Zustand store coverage (State management logic, should be well-tested)
-        'src/store/**/*.ts': {
-          branches: 90,
-        },
-      }
+      thresholds: isElectronOnlyRun ? electronCoverageThresholds : defaultCoverageThresholds,
     },
 
     // 2. ISOLATED TEST PROJECTS CONFIGURATION

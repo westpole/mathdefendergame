@@ -1,8 +1,12 @@
-const { app, BrowserWindow, Menu } = require('electron');
 const path = require('path');
 
-const isDev = !app.isPackaged && process.argv.includes('--dev');
-const isDebug = process.argv.includes('--inspect');
+function getRuntimeContext(options = {}) {
+  return {
+    electron: options.electron ?? require('electron'),
+    argv: options.argv ?? process.argv,
+    platform: options.platform ?? process.platform,
+  };
+}
 
 function sendMenuAction(win, view) {
   if (!win || win.isDestroyed()) {
@@ -14,7 +18,11 @@ function sendMenuAction(win, view) {
   );
 }
 
-function buildMenu(win) {
+function buildMenu(win, options = {}) {
+  const { electron, argv } = getRuntimeContext(options);
+  const { app, Menu } = electron;
+  const isDev = !app.isPackaged && argv.includes('--dev');
+  const isDebug = argv.includes('--inspect');
   const template = [
     {
       label: 'Play Game',
@@ -45,7 +53,12 @@ function buildMenu(win) {
   return Menu.buildFromTemplate(template);
 }
 
-function createWindow() {
+function createWindow(options = {}) {
+  console.error('[electron-main] createWindow');
+  const { electron, argv } = getRuntimeContext(options);
+  const { app, BrowserWindow, Menu } = electron;
+  const isDev = !app.isPackaged && argv.includes('--dev');
+  const isDebug = argv.includes('--inspect');
   const win = new BrowserWindow({
     width: 900,
     height: 900,
@@ -59,7 +72,7 @@ function createWindow() {
     backgroundColor: '#1e2326',
   });
 
-  Menu.setApplicationMenu(buildMenu(win));
+  Menu.setApplicationMenu(buildMenu(win, options));
 
   if (isDev) {
     win.loadURL('http://localhost:5173');
@@ -71,14 +84,44 @@ function createWindow() {
   if (isDebug && !app.isPackaged) {
     win.webContents.openDevTools();
   }
+
+  return win;
 }
 
-app.whenReady().then(createWindow);
+function initializeApp(options = {}) {
+  console.error('[electron-main] initializeApp');
+  const { electron, platform } = getRuntimeContext(options);
+  const { app, BrowserWindow } = electron;
+  app.whenReady().then(() => {
+    console.error('[electron-main] whenReady');
+    createWindow(options);
+  });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
+  app.on('window-all-closed', () => {
+    if (platform !== 'darwin') app.quit();
+  });
+
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createWindow(options);
+  });
+}
+
+/* c8 ignore next 3 */
+console.error('[electron-main]', {
+  processType: process.type,
+  defaultApp: process.defaultApp,
+  requireMain: require.main && require.main.filename,
+  moduleFile: module.filename,
 });
 
-app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
-});
+/* c8 ignore next 3 */
+if (process.type === 'browser') {
+  initializeApp();
+}
+
+module.exports = {
+  sendMenuAction,
+  buildMenu,
+  createWindow,
+  initializeApp,
+};
