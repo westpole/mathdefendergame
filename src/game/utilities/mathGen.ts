@@ -8,7 +8,7 @@
  * The operations are determined by the current stage, with specific operations unlocked at certain stages.
  */
 
-import type { MathExpression } from '../../types';
+import type { MathExpression } from '@shared/types';
 
 export function getOperationForStage(stage: number): string[] {
   if (stage <= 4) return ['+'];

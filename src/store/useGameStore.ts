@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import type { Difficulty, ScoreEntry } from '../types';
+
+import type { Difficulty, ScoreEntry } from '@shared/types';
 
 type OverlayPhase = 'booting' | 'start' | 'playing' | 'stage-message' | 'gameover';
 type MenuView = 'home' | 'high-score' | 'rules';

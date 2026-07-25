@@ -1,13 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import GameCanvas from "../__mocks__/GameCanvas";
-import { Loading } from ".";
+import GameCanvas from '@ui/components/__mocks__/GameCanvas';
+
+import { Loading } from '.';
 
 const meta = {
-  title: "Screens/Loading",
+  title: 'Screens/Loading',
   component: Loading,
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
   decorators: [
     (Story) => (

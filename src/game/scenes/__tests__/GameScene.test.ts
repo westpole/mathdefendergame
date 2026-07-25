@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
-import type { GameCallbacks } from '../../main';
-import { gameStore } from '../../../store/useGameStore';
+
+import type { GameCallbacks } from '@game/main';
+import { gameStore } from '@store/useGameStore';
+
 import { GameScene } from '../GameScene';
 
 const mockGameState = vi.hoisted(() => ({

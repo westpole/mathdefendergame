@@ -1,5 +1,5 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect } from "react";
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useEffect } from 'react';
 
 import {
   MenuView,
@@ -7,13 +7,13 @@ import {
   useGameStore,
   GameStoreState,
   StageMessageState,
-} from "../../../store/useGameStore";
+} from '@store/useGameStore';
+import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 
-import { GameOverOverlay } from ".";
-import childMock from "./__mocks__/child.json";
-import studentMock from "./__mocks__/student.json";
-import adultMock from "./__mocks__/adult.json";
-import GameCanvas from "../__mocks__/GameCanvas";
+import { GameOverOverlay } from '.';
+import childMock from './__mocks__/child.json';
+import studentMock from './__mocks__/student.json';
+import adultMock from './__mocks__/adult.json';
 
 const reusableInitialState: Partial<GameStoreState> = {
   phase: 'gameover' as OverlayPhase,
@@ -36,7 +36,7 @@ const meta = {
   title: 'Screens/GameOverOverlay',
   component: GameOverOverlay,
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
   decorators: [
     (Story, context) => {

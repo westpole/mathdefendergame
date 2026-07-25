@@ -18,7 +18,14 @@
     "types": [
       "vitest/globals",
       "@testing-library/jest-dom"
-    ]
+    ],
+    "paths": {
+      "@electron/*": ["./electron/*"],
+      "@game/*": ["./src/game/*"],
+      "@store/*": ["./src/store/*"],
+      "@ui/*": ["./src/ui/*"],
+      "@shared/*": ["./src/shared/*"]
+    },
   },
   "include": [
     "src",

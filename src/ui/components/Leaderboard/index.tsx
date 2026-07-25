@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useGameStore } from '../../../store/useGameStore';
-import type { Difficulty } from '../../../types';
+import { useGameStore } from '@store/useGameStore';
+import type { Difficulty } from '@shared/types';
 
 interface LeaderboardProps {
   initialDifficulty: Difficulty;

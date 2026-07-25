@@ -1,13 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import GameCanvas from "../__mocks__/GameCanvas";
-import { MainMenuOverlay } from ".";
+import GameCanvas from '@ui/components/__mocks__/GameCanvas';
+
+import { MainMenuOverlay } from '.';
 
 const meta = {
-  title: "Screens/MainMenuOverlay",
+  title: 'Screens/MainMenuOverlay',
   component: MainMenuOverlay,
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
   decorators: [
     (Story) => (

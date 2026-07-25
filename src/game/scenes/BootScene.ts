@@ -6,7 +6,8 @@
  * The BootScene is the first scene that runs when the game starts.
  */
 import Phaser from 'phaser';
-import { gameStore } from '../../store/useGameStore';
+
+import { gameStore } from '@store/useGameStore';
 
 export class BootScene extends Phaser.Scene {
   constructor() {

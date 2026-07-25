@@ -1,21 +1,21 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useGameStore } from "../../../store/useGameStore";
-import { HUDOverlay } from ".";
+import { useEffect } from 'react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useGameStore } from '@store/useGameStore';
+import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 
+import { HUDOverlay } from '.';
 import startGameMock from './__mocks__/start.json';
 import inProgressGameMock from './__mocks__/inProgress.json';
-import GameCanvas from "../__mocks__/GameCanvas";
-import { useEffect } from "react";
 
 interface StoryArgs {
   initialState: Record<string, unknown>;
 }
 
 const meta = {
-  title: "Screens/HUDOverlay",
+  title: 'Screens/HUDOverlay',
   component: HUDOverlay,
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
   decorators: [
     (Story, context) => {

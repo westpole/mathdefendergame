@@ -1,4 +1,4 @@
-import type { Difficulty } from '../types';
+import type { Difficulty } from '@shared/types';
 
 interface DifficultyConfig {
   speed: number;

@@ -1,5 +1,5 @@
-import { continueGame } from '../../../game/scenes/UIScene';
-import { useGameStore } from '../../../store/useGameStore';
+import { continueGame } from '@game/scenes/UIScene';
+import { useGameStore } from '@store/useGameStore';
 
 export function StageMessageOverlay() {
   const stageMessage = useGameStore((state) => state.stageMessage);

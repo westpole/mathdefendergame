@@ -1,6 +1,5 @@
 {
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  "editor.detectIndentation": false,
-  "github.copilot.chat.organizationCustomAgents.enabled": false
+  "editor.detectIndentation": false
 }

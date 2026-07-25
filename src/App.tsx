@@ -1,15 +1,16 @@
 import { useEffect } from 'react';
-import { destroyGame, ensurePhaserGame, openMenuView } from './game/scenes/UIScene';
-import type { MenuView } from './store/useGameStore';
-import { useGameStore } from './store/useGameStore';
-import { GameOverOverlay } from './ui/components/GameOverOverlay';
-import { HUDOverlay } from './ui/components/HUDOverlay';
-import { MainMenuOverlay } from './ui/components/MainMenuOverlay';
-import { StageMessageOverlay } from './ui/components/StageMessageOverlay';
-import { Loading } from './ui/components/Loading';
-import { HighScoreOverlay } from './ui/components/HighScoreOverlay';
-import { RulesOverlay } from './ui/components/Rules';
-import { CitySceneLayout } from './ui/components/CitySceneLayout';
+
+import { destroyGame, ensurePhaserGame, openMenuView } from '@game/scenes/UIScene';
+import type { MenuView } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
+import { GameOverOverlay } from '@ui/components/GameOverOverlay';
+import { HUDOverlay } from '@ui/components/HUDOverlay';
+import { MainMenuOverlay } from '@ui/components/MainMenuOverlay';
+import { StageMessageOverlay } from '@ui/components/StageMessageOverlay';
+import { Loading } from '@ui/components/Loading';
+import { HighScoreOverlay } from '@ui/components/HighScoreOverlay';
+import { RulesOverlay } from '@ui/components/Rules';
+import { CitySceneLayout } from '@ui/components/CitySceneLayout';
 
 interface ElectronMenuEventDetail {
   view: MenuView;

@@ -1,22 +1,22 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect } from "react";
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useEffect } from 'react';
 
-import { GameStoreState, useGameStore } from "../../../store/useGameStore";
+import GameCanvas from '@ui/components/__mocks__/GameCanvas';
+import { GameStoreState, useGameStore } from '@store/useGameStore';
 
-import GameCanvas from "../__mocks__/GameCanvas";
-import emptyMock from "./__mocks__/empty.json";
-import withDataMock from "./__mocks__/withData.json";
-import { Leaderboard } from ".";
+import emptyMock from './__mocks__/empty.json';
+import withDataMock from './__mocks__/withData.json';
+import { Leaderboard } from '.';
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
 }
 
 const meta = {
-  title: "Screens/Leaderboard",
+  title: 'Screens/Leaderboard',
   component: Leaderboard,
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
   decorators: [
     (Story, context) => {
@@ -30,9 +30,9 @@ const meta = {
       return (
         <GameCanvas>
           <section style={{
-            width: "80%",
-            height: "240px",
-            margin: "3em auto"
+            width: '80%',
+            height: '240px',
+            margin: '3em auto'
           }}>
             <Story />
           </section>
@@ -49,7 +49,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   name: 'Empty',
   args: {
-    initialDifficulty: "child",
+    initialDifficulty: 'child',
     limit: 5,
   },
   parameters: {
@@ -62,7 +62,7 @@ export const Default: Story = {
 export const WithData: Story = {
   name: 'With Data',
   args: {
-    initialDifficulty: "adult",
+    initialDifficulty: 'adult',
     limit: 10,
   },
   parameters: {

@@ -1,8 +1,8 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { fileURLToPath, URL } from 'node:url';
 
-// More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react()],
   base: './',
@@ -19,6 +19,15 @@ export default defineConfig({
         // Excludes all Storybook files (e.g., button.stories.tsx)
         /.*\.stories\..*/,
       ],
+    },
+  },
+  resolve: {
+    alias: {
+      '@electron': fileURLToPath(new URL('./electron', import.meta.url)),
+      '@game': fileURLToPath(new URL('./src/game', import.meta.url)),
+      '@store': fileURLToPath(new URL('./src/store', import.meta.url)),
+      '@ui': fileURLToPath(new URL('./src/ui', import.meta.url)),
+      '@shared': fileURLToPath(new URL('./src/shared', import.meta.url)),
     },
   },
   server: {

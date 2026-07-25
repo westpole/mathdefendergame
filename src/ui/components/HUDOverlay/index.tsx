@@ -1,4 +1,4 @@
-import { useGameStore } from '../../../store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 
 export function HUDOverlay() {
   const difficulty = useGameStore((state) => state.difficulty);

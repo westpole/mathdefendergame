@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { returnToMenu } from '../../../game/scenes/UIScene';
-import { useGameStore } from '../../../store/useGameStore';
+
+import { returnToMenu } from '@game/scenes/UIScene';
+import { useGameStore } from '@store/useGameStore';
 
 export function GameOverOverlay() {
   const difficulty = useGameStore((state) => state.difficulty);

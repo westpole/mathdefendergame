@@ -11,16 +11,7 @@ Use this skill when developing client-side-only React applications utilizing Zus
 
 - **Functional Components**: Write all components as functional components using explicit `const Component = () => {}` syntax.
 - **Strict Typing**: Use TypeScript `interface` for props. Avoid `React.FC` to keep generic parameters clean.
-- **File Structure**: Enforce one component per file. Group features and global state logically:
-  ```text
-  src/
-  ├── features/profile/
-  │   ├── components/ProfileCard.tsx
-  │   └── hooks/useProfileData.ts
-  └── store/
-      ├── useAuthStore.ts
-      └── useThemeStore.ts
-  ```
+- **File Structure**: Enforce one component per file. Group features and global state logically.
 
 ## 2. Zustand State Management Standards
 

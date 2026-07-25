@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
+
+import { gameStore } from '@store/useGameStore';
+
 import { BootScene } from '../BootScene';
-import { gameStore } from '../../../store/useGameStore';
 
 describe('BootScene', () => {
   const originalFonts = document.fonts;

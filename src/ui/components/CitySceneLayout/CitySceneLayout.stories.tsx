@@ -1,13 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { CitySceneLayout } from ".";
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import GameCanvas from "../__mocks__/GameCanvas";
+import GameCanvas from '@ui/components/__mocks__/GameCanvas';
+
+import { CitySceneLayout } from '.';
 
 const meta = {
-  title: "Screens/CitySceneLayout",
+  title: 'Screens/CitySceneLayout',
   component: CitySceneLayout,
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
   decorators: [
     (Story) => {

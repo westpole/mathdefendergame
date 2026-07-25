@@ -1,15 +1,16 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect } from "react";
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useEffect } from 'react';
 
-import GameCanvas from "../__mocks__/GameCanvas";
-import { useGameStore } from "../../../store/useGameStore";
-import { StageMessageOverlay } from ".";
+import GameCanvas from '@ui/components/__mocks__/GameCanvas';
+import { useGameStore } from '@store/useGameStore';
+
+import { StageMessageOverlay } from '.';
 
 const meta = {
-  title: "Screens/StageMessageOverlay",
+  title: 'Screens/StageMessageOverlay',
   component: StageMessageOverlay,
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
   decorators: [
     (Story) => {

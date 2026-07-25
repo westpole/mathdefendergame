@@ -1,4 +1,4 @@
-import { Leaderboard } from '../Leaderboard';
+import { Leaderboard } from '@ui/components/Leaderboard';
 
 export function HighScoreOverlay() {
   return (

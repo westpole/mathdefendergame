@@ -7,12 +7,14 @@
  */
 
 import Phaser from 'phaser';
+
+import { gameStore } from '@store/useGameStore';
+import type { MenuView } from '@store/useGameStore';
+import type { Difficulty } from '@shared/types';
+import { GAME_CONFIG } from '@game/config';
+
 import { BootScene } from './BootScene';
 import { GameScene } from './GameScene';
-import { gameStore } from '../../store/useGameStore';
-import type { MenuView } from '../../store/useGameStore';
-import type { Difficulty } from '../../types';
-import { GAME_CONFIG } from '../config';
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,

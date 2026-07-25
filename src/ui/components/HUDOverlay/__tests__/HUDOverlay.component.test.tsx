@@ -4,8 +4,10 @@
  */
 
 import { act, render, screen } from '@testing-library/react';
+
+import { gameStore } from '@store/useGameStore';
+
 import { HUDOverlay } from '../index';
-import { gameStore } from '../../../../store/useGameStore';
 
 describe('HUDOverlay Component', () => {
   beforeEach(() => {

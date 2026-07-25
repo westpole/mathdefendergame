@@ -1,13 +1,14 @@
-import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import GameCanvas from "../__mocks__/GameCanvas";
-import { HighScoreOverlay } from ".";
+import GameCanvas from '@ui/components/__mocks__/GameCanvas';
+
+import { HighScoreOverlay } from '.';
 
 const meta = {
-  title: "Screens/HighScoreOverlay",
+  title: 'Screens/HighScoreOverlay',
   component: HighScoreOverlay,
   parameters: {
-    layout: "fullscreen",
+    layout: 'fullscreen',
   },
   decorators: [
     (Story) => (
