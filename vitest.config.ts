@@ -104,9 +104,10 @@ export default defineConfig({
         '**/__mocks__/**',
         'electron/__tests__/**',
         'src/config.ts',
-        'src/types.ts',
+        'src/shared/**',
         'src/main.tsx',
-        'src/**/*.scss',
+        'src/ui/**/*.scss',
+        'src/assets/**',
       ],
 
       thresholds: isElectronOnlyRun ? electronCoverageThresholds : defaultCoverageThresholds,
