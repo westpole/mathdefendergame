@@ -66,7 +66,55 @@ Use this skill when developing client-side-only React applications utilizing Zus
 - **Focus Management in Modals**: When a modal or overlay opens, move focus to the first focusable element inside it. Trap focus within the modal while it is open. Return focus to the trigger element on close.
 - **Color Is Not the Only Indicator**: Never rely solely on color to communicate state (e.g., error, success). Pair color with text, icons, or patterns.
 
-## 7. Error Boundaries
+## 7. Styling Standards
+
+- **SCSS Files**: Write all component styles in dedicated SCSS files co-located with the component. Use the pattern `ComponentName.module.scss` to ensure scoped styles via CSS modules.
+  ```
+  ComponentName.tsx
+  ComponentName.module.scss
+  ComponentName.stories.tsx
+  ```
+- **No Inline Styles**: Avoid the `style` prop entirely. Inline styles bypass the cascade, defeat theming, increase bundle size, and make testing harder. Use class composition instead.
+  - *Incorrect*: `<div style={{ color: 'red', fontSize: '16px' }}>`
+  - *Correct*: `<div className={styles.errorMessage}>`
+- **BEM Methodology**: Follow the Block-Element-Modifier naming convention to keep class names predictable and maintainable.
+  - **Block**: The root component class (`.game-hud`)
+  - **Element**: A child within the block (`.game-hud__score`, `.game-hud__lives`)
+  - **Modifier**: A variant or state flag (`.game-hud--hidden`, `.game-hud__score--critical`)
+  - Use double underscores (`__`) to separate block from element, double hyphens (`--`) to separate modifier.
+  ```scss
+  .game-hud {
+    display: flex;
+    &__score { font-size: 2rem; }
+    &__lives { color: green; }
+    &--hidden { visibility: hidden; }
+    &__score--critical { color: red; }
+  }
+  ```
+- **clsx for Dynamic Classes**: Use the `clsx` utility to compose class names based on state or props. Never build class strings manually with template literals or ternaries.
+  ```tsx
+  import clsx from 'clsx';
+  import styles from './GameHUD.module.scss';
+
+  <div className={clsx(styles['game-hud'], isHidden && styles['game-hud--hidden'])}>
+    <span className={clsx(
+      styles['game-hud__score'],
+      isCritical && styles['game-hud__score--critical']
+    )}>
+      {score}
+    </span>
+  </div>
+  ```
+- **Global Styles in `styles/`**: Reserve `src/ui/styles/` for true globals (CSS resets, typography baseline, design tokens). Component-specific styles belong next to the component.
+- **Design Tokens**: Define color palettes, spacing scales, and typography in SCSS variables or CSS custom properties at the root. Import them into component SCSS files:
+  ```scss
+  @use '@/ui/styles/tokens' as *;
+  .button { background-color: $color-primary; padding: $space-md; }
+  ```
+- **Avoid Deep Nesting**: Keep SCSS nesting shallow (max 2-3 levels). Deep nesting increases specificity and makes overrides painful.
+- **One Responsibility per Class**: Each class should do one job. Compose multiple single-purpose classes with `clsx` rather than creating monolithic utility classes.
+
+## 8. Error Boundaries
 
 - **Wrap UI Regions**: Wrap independent UI regions in `ErrorBoundary` components (e.g., `react-error-boundary`) so a single component crash does not take down the entire overlay layer.
 - **Placement**: Place boundaries at the top of the overlay tree in `App.tsx` and around any dynamically loaded (`React.lazy`) sections.
@@ -79,7 +127,7 @@ Use this skill when developing client-side-only React applications utilizing Zus
   ```
 - **Fallback UI**: Always provide a minimal, user-friendly `FallbackComponent` — never show a raw error stack in production.
 
-## 8. Verification Checklist
+## 9. Verification Checklist
 
 Before completing any task, verify the code against these constraints:
 1. Did you use atomic selectors for all Zustand store consumption to avoid render loops?
@@ -89,4 +137,6 @@ Before completing any task, verify the code against these constraints:
 5. Are all interactive elements keyboard-accessible with correct ARIA roles?
 6. Are Error Boundaries in place for critical UI regions?
 7. Does the component render without throwing warnings in `React.StrictMode`?
-8. Run `npm run lint` to ensure zero compilation or type-checking errors.
+8. Are all styles in SCSS module files following BEM methodology, with no inline `style` props?
+9. Are dynamic class names composed using `clsx` instead of template literals?
+10. Run `npm run lint` to ensure zero compilation or type-checking errors.

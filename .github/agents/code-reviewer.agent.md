@@ -18,6 +18,8 @@ Review only the changes in the git diff. Use `read`/`search` sparingly, only to 
 3. **Architecture:** Consistency with `AGENTS.md` if present; otherwise infer from surrounding code and note the assumption.
 4. **Error handling:** Network calls and other I/O must handle failures explicitly.
 5. **Testing:** Flag new methods/behavior lacking test coverage.
+6. **Code style:** Follow the project's style guide; if none exists, follow common conventions for the language.
+7. **Types** Avoid `any` types in TypeScript; prefer explicit types or generics.
 
 # Output Rules
 - Reference every comment with `file:line`.
