@@ -1,0 +1,122 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// HUD Layer
+.hud-layer {
+  position: absolute;
+  z-index: $z-hud;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: $spacing-xs;
+  height: 90px;
+  width: 96%;
+  overflow: hidden;
+  margin: $spacing-xs 2%;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hud-panel {
+  padding: $spacing-sm 12px;
+  border-radius: $radius-lg;
+  background: $bg-dark-panel;
+  border: 1px solid $border-panel-light;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  height: 100%;
+
+  &--left,
+  &--right {
+    flex-flow: column nowrap;
+  }
+
+  &--right {
+    align-items: flex-start;
+
+    @include mobile {
+      align-items: flex-start;
+    }
+  }
+
+  &--left {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  &--center {
+    min-width: 140px;
+    align-items: center;
+    justify-content: center;
+
+    @include mobile {
+      align-items: flex-start;
+    }
+  }
+}
+
+.input-preview {
+  font-family: $font-display;
+  font-size: 1.8em;
+  font-weight: 700;
+  color: $color-primary-yellow;
+  width: 7vw;
+  @include flex-center;
+}
+
+.shield-row {
+  display: flex;
+  gap: $spacing-xs;
+  flex-direction: row;
+  align-items: center;
+
+  .hud-label {
+    margin-right: 20px;
+  }
+}
+
+.shield-block {
+  width: 16px;
+  height: 22px;
+  border-radius: $radius-sm;
+
+  &.is-filled {
+    background: $shield-fill;
+  }
+}
+
+.lives-track {
+  display: flex;
+  flex-direction: row;
+  width: 230px;
+  align-items: center;
+
+  strong {
+    display: block;
+    white-space: nowrap;
+    padding-right: 0.8em;
+  }
+}
+
+.lives-fill {
+  height: 3vh;
+  width: 100%;
+  border-radius: $radius-full;
+
+  &--good {
+    background: $color-success-green;
+  }
+
+  &--warn {
+    background: $color-warning-yellow;
+  }
+
+  &--danger {
+    background: $color-danger-red;
+  }
+}

@@ -1,0 +1,25 @@
+// Math Defender Game - Main Stylesheet
+// SCSS Architecture: Variables → Mixins → Reset → Fonts → Layout → Utilities → Components
+
+// 1. Foundation: Variables & Mixins
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// 2. Global: Reset & Fonts
+@use 'fonts';
+@use 'reset';
+
+// 3. Core Layout
+@use 'layout';
+
+// 4. Utilities
+@use 'utilities';
+
+// 5. Components
+@use 'components/overlay';
+@use 'components/buttons';
+@use 'components/menu';
+@use 'components/hud';
+@use 'components/table';
+@use 'components/forms';
+@use 'components/tabs';

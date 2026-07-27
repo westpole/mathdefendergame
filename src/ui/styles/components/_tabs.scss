@@ -1,0 +1,40 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Tab View Styles
+.view-tabs {
+  display: flex;
+  list-style: none;
+  width: 100%;
+}
+
+.view-tab {
+  padding: 8px 20px;
+  background-color: $tab-bg;
+  border: 1px solid $border-default;
+  border-bottom: none; // Open at the bottom to merge with content pane
+  border-top-left-radius: $radius-sm;
+  border-top-right-radius: $radius-sm;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: center;
+  text-transform: uppercase;
+  color: $tab-text;
+  transition: background-color 0.2s ease;
+  width: 10em;
+  user-select: none; // Keeps text from being highlighted on accidental double-clicks
+
+  &:hover {
+    background-color: $tab-hover;
+    color: $tab-hover-text;
+  }
+
+  &.is-active {
+    background: $tab-active;
+    color: $text-primary;
+    font-weight: 600;
+    position: relative;
+    z-index: 2; // Sits on top of the content border
+    border-color: $border-default;
+  }
+}

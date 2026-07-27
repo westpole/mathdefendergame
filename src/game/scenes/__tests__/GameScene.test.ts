@@ -5,6 +5,12 @@ import { gameStore } from '@store/useGameStore';
 
 import { GameScene } from '../GameScene';
 
+type GameScenePrivate = {
+  handleKeyDown: (e: KeyboardEvent) => void;
+  meteorTexts: Map<number, Phaser.GameObjects.Text>;
+  handleShutdown: () => void;
+};
+
 const mockGameState = vi.hoisted(() => ({
   lastInstance: undefined as undefined | {
     state: string;
@@ -97,7 +103,33 @@ function setupScene() {
   const showStageMessage = vi.fn();
   const showGameOver = vi.fn();
   const returnToMenu = vi.fn();
-  const state = { startPlaying, syncHUD, showStageMessage, showGameOver, returnToMenu } as ReturnType<typeof gameStore.getState>;
+  const state = {
+    phase: 'playing' as const,
+    menuView: 'home' as const,
+    bootReady: true,
+    difficulty: 'child' as const,
+    score: 0,
+    lives: 10,
+    shield: 5,
+    stage: 1,
+    stageScore: 0,
+    inputBuffer: '',
+    correctCount: 0,
+    incorrectCount: 0,
+    finalPerfScore: 0,
+    stageMessage: null,
+    leaderboard: { child: [], student: [], adult: [] },
+    markBootReady: vi.fn(),
+    setDifficulty: vi.fn(),
+    openMenuView: vi.fn(),
+    saveScore: vi.fn(),
+    getScores: vi.fn(() => []),
+    startPlaying,
+    syncHUD,
+    showStageMessage,
+    showGameOver,
+    returnToMenu,
+  } as ReturnType<typeof gameStore.getState>;
 
   vi.spyOn(gameStore, 'getState').mockReturnValue(state);
 
@@ -204,18 +236,18 @@ describe('GameScene', () => {
     mockGameState.lastInstance!.state = 'playing';
     mockGameState.lastInstance!.inputBuffer = '123';
 
-    (scene as never)['handleKeyDown']({ key: 'Backspace' } as KeyboardEvent);
+    (scene as unknown as GameScenePrivate).handleKeyDown({ key: 'Backspace' } as KeyboardEvent);
     expect(mockGameState.lastInstance?.inputBuffer).toBe('12');
     expect(store.syncHUD).toHaveBeenLastCalledWith({ inputBuffer: '12' });
 
-    (scene as never)['handleKeyDown']({ key: '-' } as KeyboardEvent);
-    (scene as never)['handleKeyDown']({ key: '4' } as KeyboardEvent);
-    (scene as never)['handleKeyDown']({ key: '5' } as KeyboardEvent);
-    (scene as never)['handleKeyDown']({ key: '6' } as KeyboardEvent);
+    (scene as unknown as GameScenePrivate).handleKeyDown({ key: '-' } as KeyboardEvent);
+    (scene as unknown as GameScenePrivate).handleKeyDown({ key: '4' } as KeyboardEvent);
+    (scene as unknown as GameScenePrivate).handleKeyDown({ key: '5' } as KeyboardEvent);
+    (scene as unknown as GameScenePrivate).handleKeyDown({ key: '6' } as KeyboardEvent);
 
     expect(mockGameState.lastInstance?.inputBuffer).toBe('12-45');
 
-    (scene as never)['handleKeyDown']({ key: '7' } as KeyboardEvent);
+    (scene as unknown as GameScenePrivate).handleKeyDown({ key: '7' } as KeyboardEvent);
     expect(mockGameState.lastInstance?.inputBuffer).toBe('12-45');
   });
 
@@ -227,15 +259,15 @@ describe('GameScene', () => {
     mockGameState.lastInstance!.state = 'playing';
     mockGameState.lastInstance!.inputBuffer = '42';
 
-    (scene as never)['handleKeyDown']({ key: 'Enter' } as KeyboardEvent);
+    (scene as unknown as GameScenePrivate).handleKeyDown({ key: 'Enter' } as KeyboardEvent);
     expect(mockGameState.lastInstance?.checkAnswer).toHaveBeenCalledTimes(1);
 
     mockGameState.lastInstance!.state = 'message';
     mockGameState.lastInstance!.inputBuffer = '42';
-    (scene as never)['handleKeyDown']({ key: '9' } as KeyboardEvent);
+    (scene as unknown as GameScenePrivate).handleKeyDown({ key: '9' } as KeyboardEvent);
     expect(mockGameState.lastInstance?.inputBuffer).toBe('42');
 
-    (scene as never)['handleKeyDown']({ key: 'Escape' } as KeyboardEvent);
+    (scene as unknown as GameScenePrivate).handleKeyDown({ key: 'Escape' } as KeyboardEvent);
     expect(store.returnToMenu).toHaveBeenCalledTimes(1);
     expect(phaser.stop).toHaveBeenCalledTimes(1);
   });
@@ -247,7 +279,7 @@ describe('GameScene', () => {
     scene.create();
 
     const staleText = createTextStub();
-    (scene as never).meteorTexts.set(999, staleText);
+    (scene as unknown as GameScenePrivate).meteorTexts.set(999, staleText as unknown as Phaser.GameObjects.Text);
 
     mockGameState.lastInstance!.state = 'playing';
     mockGameState.lastInstance!.meteors = [
@@ -318,7 +350,7 @@ describe('GameScene', () => {
     scene.create();
 
     const meteorText = createTextStub();
-    (scene as never).meteorTexts.set(1, meteorText);
+    (scene as unknown as GameScenePrivate).meteorTexts.set(1, meteorText as unknown as Phaser.GameObjects.Text);
     mockGameState.lastInstance!.inputBuffer = '88';
     mockGameState.lastInstance!.state = 'playing';
 
@@ -342,9 +374,9 @@ describe('GameScene', () => {
     scene.create();
 
     const meteorText = createTextStub();
-    (scene as never).meteorTexts.set(7, meteorText);
+    (scene as unknown as GameScenePrivate).meteorTexts.set(7, meteorText as unknown as Phaser.GameObjects.Text);
 
-    (scene as never).handleShutdown();
+    (scene as unknown as GameScenePrivate).handleShutdown();
 
     expect(phaser.keyboard.off).toHaveBeenCalledWith('keydown', expect.any(Function), scene);
     expect(phaser.scale.off).toHaveBeenCalledWith('resize', expect.any(Function), scene);

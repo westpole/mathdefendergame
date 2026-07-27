@@ -1,0 +1,89 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Menu Layouts
+.menu-layout,
+.menu-page-layout,
+.gameover-layout {
+  width: 100%;
+  height: 100%;
+  padding: $spacing-lg;
+  display: grid;
+  gap: $spacing-md;
+}
+
+.menu-layout {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+}
+
+.menu-page-layout {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.menu-hero {
+  grid-column: 1 / -1;
+}
+
+.menu-page-panel {
+  width: min(760px, 100%);
+  overflow: auto;
+}
+
+.menu-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-rules,
+.menu-board,
+.gameover-board {
+  overflow: hidden;
+}
+
+.menu-subtitle {
+  margin: 1em 0;
+  font-size: 14px;
+  color: $text-muted;
+}
+
+.menu-actions,
+.action-row {
+  display: flex;
+  gap: $spacing-sm;
+  flex-wrap: wrap;
+}
+
+.menu-actions {
+  justify-content: center;
+
+  button {
+    flex: 1 1 120px;
+  }
+}
+
+// Rules List
+.rules-list {
+  margin: 16px 0 0;
+  padding-left: $spacing-lg;
+  color: $text-secondary;
+  line-height: 1.7;
+
+  &--page {
+    margin-bottom: 0;
+  }
+}
+
+// Responsive
+@include mobile {
+  .menu-layout,
+  .gameover-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    overflow-y: auto;
+  }
+}

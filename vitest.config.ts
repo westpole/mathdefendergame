@@ -106,7 +106,7 @@ export default defineConfig({
         'src/config.ts',
         'src/types.ts',
         'src/main.tsx',
-        'src/**/*.css',
+        'src/**/*.scss',
       ],
 
       thresholds: isElectronOnlyRun ? electronCoverageThresholds : defaultCoverageThresholds,
@@ -127,9 +127,11 @@ export default defineConfig({
             'src/ui/**/*.{test,spec}.{ts,tsx}',
             'src/store/**/*.test.ts',
           ],
-          // alias: {
-          //   '@': path.resolve(__dirname, './src'),
-          // },
+          alias: {
+            '@store': path.resolve(__dirname, './src/store'),
+            '@shared': path.resolve(__dirname, './src/shared'),
+            '@ui': path.resolve(__dirname, './src/ui'),
+          },
         }
       },
       {
@@ -141,9 +143,11 @@ export default defineConfig({
           include: [
             'src/game/**/*.test.ts',
           ],
-          // alias: {
-          //   '@': path.resolve(__dirname, './src'),
-          // },
+          alias: {
+            '@store': path.resolve(__dirname, './src/store'),
+            '@game': path.resolve(__dirname, './src/game'),
+            '@shared': path.resolve(__dirname, './src/shared'),
+          },
         }
       },
       {
@@ -173,8 +177,8 @@ export default defineConfig({
             instances: [{
               browser: 'chromium'
             }]
-          }
-        }
+          },
+        },
       }
     ]
   },

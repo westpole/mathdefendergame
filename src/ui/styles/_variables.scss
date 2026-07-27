@@ -1,0 +1,73 @@
+// Color Palette
+$color-primary-yellow: #facc15;
+$color-primary-purple: #7c3aed;
+$color-success-green: #22c55e;
+$color-warning-yellow: #eab308;
+$color-danger-red: #ef4444;
+
+// Background Colors
+$bg-dark-base: #1e2326;
+$bg-dark-overlay: rgba(15, 23, 42, 0.82);
+$bg-dark-panel: #374151;
+$bg-dark-deep: #111827;
+$bg-transparent: transparent;
+
+// Text Colors
+$text-primary: #fff;
+$text-secondary: #d1d5db;
+$text-muted: #9ca3af;
+$text-link: #93c5fd;
+
+// Border Colors
+$border-default: #ccc;
+$border-panel: rgba(148, 163, 184, 0.28);
+$border-panel-light: rgba(148, 163, 184, 0.22);
+$border-dark: #4b5563;
+$border-success: rgba(74, 222, 128, 0.5);
+$border-danger: rgba(248, 113, 113, 0.5);
+
+// Difficulty Button Colors
+$difficulty-child: #15803d;
+$difficulty-student: #1d4ed8;
+$difficulty-adult: #b91c1c;
+
+// Tab Colors
+$tab-bg: #111827;
+$tab-active: #2563eb;
+$tab-hover: #eaeaea;
+$tab-hover-text: #111;
+$tab-text: #aaa;
+
+// HUD Colors
+$shield-fill: #60a5fa;
+
+// Spacing
+$spacing-xs: 5px;
+$spacing-sm: 10px;
+$spacing-md: 14px;
+$spacing-lg: 18px;
+$spacing-xl: 24px;
+
+// Border Radius
+$radius-sm: 4px;
+$radius-md: 12px;
+$radius-lg: 14px;
+$radius-xl: 18px;
+$radius-full: 999px;
+
+// Z-Index Layers
+$z-city-bg: 1;
+$z-game-canvas: 5;
+$z-ui-overlay: 10;
+$z-hud: 200;
+
+// Breakpoints
+$breakpoint-mobile: 720px;
+$breakpoint-tablet: 768px;
+
+// Font Families
+$font-primary: 'Roboto', sans-serif;
+$font-display: 'Press Start 2P', cursive;
+
+// Shadows
+$shadow-panel: 0 20px 60px rgba(0, 0, 0, 0.4);

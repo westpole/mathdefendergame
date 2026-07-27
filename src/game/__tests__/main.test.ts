@@ -5,9 +5,16 @@
 
 import { Game } from '../main';
 
+interface Callbacks {
+  onHUDUpdate: () => void;
+  onFinishStage: (success: boolean) => void;
+  onGameOver: () => void;
+  onShake: () => void;
+}
+
 describe('Game', () => {
   let game: Game;
-  let mockCallbacks;
+  let mockCallbacks: Callbacks;
 
   beforeEach(() => {
     // Mock callbacks

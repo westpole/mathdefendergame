@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-import { gameStore } from '@store/useGameStore';
+import { gameStore, GameStoreState } from '@store/useGameStore';
 
 import { BootScene } from '../BootScene';
 
@@ -36,7 +36,7 @@ describe('BootScene', () => {
 
     vi.spyOn(gameStore, 'getState').mockReturnValue({
       markBootReady,
-    } as ReturnType<typeof gameStore.getState>);
+    } as unknown as GameStoreState);
 
     const scene = new BootScene();
 

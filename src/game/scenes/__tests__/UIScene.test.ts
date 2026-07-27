@@ -1,6 +1,26 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mockState = vi.hoisted(() => ({
+type MockState = {
+  scenePlugin: {
+    isActive: ReturnType<typeof vi.fn<(key: string) => boolean>>;
+    isPaused: ReturnType<typeof vi.fn<(key: string) => boolean>>;
+    stop: ReturnType<typeof vi.fn<(key: string) => void>>;
+    start: ReturnType<typeof vi.fn<(key: string, data?: unknown) => void>>;
+    getScene: ReturnType<typeof vi.fn<(key: string) => { continueFromOverlay: () => void }>>;
+  };
+  destroy: ReturnType<typeof vi.fn<(removeCanvas?: boolean) => void>>;
+  gameInstances: Array<{ scene: MockState['scenePlugin']; destroy: MockState['destroy'] }>;
+  getState: ReturnType<typeof vi.fn>;
+  store: {
+    setDifficulty: ReturnType<typeof vi.fn<(difficulty: string) => void>>;
+    startPlaying: ReturnType<typeof vi.fn<() => void>>;
+    returnToMenu: ReturnType<typeof vi.fn<() => void>>;
+    openMenuView: ReturnType<typeof vi.fn<(menuView: string) => void>>;
+  };
+  continueFromOverlay: ReturnType<typeof vi.fn<() => void>>;
+};
+
+const mockState = vi.hoisted((): MockState => ({
   scenePlugin: {
     isActive: vi.fn<(key: string) => boolean>(),
     isPaused: vi.fn<(key: string) => boolean>(),
@@ -85,7 +105,7 @@ describe('UIScene module', () => {
   afterEach(async () => {
     const uiScene = await loadModule();
 
-    const currentGame = mockState.gameInstances.at(-1);
+    const currentGame = mockState.gameInstances[mockState.gameInstances.length - 1];
     if (currentGame) {
       uiScene.destroyGame(currentGame as never);
     }

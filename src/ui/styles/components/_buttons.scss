@@ -1,0 +1,34 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Button Styles
+.menu-button,
+.primary-button,
+.secondary-button {
+  @include button-base;
+}
+
+.menu-button--child {
+  background: $difficulty-child;
+}
+
+.menu-button--student {
+  background: $difficulty-student;
+}
+
+.menu-button--adult {
+  background: $difficulty-adult;
+}
+
+.primary-button {
+  background: $color-primary-purple;
+}
+
+.secondary-button,
+.board-tab {
+  background: $bg-dark-panel;
+}
+
+.menu-link-button {
+  margin-top: 16px;
+}

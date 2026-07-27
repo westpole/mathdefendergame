@@ -1,0 +1,45 @@
+@use 'variables' as *;
+
+// Media Query Mixins
+@mixin mobile {
+  @media (max-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+// Glassmorphism Effect
+@mixin glassmorphism-panel {
+  background: $bg-dark-overlay;
+  backdrop-filter: blur(10px);
+  box-shadow: $shadow-panel;
+}
+
+// Flex Center
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Button Base
+@mixin button-base {
+  border: 0;
+  border-radius: $radius-md;
+  padding: 12px 16px;
+  font: inherit;
+  font-weight: 700;
+  color: $text-primary;
+  cursor: pointer;
+}
+
+// Absolute Fill
+@mixin absolute-fill {
+  position: absolute;
+  inset: 0;
+}

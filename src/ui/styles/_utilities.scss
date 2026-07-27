@@ -1,0 +1,43 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// Accent Classes
+.accent-success {
+  border-color: $border-success;
+}
+
+.accent-danger {
+  border-color: $border-danger;
+}
+
+// Grid Container Layout
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center; // Centers contentBox horizontally
+  align-items: center;   // Centers contentBox vertically
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+}
+
+.contentBox {
+  display: grid;
+  align-items: center;    // Aligns internal text/content vertically in the middle
+  justify-items: center;  // Aligns internal text/content horizontally in the middle
+  width: 80%;
+  height: 100%;
+
+  @include tablet {
+    width: 100vw;       // Sets contentBox width to 100vw on mobile
+    margin: 0;          // Optional: removes margins on mobile to ensure full-bleed if desired
+    padding: 1.5rem;
+  }
+}
+
+// Color Utilities
+.board-empty,
+.hud-label,
+.field-label {
+  color: $text-muted;
+}

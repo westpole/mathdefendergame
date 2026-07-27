@@ -1,0 +1,47 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+
+// App Shell Layout
+#app-shell {
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  margin: 0 auto;
+}
+
+#game-container,
+#ui-overlay {
+  @include absolute-fill;
+}
+
+#game-container {
+  z-index: $z-game-canvas;
+  background: $bg-transparent;
+
+  canvas {
+    display: block;
+    background: $bg-transparent;
+  }
+}
+
+#ui-overlay {
+  z-index: $z-ui-overlay;
+  /**
+   * The overlay is non-interactive by default. Pointer events are disabled to allow
+   * interactions with the game canvas underneath. When an interactive overlay (e.g., modal)
+   * is displayed, the 'overlay-screen--interactive' class is added to enable pointer events.
+   */
+  pointer-events: none;
+}
+
+// City Background Layer
+.city-background-layer {
+  position: absolute;
+  z-index: $z-city-bg;
+  bottom: 0;
+  width: 100%;
+  height: 300px;
+  background: url('../../assets/math-defender-city-bg.png') repeat-x top;
+  background-size: cover;
+}

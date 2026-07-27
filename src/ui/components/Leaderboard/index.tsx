@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { clsx } from 'clsx';
 import { useGameStore } from '@store/useGameStore';
 import type { Difficulty } from '@shared/types';
 
@@ -26,7 +27,7 @@ export function Leaderboard({ initialDifficulty, limit }: LeaderboardProps) {
         {tabs.map((tab) => (
           <li
             key={tab}
-            className={tab === activeTab ? 'view-tab is-active' : 'view-tab'}
+            className={clsx('view-tab', { 'is-active': tab === activeTab })}
             onClick={() => setActiveTab(tab)}
           >{tab}</li>
         ))}

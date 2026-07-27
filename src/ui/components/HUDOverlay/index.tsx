@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { useGameStore } from '@store/useGameStore';
 
 export function HUDOverlay() {
@@ -37,14 +38,21 @@ export function HUDOverlay() {
           {Array.from({ length: stageShieldMax }, (_, index) => (
             <span
               key={index}
-              className={index < shield ? 'shield-block is-filled' : 'shield-block'}
+              className={clsx('shield-block', { 'is-filled': index < shield })}
             />
           ))}
         </div>
 
         <div className="lives-track">
           <strong>Lives: {lives}</strong>
-          <div className={`lives-fill lives-fill--${livesTone}`} style={{ width: `${livesPct}%` }} />
+          <div
+            className={clsx('lives-fill', {
+              'lives-fill--good': livesTone === 'good',
+              'lives-fill--warn': livesTone === 'warn',
+              'lives-fill--danger': livesTone === 'danger',
+            })}
+            style={{ width: `${livesPct}%` }}
+          />
         </div>
       </section>
     </div>

@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { continueGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
@@ -9,11 +10,15 @@ export function StageMessageOverlay() {
   }
 
   const title = stageMessage.success ? `Stage ${stageMessage.stage} Cleared!` : 'Base Destroyed';
-  const accentClass = stageMessage.success ? 'accent-success' : 'accent-danger';
 
   return (
     <div className="overlay-screen overlay-screen--interactive">
-      <div className={`overlay-panel modal-panel ${accentClass}`}>
+      <div
+        className={clsx('overlay-panel', 'modal-panel', {
+          'accent-success': stageMessage.success,
+          'accent-danger': !stageMessage.success,
+        })}
+      >
         <h1>{title}</h1>
         <p>
           {stageMessage.success

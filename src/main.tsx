@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 
-import '@ui/styles/index.css';
+import '@ui/styles/index.scss';
 
 import { App } from './App';
 

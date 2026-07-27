@@ -1,4 +1,6 @@
 import type { StorybookConfig } from '@storybook/react-vite';
+import { mergeConfig } from 'vite';
+import viteConfig from '../vite.config.ts';
 
 const config: StorybookConfig = {
   "stories": [
@@ -11,6 +13,14 @@ const config: StorybookConfig = {
     "@storybook/addon-docs",
     "@storybook/addon-onboarding"
   ],
-  "framework": "@storybook/react-vite"
+  "framework": "@storybook/react-vite",
+
+  async viteFinal(config) {
+    return mergeConfig(config, {
+      resolve: {
+        alias: viteConfig.resolve?.alias,
+      },
+    });
+  },
 };
 export default config;

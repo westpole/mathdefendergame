@@ -1,0 +1,39 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Form Styles
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-sm $spacing-lg;
+  margin: 0 1em 2em 1em;
+}
+
+.text-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid $border-dark;
+  border-radius: $radius-md;
+  background: $bg-dark-deep;
+  color: $text-primary;
+  font: inherit;
+
+  &:focus {
+    outline: none;
+    border-color: $color-primary-yellow;
+  }
+}
+
+// Modal Panel Sizing
+.modal-panel,
+.gameover-panel,
+.gameover-board {
+  width: min(92%, 460px);
+}
+
+.modal-panel,
+.gameover-panel {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}

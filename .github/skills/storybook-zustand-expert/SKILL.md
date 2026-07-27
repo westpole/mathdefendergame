@@ -120,7 +120,7 @@ The global `preview.tsx` handles shared config only (controls matchers, a11y). *
 **Current project standard:**
 ```tsx
 import type { Preview } from '@storybook/react-vite';
-import '../src/ui/styles/index.css'; // Use proper Vite type declarations, not @ts-ignore
+import '../src/ui/styles/index.scss'; // Use proper Vite type declarations, not @ts-ignore
 
 const preview: Preview = {
   parameters: {

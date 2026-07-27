@@ -1,0 +1,48 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Table Styles
+.table-wrapper {
+  display: flex;
+  flex-direction: column;
+  border: solid 1px $border-default;
+  height: 40vh;
+  overflow: hidden;
+}
+
+.table-header {
+  font-size: 0.9em;
+  color: $text-muted;
+  border-bottom: 1px solid $border-dark;
+}
+
+.table-body {
+  overflow-y: auto;
+  height: 100%;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr 0.7fr;
+  font-size: 1em;
+  line-height: 1.4;
+  color: $text-secondary;
+  padding: 0.3em 1em;
+}
+
+.board-empty {
+  border: solid 1px $border-default;
+  margin: 0;
+  height: 40vh;
+  @include flex-center;
+}
+
+.table-cell {
+  &.score {
+    color: $color-primary-yellow;
+  }
+
+  &.accuracy {
+    color: $text-link;
+  }
+}
