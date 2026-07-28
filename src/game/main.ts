@@ -196,6 +196,7 @@ export class Game {
         this.pendingGameOver = true;
       }
     } else {
+      this.meteors = [];
       this.cb.onFinishStage(false);
       this.syncStore();
     }
