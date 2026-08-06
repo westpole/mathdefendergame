@@ -26,8 +26,24 @@ export function installTestBridge(phaserGame: Phaser.Game) {
     getScene: (key: string) => phaserGame.scene.getScene(key),
     isSceneReady: (key: string) => {
       const scene = phaserGame.scene.getScene(key);
-      // Check custom isReady property if it exists
-      return (scene as unknown as { isReady?: boolean })?.isReady ?? false;
+
+      if (!scene) {
+        return false;
+      }
+
+      // BootScene readiness is driven by the shared store.
+      if (key === 'BootScene') {
+        return useGameStore.getState().bootReady;
+      }
+
+      // Respect explicit scene readiness flags when available.
+      const explicitReady = (scene as unknown as { isReady?: boolean })?.isReady;
+      if (typeof explicitReady === 'boolean') {
+        return explicitReady;
+      }
+
+      // Fall back to Phaser lifecycle state for scenes without custom flags.
+      return scene.scene.isActive() || scene.scene.isPaused();
     },
     setSeed: (seed: number) => {
       phaserGame.registry.set('rngSeed', seed);

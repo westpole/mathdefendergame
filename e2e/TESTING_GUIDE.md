@@ -46,11 +46,11 @@ Add these to make E2E tests more reliable:
 
 ```typescript
 // Get full store state
-const state = await page.evaluate(() => window.__e2e!.getStoreState());
+const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
 
 // Update store (partial state)
 await page.evaluate(() => {
-  window.__e2e!.setStoreState({
+  (window as E2EWindow).__e2e!.setStoreState({
     score: 100,
     lives: 3,
     phase: 'playing'
@@ -63,12 +63,12 @@ await page.evaluate(() => {
 ```typescript
 // Get scene instance
 const scene = await page.evaluate(() =>
-  window.__e2e!.getScene('GameScene')
+  (window as E2EWindow).__e2e!.getScene('GameScene')
 );
 
 // Check if scene is ready
 const isReady = await page.evaluate(() =>
-  window.__e2e!.isSceneReady('BootScene')
+  (window as E2EWindow).__e2e!.isSceneReady('BootScene')
 );
 ```
 
@@ -77,17 +77,17 @@ const isReady = await page.evaluate(() =>
 ```typescript
 // Set fixed RNG seed for reproducible tests
 await page.evaluate(() => {
-  window.__e2e!.setSeed(12345);
+  (window as E2EWindow).__e2e!.setSeed(12345);
 });
 
 // Freeze game time
 await page.evaluate(() => {
-  window.__e2e!.freezeTime();
+  (window as E2EWindow).__e2e!.freezeTime();
 });
 
 // Manually step frame
 await page.evaluate(() => {
-  window.__e2e!.stepFrame();
+  (window as E2EWindow).__e2e!.stepFrame();
 });
 ```
 
@@ -95,10 +95,10 @@ await page.evaluate(() => {
 
 ```typescript
 // Wait for game to be idle (no boot/loading)
-await page.evaluate(() => window.__e2e!.waitForIdle());
+await page.evaluate(() => (window as E2EWindow).__e2e!.waitForIdle());
 
 // Standard wait for test bridge availability
-await page.waitForFunction(() => window.__e2e !== undefined, {
+await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, {
   timeout: 5000
 });
 ```
@@ -109,15 +109,15 @@ await page.waitForFunction(() => window.__e2e !== undefined, {
 
 ```typescript
 test('start game at easy difficulty', async ({ page }) => {
-  await page.waitForFunction(() => window.__e2e !== undefined);
+  await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined);
 
   await page.evaluate(() => {
-    const state = window.__e2e!.getStoreState();
+    const state = (window as E2EWindow).__e2e!.getStoreState();
     state.setDifficulty('easy');
     state.startPlaying();
   });
 
-  const newState = await page.evaluate(() => window.__e2e!.getStoreState());
+  const newState = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
   expect(newState.phase).toBe('playing');
 });
 ```
@@ -126,19 +126,19 @@ test('start game at easy difficulty', async ({ page }) => {
 
 ```typescript
 test('score increases on correct answer', async ({ page }) => {
-  await page.waitForFunction(() => window.__e2e !== undefined);
+  await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined);
 
   // Start game with fixed seed
   await page.evaluate(() => {
-    window.__e2e!.setSeed(12345);
-    const state = window.__e2e!.getStoreState();
+    (window as E2EWindow).__e2e!.setSeed(12345);
+    const state = (window as E2EWindow).__e2e!.getStoreState();
     state.setDifficulty('easy');
     state.startPlaying();
   });
 
   // Get initial score
   const initialScore = await page.evaluate(() =>
-    window.__e2e!.getStoreState().score
+    (window as E2EWindow).__e2e!.getStoreState().score
   );
 
   // Submit correct answer (you'll need to determine what the answer is)
@@ -147,7 +147,7 @@ test('score increases on correct answer', async ({ page }) => {
 
   // Verify score increased
   const newScore = await page.evaluate(() =>
-    window.__e2e!.getStoreState().score
+    (window as E2EWindow).__e2e!.getStoreState().score
   );
   expect(newScore).toBeGreaterThan(initialScore);
 });
@@ -157,12 +157,12 @@ test('score increases on correct answer', async ({ page }) => {
 
 ```typescript
 test('game at stage 5 matches snapshot', async ({ page }) => {
-  await page.waitForFunction(() => window.__e2e !== undefined);
+  await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined);
 
   // Set up deterministic state
   await page.evaluate(() => {
-    window.__e2e!.setSeed(12345);
-    window.__e2e!.setStoreState({
+    (window as E2EWindow).__e2e!.setSeed(12345);
+    (window as E2EWindow).__e2e!.setStoreState({
       phase: 'playing',
       stage: 5,
       score: 5000,
@@ -182,20 +182,20 @@ test('game at stage 5 matches snapshot', async ({ page }) => {
 
 ```typescript
 test('navigate through menus', async ({ page }) => {
-  await page.waitForFunction(() => window.__e2e !== undefined);
+  await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined);
 
   // Start at home
-  let state = await page.evaluate(() => window.__e2e!.getStoreState());
+  let state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
   expect(state.menuView).toBe('home');
 
   // Go to high scores
   await page.click('[data-testid="high-score-button"]');
-  state = await page.evaluate(() => window.__e2e!.getStoreState());
+  state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
   expect(state.menuView).toBe('high-score');
 
   // Back to home
   await page.click('[data-testid="back-button"]');
-  state = await page.evaluate(() => window.__e2e!.getStoreState());
+  state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
   expect(state.menuView).toBe('home');
 });
 ```

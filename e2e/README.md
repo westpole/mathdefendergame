@@ -52,17 +52,17 @@ import { test, expect } from '../fixtures/electron-app';
 
 test('can start game', async ({ page }) => {
   // Wait for test bridge
-  await page.waitForFunction(() => window.__e2e !== undefined);
+  await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined);
 
   // Interact with store
   await page.evaluate(() => {
-    const state = window.__e2e!.getStoreState();
+    const state = (window as E2EWindow).__e2e!.getStoreState();
     state.setDifficulty('easy');
     state.startPlaying();
   });
 
   // Verify state
-  const state = await page.evaluate(() => window.__e2e!.getStoreState());
+  const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
   expect(state.phase).toBe('playing');
 });
 ```
@@ -71,35 +71,35 @@ test('can start game', async ({ page }) => {
 
 ```typescript
 // Read store state
-const state = await page.evaluate(() => window.__e2e!.getStoreState());
+const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
 
 // Write store state
 await page.evaluate(() => {
-  window.__e2e!.setStoreState({ score: 100, lives: 3 });
+  (window as E2EWindow).__e2e!.setStoreState({ score: 100, lives: 3 });
 });
 
 // Access Phaser scene
 const sceneExists = await page.evaluate(() => {
-  const scene = window.__e2e!.getScene('GameScene');
+  const scene = (window as E2EWindow).__e2e!.getScene('GameScene');
   return scene !== null;
 });
 
 // Deterministic testing
 await page.evaluate(() => {
-  window.__e2e!.setSeed(12345); // Fixed RNG
-  window.__e2e!.freezeTime();   // Stop game loop
-  window.__e2e!.stepFrame();    // Manual frame step
+  (window as E2EWindow).__e2e!.setSeed(12345); // Fixed RNG
+  (window as E2EWindow).__e2e!.freezeTime();   // Stop game loop
+  (window as E2EWindow).__e2e!.stepFrame();    // Manual frame step
 });
 
 // Wait for game ready
-await page.evaluate(() => window.__e2e!.waitForIdle());
+await page.evaluate(() => (window as E2EWindow).__e2e!.waitForIdle());
 ```
 
 ### Visual Tests
 
 ```typescript
 test('menu matches snapshot', async ({ page }) => {
-  await page.waitForFunction(() => window.__e2e !== undefined);
+  await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined);
   await page.waitForTimeout(1500); // Wait for fonts
 
   await expect(page).toHaveScreenshot('menu.png', {
