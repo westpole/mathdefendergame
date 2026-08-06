@@ -7,6 +7,15 @@ import { playwright } from '@vitest/browser-playwright';
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+const aliases = {
+  '@electron': path.resolve(dirname, './electron'),
+  '@game': path.resolve(dirname, './src/game'),
+  '@store': path.resolve(dirname, './src/store'),
+  '@ui': path.resolve(dirname, './src/ui'),
+  '@shared': path.resolve(dirname, './src/shared'),
+  '@assets': path.resolve(dirname, './src/assets'),
+};
+
 const isElectronOnlyRun = process.argv.some((arg, index, argv) => {
   return arg === '--project=electron' || (arg === '--project' && argv[index + 1] === 'electron');
 });
@@ -73,6 +82,9 @@ const electronCoverageThresholds = {
 };
 
 export default defineConfig({
+  resolve: {
+    alias: aliases,
+  },
   test: {
     globals: true,
 
@@ -128,11 +140,6 @@ export default defineConfig({
             'src/ui/**/*.{test,spec}.{ts,tsx}',
             'src/store/**/*.test.ts',
           ],
-          alias: {
-            '@store': path.resolve(__dirname, './src/store'),
-            '@shared': path.resolve(__dirname, './src/shared'),
-            '@ui': path.resolve(__dirname, './src/ui'),
-          },
         }
       },
       {
@@ -144,11 +151,6 @@ export default defineConfig({
           include: [
             'src/game/**/*.test.ts',
           ],
-          alias: {
-            '@store': path.resolve(__dirname, './src/store'),
-            '@game': path.resolve(__dirname, './src/game'),
-            '@shared': path.resolve(__dirname, './src/shared'),
-          },
         }
       },
       {
