@@ -4,3 +4,4 @@ build
 reports
 *storybook.log
 storybook-static
+test-results

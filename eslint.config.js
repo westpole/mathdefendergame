@@ -109,4 +109,14 @@ export default tseslint.config(
       'react-refresh/only-export-components': 'off',
     },
   },
+
+  // E2E test files (Playwright)
+  {
+    files: ['e2e/**/*.ts'],
+    rules: {
+      // Playwright fixtures often use empty object destructuring
+      'no-empty-pattern': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+    },
+  },
 );

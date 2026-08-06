@@ -30,6 +30,8 @@
   },
   "include": [
     "src",
-    "electron"
+    "electron",
+    "e2e",
+    "global.d.ts"
   ]
 }

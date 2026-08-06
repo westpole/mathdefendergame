@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   base: './',
   // Required for Electron file:// protocol in production
@@ -34,4 +34,7 @@ export default defineConfig({
   server: {
     port: 5173
   },
-});
+  define: {
+    __E2E__: mode === 'e2e',
+  },
+}));
