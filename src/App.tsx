@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 
 import { destroyGame, ensurePhaserGame, openMenuView } from '@game/scenes/UIScene';
-import type { MenuView } from '@store/useGameStore';
+import type { MenuView, OverlayPhase } from '@store/useGameStore';
 import { useGameStore } from '@store/useGameStore';
 import { GameOverOverlay } from '@ui/components/GameOverOverlay';
 import { HUDOverlay } from '@ui/components/HUDOverlay';
@@ -14,6 +14,10 @@ import { CitySceneLayout } from '@ui/components/CitySceneLayout';
 
 interface ElectronMenuEventDetail {
   view: MenuView;
+}
+
+function isElectronMenuEnabledForPhase(phase: OverlayPhase): boolean {
+  return phase === 'start' || phase === 'gameover';
 }
 
 export function App() {
@@ -31,6 +35,11 @@ export function App() {
 
   useEffect(() => {
     function handleElectronMenuAction(event: Event) {
+      const phase = useGameStore.getState().phase;
+      if (!isElectronMenuEnabledForPhase(phase)) {
+        return;
+      }
+
       const menuEvent = event as CustomEvent<ElectronMenuEventDetail>;
 
       openMenuView(menuEvent.detail.view);

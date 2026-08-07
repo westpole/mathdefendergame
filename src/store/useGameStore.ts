@@ -91,9 +91,7 @@ export const useGameStore = create<GameStoreState>()(
       showStageMessage: (stageMessage) => set({ phase: 'stage-message', stageMessage }),
       showGameOver: (payload) => set({ phase: 'gameover', stageMessage: null, ...payload }),
       startPlaying: () => set({ phase: 'playing', stageMessage: null }),
-      // @todo: check if still in use
       returnToMenu: () => set({ ...initialState, bootReady: true, phase: 'start', leaderboard: get().leaderboard }),
-      // @todo: check if still in use
       openMenuView: (menuView) => set({ ...initialState, bootReady: true, phase: 'start', menuView, leaderboard: get().leaderboard }),
       saveScore: (name, score, perfScore, difficulty) => {
         const entry: ScoreEntry = {
