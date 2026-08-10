@@ -47,34 +47,15 @@ describe('Electron Main Process', () => {
   });
 
   describe('Menu', () => {
-    it('should build menu from template', () => {
-      const menu = mainProcess.buildMenu({
-        isDestroyed: vi.fn().mockReturnValue(false),
-        webContents: { executeJavaScript: vi.fn() },
-      }, createRuntimeOptions());
+    it('should build an empty menu outside developer modes', () => {
+      const menu = mainProcess.buildMenu(createRuntimeOptions());
 
-      expect(Menu.buildFromTemplate).toHaveBeenCalledWith([
-        {
-          label: 'Play Game',
-          click: expect.any(Function),
-        },
-        {
-          label: 'High Score',
-          click: expect.any(Function),
-        },
-        {
-          label: 'Rules',
-          click: expect.any(Function),
-        },
-      ]);
+      expect(Menu.buildFromTemplate).toHaveBeenCalledWith([]);
       expect(menu).toBeDefined();
     });
 
     it('should include developer tools menu in development mode', () => {
-      mainProcess.buildMenu({
-        isDestroyed: vi.fn().mockReturnValue(false),
-        webContents: { executeJavaScript: vi.fn() },
-      }, createRuntimeOptions({ argv: ['node', 'electron', '--dev'] }));
+      mainProcess.buildMenu(createRuntimeOptions({ argv: ['node', 'electron', '--dev'] }));
 
       expect(Menu.buildFromTemplate).toHaveBeenCalledWith(expect.arrayContaining([
         expect.objectContaining({
@@ -85,66 +66,6 @@ describe('Electron Main Process', () => {
           ]),
         }),
       ]));
-    });
-
-    it('should wire menu clicks to renderer actions', () => {
-      const executeJavaScript = vi.fn();
-      mainProcess.buildMenu({
-        isDestroyed: vi.fn().mockReturnValue(false),
-        webContents: { executeJavaScript },
-      }, createRuntimeOptions());
-
-      const template = Menu.buildFromTemplate.mock.calls[0][0];
-      template[0].click();
-      template[1].click();
-      template[2].click();
-
-      expect(executeJavaScript).toHaveBeenNthCalledWith(
-        1,
-        `window.dispatchEvent(new CustomEvent('electron-menu-action', { detail: ${JSON.stringify({ view: 'home' })} }));`,
-      );
-      expect(executeJavaScript).toHaveBeenNthCalledWith(
-        2,
-        `window.dispatchEvent(new CustomEvent('electron-menu-action', { detail: ${JSON.stringify({ view: 'high-score' })} }));`,
-      );
-      expect(executeJavaScript).toHaveBeenNthCalledWith(
-        3,
-        `window.dispatchEvent(new CustomEvent('electron-menu-action', { detail: ${JSON.stringify({ view: 'rules' })} }));`,
-      );
-    });
-
-    it('should send menu action to renderer', () => {
-      const executeJavaScript = vi.fn();
-
-      mainProcess.sendMenuAction(
-        {
-          isDestroyed: vi.fn().mockReturnValue(false),
-          webContents: { executeJavaScript },
-        },
-        'rules',
-      );
-
-      expect(executeJavaScript).toHaveBeenCalledWith(
-        `window.dispatchEvent(new CustomEvent('electron-menu-action', { detail: ${JSON.stringify({ view: 'rules' })} }));`,
-      );
-    });
-
-    it('should not send menu action to a destroyed window', () => {
-      const executeJavaScript = vi.fn();
-
-      mainProcess.sendMenuAction(
-        {
-          isDestroyed: vi.fn().mockReturnValue(true),
-          webContents: { executeJavaScript },
-        },
-        'rules',
-      );
-
-      expect(executeJavaScript).not.toHaveBeenCalled();
-    });
-
-    it('should not send menu action when no window is provided', () => {
-      expect(() => mainProcess.sendMenuAction(null, 'rules')).not.toThrow();
     });
   });
 

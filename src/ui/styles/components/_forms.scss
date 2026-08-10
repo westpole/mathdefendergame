@@ -28,6 +28,14 @@
   width: min(92%, 480px);
 }
 
+.login-tabs {
+  margin-top: $spacing-md;
+}
+
+.login-subtitle {
+  margin: $spacing-md 0 1.5em 0 !important;
+}
+
 .login-form {
   display: flex;
   flex-direction: column;

@@ -55,6 +55,7 @@ export interface GameStoreState {
   startPlaying: () => void;
   returnToMenu: () => void;
   openMenuView: (menuView: MenuView) => void;
+  loginProfile: (username: string, password: string) => LoginResult;
   createAndLoginProfile: (username: string, password: string) => LoginResult;
   getActiveProfile: () => PlayerProfile | null;
   saveScore: (name: string, score: number, perfScore: number, difficulty: Difficulty) => void;
@@ -195,6 +196,41 @@ export const useGameStore = create<GameStoreState>()(
         profiles: get().profiles,
         activeUsername: get().activeUsername,
       }),
+      loginProfile: (username, password) => {
+        const normalizedUsername = username.trim();
+
+        if (!normalizedUsername) {
+          return {
+            success: false,
+            error: 'Username is required.',
+          };
+        }
+
+        const profile = get().profiles[normalizedUsername];
+
+        if (!profile) {
+          return {
+            success: false,
+            error: 'Username not found. Switch to Create profile to register this commander.',
+          };
+        }
+
+        if (profile.password !== password) {
+          return {
+            success: false,
+            error: 'Incorrect password. Check your credentials or create a new profile if needed.',
+          };
+        }
+
+        set({
+          activeUsername: normalizedUsername,
+          difficulty: profile.preferredDifficulty,
+          phase: 'start',
+          menuView: 'home',
+        });
+
+        return { success: true };
+      },
       createAndLoginProfile: (username, password) => {
         const normalizedUsername = username.trim();
 

@@ -8,35 +8,12 @@ function getRuntimeContext(options = {}) {
   };
 }
 
-function sendMenuAction(win, view) {
-  if (!win || win.isDestroyed()) {
-    return;
-  }
-
-  win.webContents.executeJavaScript(
-    `window.dispatchEvent(new CustomEvent('electron-menu-action', { detail: ${JSON.stringify({ view })} }));`,
-  );
-}
-
-function buildMenu(win, options = {}) {
+function buildMenu(options = {}) {
   const { electron, argv } = getRuntimeContext(options);
   const { app, Menu } = electron;
   const isDev = !app.isPackaged && argv.includes('--dev');
   const isDebug = argv.includes('--inspect');
-  const template = [
-    {
-      label: 'Play Game',
-      click: () => sendMenuAction(win, 'home'),
-    },
-    {
-      label: 'High Score',
-      click: () => sendMenuAction(win, 'high-score'),
-    },
-    {
-      label: 'Rules',
-      click: () => sendMenuAction(win, 'rules'),
-    },
-  ];
+  const template = [];
 
   if (isDev || isDebug) {
     template.push({
@@ -71,7 +48,7 @@ function createWindow(options = {}) {
     backgroundColor: '#1e2326',
   });
 
-  Menu.setApplicationMenu(buildMenu(win, options));
+  Menu.setApplicationMenu(buildMenu(options));
 
   if (isDev) {
     win.loadURL('http://localhost:5173');
@@ -109,7 +86,6 @@ if (process.type === 'browser') {
 }
 
 module.exports = {
-  sendMenuAction,
   buildMenu,
   createWindow,
   initializeApp,

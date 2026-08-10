@@ -122,6 +122,37 @@ describe('gameStore', () => {
       expect(result.error).toMatch(/must be exactly 8 characters/i);
       expect(gameStore.getState().profiles.PilotTwo).toBeUndefined();
     });
+
+    it('logs in existing profile when credentials match', () => {
+      gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+      gameStore.setState({ phase: 'login', activeUsername: null });
+
+      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12345');
+
+      expect(result.success).toBe(true);
+      expect(gameStore.getState().activeUsername).toBe('PilotOne');
+      expect(gameStore.getState().phase).toBe('start');
+    });
+
+    it('shows create profile suggestion when username is not found', () => {
+      const result = gameStore.getState().loginProfile('GhostPilot', 'Abc12345');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toMatch(/username not found/i);
+      expect(result.error).toMatch(/create profile/i);
+    });
+
+    it('rejects login when password does not match', () => {
+      gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+      gameStore.setState({ phase: 'login', activeUsername: null });
+
+      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12344');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toMatch(/incorrect password/i);
+      expect(gameStore.getState().activeUsername).toBeNull();
+      expect(gameStore.getState().phase).toBe('login');
+    });
   });
 
   describe('stage message', () => {
