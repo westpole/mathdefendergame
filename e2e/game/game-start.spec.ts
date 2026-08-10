@@ -2,14 +2,14 @@ import { test, expect } from '../fixtures/electron-app';
 import type { E2EWindow } from '../types';
 
 test.describe('Game Start Flow', () => {
-  test('should launch with home menu visible', async ({ page }) => {
+  test('should launch with login screen visible', async ({ page }) => {
     // Wait for the E2E bridge to be available
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
 
     // Get initial store state
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
 
-    expect(state.phase).toBe('start');
+    expect(state.phase).toBe('login');
     expect(state.menuView).toBe('home');
   });
 

@@ -11,6 +11,7 @@ import { Loading } from '@ui/components/Loading';
 import { HighScoreOverlay } from '@ui/components/HighScoreOverlay';
 import { RulesOverlay } from '@ui/components/Rules';
 import { CitySceneLayout } from '@ui/components/CitySceneLayout';
+import { LoginOverlay } from '@ui/components/LoginOverlay';
 
 interface ElectronMenuEventDetail {
   view: MenuView;
@@ -58,6 +59,7 @@ export function App() {
       <CitySceneLayout />
       <div id="ui-overlay">
         {!bootReady && <Loading />}
+        {bootReady && phase === 'login' && <LoginOverlay />}
         {bootReady && phase === 'start' && menuView === 'home' && <MainMenuOverlay />}
         {bootReady && phase === 'start' && menuView === 'high-score' && <HighScoreOverlay />}
         {bootReady && phase === 'start' && menuView === 'rules' && <RulesOverlay />}

@@ -2,12 +2,11 @@ import { test, expect } from '../fixtures/electron-app';
 import type { E2EWindow } from '../types';
 
 test.describe('Menu Navigation', () => {
-  test('should show main menu on launch', async ({ page }) => {
+  test('should show login screen on launch', async ({ page }) => {
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
 
-    // Check that main menu overlay is visible
-    const mainMenu = page.locator('[data-testid="main-menu"]');
-    await expect(mainMenu).toBeVisible();
+    const loginScreen = page.locator('[data-testid="login-screen"]');
+    await expect(loginScreen).toBeVisible();
   });
 
   test('can navigate to high scores view', async ({ page }) => {

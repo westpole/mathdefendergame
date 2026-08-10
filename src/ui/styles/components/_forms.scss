@@ -24,6 +24,26 @@
   }
 }
 
+.login-panel {
+  width: min(92%, 480px);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.form-error-block {
+  padding: 10px 12px;
+  border-radius: $radius-md;
+  border: 1px solid rgba(234, 179, 8, 0.6);
+  background: rgba(234, 179, 8, 0.22);
+  color: #fde68a;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 // Modal Panel Sizing
 .modal-panel,
 .gameover-panel,

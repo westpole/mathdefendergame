@@ -12,6 +12,8 @@ describe('gameStore', () => {
       phase: 'booting',
       menuView: 'home',
       bootReady: false,
+      activeUsername: null,
+      profiles: {},
       difficulty: 'child',
       score: 0,
       lives: 10,
@@ -35,6 +37,7 @@ describe('gameStore', () => {
     it('should transition to menu after boot', () => {
       gameStore.getState().markBootReady();
       expect(gameStore.getState().bootReady).toBe(true);
+      expect(gameStore.getState().phase).toBe('login');
     });
 
     it('should start playing phase', () => {
@@ -88,6 +91,36 @@ describe('gameStore', () => {
       gameStore.getState().openMenuView('rules');
       gameStore.getState().openMenuView('home');
       expect(gameStore.getState().menuView).toBe('home');
+    });
+  });
+
+  describe('profile login', () => {
+    it('creates and loads profile when credentials are valid', () => {
+      gameStore.getState().markBootReady();
+
+      const result = gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+
+      expect(result.success).toBe(true);
+      expect(gameStore.getState().activeUsername).toBe('PilotOne');
+      expect(gameStore.getState().phase).toBe('start');
+      expect(gameStore.getState().profiles.PilotOne).toBeTruthy();
+    });
+
+    it('rejects duplicate usernames', () => {
+      gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+
+      const duplicate = gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+
+      expect(duplicate.success).toBe(false);
+      expect(duplicate.error).toMatch(/already exists/i);
+    });
+
+    it('rejects invalid passwords', () => {
+      const result = gameStore.getState().createAndLoginProfile('PilotTwo', 'password');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toMatch(/must be exactly 8 characters/i);
+      expect(gameStore.getState().profiles.PilotTwo).toBeUndefined();
     });
   });
 
