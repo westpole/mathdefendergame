@@ -10,7 +10,7 @@ import Phaser from 'phaser';
 
 import { gameStore } from '@store/useGameStore';
 import type { MenuView } from '@store/useGameStore';
-import { GAME_CONFIG } from '@game/config';
+import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
 
 import { BootScene } from './BootScene';
 import { GameScene } from './GameScene';
@@ -58,15 +58,18 @@ export function destroyGame(game: Phaser.Game): void {
 
 export function startGame(): void {
   const game = ensurePhaserGame();
+  const state = gameStore.getState();
+  const startingScore = Math.max(0, state.score);
+  const startingGrade = resolveGradeFromScore(startingScore);
 
-  gameStore.getState().setGrade('trainee');
-  gameStore.getState().startPlaying();
+  state.setGrade(startingGrade);
+  state.startPlaying();
 
   if (game.scene.isActive('GameScene') || game.scene.isPaused('GameScene')) {
     game.scene.stop('GameScene');
   }
 
-  game.scene.start('GameScene', { grade: 'trainee' });
+  game.scene.start('GameScene', { grade: startingGrade, score: startingScore });
 }
 
 export function continueGame(): void {

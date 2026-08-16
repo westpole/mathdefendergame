@@ -6,7 +6,7 @@
  * It also handles scene transitions and game state management.
  */
 import { gameStore } from '@store/useGameStore';
-import type { Meteor, Particle, GameState, Grade } from '@shared/types';
+import type { Meteor, Particle, GameOverReason, GameState, Grade } from '@shared/types';
 
 import { GAME_CONFIG } from './config';
 import { DDAController, type DDAConfiguration } from './utilities/DDAController';
@@ -15,7 +15,7 @@ import { generateMath } from './utilities/mathGen';
 export interface GameCallbacks {
   onHUDUpdate: () => void;
   onFinishStage: (success: boolean) => void;
-  onGameOver: () => void;
+  onGameOver: (reason: GameOverReason) => void;
   onShake: () => void;
 }
 
@@ -38,6 +38,7 @@ export class Game {
   correctCount: number = 0;
   incorrectCount: number = 0;
   stageIncorrect: number = 0;
+  stageCorrect: number = 0;
 
   lastSpawn: number = 0;
   scoreAtStageStart: number = 0;
@@ -47,6 +48,7 @@ export class Game {
   // Tracks whether the last stage transition was a success (used by resumeFromMessage)
   private lastStageSuccess: boolean = true;
   private pendingGameOver: boolean = false;
+  private pendingGameOverReason: GameOverReason = 'lives-depleted';
   private dda: DDAController;
 
   private readonly cb: GameCallbacks;
@@ -60,15 +62,16 @@ export class Game {
     this.applyGradeBaseline(grade);
   }
 
-  reset(): void {
+  reset(startingScore = 0): void {
     this.lives = GAME_CONFIG.initialLives;
     this.shield = GAME_CONFIG.stageShieldMax;
-    this.score = 0;
+    this.score = Math.max(0, startingScore);
     this.stage = 1;
     this.stageScore = 0;
     this.correctCount = 0;
     this.incorrectCount = 0;
     this.stageIncorrect = 0;
+    this.stageCorrect = 0;
     this.meteors = [];
     this.particles = [];
     this.inputBuffer = '';
@@ -76,7 +79,9 @@ export class Game {
     this.livesAtStageStart = GAME_CONFIG.initialLives;
     this.lastStageSuccess = true;
     this.pendingGameOver = false;
+    this.pendingGameOverReason = 'lives-depleted';
     this.applyGradeBaseline('trainee');
+    this.syncGradeFromScore();
     this.canvasHeight = GAME_CONFIG.CANVAS_HEIGHT;
     this.state = 'start';
     this.syncStore();
@@ -140,13 +145,15 @@ export class Game {
       this.createExplosion(m.x, m.y, hitColor);
       this.meteors.splice(hitIndex, 1);
       this.dda.recordSample({ isCorrect: true, latencyMs, baseHit: false });
-      this.score += 10;
-      this.stageScore += 10;
+      this.score += GAME_CONFIG.scorePerCorrectAnswer;
+      this.stageScore += 1;
+      this.stageCorrect += 1;
       this.correctCount++;
       this.inputBuffer = '';
       this.syncGradeFromScore();
 
-      if (this.stageScore >= 200) {
+      const stageTarget = GAME_CONFIG.grades[this.grade].stageClearCorrectAnswers;
+      if (this.stageCorrect >= stageTarget) {
         this.finishStage(true);
         return;
       }
@@ -158,6 +165,8 @@ export class Game {
       });
       this.incorrectCount++;
       this.stageIncorrect++;
+      this.score = Math.max(0, this.score - GAME_CONFIG.scorePenaltyPerIncorrectAnswer);
+      this.syncGradeFromScore();
       this.inputBuffer = '';
       this.cb.onShake();
     }
@@ -181,11 +190,13 @@ export class Game {
     this.lives--;
     this.cb.onHUDUpdate();
     this.syncStore();
+
     if (this.lives <= 0) {
-      this.gameOver();
-    } else {
-      this.finishStage(false);
+      this.pendingGameOver = true;
+      this.pendingGameOverReason = 'lives-depleted';
     }
+
+    this.finishStage(false);
   }
 
   finishStage(success: boolean): void {
@@ -194,6 +205,12 @@ export class Game {
 
     if (success) {
       this.createConfetti();
+
+      if (this.stageIncorrect === 0) {
+        this.score += GAME_CONFIG.grades[this.grade].cleanStageBonusPoints;
+        this.syncGradeFromScore();
+      }
+
       if (this.stageIncorrect === 0) {
         this.lives += 1; // Perfect bonus – applied before the UI callback reads lives
       }
@@ -212,6 +229,7 @@ export class Game {
         const accuracy = total > 0 ? (this.correctCount / total) * 100 : 0;
         this.finalPerfScore = parseFloat(accuracy.toFixed(2));
         this.pendingGameOver = true;
+        this.pendingGameOverReason = 'victory';
       }
     } else {
       this.meteors = [];
@@ -223,7 +241,7 @@ export class Game {
   resumeFromMessage(): void {
     if (this.pendingGameOver) {
       this.pendingGameOver = false;
-      this.gameOver(true);
+      this.gameOver(this.pendingGameOverReason === 'victory');
       return;
     }
 
@@ -234,6 +252,7 @@ export class Game {
     this.inputBuffer = '';
     this.stageScore = 0;
     this.stageIncorrect = 0;
+    this.stageCorrect = 0;
     this.shield = GAME_CONFIG.stageShieldMax;
 
     if (!this.lastStageSuccess) {
@@ -250,7 +269,6 @@ export class Game {
   }
 
   gameOver(win = false): void {
-    void win; // reserved for future win screen differentiation
     this.state = 'gameover';
 
     const total = this.correctCount + this.incorrectCount;
@@ -258,7 +276,7 @@ export class Game {
     this.finalPerfScore = parseFloat(accuracy.toFixed(2));
 
     this.syncStore();
-    this.cb.onGameOver();
+    this.cb.onGameOver(win ? 'victory' : 'lives-depleted');
   }
 
   update(dt: number): void {

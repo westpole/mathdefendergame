@@ -10,7 +10,7 @@ import Phaser from 'phaser';
 import { Game } from '@game/main';
 import { GAME_CONFIG } from '@game/config';
 import { gameStore } from '@store/useGameStore';
-import type { Grade } from '@shared/types';
+import type { GameOverReason, Grade } from '@shared/types';
 
 function colorToInt(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
@@ -49,14 +49,14 @@ export class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
-  init(data?: { grade?: Grade }): void {
+  init(data?: { grade?: Grade; score?: number }): void {
     this.gameLogic = new Game({
       onHUDUpdate: () => this.updateHUD(),
       onFinishStage: (success) => this.handleFinishStage(success),
-      onGameOver: () => this.handleGameOver(),
+      onGameOver: (reason) => this.handleGameOver(reason),
       onShake: () => this.cameras.main.shake(500, 0.01),
     });
-    this.gameLogic.reset();
+    this.gameLogic.reset(data?.score ?? 0);
     this.gameLogic.setGrade(data?.grade ?? 'trainee');
     this.gameLogic.state = 'playing';
     this.gameLogic.lastSpawn = Date.now();
@@ -141,7 +141,13 @@ export class GameScene extends Phaser.Scene {
   }
 
   // ── Game over (lives = 0) ─────────────────────────────────────────────────
-  private handleGameOver(): void {
+  private handleGameOver(reason: GameOverReason): void {
+    if (reason === 'lives-depleted') {
+      gameStore.getState().returnToMenu();
+      this.scene.stop();
+      return;
+    }
+
     gameStore.getState().showGameOver({
       grade:          this.gameLogic.grade,
       score:          this.gameLogic.score,

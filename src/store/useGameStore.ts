@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { GAME_CONFIG } from '@game/config';
 import type { DDAMathTier, DDAHeatState, Grade, ScoreEntry } from '@shared/types';
 
 type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'stage-message' | 'gameover';
@@ -215,8 +216,8 @@ const initialState = {
   profiles: {} as Record<string, PlayerProfile>,
   grade: 'trainee' as Grade,
   score: 0,
-  lives: 10,
-  shield: 5,
+  lives: GAME_CONFIG.initialLives,
+  shield: GAME_CONFIG.stageShieldMax,
   stage: 1,
   stageScore: 0,
   inputBuffer: '',
@@ -295,6 +296,8 @@ export const useGameStore = create<GameStoreState>()(
         ...initialState,
         bootReady: true,
         phase: 'start',
+        score: get().score,
+        grade: get().grade,
         leaderboard: get().leaderboard,
         profiles: get().profiles,
         activeUsername: get().activeUsername,
@@ -304,6 +307,8 @@ export const useGameStore = create<GameStoreState>()(
         bootReady: true,
         phase: 'start',
         menuView,
+        score: get().score,
+        grade: get().grade,
         leaderboard: get().leaderboard,
         profiles: get().profiles,
         activeUsername: get().activeUsername,

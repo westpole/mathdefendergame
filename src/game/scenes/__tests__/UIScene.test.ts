@@ -12,6 +12,7 @@ type MockState = {
   gameInstances: Array<{ scene: MockState['scenePlugin']; destroy: MockState['destroy'] }>;
   getState: ReturnType<typeof vi.fn>;
   store: {
+    score: number;
     setGrade: ReturnType<typeof vi.fn<(grade: string) => void>>;
     startPlaying: ReturnType<typeof vi.fn<() => void>>;
     returnToMenu: ReturnType<typeof vi.fn<() => void>>;
@@ -32,6 +33,7 @@ const mockState = vi.hoisted((): MockState => ({
   gameInstances: [] as Array<{ scene: typeof mockState.scenePlugin; destroy: typeof mockState.destroy }>,
   getState: vi.fn(),
   store: {
+    score: 0,
     setGrade: vi.fn<(grade: string) => void>(),
     startPlaying: vi.fn<() => void>(),
     returnToMenu: vi.fn<() => void>(),
@@ -92,6 +94,7 @@ describe('UIScene module', () => {
     mockState.store.startPlaying.mockReset();
     mockState.store.returnToMenu.mockReset();
     mockState.store.openMenuView.mockReset();
+    mockState.store.score = 0;
     mockState.continueFromOverlay.mockReset();
 
     mockState.getState.mockReturnValue(mockState.store);
@@ -143,13 +146,17 @@ describe('UIScene module', () => {
   it('starts the game, updates the store, and restarts GameScene when needed', async () => {
     const uiScene = await loadModule();
     mockState.scenePlugin.isActive.mockReturnValue(true);
+    mockState.store.score = 351;
 
     uiScene.startGame();
 
-    expect(mockState.store.setGrade).toHaveBeenCalledWith('trainee');
+    expect(mockState.store.setGrade).toHaveBeenCalledWith('commander');
     expect(mockState.store.startPlaying).toHaveBeenCalledTimes(1);
     expect(mockState.scenePlugin.stop).toHaveBeenCalledWith('GameScene');
-    expect(mockState.scenePlugin.start).toHaveBeenCalledWith('GameScene', { grade: 'trainee' });
+    expect(mockState.scenePlugin.start).toHaveBeenCalledWith('GameScene', {
+      grade: 'commander',
+      score: 351,
+    });
   });
 
   it('continues the current GameScene overlay flow when the scene is available', async () => {

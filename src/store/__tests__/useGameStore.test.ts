@@ -16,7 +16,7 @@ describe('gameStore', () => {
       profiles: {},
       grade: 'trainee',
       score: 0,
-      lives: 10,
+      lives: 3,
       shield: 5,
       stage: 1,
       stageScore: 0,
@@ -84,7 +84,7 @@ describe('gameStore', () => {
     it('should partially update HUD', () => {
       gameStore.getState().syncHUD({ score: 500 });
       expect(gameStore.getState().score).toBe(500);
-      expect(gameStore.getState().lives).toBe(10); // unchanged
+      expect(gameStore.getState().lives).toBe(3); // unchanged
     });
   });
 

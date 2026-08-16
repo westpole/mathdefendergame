@@ -44,32 +44,34 @@ describe('HUDOverlay Component', () => {
 
   it('should render lives correctly', () => {
     render(<HUDOverlay />);
-    expect(screen.getByText('Lives: 3')).toBeInTheDocument();
+    expect(screen.getByText('Lives')).toBeInTheDocument();
+    expect(screen.getByText('3')).toBeInTheDocument();
   });
 
   it('should render the base shield label', () => {
     render(<HUDOverlay />);
     expect(screen.getByText('Base Shield')).toBeInTheDocument();
+    expect(screen.getByText('5')).toBeInTheDocument();
   });
 
-  it('should render stage number', () => {
+  it('should render stage goal by grade target', () => {
     render(<HUDOverlay />);
-    expect(screen.getByText('Stage 5/28')).toBeInTheDocument();
+    expect(screen.getByText('Goal: Correct 200/20')).toBeInTheDocument();
   });
 
   it('should display warning when lives are in the warning range', () => {
-    gameStore.setState({ lives: 4 });
+    gameStore.setState({ lives: 1 });
 
     render(<HUDOverlay />);
-    const livesFill = document.querySelector('.lives-fill');
+    const livesSquare = document.querySelector('.status-square--lives');
 
-    expect(livesFill).toHaveClass('lives-fill--warn');
+    expect(livesSquare).toHaveClass('status-square--warn');
   });
 
-  it('should render one shield block per base shield slot', () => {
+  it('should render numeric status squares for shield and lives', () => {
     render(<HUDOverlay />);
 
-    expect(document.querySelectorAll('.shield-block')).toHaveLength(5);
+    expect(document.querySelectorAll('.status-square')).toHaveLength(2);
   });
 
   it('should update when store state changes', () => {
@@ -88,7 +90,5 @@ describe('HUDOverlay Component', () => {
 
     expect(screen.getByText('Grade: major-general')).toBeInTheDocument();
     expect(screen.getByText('Top Rank Reached')).toBeInTheDocument();
-    expect(screen.getByText('Speed x1.50')).toBeInTheDocument();
-    expect(screen.getByText('Cooloff: ON')).toBeInTheDocument();
   });
 });

@@ -69,54 +69,51 @@
   @include flex-center;
 }
 
-.shield-row {
+.status-squares {
   display: flex;
-  gap: $spacing-xs;
-  flex-direction: row;
+  gap: $spacing-sm;
   align-items: center;
-
-  .hud-label {
-    margin-right: 20px;
-  }
 }
 
-.shield-block {
-  width: 16px;
-  height: 22px;
-  border-radius: $radius-sm;
-
-  &.is-filled {
-    background: $shield-fill;
-  }
-}
-
-.lives-track {
+.status-square {
+  width: 76px;
+  min-height: 64px;
+  border-radius: $radius-md;
+  border: 1px solid $border-panel-light;
+  background: rgba(0, 0, 0, 0.3);
   display: flex;
-  flex-direction: row;
-  width: 230px;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding: 6px;
 
-  strong {
-    display: block;
-    white-space: nowrap;
-    padding-right: 0.8em;
+  &__label {
+    font-size: 10px;
+    color: $text-muted;
+    text-align: center;
   }
-}
 
-.lives-fill {
-  height: 3vh;
-  width: 100%;
-  border-radius: $radius-full;
+  &__value {
+    font-family: $font-display;
+    font-size: 20px;
+    line-height: 1.1;
+    margin-top: 2px;
+    color: $color-primary-yellow;
+  }
+
+  &--shield {
+    border-color: rgba($shield-fill, 0.5);
+  }
 
   &--good {
-    background: $color-success-green;
+    border-color: rgba($color-success-green, 0.7);
   }
 
   &--warn {
-    background: $color-warning-yellow;
+    border-color: rgba($color-warning-yellow, 0.8);
   }
 
   &--danger {
-    background: $color-danger-red;
+    border-color: rgba($color-danger-red, 0.8);
   }
 }

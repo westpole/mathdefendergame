@@ -2,6 +2,8 @@ import type { DDAMathTier, Grade } from '@shared/types';
 
 interface GradeConfig {
   thresholdScore: number;
+  stageClearCorrectAnswers: number;
+  cleanStageBonusPoints: number;
   baseFallSpeedPxSec: number;
   spawnRate: number;
   targetLatencyMs: number;
@@ -13,6 +15,8 @@ export const GAME_CONFIG = {
   grades: {
     trainee: {
       thresholdScore: 0,
+      stageClearCorrectAnswers: 7,
+      cleanStageBonusPoints: 5,
       baseFallSpeedPxSec: 36,
       spawnRate: 2700,
       targetLatencyMs: 2600,
@@ -20,7 +24,9 @@ export const GAME_CONFIG = {
       mathTier: 1,
     },
     cadet: {
-      thresholdScore: 150,
+      thresholdScore: 101,
+      stageClearCorrectAnswers: 10,
+      cleanStageBonusPoints: 7,
       baseFallSpeedPxSec: 52,
       spawnRate: 2300,
       targetLatencyMs: 2300,
@@ -28,7 +34,9 @@ export const GAME_CONFIG = {
       mathTier: 2,
     },
     commander: {
-      thresholdScore: 250,
+      thresholdScore: 351,
+      stageClearCorrectAnswers: 15,
+      cleanStageBonusPoints: 10,
       baseFallSpeedPxSec: 72,
       spawnRate: 1900,
       targetLatencyMs: 2000,
@@ -36,7 +44,9 @@ export const GAME_CONFIG = {
       mathTier: 3,
     },
     'major-general': {
-      thresholdScore: 350,
+      thresholdScore: 751,
+      stageClearCorrectAnswers: 20,
+      cleanStageBonusPoints: 15,
       baseFallSpeedPxSec: 92,
       spawnRate: 1500,
       targetLatencyMs: 1700,
@@ -55,9 +65,23 @@ export const GAME_CONFIG = {
   } as Record<string, string>,
 
   dangerZone: 100, // px from bottom
-  initialLives: 10,
+  initialLives: 3,
   stageShieldMax: 5,
+  scorePerCorrectAnswer: 1,
+  scorePenaltyPerIncorrectAnswer: 1,
 
   CANVAS_WIDTH: 700,
   CANVAS_HEIGHT: 700,
 };
+
+export function resolveGradeFromScore(score: number): Grade {
+  let resolved: Grade = 'trainee';
+
+  for (const grade of GAME_CONFIG.gradeOrder) {
+    if (score >= GAME_CONFIG.grades[grade].thresholdScore) {
+      resolved = grade;
+    }
+  }
+
+  return resolved;
+}

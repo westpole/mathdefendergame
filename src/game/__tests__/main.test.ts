@@ -8,7 +8,7 @@ import { Game } from '../main';
 interface Callbacks {
   onHUDUpdate: () => void;
   onFinishStage: (success: boolean) => void;
-  onGameOver: () => void;
+  onGameOver: (reason: 'victory' | 'lives-depleted') => void;
   onShake: () => void;
 }
 
@@ -31,7 +31,7 @@ describe('Game', () => {
   describe('initialization', () => {
     it('should initialize with default values', () => {
       expect(game.score).toBe(0);
-      expect(game.lives).toBe(10);
+      expect(game.lives).toBe(3);
       expect(game.shield).toBe(5);
       expect(game.stage).toBe(1);
     });
@@ -81,7 +81,7 @@ describe('Game', () => {
       game.reset();
 
       expect(game.score).toBe(0);
-      expect(game.lives).toBe(10);
+      expect(game.lives).toBe(3);
       expect(game.shield).toBe(5);
       expect(game.stage).toBe(1);
       expect(game.meteors.length).toBe(0);
@@ -126,45 +126,42 @@ describe('Game', () => {
       expect(game.incorrectCount).toBe(0);
     });
 
-    it('promotes to cadet at score 150', () => {
+    it('promotes to cadet at score 101', () => {
       game.spawnMeteor();
       game.state = 'playing';
-      game.score = 140;
-      game.stageScore = 140;
+      game.score = 100;
 
       const meteor = game.meteors[0];
       game.inputBuffer = meteor.answer.toString();
       game.checkAnswer();
 
-      expect(game.score).toBe(150);
+      expect(game.score).toBe(101);
       expect(game.grade).toBe('cadet');
     });
 
-    it('promotes to commander at score 250', () => {
+    it('promotes to commander at score 351', () => {
       game.spawnMeteor();
       game.state = 'playing';
-      game.score = 240;
-      game.stageScore = 190;
+      game.score = 350;
 
       const meteor = game.meteors[0];
       game.inputBuffer = meteor.answer.toString();
       game.checkAnswer();
 
-      expect(game.score).toBe(250);
+      expect(game.score).toBe(351);
       expect(game.grade).toBe('commander');
     });
 
-    it('promotes to major-general at score 350', () => {
+    it('promotes to major-general at score 751', () => {
       game.spawnMeteor();
       game.state = 'playing';
-      game.score = 340;
-      game.stageScore = 190;
+      game.score = 750;
 
       const meteor = game.meteors[0];
       game.inputBuffer = meteor.answer.toString();
       game.checkAnswer();
 
-      expect(game.score).toBe(350);
+      expect(game.score).toBe(751);
       expect(game.grade).toBe('major-general');
     });
   });
@@ -182,8 +179,8 @@ describe('Game', () => {
       game.checkAnswer();
 
       expect(game.meteors.length).toBe(0);
-      expect(game.score).toBe(10);
-      expect(game.stageScore).toBe(10);
+      expect(game.score).toBe(1);
+      expect(game.stageScore).toBe(1);
       expect(game.correctCount).toBe(1);
       expect(game.inputBuffer).toBe('');
     });
@@ -204,8 +201,18 @@ describe('Game', () => {
 
       expect(game.incorrectCount).toBe(1);
       expect(game.stageIncorrect).toBe(1);
+      expect(game.score).toBe(0);
       expect(game.inputBuffer).toBe('');
       expect(mockCallbacks.onShake).toHaveBeenCalled();
+    });
+
+    it('should not reduce score below zero on wrong answers', () => {
+      game.score = 0;
+      game.inputBuffer = '99999';
+
+      game.checkAnswer();
+
+      expect(game.score).toBe(0);
     });
 
     it('should not process NaN input', () => {
@@ -218,10 +225,11 @@ describe('Game', () => {
       expect(game.score).toBe(0);
     });
 
-    it('should finish stage when score reaches 200', () => {
+    it('should finish stage when correct-answer target is reached', () => {
       const meteor = game.meteors[0];
       game.inputBuffer = meteor.answer.toString();
-      game.stageScore = 190;
+      game.stageScore = 6;
+      game.stageCorrect = 6;
 
       game.checkAnswer();
 
@@ -254,7 +262,7 @@ describe('Game', () => {
       game.hitBase();
 
       expect(game.shield).toBe(0);
-      expect(game.lives).toBe(9);
+      expect(game.lives).toBe(2);
     });
 
     it('should not fail stage when shield is above 0', () => {
@@ -277,14 +285,15 @@ describe('Game', () => {
       expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
     });
 
-    it('should trigger game over when lives reach 0', () => {
+    it('should show failed stage when lives reach 0', () => {
       game.lives = 1;
 
       game.failStage();
 
       expect(game.lives).toBe(0);
-      expect(game.state).toBe('gameover');
-      expect(mockCallbacks.onGameOver).toHaveBeenCalled();
+      expect(game.state).toBe('message');
+      expect(mockCallbacks.onFinishStage).toHaveBeenCalledWith(false);
+      expect(mockCallbacks.onGameOver).not.toHaveBeenCalled();
     });
 
     it('should finish stage with failure when lives remain', () => {
@@ -337,10 +346,11 @@ describe('Game', () => {
     it('should update checkpoints on success', () => {
       game.score = 100;
       game.lives = 8;
+      game.grade = 'trainee';
 
       game.finishStage(true);
 
-      expect(game.scoreAtStageStart).toBe(100);
+      expect(game.scoreAtStageStart).toBe(105);
       expect(game.livesAtStageStart).toBe(9); // includes bonus
     });
 
@@ -433,7 +443,19 @@ describe('Game', () => {
       game.resumeFromMessage();
 
       expect(game.state).toBe('gameover');
-      expect(mockCallbacks.onGameOver).toHaveBeenCalled();
+      expect(mockCallbacks.onGameOver).toHaveBeenCalledWith('victory');
+    });
+
+    it('should trigger lives-depleted game over after stage message', () => {
+      game.lives = 1;
+
+      game.failStage();
+      expect(game.state).toBe('message');
+
+      game.resumeFromMessage();
+
+      expect(game.state).toBe('gameover');
+      expect(mockCallbacks.onGameOver).toHaveBeenCalledWith('lives-depleted');
     });
 
     it('should not resume if already in gameover state', () => {
@@ -480,7 +502,7 @@ describe('Game', () => {
     it('should call onGameOver callback', () => {
       game.gameOver();
 
-      expect(mockCallbacks.onGameOver).toHaveBeenCalled();
+      expect(mockCallbacks.onGameOver).toHaveBeenCalledWith('lives-depleted');
     });
 
     it('should accept win parameter', () => {
@@ -618,7 +640,7 @@ describe('Game', () => {
       }
 
       expect(game.correctCount).toBe(5);
-      expect(game.score).toBe(50);
+      expect(game.score).toBe(5);
     });
 
     it('should handle multiple incorrect answers in sequence', () => {

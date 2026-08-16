@@ -97,6 +97,17 @@
   }
 }
 
+.grade-icon-wrap {
+  display: flex;
+  justify-content: center;
+}
+
+.grade-icon {
+  display: block;
+  margin: 0 auto 1em auto;
+  border-radius: 5em;
+}
+
 // Rules List
 .rules-list {
   margin: 16px 0 0;

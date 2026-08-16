@@ -317,7 +317,7 @@ describe('GameScene', () => {
   });
 
   it('bridges stage and game-over callbacks into the store', () => {
-    const { scene, store } = setupScene();
+    const { scene, store, phaser } = setupScene();
 
     scene.init({ grade: 'commander' });
     mockGameState.lastInstance!.stage = 4;
@@ -337,7 +337,7 @@ describe('GameScene', () => {
       lives: 3,
     });
 
-    mockGameState.lastCallbacks?.onGameOver();
+    mockGameState.lastCallbacks?.onGameOver('victory');
     expect(store.showGameOver).toHaveBeenCalledWith({
       grade: 'commander',
       score: 150,
@@ -345,6 +345,10 @@ describe('GameScene', () => {
       incorrectCount: 5,
       finalPerfScore: 70.59,
     });
+
+    mockGameState.lastCallbacks?.onGameOver('lives-depleted');
+    expect(store.returnToMenu).toHaveBeenCalledTimes(1);
+    expect(phaser.stop).toHaveBeenCalledTimes(1);
   });
 
   it('resumes from overlay, clears renderables, and restarts play unless the game is over', () => {
