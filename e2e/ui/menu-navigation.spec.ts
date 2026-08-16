@@ -1,7 +1,8 @@
 import { test, expect } from '../fixtures/electron-app';
+import type { Page } from '@playwright/test';
 import type { E2EWindow } from '../types';
 
-async function loginToStartMenu(page: Parameters<typeof test>[0]['page']) {
+async function loginToStartMenu(page: Page) {
   const username = `Pilot${Date.now()}`;
 
   await page.getByLabel('Username').fill(username);

@@ -11,9 +11,9 @@ import {
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 
 import { GameOverOverlay } from '.';
-import childMock from './__mocks__/child.json';
-import studentMock from './__mocks__/student.json';
-import adultMock from './__mocks__/adult.json';
+import traineeMock from './__mocks__/child.json';
+import commanderMock from './__mocks__/student.json';
+import majorGeneralMock from './__mocks__/adult.json';
 
 const reusableInitialState: Partial<GameStoreState> = {
   phase: 'gameover' as OverlayPhase,
@@ -61,31 +61,31 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Child: Story = {
-  name: 'Child Level',
+  name: 'Trainee',
   args: {
     initialState: {
       ...reusableInitialState,
-      ...childMock,
+      ...traineeMock,
     }
   },
 };
 
 export const Student: Story = {
-  name: 'Student Level',
+  name: 'Commander',
   args: {
     initialState: {
       ...reusableInitialState,
-      ...studentMock,
+      ...commanderMock,
     }
   },
 };
 
 export const Adult: Story = {
-  name: 'Adult Level',
+  name: 'Major General',
   args: {
     initialState: {
       ...reusableInitialState,
-      ...adultMock,
+      ...majorGeneralMock,
     }
   },
 };

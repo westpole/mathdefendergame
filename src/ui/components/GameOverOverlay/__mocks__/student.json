@@ -1,5 +1,5 @@
 {
-  "difficulty": "student",
+  "grade": "commander",
   "score": 33,
   "lives": 0,
   "shield": 5,
@@ -9,13 +9,14 @@
   "incorrectCount": 4,
   "finalPerfScore": 75,
   "leaderboard": {
-    "child": [],
-    "student": [
+    "trainee": [],
+    "cadet": [],
+    "commander": [
       {
         "name": "Student player",
         "score": 33
       }
     ],
-    "adult": []
+    "major-general": []
   }
 }

@@ -57,7 +57,7 @@ test('can start game', async ({ page }) => {
   // Interact with store
   await page.evaluate(() => {
     const state = (window as E2EWindow).__e2e!.getStoreState();
-    state.setDifficulty('easy');
+    state.setGrade('trainee');
     state.startPlaying();
   });
 

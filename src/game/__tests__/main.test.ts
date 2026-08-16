@@ -116,14 +116,56 @@ describe('Game', () => {
     });
   });
 
-  describe('difficulty settings', () => {
-    it('should initialize with child difficulty', () => {
-      expect(game.difficulty).toBe('child');
+  describe('grade progression', () => {
+    it('should initialize with trainee grade', () => {
+      expect(game.grade).toBe('trainee');
     });
 
     it('should track correct and incorrect answers', () => {
       expect(game.correctCount).toBe(0);
       expect(game.incorrectCount).toBe(0);
+    });
+
+    it('promotes to cadet at score 150', () => {
+      game.spawnMeteor();
+      game.state = 'playing';
+      game.score = 140;
+      game.stageScore = 140;
+
+      const meteor = game.meteors[0];
+      game.inputBuffer = meteor.answer.toString();
+      game.checkAnswer();
+
+      expect(game.score).toBe(150);
+      expect(game.grade).toBe('cadet');
+    });
+
+    it('promotes to commander at score 250', () => {
+      game.spawnMeteor();
+      game.state = 'playing';
+      game.score = 240;
+      game.stageScore = 190;
+
+      const meteor = game.meteors[0];
+      game.inputBuffer = meteor.answer.toString();
+      game.checkAnswer();
+
+      expect(game.score).toBe(250);
+      expect(game.grade).toBe('commander');
+    });
+
+    it('promotes to major-general at score 350', () => {
+      game.spawnMeteor();
+      game.state = 'playing';
+      game.score = 340;
+      game.stageScore = 190;
+
+      const meteor = game.meteors[0];
+      game.inputBuffer = meteor.answer.toString();
+      game.checkAnswer();
+
+      expect(game.score).toBe(350);
+      expect(game.grade).toBe('major-general');
     });
   });
 
@@ -335,7 +377,7 @@ describe('Game', () => {
   describe('resumeFromMessage', () => {
     beforeEach(() => {
       game.state = 'message';
-      game.meteors.push({ x: 100, y: 100, text: '2+2', answer: 4, op: '+', speed: 1, id: 1 });
+      game.meteors.push({ x: 100, y: 100, text: '2+2', answer: 4, op: '+', speed: 1, id: 1, spawnTimeMs: Date.now() });
       game.particles.push({ x: 50, y: 50, vx: 1, vy: 1, life: 1, color: '#fff' });
       game.inputBuffer = 'test';
       game.stageScore = 50;
@@ -517,6 +559,26 @@ describe('Game', () => {
       game.update(16);
 
       expect(game.particles[0].life).toBeLessThan(initialLife);
+    });
+
+    it('should respect DDA max active meteor gating', () => {
+      game.lastSpawn = 0;
+      vi.setSystemTime(3000);
+
+      game.meteors = Array.from({ length: 4 }, (_, index) => ({
+        x: 100,
+        y: 0,
+        text: '1 + 1',
+        answer: 2,
+        op: '+',
+        speed: 1,
+        id: index + 1,
+        spawnTimeMs: Date.now(),
+      }));
+
+      game.update(16);
+
+      expect(game.meteors).toHaveLength(4);
     });
   });
 

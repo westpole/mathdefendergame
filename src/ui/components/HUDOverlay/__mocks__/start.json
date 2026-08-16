@@ -1,5 +1,5 @@
 {
-  "difficulty": "adult",
+  "grade": "trainee",
   "score": 0,
   "lives": 10,
   "shield": 5,
@@ -9,8 +9,9 @@
   "incorrectCount": 0,
   "finalPerfScore": 0,
   "leaderboard": {
-    "child": [],
-    "student": [],
-    "adult": []
+    "trainee": [],
+    "cadet": [],
+    "commander": [],
+    "major-general": []
   }
 }

@@ -10,7 +10,6 @@ import Phaser from 'phaser';
 
 import { gameStore } from '@store/useGameStore';
 import type { MenuView } from '@store/useGameStore';
-import type { Difficulty } from '@shared/types';
 import { GAME_CONFIG } from '@game/config';
 
 import { BootScene } from './BootScene';
@@ -57,17 +56,17 @@ export function destroyGame(game: Phaser.Game): void {
   phaserGame = null;
 }
 
-export function startGame(difficulty: Difficulty): void {
+export function startGame(): void {
   const game = ensurePhaserGame();
 
-  gameStore.getState().setDifficulty(difficulty);
+  gameStore.getState().setGrade('trainee');
   gameStore.getState().startPlaying();
 
   if (game.scene.isActive('GameScene') || game.scene.isPaused('GameScene')) {
     game.scene.stop('GameScene');
   }
 
-  game.scene.start('GameScene', { difficulty });
+  game.scene.start('GameScene', { grade: 'trainee' });
 }
 
 export function continueGame(): void {

@@ -27,7 +27,7 @@ test.describe('Visual Regression Tests', () => {
 
       e2e.setSeed(12345);
       const state = e2e.getStoreState();
-      state.setDifficulty('easy');
+      state.setGrade('trainee');
       state.startPlaying();
     });
 

@@ -12,7 +12,7 @@ describe('LoginOverlay', () => {
       bootReady: true,
       activeUsername: null,
       profiles: {},
-      difficulty: 'child',
+      grade: 'trainee',
       score: 0,
       lives: 10,
       shield: 5,
@@ -24,9 +24,10 @@ describe('LoginOverlay', () => {
       finalPerfScore: 0,
       stageMessage: null,
       leaderboard: {
-        child: [],
-        student: [],
-        adult: [],
+        trainee: [],
+        cadet: [],
+        commander: [],
+        'major-general': [],
       },
     });
   });

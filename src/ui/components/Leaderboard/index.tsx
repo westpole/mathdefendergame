@@ -1,25 +1,25 @@
 import { useEffect, useState } from 'react';
 import { clsx } from 'clsx';
 import { useGameStore } from '@store/useGameStore';
-import type { Difficulty } from '@shared/types';
+import type { Grade } from '@shared/types';
 
 interface LeaderboardProps {
-  initialDifficulty: Difficulty;
+  initialGrade: Grade;
   limit: number;
 }
 
-const tabs: Difficulty[] = ['child', 'student', 'adult'];
+const tabs: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
 
-export function Leaderboard({ initialDifficulty, limit }: LeaderboardProps) {
-  const [activeTab, setActiveTab] = useState<Difficulty>(initialDifficulty);
-  const difficultyScores = useGameStore((state) => state.leaderboard[activeTab]);
-  const scores = difficultyScores.slice(0, limit);
+export function Leaderboard({ initialGrade, limit }: LeaderboardProps) {
+  const [activeTab, setActiveTab] = useState<Grade>(initialGrade);
+  const gradeScores = useGameStore((state) => state.leaderboard[activeTab]);
+  const scores = gradeScores.slice(0, limit);
 
   useEffect(() => {
     (async () => {
-      await setActiveTab(initialDifficulty);
+      await setActiveTab(initialGrade);
     })();
-  }, [initialDifficulty]);
+  }, [initialGrade]);
 
   return (
     <div className="overlay-content">

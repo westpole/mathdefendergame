@@ -1,5 +1,5 @@
 {
-  "difficulty": "adult",
+  "grade": "major-general",
   "score": 75,
   "lives": 0,
   "shield": 5,
@@ -9,7 +9,7 @@
   "incorrectCount": 2,
   "finalPerfScore": 85,
   "leaderboard": {
-    "child": [
+    "trainee": [
       {
         "key": "temp-125",
         "name": "John Connor",
@@ -17,7 +17,7 @@
         "perfScore": 21
       }
     ],
-    "student": [
+    "cadet": [
       {
         "key": "temp-126",
         "name": "John Connor",
@@ -61,7 +61,7 @@
         "perfScore": 39
       }
     ],
-    "adult": [
+    "major-general": [
       {
         "key": "temp-133",
         "name": "John Connor",

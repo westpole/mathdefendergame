@@ -6,9 +6,10 @@
  * It also handles scene transitions and game state management.
  */
 import { gameStore } from '@store/useGameStore';
-import type { Meteor, Particle, Difficulty, GameState } from '@shared/types';
+import type { Meteor, Particle, GameState, Grade } from '@shared/types';
 
 import { GAME_CONFIG } from './config';
+import { DDAController, type DDAConfiguration } from './utilities/DDAController';
 import { generateMath } from './utilities/mathGen';
 
 export interface GameCallbacks {
@@ -27,7 +28,7 @@ export class Game {
   stage: number = 1;
   stageScore: number = 0;
 
-  difficulty: Difficulty = 'child';
+  grade: Grade = 'trainee';
   canvasHeight: number = GAME_CONFIG.CANVAS_HEIGHT;
 
   meteors: Meteor[] = [];
@@ -46,11 +47,17 @@ export class Game {
   // Tracks whether the last stage transition was a success (used by resumeFromMessage)
   private lastStageSuccess: boolean = true;
   private pendingGameOver: boolean = false;
+  private dda: DDAController;
 
   private readonly cb: GameCallbacks;
 
   constructor(callbacks: GameCallbacks) {
     this.cb = callbacks;
+    this.dda = new DDAController(getDDAConfigForGrade(this.grade));
+  }
+
+  setGrade(grade: Grade): void {
+    this.applyGradeBaseline(grade);
   }
 
   reset(): void {
@@ -69,6 +76,7 @@ export class Game {
     this.livesAtStageStart = GAME_CONFIG.initialLives;
     this.lastStageSuccess = true;
     this.pendingGameOver = false;
+    this.applyGradeBaseline('trainee');
     this.canvasHeight = GAME_CONFIG.CANVAS_HEIGHT;
     this.state = 'start';
     this.syncStore();
@@ -79,9 +87,8 @@ export class Game {
   }
 
   spawnMeteor(): void {
-    const expr = generateMath(this.stage);
-    const settings = GAME_CONFIG.difficulties[this.difficulty];
-    const speedMod = 1 + this.stage * 0.05;
+    const difficultyState = this.dda.getDifficultyState();
+    const expr = generateMath(this.stage, difficultyState.mathTier);
 
     this.meteors.push({
       x: Math.random() * (GAME_CONFIG.CANVAS_WIDTH - 120) + 60,
@@ -89,8 +96,9 @@ export class Game {
       text: expr.text,
       answer: expr.answer,
       op: expr.op,
-      speed: settings.speed * speedMod,
+      speed: difficultyState.effectiveFallSpeed,
       id: Math.random(),
+      spawnTimeMs: Date.now(),
     });
   }
 
@@ -127,19 +135,27 @@ export class Game {
 
     if (hitIndex !== -1) {
       const m = this.meteors[hitIndex];
+      const latencyMs = Math.max(0, Date.now() - m.spawnTimeMs);
       const hitColor = GAME_CONFIG.colors[m.op] ?? '#fff';
       this.createExplosion(m.x, m.y, hitColor);
       this.meteors.splice(hitIndex, 1);
+      this.dda.recordSample({ isCorrect: true, latencyMs, baseHit: false });
       this.score += 10;
       this.stageScore += 10;
       this.correctCount++;
       this.inputBuffer = '';
+      this.syncGradeFromScore();
 
       if (this.stageScore >= 200) {
         this.finishStage(true);
         return;
       }
     } else {
+      this.dda.recordSample({
+        isCorrect: false,
+        latencyMs: this.getOldestMeteorLatencyMs(),
+        baseHit: false,
+      });
       this.incorrectCount++;
       this.stageIncorrect++;
       this.inputBuffer = '';
@@ -150,7 +166,9 @@ export class Game {
     this.syncStore();
   }
 
-  hitBase(): void {
+  hitBase(impactMeteor?: Meteor): void {
+    const latencyMs = impactMeteor ? Math.max(0, Date.now() - impactMeteor.spawnTimeMs) : 0;
+    this.dda.recordSample({ isCorrect: false, latencyMs, baseHit: true });
     this.shield--;
     this.cb.onHUDUpdate();
     this.syncStore();
@@ -223,6 +241,7 @@ export class Game {
       // Update the lives checkpoint so a second failure doesn't restore them.
       this.score = this.scoreAtStageStart;
       this.livesAtStageStart = this.lives;
+      this.syncGradeFromScore();
     }
 
     this.state = 'playing';
@@ -242,10 +261,14 @@ export class Game {
     this.cb.onGameOver();
   }
 
-  update(_dt: number): void {
-    const settings = GAME_CONFIG.difficulties[this.difficulty];
+  update(dt: number): void {
+    const settings = GAME_CONFIG.grades[this.grade];
+    const difficultyState = this.dda.getDifficultyState();
 
-    if (Date.now() - this.lastSpawn > settings.spawnRate) {
+    if (
+      Date.now() - this.lastSpawn > settings.spawnRate &&
+      this.meteors.length < difficultyState.maxActiveMeteors
+    ) {
       this.spawnMeteor();
       this.lastSpawn = Date.now();
     }
@@ -254,10 +277,13 @@ export class Game {
 
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const m = this.meteors[i];
-      m.y += m.speed;
+      const normalizedY = Math.max(0, Math.min(1, m.y / dangerY));
+      const tickSpeedPxSec = this.dda.getMeteorTickSpeed(normalizedY);
+      m.speed = tickSpeedPxSec;
+      m.y += tickSpeedPxSec * (dt / 1000);
       if (m.y > dangerY) {
         this.meteors.splice(i, 1);
-        this.hitBase();
+        this.hitBase(m);
         return; // Re-evaluate after shield/life state change
       }
     }
@@ -273,7 +299,7 @@ export class Game {
 
   private syncStore(): void {
     gameStore.getState().syncHUD({
-      difficulty: this.difficulty,
+      grade: this.grade,
       score: this.score,
       lives: this.lives,
       shield: this.shield,
@@ -283,6 +309,60 @@ export class Game {
       correctCount: this.correctCount,
       incorrectCount: this.incorrectCount,
       finalPerfScore: this.finalPerfScore,
+      ddaHeatState: this.dda.getDifficultyState().heatState,
+      ddaMathTier: this.dda.getDifficultyState().mathTier,
+      ddaSpeedMultiplier: this.dda.getDifficultyState().fallSpeedMultiplier,
+      ddaIsCooloffActive: this.dda.getDifficultyState().isCooloffActive,
     });
   }
+
+  private syncGradeFromScore(): void {
+    const nextGrade = resolveGradeFromScore(this.score);
+
+    if (nextGrade === this.grade) {
+      return;
+    }
+
+    this.applyGradeBaseline(nextGrade);
+  }
+
+  private applyGradeBaseline(grade: Grade): void {
+    this.grade = grade;
+    this.dda = new DDAController(getDDAConfigForGrade(grade));
+  }
+
+  private getOldestMeteorLatencyMs(): number {
+    if (this.meteors.length === 0) {
+      return 3000;
+    }
+
+    const oldestSpawnTime = this.meteors.reduce((oldest, meteor) => {
+      return Math.min(oldest, meteor.spawnTimeMs);
+    }, this.meteors[0].spawnTimeMs);
+
+    return Math.max(0, Date.now() - oldestSpawnTime);
+  }
+}
+
+function getDDAConfigForGrade(grade: Grade): Partial<DDAConfiguration> {
+  const settings = GAME_CONFIG.grades[grade];
+
+  return {
+    targetLatencyMs: settings.targetLatencyMs,
+    dampingFactorAlpha: settings.dampingFactorAlpha,
+    baseFallSpeedPxSec: settings.baseFallSpeedPxSec,
+    startingMathTier: settings.mathTier,
+  };
+}
+
+function resolveGradeFromScore(score: number): Grade {
+  let resolved: Grade = 'trainee';
+
+  for (const grade of GAME_CONFIG.gradeOrder) {
+    if (score >= GAME_CONFIG.grades[grade].thresholdScore) {
+      resolved = grade;
+    }
+  }
+
+  return resolved;
 }

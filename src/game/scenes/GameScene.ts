@@ -10,7 +10,7 @@ import Phaser from 'phaser';
 import { Game } from '@game/main';
 import { GAME_CONFIG } from '@game/config';
 import { gameStore } from '@store/useGameStore';
-import type { Difficulty } from '@shared/types';
+import type { Grade } from '@shared/types';
 
 function colorToInt(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
@@ -49,15 +49,15 @@ export class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
-  init(data: { difficulty: Difficulty }): void {
+  init(data?: { grade?: Grade }): void {
     this.gameLogic = new Game({
       onHUDUpdate: () => this.updateHUD(),
       onFinishStage: (success) => this.handleFinishStage(success),
       onGameOver: () => this.handleGameOver(),
       onShake: () => this.cameras.main.shake(500, 0.01),
     });
-    this.gameLogic.difficulty = data.difficulty ?? 'child';
     this.gameLogic.reset();
+    this.gameLogic.setGrade(data?.grade ?? 'trainee');
     this.gameLogic.state = 'playing';
     this.gameLogic.lastSpawn = Date.now();
     gameStore.getState().startPlaying();
@@ -143,7 +143,7 @@ export class GameScene extends Phaser.Scene {
   // ── Game over (lives = 0) ─────────────────────────────────────────────────
   private handleGameOver(): void {
     gameStore.getState().showGameOver({
-      difficulty:     this.gameLogic.difficulty,
+      grade:          this.gameLogic.grade,
       score:          this.gameLogic.score,
       correctCount:   this.gameLogic.correctCount,
       incorrectCount: this.gameLogic.incorrectCount,

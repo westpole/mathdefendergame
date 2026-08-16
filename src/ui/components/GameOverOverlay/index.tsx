@@ -4,7 +4,7 @@ import { returnToMenu } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
 export function GameOverOverlay() {
-  const difficulty = useGameStore((state) => state.difficulty);
+  const grade = useGameStore((state) => state.grade);
   const score = useGameStore((state) => state.score);
   const correctCount = useGameStore((state) => state.correctCount);
   const incorrectCount = useGameStore((state) => state.incorrectCount);
@@ -13,7 +13,7 @@ export function GameOverOverlay() {
   const [name, setName] = useState('');
 
   const saveAndReturn = () => {
-    saveScore(name.trim() || 'Anonymous', score, finalPerfScore, difficulty);
+    saveScore(name.trim() || 'Anonymous', score, finalPerfScore, grade);
     returnToMenu();
   };
 
@@ -26,8 +26,8 @@ export function GameOverOverlay() {
           </div>
 
           <div className="stats-grid">
-            <span>Difficulty</span>
-            <strong>{difficulty}</strong>
+            <span>Grade</span>
+            <strong>{grade}</strong>
             <span>Total Score</span>
             <strong>{score}</strong>
             <span>Correct</span>

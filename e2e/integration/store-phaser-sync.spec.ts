@@ -10,7 +10,7 @@ test.describe('Store and Phaser Synchronization', () => {
       (window as E2EWindow).__e2e!.setStoreState({
         score: 1000,
         lives: 2,
-        difficulty: 'medium',
+        grade: 'commander',
       });
     });
 
@@ -18,7 +18,7 @@ test.describe('Store and Phaser Synchronization', () => {
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
     expect(state.score).toBe(1000);
     expect(state.lives).toBe(2);
-    expect(state.difficulty).toBe('medium');
+    expect(state.grade).toBe('commander');
   });
 
   test('can wait for game to be idle', async ({ page }) => {
@@ -27,7 +27,7 @@ test.describe('Store and Phaser Synchronization', () => {
     // Start game
     await page.evaluate(() => {
       const state = (window as E2EWindow).__e2e!.getStoreState();
-      state.setDifficulty('easy');
+      state.setGrade('trainee');
       state.startPlaying();
     });
 

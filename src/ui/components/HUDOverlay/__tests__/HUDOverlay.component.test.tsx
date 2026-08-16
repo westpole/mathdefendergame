@@ -13,6 +13,7 @@ describe('HUDOverlay Component', () => {
   beforeEach(() => {
     // Set initial state for the game store before each test
     gameStore.setState({
+      grade: 'major-general',
       score: 1000,
       lives: 3,
       shield: 80,
@@ -22,11 +23,16 @@ describe('HUDOverlay Component', () => {
       correctCount: 10,
       incorrectCount: 2,
       finalPerfScore: 85,
+      ddaHeatState: 'FLOW',
+      ddaMathTier: 3,
+      ddaSpeedMultiplier: 1.5,
+      ddaIsCooloffActive: true,
       stageMessage: null,
       leaderboard: {
-        child: [],
-        student: [],
-        adult: [],
+        trainee: [],
+        cadet: [],
+        commander: [],
+        'major-general': [],
       },
     });
   });
@@ -48,7 +54,7 @@ describe('HUDOverlay Component', () => {
 
   it('should render stage number', () => {
     render(<HUDOverlay />);
-    expect(screen.getByText(/5/)).toBeInTheDocument();
+    expect(screen.getByText('Stage 5/28')).toBeInTheDocument();
   });
 
   it('should display warning when lives are in the warning range', () => {
@@ -75,5 +81,14 @@ describe('HUDOverlay Component', () => {
     });
 
     expect(screen.getByText(/2000/)).toBeInTheDocument();
+  });
+
+  it('should render DDA telemetry', () => {
+    render(<HUDOverlay />);
+
+    expect(screen.getByText('Grade: major-general')).toBeInTheDocument();
+    expect(screen.getByText('Top Rank Reached')).toBeInTheDocument();
+    expect(screen.getByText('Speed x1.50')).toBeInTheDocument();
+    expect(screen.getByText('Cooloff: ON')).toBeInTheDocument();
   });
 });

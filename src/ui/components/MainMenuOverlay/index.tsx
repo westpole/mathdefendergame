@@ -1,12 +1,6 @@
 import { startGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
-const difficulties = [
-  { key: 'child', label: 'Child', className: 'menu-button menu-button--child' },
-  { key: 'student', label: 'Student', className: 'menu-button menu-button--student' },
-  { key: 'adult', label: 'Adult', className: 'menu-button menu-button--adult' },
-] as const;
-
 export function MainMenuOverlay() {
   const activeUsername = useGameStore((state) => state.activeUsername);
 
@@ -15,18 +9,16 @@ export function MainMenuOverlay() {
       <div className="overlay-panel">
         <h1>{activeUsername ?? 'Commander'}</h1>
         <h4 className="menu-subtitle">Commander on duty</h4>
-        <p className="menu-subtitle">Select difficulty to begin your defense mission.</p>
+        <p className="menu-subtitle">Start as Trainee and rank up by score.</p>
         <div className="menu-actions">
-          {difficulties.map((difficulty) => (
-            <button
-              key={difficulty.key}
-              className={difficulty.className}
-              onClick={() => startGame(difficulty.key)}
-              type="button"
-            >
-              {difficulty.label}
-            </button>
-          ))}
+          <button
+            className="menu-button menu-button--student"
+            data-testid="start-defense-button"
+            onClick={() => startGame()}
+            type="button"
+          >
+            Start Defense
+          </button>
         </div>
       </div>
     </div>

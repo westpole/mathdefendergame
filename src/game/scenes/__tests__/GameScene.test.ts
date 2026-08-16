@@ -14,7 +14,7 @@ type GameScenePrivate = {
 const mockGameState = vi.hoisted(() => ({
   lastInstance: undefined as undefined | {
     state: string;
-    difficulty: string;
+    grade: string;
     inputBuffer: string;
     lastSpawn: number;
     stage: number;
@@ -31,6 +31,7 @@ const mockGameState = vi.hoisted(() => ({
     update: ReturnType<typeof vi.fn>;
     checkAnswer: ReturnType<typeof vi.fn>;
     resumeFromMessage: ReturnType<typeof vi.fn>;
+    setGrade: ReturnType<typeof vi.fn>;
   },
   lastCallbacks: undefined as GameCallbacks | undefined,
 }));
@@ -53,7 +54,7 @@ type MockParticle = {
 vi.mock('../../main', () => ({
   Game: class {
     state = 'start';
-    difficulty = 'child';
+    grade = 'trainee';
     inputBuffer = '';
     lastSpawn = 0;
     stage = 1;
@@ -71,6 +72,9 @@ vi.mock('../../main', () => ({
     update = vi.fn();
     checkAnswer = vi.fn();
     resumeFromMessage = vi.fn();
+    setGrade = vi.fn((grade: string) => {
+      this.grade = grade;
+    });
 
     constructor(callbacks: GameCallbacks) {
       mockGameState.lastInstance = this;
@@ -107,7 +111,7 @@ function setupScene() {
     phase: 'playing' as const,
     menuView: 'home' as const,
     bootReady: true,
-    difficulty: 'child' as const,
+    grade: 'trainee' as const,
     score: 0,
     lives: 10,
     shield: 5,
@@ -118,9 +122,9 @@ function setupScene() {
     incorrectCount: 0,
     finalPerfScore: 0,
     stageMessage: null,
-    leaderboard: { child: [], student: [], adult: [] },
+    leaderboard: { trainee: [], cadet: [], commander: [], 'major-general': [] },
     markBootReady: vi.fn(),
-    setDifficulty: vi.fn(),
+    setGrade: vi.fn(),
     openMenuView: vi.fn(),
     saveScore: vi.fn(),
     getScores: vi.fn(() => []),
@@ -129,7 +133,7 @@ function setupScene() {
     showStageMessage,
     showGameOver,
     returnToMenu,
-  } as ReturnType<typeof gameStore.getState>;
+  } as unknown as ReturnType<typeof gameStore.getState>;
 
   vi.spyOn(gameStore, 'getState').mockReturnValue(state);
 
@@ -200,10 +204,10 @@ describe('GameScene', () => {
     const { scene, store, phaser } = setupScene();
     const beforeInit = Date.now();
 
-    scene.init({ difficulty: 'adult' });
+    scene.init({ grade: 'major-general' });
 
     expect(mockGameState.lastInstance).toBeDefined();
-    expect(mockGameState.lastInstance?.difficulty).toBe('adult');
+    expect(mockGameState.lastInstance?.grade).toBe('major-general');
     expect(mockGameState.lastInstance?.reset).toHaveBeenCalledTimes(1);
     expect(mockGameState.lastInstance?.state).toBe('playing');
     expect(mockGameState.lastInstance?.lastSpawn).toBeGreaterThanOrEqual(beforeInit);
@@ -216,7 +220,7 @@ describe('GameScene', () => {
   it('wires scene services during create and paints the initial HUD', () => {
     const { scene, store, phaser } = setupScene();
 
-    scene.init({ difficulty: 'child' });
+    scene.init({ grade: 'trainee' });
     scene.create();
 
     expect(phaser.events.once).toHaveBeenCalledWith(Phaser.Scenes.Events.SHUTDOWN, expect.any(Function), scene);
@@ -232,7 +236,7 @@ describe('GameScene', () => {
   it('updates the HUD input buffer on backspace and accepts numeric input up to five chars', () => {
     const { scene, store } = setupScene();
 
-    scene.init({ difficulty: 'child' });
+    scene.init({ grade: 'trainee' });
     mockGameState.lastInstance!.state = 'playing';
     mockGameState.lastInstance!.inputBuffer = '123';
 
@@ -254,7 +258,7 @@ describe('GameScene', () => {
   it('submits entered answers and ignores gameplay keys outside the playing state', () => {
     const { scene, store, phaser } = setupScene();
 
-    scene.init({ difficulty: 'child' });
+    scene.init({ grade: 'trainee' });
     scene.create();
     mockGameState.lastInstance!.state = 'playing';
     mockGameState.lastInstance!.inputBuffer = '42';
@@ -275,7 +279,7 @@ describe('GameScene', () => {
   it('synchronizes meteor text objects and particle drawing during update', () => {
     const { scene, phaser } = setupScene();
 
-    scene.init({ difficulty: 'child' });
+    scene.init({ grade: 'trainee' });
     scene.create();
 
     const staleText = createTextStub();
@@ -315,7 +319,7 @@ describe('GameScene', () => {
   it('bridges stage and game-over callbacks into the store', () => {
     const { scene, store } = setupScene();
 
-    scene.init({ difficulty: 'student' });
+    scene.init({ grade: 'commander' });
     mockGameState.lastInstance!.stage = 4;
     mockGameState.lastInstance!.stageIncorrect = 2;
     mockGameState.lastInstance!.score = 150;
@@ -335,7 +339,7 @@ describe('GameScene', () => {
 
     mockGameState.lastCallbacks?.onGameOver();
     expect(store.showGameOver).toHaveBeenCalledWith({
-      difficulty: 'student',
+      grade: 'commander',
       score: 150,
       correctCount: 12,
       incorrectCount: 5,
@@ -346,7 +350,7 @@ describe('GameScene', () => {
   it('resumes from overlay, clears renderables, and restarts play unless the game is over', () => {
     const { scene, store, phaser } = setupScene();
 
-    scene.init({ difficulty: 'child' });
+    scene.init({ grade: 'trainee' });
     scene.create();
 
     const meteorText = createTextStub();
@@ -370,7 +374,7 @@ describe('GameScene', () => {
   it('removes listeners and transient renderables during shutdown', () => {
     const { scene, phaser } = setupScene();
 
-    scene.init({ difficulty: 'child' });
+    scene.init({ grade: 'trainee' });
     scene.create();
 
     const meteorText = createTextStub();

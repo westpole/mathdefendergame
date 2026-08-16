@@ -8,7 +8,7 @@ export function HighScoreOverlay() {
           <div className="overlay-header">
             <h1>HIGH SCORES</h1>
           </div>
-          <Leaderboard initialDifficulty="child" limit={10} />
+          <Leaderboard initialGrade="trainee" limit={10} />
         </section>
       </div>
     </div>

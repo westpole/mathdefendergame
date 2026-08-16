@@ -14,7 +14,7 @@ describe('gameStore', () => {
       bootReady: false,
       activeUsername: null,
       profiles: {},
-      difficulty: 'child',
+      grade: 'trainee',
       score: 0,
       lives: 10,
       shield: 5,
@@ -24,6 +24,10 @@ describe('gameStore', () => {
       correctCount: 0,
       incorrectCount: 0,
       finalPerfScore: 0,
+      ddaHeatState: 'BALANCED',
+      ddaMathTier: 1,
+      ddaSpeedMultiplier: 1,
+      ddaIsCooloffActive: false,
       stageMessage: null,
     });
   });
@@ -59,7 +63,11 @@ describe('gameStore', () => {
         score: 100,
         lives: 2,
         shield: 80,
-        stage: 5
+        stage: 5,
+        ddaHeatState: 'FLOW',
+        ddaMathTier: 3,
+        ddaSpeedMultiplier: 1.45,
+        ddaIsCooloffActive: false,
       });
 
       const state = gameStore.getState();
@@ -67,6 +75,10 @@ describe('gameStore', () => {
       expect(state.lives).toBe(2);
       expect(state.shield).toBe(80);
       expect(state.stage).toBe(5);
+      expect(state.ddaHeatState).toBe('FLOW');
+      expect(state.ddaMathTier).toBe(3);
+      expect(state.ddaSpeedMultiplier).toBe(1.45);
+      expect(state.ddaIsCooloffActive).toBe(false);
     });
 
     it('should partially update HUD', () => {
@@ -189,7 +201,7 @@ describe('gameStore', () => {
   describe('game over', () => {
     it('should transition to game over phase', () => {
       gameStore.getState().showGameOver({
-        difficulty: 'student',
+        grade: 'commander',
         score: 2000,
         correctCount: 50,
         incorrectCount: 10,
@@ -203,14 +215,14 @@ describe('gameStore', () => {
     });
   });
 
-  describe('difficulty', () => {
-    it('should set difficulty level', () => {
-      gameStore.getState().setDifficulty('adult');
-      expect(gameStore.getState().difficulty).toBe('adult');
+  describe('grade', () => {
+    it('should set grade level', () => {
+      gameStore.getState().setGrade('major-general');
+      expect(gameStore.getState().grade).toBe('major-general');
     });
 
-    it('should default to child difficulty', () => {
-      expect(gameStore.getState().difficulty).toBe('child');
+    it('should default to trainee grade', () => {
+      expect(gameStore.getState().grade).toBe('trainee');
     });
   });
 
@@ -219,38 +231,39 @@ describe('gameStore', () => {
       // Clear leaderboard before each test
       gameStore.setState({
         leaderboard: {
-          child: [],
-          student: [],
-          adult: [],
+          trainee: [],
+          cadet: [],
+          commander: [],
+          'major-general': [],
         },
       });
     });
 
     it('should save score to leaderboard', () => {
-      gameStore.getState().saveScore('Test Player', 1000, 90, 'child');
+      gameStore.getState().saveScore('Test Player', 1000, 90, 'trainee');
 
-      const scores = gameStore.getState().getScores('child');
+      const scores = gameStore.getState().getScores('trainee');
       expect(scores.length).toBeGreaterThan(0);
       expect(scores[0].name).toBe('Test Player');
       expect(scores[0].score).toBe(1000);
     });
 
-    it('should get scores for specific difficulty', () => {
-      gameStore.getState().saveScore('Player 1', 500, 80, 'child');
-      gameStore.getState().saveScore('Player 2', 1000, 90, 'student');
+    it('should get scores for specific grade', () => {
+      gameStore.getState().saveScore('Player 1', 500, 80, 'trainee');
+      gameStore.getState().saveScore('Player 2', 1000, 90, 'cadet');
 
-      const childScores = gameStore.getState().getScores('child');
-      const studentScores = gameStore.getState().getScores('student');
-      expect(childScores.length).toBe(1);
-      expect(studentScores.length).toBe(1);
+      const traineeScores = gameStore.getState().getScores('trainee');
+      const cadetScores = gameStore.getState().getScores('cadet');
+      expect(traineeScores.length).toBe(1);
+      expect(cadetScores.length).toBe(1);
     });
 
     it('should sort leaderboard by score descending', () => {
-      gameStore.getState().saveScore('Player 1', 500, 80, 'child');
-      gameStore.getState().saveScore('Player 2', 1000, 90, 'child');
-      gameStore.getState().saveScore('Player 3', 750, 85, 'child');
+      gameStore.getState().saveScore('Player 1', 500, 80, 'trainee');
+      gameStore.getState().saveScore('Player 2', 1000, 90, 'trainee');
+      gameStore.getState().saveScore('Player 3', 750, 85, 'trainee');
 
-      const scores = gameStore.getState().getScores('child');
+      const scores = gameStore.getState().getScores('trainee');
       expect(scores[0].score).toBeGreaterThanOrEqual(scores[1].score);
       expect(scores[1].score).toBeGreaterThanOrEqual(scores[2].score);
     });

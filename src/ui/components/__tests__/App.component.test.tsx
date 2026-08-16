@@ -29,7 +29,7 @@ describe('App start menu controls', () => {
       bootReady: true,
       activeUsername: 'AcePilot',
       profiles: {},
-      difficulty: 'child',
+      grade: 'trainee',
       score: 0,
       lives: 10,
       shield: 5,
@@ -41,9 +41,10 @@ describe('App start menu controls', () => {
       finalPerfScore: 0,
       stageMessage: null,
       leaderboard: {
-        child: [],
-        student: [],
-        adult: [],
+        trainee: [],
+        cadet: [],
+        commander: [],
+        'major-general': [],
       },
     });
   });

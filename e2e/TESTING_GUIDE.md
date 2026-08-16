@@ -28,9 +28,7 @@ Add these to make E2E tests more reliable:
 - `loading-overlay` - Loading
 
 **Interactive Elements:**
-- `difficulty-child-button` - Child difficulty button
-- `difficulty-student-button` - Student difficulty button
-- `difficulty-adult-button` - Adult difficulty button
+- `start-defense-button` - Start game button
 - `answer-input` - Game answer input field
 - `submit-answer-button` - Submit answer button
 
@@ -108,12 +106,12 @@ await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, {
 ### Starting a Game
 
 ```typescript
-test('start game at easy difficulty', async ({ page }) => {
+test('start game with trainee baseline', async ({ page }) => {
   await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined);
 
   await page.evaluate(() => {
     const state = (window as E2EWindow).__e2e!.getStoreState();
-    state.setDifficulty('easy');
+    state.setGrade('trainee');
     state.startPlaying();
   });
 
@@ -132,7 +130,7 @@ test('score increases on correct answer', async ({ page }) => {
   await page.evaluate(() => {
     (window as E2EWindow).__e2e!.setSeed(12345);
     const state = (window as E2EWindow).__e2e!.getStoreState();
-    state.setDifficulty('easy');
+    state.setGrade('trainee');
     state.startPlaying();
   });
 

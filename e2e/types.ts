@@ -2,10 +2,10 @@ export type E2EWindow = Window & typeof globalThis & {
   __e2e?: {
     setSeed: (seed: number) => void;
     getStoreState: () => {
-      setDifficulty: (difficulty: string) => void;
+      setGrade: (grade: string) => void;
       startPlaying: () => void;
       phase: string;
-      difficulty: string;
+      grade: string;
       score: number;
       lives: number;
       menuView: string;
@@ -13,7 +13,7 @@ export type E2EWindow = Window & typeof globalThis & {
     setStoreState: (state: Partial<{
       score: number;
       lives: number;
-      difficulty: string;
+      grade: string;
       menuView: string;
     }>) => void;
     isSceneReady: (sceneKey: string) => boolean;

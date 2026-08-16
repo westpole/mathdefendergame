@@ -49,7 +49,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   name: 'Empty',
   args: {
-    initialDifficulty: 'child',
+    initialGrade: 'trainee',
     limit: 5,
   },
   parameters: {
@@ -62,7 +62,7 @@ export const Default: Story = {
 export const WithData: Story = {
   name: 'With Data',
   args: {
-    initialDifficulty: 'adult',
+    initialGrade: 'major-general',
     limit: 10,
   },
   parameters: {

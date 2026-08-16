@@ -1,17 +1,18 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import type { Difficulty, ScoreEntry } from '@shared/types';
+import type { DDAMathTier, DDAHeatState, Grade, ScoreEntry } from '@shared/types';
 
 type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'stage-message' | 'gameover';
 type MenuView = 'home' | 'high-score' | 'rules';
+type LegacyDifficulty = 'child' | 'student' | 'adult';
 
 export interface PlayerProfile {
   username: string;
   password: string;
   bestScore: number;
   highestStage: number;
-  preferredDifficulty: Difficulty;
+  preferredGrade: Grade;
   createdAt: number;
   updatedAt: number;
 }
@@ -35,7 +36,7 @@ export interface GameStoreState {
   bootReady: boolean;
   activeUsername: string | null;
   profiles: Record<string, PlayerProfile>;
-  difficulty: Difficulty;
+  grade: Grade;
   score: number;
   lives: number;
   shield: number;
@@ -45,32 +46,37 @@ export interface GameStoreState {
   correctCount: number;
   incorrectCount: number;
   finalPerfScore: number;
+  ddaHeatState: DDAHeatState;
+  ddaMathTier: DDAMathTier;
+  ddaSpeedMultiplier: number;
+  ddaIsCooloffActive: boolean;
   stageMessage: StageMessageState | null;
-  leaderboard: Record<Difficulty, ScoreEntry[]>;
+  leaderboard: Record<Grade, ScoreEntry[]>;
   markBootReady: () => void;
-  setDifficulty: (difficulty: Difficulty) => void;
-  syncHUD: (payload: Partial<Pick<GameStoreState, 'difficulty' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'inputBuffer' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>>) => void;
+  setGrade: (grade: Grade) => void;
+  syncHUD: (payload: Partial<Pick<GameStoreState, 'grade' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'inputBuffer' | 'correctCount' | 'incorrectCount' | 'finalPerfScore' | 'ddaHeatState' | 'ddaMathTier' | 'ddaSpeedMultiplier' | 'ddaIsCooloffActive'>>) => void;
   showStageMessage: (payload: StageMessageState) => void;
-  showGameOver: (payload: Pick<GameStoreState, 'difficulty' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
+  showGameOver: (payload: Pick<GameStoreState, 'grade' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   startPlaying: () => void;
   returnToMenu: () => void;
   openMenuView: (menuView: MenuView) => void;
   loginProfile: (username: string, password: string) => LoginResult;
   createAndLoginProfile: (username: string, password: string) => LoginResult;
   getActiveProfile: () => PlayerProfile | null;
-  saveScore: (name: string, score: number, perfScore: number, difficulty: Difficulty) => void;
-  getScores: (difficultyFilter?: Difficulty | null) => ScoreEntry[];
+  saveScore: (name: string, score: number, perfScore: number, grade: Grade) => void;
+  getScores: (gradeFilter?: Grade | null) => ScoreEntry[];
 }
 
-const difficultyOrder: Difficulty[] = ['child', 'student', 'adult'];
+const gradeOrder: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
 const leaderboardStorageKey = 'math-defender-game-store';
 const passwordPolicy = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8}$/;
 
-function createEmptyLeaderboard(): Record<Difficulty, ScoreEntry[]> {
+function createEmptyLeaderboard(): Record<Grade, ScoreEntry[]> {
   return {
-    child: [],
-    student: [],
-    adult: [],
+    trainee: [],
+    cadet: [],
+    commander: [],
+    'major-general': [],
   };
 }
 
@@ -80,8 +86,8 @@ function sortAndTrimScores(scores: ScoreEntry[]): ScoreEntry[] {
     .slice(0, 10);
 }
 
-function flattenLeaderboard(leaderboard: Record<Difficulty, ScoreEntry[]>): ScoreEntry[] {
-  return difficultyOrder.flatMap((difficulty) => leaderboard[difficulty]);
+function flattenLeaderboard(leaderboard: Record<Grade, ScoreEntry[]>): ScoreEntry[] {
+  return gradeOrder.flatMap((grade) => leaderboard[grade]);
 }
 
 function validatePassword(password: string): boolean {
@@ -99,13 +105,115 @@ function resolveActiveProfile(
   return profiles[activeUsername] ?? null;
 }
 
+function isGrade(value: unknown): value is Grade {
+  return value === 'trainee' || value === 'cadet' || value === 'commander' || value === 'major-general';
+}
+
+function mapLegacyDifficultyToGrade(value: LegacyDifficulty): Grade {
+  switch (value) {
+    case 'child':
+      return 'trainee';
+    case 'student':
+      return 'cadet';
+    case 'adult':
+      return 'major-general';
+    default:
+      return 'trainee';
+  }
+}
+
+function normalizeGrade(value: unknown): Grade {
+  if (isGrade(value)) {
+    return value;
+  }
+
+  if (value === 'child' || value === 'student' || value === 'adult') {
+    return mapLegacyDifficultyToGrade(value);
+  }
+
+  return 'trainee';
+}
+
+function migrateProfiles(rawProfiles: unknown): Record<string, PlayerProfile> {
+  if (!rawProfiles || typeof rawProfiles !== 'object') {
+    return {};
+  }
+
+  const migrated: Record<string, PlayerProfile> = {};
+
+  for (const [username, profile] of Object.entries(rawProfiles as Record<string, unknown>)) {
+    if (!profile || typeof profile !== 'object') {
+      continue;
+    }
+
+    const legacyProfile = profile as Record<string, unknown>;
+    const preferredGrade = normalizeGrade(
+      legacyProfile.preferredGrade ?? legacyProfile.preferredDifficulty,
+    );
+
+    migrated[username] = {
+      username: typeof legacyProfile.username === 'string' ? legacyProfile.username : username,
+      password: typeof legacyProfile.password === 'string' ? legacyProfile.password : '',
+      bestScore: typeof legacyProfile.bestScore === 'number' ? legacyProfile.bestScore : 0,
+      highestStage: typeof legacyProfile.highestStage === 'number' ? legacyProfile.highestStage : 1,
+      preferredGrade,
+      createdAt: typeof legacyProfile.createdAt === 'number' ? legacyProfile.createdAt : Date.now(),
+      updatedAt: typeof legacyProfile.updatedAt === 'number' ? legacyProfile.updatedAt : Date.now(),
+    };
+  }
+
+  return migrated;
+}
+
+function migrateLeaderboard(rawLeaderboard: unknown): Record<Grade, ScoreEntry[]> {
+  const nextLeaderboard = createEmptyLeaderboard();
+
+  if (!rawLeaderboard || typeof rawLeaderboard !== 'object') {
+    return nextLeaderboard;
+  }
+
+  for (const [bucketKey, entries] of Object.entries(rawLeaderboard as Record<string, unknown>)) {
+    if (!Array.isArray(entries)) {
+      continue;
+    }
+
+    const bucketGrade = normalizeGrade(bucketKey);
+    const migratedEntries: ScoreEntry[] = entries.map((entry) => {
+      const legacyEntry = (entry ?? {}) as Record<string, unknown>;
+      const entryGrade = normalizeGrade(legacyEntry.grade ?? legacyEntry.difficulty ?? bucketGrade);
+
+      return {
+        key: typeof legacyEntry.key === 'string'
+          ? legacyEntry.key
+          : `leaderboard_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`,
+        name: typeof legacyEntry.name === 'string' ? legacyEntry.name : 'Anonymous',
+        score: typeof legacyEntry.score === 'number' ? legacyEntry.score : 0,
+        perfScore: typeof legacyEntry.perfScore === 'number' ? legacyEntry.perfScore : 0,
+        combined: typeof legacyEntry.combined === 'number'
+          ? legacyEntry.combined
+          : (typeof legacyEntry.score === 'number' ? legacyEntry.score : 0)
+            + (typeof legacyEntry.perfScore === 'number' ? legacyEntry.perfScore : 0),
+        grade: entryGrade,
+        date: typeof legacyEntry.date === 'number' ? legacyEntry.date : Date.now(),
+      };
+    });
+
+    nextLeaderboard[bucketGrade] = sortAndTrimScores([
+      ...nextLeaderboard[bucketGrade],
+      ...migratedEntries,
+    ]);
+  }
+
+  return nextLeaderboard;
+}
+
 const initialState = {
   phase: 'booting' as OverlayPhase,
   menuView: 'home' as MenuView,
   bootReady: false,
   activeUsername: null as string | null,
   profiles: {} as Record<string, PlayerProfile>,
-  difficulty: 'child' as Difficulty,
+  grade: 'trainee' as Grade,
   score: 0,
   lives: 10,
   shield: 5,
@@ -115,6 +223,10 @@ const initialState = {
   correctCount: 0,
   incorrectCount: 0,
   finalPerfScore: 0,
+  ddaHeatState: 'BALANCED' as DDAHeatState,
+  ddaMathTier: 1 as DDAMathTier,
+  ddaSpeedMultiplier: 1,
+  ddaIsCooloffActive: false,
   stageMessage: null,
   leaderboard: createEmptyLeaderboard(),
 };
@@ -124,7 +236,7 @@ export const useGameStore = create<GameStoreState>()(
     (set, get) => ({
       ...initialState,
       markBootReady: () => set({ bootReady: true, phase: 'login' }),
-      setDifficulty: (difficulty) => set({ difficulty }),
+      setGrade: (grade) => set({ grade }),
       syncHUD: (payload) => {
         set((state) => {
           const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
@@ -135,7 +247,7 @@ export const useGameStore = create<GameStoreState>()(
 
           const nextScore = payload.score ?? state.score;
           const nextStage = payload.stage ?? state.stage;
-          const nextDifficulty = payload.difficulty ?? state.difficulty;
+          const nextGrade = payload.grade ?? state.grade;
 
           return {
             ...payload,
@@ -145,7 +257,7 @@ export const useGameStore = create<GameStoreState>()(
                 ...activeProfile,
                 bestScore: Math.max(activeProfile.bestScore, nextScore),
                 highestStage: Math.max(activeProfile.highestStage, nextStage),
-                preferredDifficulty: nextDifficulty,
+                preferredGrade: nextGrade,
                 updatedAt: Date.now(),
               },
             },
@@ -171,7 +283,7 @@ export const useGameStore = create<GameStoreState>()(
                 ...activeProfile,
                 bestScore: Math.max(activeProfile.bestScore, payload.score),
                 highestStage: Math.max(activeProfile.highestStage, state.stage),
-                preferredDifficulty: payload.difficulty,
+                preferredGrade: payload.grade,
                 updatedAt: Date.now(),
               },
             },
@@ -224,7 +336,7 @@ export const useGameStore = create<GameStoreState>()(
 
         set({
           activeUsername: normalizedUsername,
-          difficulty: profile.preferredDifficulty,
+          grade: profile.preferredGrade,
           phase: 'start',
           menuView: 'home',
         });
@@ -261,7 +373,7 @@ export const useGameStore = create<GameStoreState>()(
           password,
           bestScore: 0,
           highestStage: 1,
-          preferredDifficulty: get().difficulty,
+          preferredGrade: get().grade,
           createdAt: now,
           updatedAt: now,
         };
@@ -282,29 +394,29 @@ export const useGameStore = create<GameStoreState>()(
         const state = get();
         return resolveActiveProfile(state.activeUsername, state.profiles);
       },
-      saveScore: (name, score, perfScore, difficulty) => {
+      saveScore: (name, score, perfScore, grade) => {
         const entry: ScoreEntry = {
           key: `leaderboard_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`,
           name,
           score,
           perfScore,
           combined: score + perfScore,
-          difficulty,
+          grade,
           date: Date.now(),
         };
 
         set((state) => ({
           leaderboard: {
             ...state.leaderboard,
-            [difficulty]: sortAndTrimScores([...state.leaderboard[difficulty], entry]),
+            [grade]: sortAndTrimScores([...state.leaderboard[grade], entry]),
           },
         }));
       },
-      getScores: (difficultyFilter = null) => {
+      getScores: (gradeFilter = null) => {
         const { leaderboard } = get();
 
-        if (difficultyFilter) {
-          return leaderboard[difficultyFilter];
+        if (gradeFilter) {
+          return leaderboard[gradeFilter];
         }
 
         return flattenLeaderboard(leaderboard).sort(
@@ -314,7 +426,21 @@ export const useGameStore = create<GameStoreState>()(
     }),
     {
       name: leaderboardStorageKey,
+      version: 2,
       storage: createJSONStorage(() => localStorage),
+      migrate: (persistedState) => {
+        const rawState = (persistedState ?? {}) as Record<string, unknown>;
+
+        return {
+          ...rawState,
+          leaderboard: migrateLeaderboard(rawState.leaderboard),
+          profiles: migrateProfiles(rawState.profiles),
+          activeUsername:
+            typeof rawState.activeUsername === 'string' || rawState.activeUsername === null
+              ? rawState.activeUsername
+              : null,
+        };
+      },
       partialize: (state) => ({
         leaderboard: state.leaderboard,
         profiles: state.profiles,

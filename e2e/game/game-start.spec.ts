@@ -27,17 +27,17 @@ test.describe('Game Start Flow', () => {
   test('can start a new game via store', async ({ page }) => {
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
 
-    // Set difficulty and start game via store
+    // Set grade and start game via store
     await page.evaluate(() => {
       const state = (window as E2EWindow).__e2e!.getStoreState();
-      state.setDifficulty('easy');
+      state.setGrade('trainee');
       state.startPlaying();
     });
 
     // Verify state changed
     const newState = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
     expect(newState.phase).toBe('playing');
-    expect(newState.difficulty).toBe('easy');
+    expect(newState.grade).toBe('trainee');
   });
 
   test('can access and manipulate GameScene', async ({ page }) => {
@@ -46,7 +46,7 @@ test.describe('Game Start Flow', () => {
     // Start a game first
     await page.evaluate(() => {
       const state = (window as E2EWindow).__e2e!.getStoreState();
-      state.setDifficulty('easy');
+      state.setGrade('trainee');
       state.startPlaying();
     });
 

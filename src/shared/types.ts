@@ -6,6 +6,7 @@ export interface Meteor {
   op: string;
   speed: number;
   id: number;
+  spawnTimeMs: number;
 }
 
 export interface Particle {
@@ -29,10 +30,19 @@ export interface ScoreEntry {
   score: number;
   perfScore: number;
   combined: number;
-  difficulty: Difficulty;
+  grade: Grade;
   date: number;
 }
 
-export type Difficulty = 'child' | 'student' | 'adult';
+export type Grade = 'trainee' | 'cadet' | 'commander' | 'major-general';
+
+export type DDAHeatState =
+  | 'CRITICAL'
+  | 'STRUGGLING'
+  | 'BALANCED'
+  | 'FLOW'
+  | 'OVERDRIVE';
+
+export type DDAMathTier = 1 | 2 | 3 | 4;
 
 export type GameState = 'start' | 'playing' | 'message' | 'gameover';

@@ -12,7 +12,7 @@ type MockState = {
   gameInstances: Array<{ scene: MockState['scenePlugin']; destroy: MockState['destroy'] }>;
   getState: ReturnType<typeof vi.fn>;
   store: {
-    setDifficulty: ReturnType<typeof vi.fn<(difficulty: string) => void>>;
+    setGrade: ReturnType<typeof vi.fn<(grade: string) => void>>;
     startPlaying: ReturnType<typeof vi.fn<() => void>>;
     returnToMenu: ReturnType<typeof vi.fn<() => void>>;
     openMenuView: ReturnType<typeof vi.fn<(menuView: string) => void>>;
@@ -32,7 +32,7 @@ const mockState = vi.hoisted((): MockState => ({
   gameInstances: [] as Array<{ scene: typeof mockState.scenePlugin; destroy: typeof mockState.destroy }>,
   getState: vi.fn(),
   store: {
-    setDifficulty: vi.fn<(difficulty: string) => void>(),
+    setGrade: vi.fn<(grade: string) => void>(),
     startPlaying: vi.fn<() => void>(),
     returnToMenu: vi.fn<() => void>(),
     openMenuView: vi.fn<(menuView: string) => void>(),
@@ -88,7 +88,7 @@ describe('UIScene module', () => {
     mockState.destroy.mockReset();
     mockState.gameInstances.length = 0;
     mockState.getState.mockReset();
-    mockState.store.setDifficulty.mockReset();
+    mockState.store.setGrade.mockReset();
     mockState.store.startPlaying.mockReset();
     mockState.store.returnToMenu.mockReset();
     mockState.store.openMenuView.mockReset();
@@ -144,12 +144,12 @@ describe('UIScene module', () => {
     const uiScene = await loadModule();
     mockState.scenePlugin.isActive.mockReturnValue(true);
 
-    uiScene.startGame('adult');
+    uiScene.startGame();
 
-    expect(mockState.store.setDifficulty).toHaveBeenCalledWith('adult');
+    expect(mockState.store.setGrade).toHaveBeenCalledWith('trainee');
     expect(mockState.store.startPlaying).toHaveBeenCalledTimes(1);
     expect(mockState.scenePlugin.stop).toHaveBeenCalledWith('GameScene');
-    expect(mockState.scenePlugin.start).toHaveBeenCalledWith('GameScene', { difficulty: 'adult' });
+    expect(mockState.scenePlugin.start).toHaveBeenCalledWith('GameScene', { grade: 'trainee' });
   });
 
   it('continues the current GameScene overlay flow when the scene is available', async () => {
