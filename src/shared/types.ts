@@ -34,6 +34,27 @@ export interface ScoreEntry {
   date: number;
 }
 
+export type MathOperation = '+' | '-' | '*' | '/';
+
+export interface OperationHistoryStat {
+  attempts: number;
+  incorrect: number;
+  avgTimeMs: number;
+}
+
+export interface GameHistoryEntry {
+  key: string;
+  playedAt: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+  averageAnswerTimeMs: number;
+  mostProblematicOperation: MathOperation | null;
+  operationStats: Record<MathOperation, OperationHistoryStat>;
+  gradeAtFinish: Grade;
+  finalScore: number;
+  finalPerfScore: number;
+}
+
 export type Grade = 'trainee' | 'cadet' | 'commander' | 'major-general';
 
 export type DDAHeatState =

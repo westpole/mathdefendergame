@@ -29,6 +29,13 @@ describe('gameStore', () => {
       ddaSpeedMultiplier: 1,
       ddaIsCooloffActive: false,
       stageMessage: null,
+      leaderboard: {
+        trainee: [],
+        cadet: [],
+        commander: [],
+        'major-general': [],
+      },
+      gameHistoryByProfile: {},
     });
   });
 
@@ -266,6 +273,83 @@ describe('gameStore', () => {
       const scores = gameStore.getState().getScores('trainee');
       expect(scores[0].score).toBeGreaterThanOrEqual(scores[1].score);
       expect(scores[1].score).toBeGreaterThanOrEqual(scores[2].score);
+    });
+  });
+
+  describe('game history', () => {
+    const baseHistoryEntry = {
+      key: 'history-1',
+      playedAt: 1_700_000_000_000,
+      correctAnswers: 10,
+      incorrectAnswers: 3,
+      averageAnswerTimeMs: 1450,
+      mostProblematicOperation: '+',
+      operationStats: {
+        '+': { attempts: 6, incorrect: 3, avgTimeMs: 1700 },
+        '-': { attempts: 3, incorrect: 0, avgTimeMs: 1200 },
+        '*': { attempts: 2, incorrect: 0, avgTimeMs: 1300 },
+        '/': { attempts: 2, incorrect: 0, avgTimeMs: 1600 },
+      },
+      gradeAtFinish: 'cadet' as const,
+      finalScore: 120,
+      finalPerfScore: 76.92,
+    };
+
+    it('stores history under active profile', () => {
+      gameStore.setState({ activeUsername: 'PilotOne' });
+
+      gameStore.getState().addGameHistory(baseHistoryEntry);
+
+      const history = gameStore.getState().getGameHistory('PilotOne');
+      expect(history).toHaveLength(1);
+      expect(history[0].finalScore).toBe(120);
+      expect(history[0].gradeAtFinish).toBe('cadet');
+    });
+
+    it('stores history in guest bucket when no profile is active', () => {
+      gameStore.getState().addGameHistory(baseHistoryEntry);
+
+      const history = gameStore.getState().getGameHistory(null);
+      expect(history).toHaveLength(1);
+      expect(history[0].mostProblematicOperation).toBe('+');
+    });
+
+    it('returns newest history first', () => {
+      gameStore.setState({ activeUsername: 'PilotOne' });
+
+      gameStore.getState().addGameHistory({
+        ...baseHistoryEntry,
+        key: 'older-entry',
+        playedAt: baseHistoryEntry.playedAt - 5000,
+      });
+
+      gameStore.getState().addGameHistory({
+        ...baseHistoryEntry,
+        key: 'newer-entry',
+        playedAt: baseHistoryEntry.playedAt + 5000,
+      });
+
+      const history = gameStore.getState().getGameHistory('PilotOne');
+      expect(history).toHaveLength(2);
+      expect(history[0].key).toBe('newer-entry');
+      expect(history[1].key).toBe('older-entry');
+    });
+
+    it('limits history to 50 entries per profile', () => {
+      gameStore.setState({ activeUsername: 'PilotOne' });
+
+      for (let i = 0; i < 55; i++) {
+        gameStore.getState().addGameHistory({
+          ...baseHistoryEntry,
+          key: `history-${i}`,
+          playedAt: baseHistoryEntry.playedAt + i,
+        });
+      }
+
+      const history = gameStore.getState().getGameHistory('PilotOne', 100);
+      expect(history).toHaveLength(50);
+      expect(history[0].key).toBe('history-54');
+      expect(history[49].key).toBe('history-5');
     });
   });
 });

@@ -6,7 +6,16 @@
  * It also handles scene transitions and game state management.
  */
 import { gameStore } from '@store/useGameStore';
-import type { Meteor, Particle, GameOverReason, GameState, Grade } from '@shared/types';
+import type {
+  GameHistoryEntry,
+  GameOverReason,
+  GameState,
+  Grade,
+  MathOperation,
+  Meteor,
+  OperationHistoryStat,
+  Particle,
+} from '@shared/types';
 
 import { GAME_CONFIG } from './config';
 import { DDAController, type DDAConfiguration } from './utilities/DDAController';
@@ -17,6 +26,27 @@ export interface GameCallbacks {
   onFinishStage: (success: boolean) => void;
   onGameOver: (reason: GameOverReason) => void;
   onShake: () => void;
+}
+
+type RoundOperationTelemetry = Record<MathOperation, {
+  attempts: number;
+  incorrect: number;
+  totalLatencyMs: number;
+}>;
+
+const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
+
+function createEmptyRoundOperationTelemetry(): RoundOperationTelemetry {
+  return {
+    '+': { attempts: 0, incorrect: 0, totalLatencyMs: 0 },
+    '-': { attempts: 0, incorrect: 0, totalLatencyMs: 0 },
+    '*': { attempts: 0, incorrect: 0, totalLatencyMs: 0 },
+    '/': { attempts: 0, incorrect: 0, totalLatencyMs: 0 },
+  };
+}
+
+function isMathOperation(value: unknown): value is MathOperation {
+  return value === '+' || value === '-' || value === '*' || value === '/';
 }
 
 export class Game {
@@ -44,6 +74,9 @@ export class Game {
   scoreAtStageStart: number = 0;
   livesAtStageStart: number = GAME_CONFIG.initialLives;
   finalPerfScore: number = 0;
+  roundResolvedAnswerCount: number = 0;
+  roundTotalAnswerLatencyMs: number = 0;
+  roundOperationTelemetry: RoundOperationTelemetry = createEmptyRoundOperationTelemetry();
 
   // Tracks whether the last stage transition was a success (used by resumeFromMessage)
   private lastStageSuccess: boolean = true;
@@ -75,6 +108,9 @@ export class Game {
     this.meteors = [];
     this.particles = [];
     this.inputBuffer = '';
+    this.roundResolvedAnswerCount = 0;
+    this.roundTotalAnswerLatencyMs = 0;
+    this.roundOperationTelemetry = createEmptyRoundOperationTelemetry();
     this.scoreAtStageStart = 0;
     this.livesAtStageStart = GAME_CONFIG.initialLives;
     this.lastStageSuccess = true;
@@ -145,6 +181,7 @@ export class Game {
       this.createExplosion(m.x, m.y, hitColor);
       this.meteors.splice(hitIndex, 1);
       this.dda.recordSample({ isCorrect: true, latencyMs, baseHit: false });
+      this.recordOperationAttempt(m.op, latencyMs, false);
       this.score += GAME_CONFIG.scorePerCorrectAnswer;
       this.stageScore += 1;
       this.stageCorrect += 1;
@@ -158,11 +195,14 @@ export class Game {
         return;
       }
     } else {
+      const oldestMeteor = this.getOldestMeteor();
+      const latencyMs = oldestMeteor ? Math.max(0, Date.now() - oldestMeteor.spawnTimeMs) : 3000;
       this.dda.recordSample({
         isCorrect: false,
-        latencyMs: this.getOldestMeteorLatencyMs(),
+        latencyMs,
         baseHit: false,
       });
+      this.recordOperationAttempt(oldestMeteor?.op, latencyMs, true);
       this.incorrectCount++;
       this.stageIncorrect++;
       this.score = Math.max(0, this.score - GAME_CONFIG.scorePenaltyPerIncorrectAnswer);
@@ -178,6 +218,7 @@ export class Game {
   hitBase(impactMeteor?: Meteor): void {
     const latencyMs = impactMeteor ? Math.max(0, Date.now() - impactMeteor.spawnTimeMs) : 0;
     this.dda.recordSample({ isCorrect: false, latencyMs, baseHit: true });
+    this.recordOperationAttempt(impactMeteor?.op, latencyMs, true);
     this.shield--;
     this.cb.onHUDUpdate();
     this.syncStore();
@@ -274,6 +315,25 @@ export class Game {
     const total = this.correctCount + this.incorrectCount;
     const accuracy = total > 0 ? (this.correctCount / total) * 100 : 0;
     this.finalPerfScore = parseFloat(accuracy.toFixed(2));
+    const averageAnswerTimeMs = this.roundResolvedAnswerCount > 0
+      ? Math.round(this.roundTotalAnswerLatencyMs / this.roundResolvedAnswerCount)
+      : 0;
+    const operationStats = this.buildOperationHistoryStats();
+
+    const historyEntry: GameHistoryEntry = {
+      key: `game_history_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`,
+      playedAt: Date.now(),
+      correctAnswers: this.correctCount,
+      incorrectAnswers: this.incorrectCount,
+      averageAnswerTimeMs,
+      mostProblematicOperation: this.resolveMostProblematicOperation(operationStats),
+      operationStats,
+      gradeAtFinish: this.grade,
+      finalScore: this.score,
+      finalPerfScore: this.finalPerfScore,
+    };
+
+    gameStore.getState().addGameHistory(historyEntry);
 
     this.syncStore();
     this.cb.onGameOver(win ? 'victory' : 'lives-depleted');
@@ -349,16 +409,89 @@ export class Game {
     this.dda = new DDAController(getDDAConfigForGrade(grade));
   }
 
-  private getOldestMeteorLatencyMs(): number {
+  private getOldestMeteor(): Meteor | null {
     if (this.meteors.length === 0) {
-      return 3000;
+      return null;
     }
 
-    const oldestSpawnTime = this.meteors.reduce((oldest, meteor) => {
-      return Math.min(oldest, meteor.spawnTimeMs);
-    }, this.meteors[0].spawnTimeMs);
+    return this.meteors.reduce((oldest, meteor) => {
+      return meteor.spawnTimeMs < oldest.spawnTimeMs ? meteor : oldest;
+    }, this.meteors[0]);
+  }
 
-    return Math.max(0, Date.now() - oldestSpawnTime);
+  private recordOperationAttempt(op: unknown, latencyMs: number, isIncorrect: boolean): void {
+    this.roundResolvedAnswerCount += 1;
+    this.roundTotalAnswerLatencyMs += Math.max(0, latencyMs);
+
+    if (!isMathOperation(op)) {
+      return;
+    }
+
+    const operationTelemetry = this.roundOperationTelemetry[op];
+    operationTelemetry.attempts += 1;
+    operationTelemetry.totalLatencyMs += Math.max(0, latencyMs);
+
+    if (isIncorrect) {
+      operationTelemetry.incorrect += 1;
+    }
+  }
+
+  private buildOperationHistoryStats(): Record<MathOperation, OperationHistoryStat> {
+    const operationStats: Record<MathOperation, OperationHistoryStat> = {
+      '+': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+      '-': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+      '*': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+      '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+    };
+
+    for (const op of MATH_OPERATIONS) {
+      const telemetry = this.roundOperationTelemetry[op];
+      operationStats[op] = {
+        attempts: telemetry.attempts,
+        incorrect: telemetry.incorrect,
+        avgTimeMs: telemetry.attempts > 0
+          ? Math.round(telemetry.totalLatencyMs / telemetry.attempts)
+          : 0,
+      };
+    }
+
+    return operationStats;
+  }
+
+  private resolveMostProblematicOperation(
+    operationStats: Record<MathOperation, OperationHistoryStat>,
+  ): MathOperation | null {
+    let selectedOp: MathOperation | null = null;
+    let selectedErrorRate = -1;
+    let selectedIncorrect = -1;
+    let selectedAvgTimeMs = -1;
+
+    for (const op of MATH_OPERATIONS) {
+      const stat = operationStats[op];
+
+      if (stat.attempts === 0) {
+        continue;
+      }
+
+      const errorRate = stat.incorrect / stat.attempts;
+      const isBetter =
+        errorRate > selectedErrorRate
+        || (errorRate === selectedErrorRate && stat.incorrect > selectedIncorrect)
+        || (
+          errorRate === selectedErrorRate
+          && stat.incorrect === selectedIncorrect
+          && stat.avgTimeMs > selectedAvgTimeMs
+        );
+
+      if (isBetter) {
+        selectedOp = op;
+        selectedErrorRate = errorRate;
+        selectedIncorrect = stat.incorrect;
+        selectedAvgTimeMs = stat.avgTimeMs;
+      }
+    }
+
+    return selectedOp;
   }
 }
 

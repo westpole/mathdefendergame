@@ -4,6 +4,7 @@
  */
 
 import { Game } from '../main';
+import { gameStore } from '@store/useGameStore';
 
 interface Callbacks {
   onHUDUpdate: () => void;
@@ -26,6 +27,7 @@ describe('Game', () => {
     };
 
     game = new Game(mockCallbacks);
+    gameStore.setState({ activeUsername: null, gameHistoryByProfile: {} });
   });
 
   describe('initialization', () => {
@@ -509,6 +511,63 @@ describe('Game', () => {
       game.gameOver(true);
 
       expect(game.state).toBe('gameover');
+    });
+
+    it('persists history entry with required summary fields', () => {
+      game.correctCount = 8;
+      game.incorrectCount = 2;
+      game.score = 155;
+      game.grade = 'cadet';
+
+      game.gameOver();
+
+      const history = gameStore.getState().getGameHistory(null, 1);
+      expect(history).toHaveLength(1);
+      expect(history[0].correctAnswers).toBe(8);
+      expect(history[0].incorrectAnswers).toBe(2);
+      expect(history[0].gradeAtFinish).toBe('cadet');
+      expect(history[0].finalScore).toBe(155);
+      expect(history[0].finalPerfScore).toBe(80);
+    });
+
+    it('persists operation stats and resolves most problematic operation', () => {
+      vi.useFakeTimers();
+      vi.setSystemTime(10_000);
+
+      game.state = 'playing';
+      game.meteors = [
+        { x: 0, y: 0, text: '2 + 2', answer: 4, op: '+', speed: 1, id: 1, spawnTimeMs: 9_000 },
+        { x: 0, y: 0, text: '3 - 1', answer: 2, op: '-', speed: 1, id: 2, spawnTimeMs: 9_500 },
+      ];
+
+      game.inputBuffer = '4';
+      game.checkAnswer(); // '+' correct, latency 1000
+
+      game.inputBuffer = '99999';
+      game.checkAnswer(); // '-' incorrect, latency 500
+
+      const baseHitMeteor = {
+        x: 0,
+        y: 0,
+        text: '8 - 3',
+        answer: 5,
+        op: '-' as const,
+        speed: 1,
+        id: 3,
+        spawnTimeMs: 9_800,
+      };
+
+      game.hitBase(baseHitMeteor); // '-' incorrect, latency 200
+      game.gameOver();
+
+      const history = gameStore.getState().getGameHistory(null, 1);
+      expect(history).toHaveLength(1);
+      expect(history[0].averageAnswerTimeMs).toBe(567);
+      expect(history[0].mostProblematicOperation).toBe('-');
+      expect(history[0].operationStats['+']).toEqual({ attempts: 1, incorrect: 0, avgTimeMs: 1000 });
+      expect(history[0].operationStats['-']).toEqual({ attempts: 2, incorrect: 2, avgTimeMs: 350 });
+
+      vi.useRealTimers();
     });
   });
 

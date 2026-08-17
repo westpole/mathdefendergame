@@ -2,11 +2,20 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { GAME_CONFIG } from '@game/config';
-import type { DDAMathTier, DDAHeatState, Grade, ScoreEntry } from '@shared/types';
+import type {
+  DDAMathTier,
+  DDAHeatState,
+  GameHistoryEntry,
+  Grade,
+  MathOperation,
+  OperationHistoryStat,
+  ScoreEntry,
+} from '@shared/types';
 
 type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'stage-message' | 'gameover';
 type MenuView = 'home' | 'high-score' | 'rules';
 type LegacyDifficulty = 'child' | 'student' | 'adult';
+type HistoryByProfile = Record<string, GameHistoryEntry[]>;
 
 export interface PlayerProfile {
   username: string;
@@ -31,6 +40,10 @@ interface StageMessageState {
   stageIncorrect: number;
 }
 
+const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
+const GUEST_HISTORY_BUCKET = '__guest__';
+const MAX_HISTORY_ENTRIES_PER_PROFILE = 50;
+
 export interface GameStoreState {
   phase: OverlayPhase;
   menuView: MenuView;
@@ -53,6 +66,7 @@ export interface GameStoreState {
   ddaIsCooloffActive: boolean;
   stageMessage: StageMessageState | null;
   leaderboard: Record<Grade, ScoreEntry[]>;
+  gameHistoryByProfile: HistoryByProfile;
   markBootReady: () => void;
   setGrade: (grade: Grade) => void;
   syncHUD: (payload: Partial<Pick<GameStoreState, 'grade' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'inputBuffer' | 'correctCount' | 'incorrectCount' | 'finalPerfScore' | 'ddaHeatState' | 'ddaMathTier' | 'ddaSpeedMultiplier' | 'ddaIsCooloffActive'>>) => void;
@@ -66,6 +80,8 @@ export interface GameStoreState {
   getActiveProfile: () => PlayerProfile | null;
   saveScore: (name: string, score: number, perfScore: number, grade: Grade) => void;
   getScores: (gradeFilter?: Grade | null) => ScoreEntry[];
+  addGameHistory: (entry: GameHistoryEntry) => void;
+  getGameHistory: (username?: string | null, limit?: number) => GameHistoryEntry[];
 }
 
 const gradeOrder: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
@@ -79,6 +95,101 @@ function createEmptyLeaderboard(): Record<Grade, ScoreEntry[]> {
     commander: [],
     'major-general': [],
   };
+}
+
+function createEmptyOperationHistoryStats(): Record<MathOperation, OperationHistoryStat> {
+  return {
+    '+': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+    '-': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+    '*': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+    '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+  };
+}
+
+function sortAndTrimHistory(entries: GameHistoryEntry[]): GameHistoryEntry[] {
+  return [...entries]
+    .sort((left, right) => right.playedAt - left.playedAt)
+    .slice(0, MAX_HISTORY_ENTRIES_PER_PROFILE);
+}
+
+function isMathOperation(value: unknown): value is MathOperation {
+  return value === '+' || value === '-' || value === '*' || value === '/';
+}
+
+function normalizeOperationHistoryStats(rawStats: unknown): Record<MathOperation, OperationHistoryStat> {
+  const normalizedStats = createEmptyOperationHistoryStats();
+
+  if (!rawStats || typeof rawStats !== 'object') {
+    return normalizedStats;
+  }
+
+  for (const op of MATH_OPERATIONS) {
+    const stat = (rawStats as Record<string, unknown>)[op];
+
+    if (!stat || typeof stat !== 'object') {
+      continue;
+    }
+
+    const statRecord = stat as Record<string, unknown>;
+    normalizedStats[op] = {
+      attempts: typeof statRecord.attempts === 'number' ? statRecord.attempts : 0,
+      incorrect: typeof statRecord.incorrect === 'number' ? statRecord.incorrect : 0,
+      avgTimeMs: typeof statRecord.avgTimeMs === 'number' ? statRecord.avgTimeMs : 0,
+    };
+  }
+
+  return normalizedStats;
+}
+
+function normalizeHistoryEntry(rawEntry: unknown): GameHistoryEntry {
+  const legacyEntry = (rawEntry ?? {}) as Record<string, unknown>;
+
+  return {
+    key: typeof legacyEntry.key === 'string'
+      ? legacyEntry.key
+      : `game_history_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`,
+    playedAt: typeof legacyEntry.playedAt === 'number'
+      ? legacyEntry.playedAt
+      : (typeof legacyEntry.date === 'number' ? legacyEntry.date : Date.now()),
+    correctAnswers: typeof legacyEntry.correctAnswers === 'number'
+      ? legacyEntry.correctAnswers
+      : (typeof legacyEntry.correctCount === 'number' ? legacyEntry.correctCount : 0),
+    incorrectAnswers: typeof legacyEntry.incorrectAnswers === 'number'
+      ? legacyEntry.incorrectAnswers
+      : (typeof legacyEntry.incorrectCount === 'number' ? legacyEntry.incorrectCount : 0),
+    averageAnswerTimeMs: typeof legacyEntry.averageAnswerTimeMs === 'number'
+      ? legacyEntry.averageAnswerTimeMs
+      : 0,
+    mostProblematicOperation: isMathOperation(legacyEntry.mostProblematicOperation)
+      ? legacyEntry.mostProblematicOperation
+      : null,
+    operationStats: normalizeOperationHistoryStats(legacyEntry.operationStats),
+    gradeAtFinish: normalizeGrade(legacyEntry.gradeAtFinish ?? legacyEntry.grade),
+    finalScore: typeof legacyEntry.finalScore === 'number'
+      ? legacyEntry.finalScore
+      : (typeof legacyEntry.score === 'number' ? legacyEntry.score : 0),
+    finalPerfScore: typeof legacyEntry.finalPerfScore === 'number'
+      ? legacyEntry.finalPerfScore
+      : (typeof legacyEntry.perfScore === 'number' ? legacyEntry.perfScore : 0),
+  };
+}
+
+function migrateGameHistoryByProfile(rawHistoryByProfile: unknown): HistoryByProfile {
+  if (!rawHistoryByProfile || typeof rawHistoryByProfile !== 'object') {
+    return {};
+  }
+
+  const migrated: HistoryByProfile = {};
+
+  for (const [profileKey, entries] of Object.entries(rawHistoryByProfile as Record<string, unknown>)) {
+    if (!Array.isArray(entries)) {
+      continue;
+    }
+
+    migrated[profileKey] = sortAndTrimHistory(entries.map((entry) => normalizeHistoryEntry(entry)));
+  }
+
+  return migrated;
 }
 
 function sortAndTrimScores(scores: ScoreEntry[]): ScoreEntry[] {
@@ -230,6 +341,7 @@ const initialState = {
   ddaIsCooloffActive: false,
   stageMessage: null,
   leaderboard: createEmptyLeaderboard(),
+  gameHistoryByProfile: {},
 };
 
 export const useGameStore = create<GameStoreState>()(
@@ -428,10 +540,30 @@ export const useGameStore = create<GameStoreState>()(
           (left, right) => right.combined - left.combined || right.date - left.date,
         );
       },
+      addGameHistory: (entry) => {
+        set((state) => {
+          const profileKey = state.activeUsername ?? GUEST_HISTORY_BUCKET;
+          const historyForProfile = state.gameHistoryByProfile[profileKey] ?? [];
+
+          return {
+            gameHistoryByProfile: {
+              ...state.gameHistoryByProfile,
+              [profileKey]: sortAndTrimHistory([...historyForProfile, entry]),
+            },
+          };
+        });
+      },
+      getGameHistory: (username = null, limit = 20) => {
+        const state = get();
+        const profileKey = username ?? state.activeUsername ?? GUEST_HISTORY_BUCKET;
+        const historyForProfile = state.gameHistoryByProfile[profileKey] ?? [];
+
+        return historyForProfile.slice(0, Math.max(0, limit));
+      },
     }),
     {
       name: leaderboardStorageKey,
-      version: 2,
+      version: 3,
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState) => {
         const rawState = (persistedState ?? {}) as Record<string, unknown>;
@@ -440,6 +572,7 @@ export const useGameStore = create<GameStoreState>()(
           ...rawState,
           leaderboard: migrateLeaderboard(rawState.leaderboard),
           profiles: migrateProfiles(rawState.profiles),
+          gameHistoryByProfile: migrateGameHistoryByProfile(rawState.gameHistoryByProfile),
           activeUsername:
             typeof rawState.activeUsername === 'string' || rawState.activeUsername === null
               ? rawState.activeUsername
@@ -449,6 +582,7 @@ export const useGameStore = create<GameStoreState>()(
       partialize: (state) => ({
         leaderboard: state.leaderboard,
         profiles: state.profiles,
+        gameHistoryByProfile: state.gameHistoryByProfile,
         activeUsername: state.activeUsername,
       }),
     },
