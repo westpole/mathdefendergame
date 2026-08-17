@@ -7,7 +7,7 @@ import { HUDOverlay } from '@ui/components/HUDOverlay';
 import { MainMenuOverlay } from '@ui/components/MainMenuOverlay';
 import { StageMessageOverlay } from '@ui/components/StageMessageOverlay';
 import { Loading } from '@ui/components/Loading';
-import { HighScoreOverlay } from '@ui/components/HighScoreOverlay';
+import { ProfileOverlay } from '@ui/components/ProfileOverlay';
 import { RulesOverlay } from '@ui/components/Rules';
 import { CitySceneLayout } from '@ui/components/CitySceneLayout';
 import { LoginOverlay } from '@ui/components/LoginOverlay';
@@ -35,7 +35,7 @@ export function App() {
         {!bootReady && <Loading />}
         {bootReady && phase === 'login' && <LoginOverlay />}
         {isStartPhase && menuView === 'home' && <MainMenuOverlay />}
-        {isStartPhase && menuView === 'high-score' && <HighScoreOverlay />}
+        {isStartPhase && menuView === 'profile' && <ProfileOverlay />}
         {isStartPhase && menuView === 'rules' && <RulesOverlay />}
         {isStartPhase && <StartMenuControls />}
         {bootReady && phase === 'playing' && <HUDOverlay />}

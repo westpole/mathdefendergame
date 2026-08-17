@@ -101,9 +101,9 @@ describe('gameStore', () => {
       expect(gameStore.getState().menuView).toBe('rules');
     });
 
-    it('should switch to high-score view', () => {
-      gameStore.getState().openMenuView('high-score');
-      expect(gameStore.getState().menuView).toBe('high-score');
+    it('should switch to profile view', () => {
+      gameStore.getState().openMenuView('profile');
+      expect(gameStore.getState().menuView).toBe('profile');
     });
 
     it('should return to home menu', () => {

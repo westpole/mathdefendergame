@@ -30,22 +30,22 @@ test.describe('Menu Navigation', () => {
 
     await expect(page.getByTestId('start-menu-options')).toBeVisible();
     await expect(page.getByTestId('menu-option-home')).toBeVisible();
-    await expect(page.getByTestId('menu-option-high-score')).toBeVisible();
+    await expect(page.getByTestId('menu-option-profile')).toBeVisible();
     await expect(page.getByTestId('menu-option-rules')).toBeVisible();
   });
 
-  test('can navigate to high scores view from the React menu', async ({ page }) => {
+  test('can navigate to the profile view from the React menu', async ({ page }) => {
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
     await loginToStartMenu(page);
 
     await page.getByTestId('menu-toggle-button').click();
-    await page.getByTestId('menu-option-high-score').click();
+    await page.getByTestId('menu-option-profile').click();
 
-    await expect(page.getByTestId('high-score-overlay')).toBeVisible();
+    await expect(page.getByTestId('profile-overlay')).toBeVisible();
     await expect(page.getByTestId('start-menu-options')).toHaveCount(0);
 
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-    expect(state.menuView).toBe('high-score');
+    expect(state.menuView).toBe('profile');
   });
 
   test('can navigate to rules view from the React menu', async ({ page }) => {

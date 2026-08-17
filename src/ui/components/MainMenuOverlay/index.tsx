@@ -24,7 +24,7 @@ export function MainMenuOverlay() {
           />
         </div>
 
-        <h1>{activeUsername ?? 'Commander'}</h1>
+        <h1>{activeUsername ?? 'Ghost'}</h1>
         <h4 className="menu-subtitle">{toGradeTitle(grade)} on duty</h4>
         <div className="menu-actions">
           <button

@@ -62,8 +62,8 @@ export function LoginOverlay() {
         </div>
         <p className="menu-subtitle login-subtitle">
           {activeTab === 'login'
-            ? 'Login with your existing commander profile.'
-            : 'Create your commander profile to continue.'}
+            ? 'Login with your existing profile.'
+            : 'Create your profile to continue.'}
         </p>
 
         <form className="login-form" onSubmit={handleSubmit} id="auth-panel" role="tabpanel">

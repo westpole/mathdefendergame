@@ -74,9 +74,20 @@ describe('App start menu controls', () => {
 
     expect(screen.getByTestId('start-menu-options')).toBeVisible();
 
-    fireEvent.click(screen.getByTestId('menu-option-high-score'));
+    fireEvent.click(screen.getByTestId('menu-option-profile'));
 
-    expect(uiSceneMocks.openMenuView).toHaveBeenCalledWith('high-score');
+    expect(uiSceneMocks.openMenuView).toHaveBeenCalledWith('profile');
     expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
+  });
+
+  it('renders the profile page when the menu view is set to profile', () => {
+    act(() => {
+      gameStore.setState({ phase: 'start', menuView: 'profile' });
+    });
+
+    render(<App />);
+
+    expect(screen.getByTestId('profile-overlay')).toBeVisible();
+    expect(screen.getByText(/profile/i)).toBeInTheDocument();
   });
 });

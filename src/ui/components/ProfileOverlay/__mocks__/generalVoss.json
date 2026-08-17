@@ -1,0 +1,61 @@
+{
+  "activeUsername": "GeneralVoss",
+  "score": 1100,
+  "correctCount": 31,
+  "grade": "major-general",
+  "profiles": {
+    "GeneralVoss": {
+      "username": "GeneralVoss",
+      "password": "Abc12345",
+      "bestScore": 1100,
+      "highestStage": 18,
+      "preferredGrade": "major-general",
+      "createdAt": 1710000000000,
+      "updatedAt": 1710000000000
+    }
+  },
+  "gameHistoryByProfile": {
+    "GeneralVoss": [
+      {
+        "key": "game-3",
+        "playedAt": 1710000003000,
+        "correctAnswers": 28,
+        "incorrectAnswers": 4,
+        "averageAnswerTimeMs": 1500,
+        "mostProblematicOperation": "+",
+        "operationStats": {
+          "+": { "attempts": 15, "incorrect": 1, "avgTimeMs": 1500 },
+          "-": { "attempts": 12, "incorrect": 2, "avgTimeMs": 1700 },
+          "*": { "attempts": 10, "incorrect": 1, "avgTimeMs": 1800 },
+          "/": { "attempts": 8, "incorrect": 0, "avgTimeMs": 1900 }
+        },
+        "gradeAtFinish": "major-general",
+        "finalScore": 880,
+        "finalPerfScore": 85
+      },
+      {
+        "key": "game-4",
+        "playedAt": 1710000001000,
+        "correctAnswers": 33,
+        "incorrectAnswers": 2,
+        "averageAnswerTimeMs": 1400,
+        "mostProblematicOperation": "/",
+        "operationStats": {
+          "+": { "attempts": 14, "incorrect": 1, "avgTimeMs": 1400 },
+          "-": { "attempts": 13, "incorrect": 1, "avgTimeMs": 1500 },
+          "*": { "attempts": 11, "incorrect": 0, "avgTimeMs": 1700 },
+          "/": { "attempts": 9, "incorrect": 0, "avgTimeMs": 1800 }
+        },
+        "gradeAtFinish": "major-general",
+        "finalScore": 1120,
+        "finalPerfScore": 94
+      }
+    ]
+  },
+  "leaderboard": {
+    "trainee": [],
+    "cadet": [],
+    "commander": [],
+    "major-general": []
+  }
+}

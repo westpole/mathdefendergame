@@ -1,0 +1,147 @@
+import { useMemo } from 'react';
+
+import { GAME_CONFIG } from '@game/config';
+import { useGameStore } from '@store/useGameStore';
+import type { Grade } from '@shared/types';
+
+const gradeOrder: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
+const EMPTY_HISTORY: Array<{ finalScore: number; finalPerfScore: number; correctAnswers: number }> = [];
+const gradeColorMap: Record<Exclude<Grade, 'major-general'>, string> = {
+  trainee: '#ef4444',
+  cadet: '#facc15',
+  commander: '#22c55e',
+};
+
+function toGradeTitle(grade: Grade): string {
+  return grade
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function formatScore(value: number): string {
+  return value.toLocaleString();
+}
+
+export function ProfileOverlay() {
+  const activeUsername = useGameStore((state) => state.activeUsername);
+  const grade = useGameStore((state) => state.grade);
+  const currentScore = useGameStore((state) => state.score);
+  const correctCount = useGameStore((state) => state.correctCount);
+  const profile = useGameStore((state) => (state.activeUsername ? state.profiles[state.activeUsername] ?? null : null));
+  const history = useGameStore((state) => {
+    const key = state.activeUsername ?? '__guest__';
+    return state.gameHistoryByProfile[key] ?? EMPTY_HISTORY;
+  });
+
+  const stats = useMemo(() => {
+    const totalScore = history.reduce((sum, entry) => sum + entry.finalScore, 0);
+    const gameCount = history.length;
+    const averageAccuracy = gameCount > 0
+      ? history.reduce((sum, entry) => sum + entry.finalPerfScore, 0) / gameCount
+      : 0;
+    const activeStreak = history.length > 0
+      ? Math.max(...history.map((entry) => entry.correctAnswers), correctCount)
+      : correctCount;
+
+    return {
+      totalScore,
+      gameCount,
+      averageAccuracy,
+      activeStreak,
+    };
+  }, [correctCount, history]);
+
+  const scoreDisplay = Math.max(currentScore, profile?.bestScore ?? 0, stats.totalScore, 0);
+  const currentIndex = gradeOrder.indexOf(grade);
+  const currentThreshold = GAME_CONFIG.grades[grade].thresholdScore;
+  const nextGrade = currentIndex < gradeOrder.length - 1 ? gradeOrder[currentIndex + 1] : null;
+  const nextThreshold = nextGrade ? GAME_CONFIG.grades[nextGrade].thresholdScore : null;
+  const pointsLeft = nextThreshold !== null ? Math.max(nextThreshold - scoreDisplay, 0) : 0;
+  const progressRatio = nextThreshold !== null && nextThreshold > currentThreshold
+    ? Math.min(Math.max((scoreDisplay - currentThreshold) / (nextThreshold - currentThreshold), 0), 1)
+    : 0;
+  const trackColor = grade === 'trainee' ? gradeColorMap.trainee
+    : grade === 'cadet' ? gradeColorMap.cadet
+    : grade === 'commander' ? gradeColorMap.commander
+    : '#4b5563';
+
+  return (
+    <div className="grid-container" data-testid="profile-overlay">
+      <div className="contentBox">
+        <section className="overlay-panel menu-page-panel profile-panel">
+          <div className="overlay-header">
+            <h1>PROFILE</h1>
+          </div>
+
+          <div className="profile-header">
+            <div className="profile-grade-icon-wrap">
+              <img
+                alt={`${toGradeTitle(grade)} icon`}
+                className="profile-grade-icon"
+                src={`/src/assets/${grade}-icon.png`}
+                width={96}
+              />
+            </div>
+
+            <div className="profile-stat-list">
+              <div className="profile-identity-row">
+                <strong className="profile-identity-label">{activeUsername ?? 'Ghost'}</strong>
+              </div>
+
+              <div className="profile-stat-grid">
+                <div className="profile-stat">
+                  <span className="profile-stat-label">Total Score</span>
+                  <strong>{formatScore(stats.totalScore || scoreDisplay)}</strong>
+                </div>
+                <div className="profile-stat">
+                  <span className="profile-stat-label">Games</span>
+                  <strong>{stats.gameCount}</strong>
+                </div>
+                <div className="profile-stat">
+                  <span className="profile-stat-label">Avg Accuracy</span>
+                  <strong>{`${Math.round(stats.averageAccuracy)}%`}</strong>
+                </div>
+                <div className="profile-stat">
+                  <span className="profile-stat-label">Active Streak</span>
+                  <strong>{stats.activeStreak}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="profile-progress-section">
+            {grade === 'major-general' ? (
+              <div className="profile-major-general-box" style={{ backgroundColor: '#4b5563', color: '#fff' }}>
+                <span>{formatScore(scoreDisplay)}</span>
+              </div>
+            ) : (
+              <>
+                <div className="profile-progress-labels">
+                  <span>{formatScore(currentThreshold)}</span>
+                  <span>{nextGrade ? `Next ${toGradeTitle(nextGrade)}` : 'Top grade'}</span>
+                  <span>{formatScore(nextThreshold ?? currentThreshold)}</span>
+                </div>
+
+                <div className="profile-progress-bar" style={{ width: '100%', height: '25px' }}>
+                  <div
+                    className="profile-progress-fill"
+                    style={{ width: `${progressRatio * 100}%`, backgroundColor: trackColor }}
+                  />
+                  <div
+                    className="profile-progress-marker"
+                    style={{ left: `${progressRatio * 100}%`, backgroundColor: trackColor }}
+                  />
+                </div>
+
+                <div className="profile-points-remaining">
+                  {formatScore(pointsLeft)} pts to next grade
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}

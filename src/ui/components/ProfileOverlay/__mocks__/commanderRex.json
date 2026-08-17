@@ -1,0 +1,61 @@
+{
+  "activeUsername": "CommanderRex",
+  "score": 645,
+  "correctCount": 24,
+  "grade": "commander",
+  "profiles": {
+    "CommanderRex": {
+      "username": "CommanderRex",
+      "password": "Abc12345",
+      "bestScore": 355,
+      "highestStage": 18,
+      "preferredGrade": "commander",
+      "createdAt": 1710000000000,
+      "updatedAt": 1710000000000
+    }
+  },
+  "gameHistoryByProfile": {
+    "CommanderRex": [
+      {
+        "key": "game-1",
+        "playedAt": 1710000004000,
+        "correctAnswers": 18,
+        "incorrectAnswers": 7,
+        "averageAnswerTimeMs": 1800,
+        "mostProblematicOperation": "*",
+        "operationStats": {
+          "+": { "attempts": 10, "incorrect": 2, "avgTimeMs": 1900 },
+          "-": { "attempts": 9, "incorrect": 2, "avgTimeMs": 2000 },
+          "*": { "attempts": 8, "incorrect": 3, "avgTimeMs": 2200 },
+          "/": { "attempts": 5, "incorrect": 1, "avgTimeMs": 2400 }
+        },
+        "gradeAtFinish": "commander",
+        "finalScore": 345,
+        "finalPerfScore": 72
+      },
+      {
+        "key": "game-2",
+        "playedAt": 1710000002000,
+        "correctAnswers": 24,
+        "incorrectAnswers": 6,
+        "averageAnswerTimeMs": 1600,
+        "mostProblematicOperation": "-",
+        "operationStats": {
+          "+": { "attempts": 12, "incorrect": 2, "avgTimeMs": 1800 },
+          "-": { "attempts": 11, "incorrect": 1, "avgTimeMs": 1700 },
+          "*": { "attempts": 10, "incorrect": 2, "avgTimeMs": 1900 },
+          "/": { "attempts": 6, "incorrect": 1, "avgTimeMs": 2100 }
+        },
+        "gradeAtFinish": "commander",
+        "finalScore": 355,
+        "finalPerfScore": 80
+      }
+    ]
+  },
+  "leaderboard": {
+    "trainee": [],
+    "cadet": [],
+    "commander": [],
+    "major-general": []
+  }
+}
