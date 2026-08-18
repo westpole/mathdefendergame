@@ -108,7 +108,7 @@ import {
   useGameStore,
   GameStoreState,    // full state shape
   OverlayPhase,      // 'booting' | 'start' | 'playing' | 'stage-message' | 'gameover'
-  MenuView,          // 'home' | 'high-score' | 'rules'
+  MenuView,          // 'home' | 'profile' | 'rules'
   StageMessageState,
 } from '../../../store/useGameStore';
 ```

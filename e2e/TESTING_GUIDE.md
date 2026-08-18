@@ -20,7 +20,6 @@ Add these to make E2E tests more reliable:
 
 **UI Overlays:**
 - ✅ `main-menu` - MainMenuOverlay (added)
-- `high-score-overlay` - HighScoreOverlay
 - `rules-overlay` - RulesOverlay
 - `game-over-overlay` - GameOverOverlay
 - `hud-overlay` - HUDOverlay
@@ -186,10 +185,10 @@ test('navigate through menus', async ({ page }) => {
   let state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
   expect(state.menuView).toBe('home');
 
-  // Go to high scores
-  await page.click('[data-testid="high-score-button"]');
+  // Open rules from the menu
+  await page.click('[data-testid="rules-button"]');
   state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-  expect(state.menuView).toBe('high-score');
+  expect(state.menuView).toBe('rules');
 
   // Back to home
   await page.click('[data-testid="back-button"]');

@@ -1,6 +1,6 @@
 # Math Defender
 
-The player defends a base from falling meteors containing math expressions by typing the correct answer and pressing Enter. The game features score-based grade progression, dynamic difficulty adjustment (DDA), and a persistent leaderboard.
+The player defends a base from falling meteors containing math expressions by typing the correct answer and pressing Enter. The game features score-based grade progression, dynamic difficulty adjustment (DDA), and a persistent score ledger that is surfaced in the overlay flow.
 
 ## Grade Progression and DDA Baseline
 

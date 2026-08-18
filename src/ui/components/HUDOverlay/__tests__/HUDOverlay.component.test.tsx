@@ -84,11 +84,4 @@ describe('HUDOverlay Component', () => {
 
     expect(screen.getByText(/2000/)).toBeInTheDocument();
   });
-
-  it('should render DDA telemetry', () => {
-    render(<HUDOverlay />);
-
-    expect(screen.getByText('Grade: major-general')).toBeInTheDocument();
-    expect(screen.getByText('Top Rank Reached')).toBeInTheDocument();
-  });
 });

@@ -30,9 +30,9 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 
 ## Repo-Specific Patterns
 
-- Phaser owns the canvas. React owns menu, HUD, stage-message, game-over, rules, high-score, and loading overlays.
+- Phaser owns the canvas. React owns menu, HUD, stage-message, game-over, rules, and loading overlays.
 - Put gameplay rule changes in `src/game/main.ts`; keep `GameScene` focused on rendering, input, and store synchronization.
 - Treat Zustand as the integration boundary between Phaser and React. Avoid duplicate state or parallel sources of truth.
-- Overlay flow is driven by `phase` (`booting | start | playing | stage-message | gameover`) and `menuView` (`home | high-score | rules`).
+- Overlay flow is driven by `phase` (`booting | start | playing | stage-message | gameover`) and `menuView` (`home | profile | rules`).
 - Stories live beside components in `src/ui/components/**`; use the Storybook skill instead of inventing a new store-mocking pattern.
 - Preserve the existing Electron security posture: `contextIsolation: true` and `nodeIntegration: false`.

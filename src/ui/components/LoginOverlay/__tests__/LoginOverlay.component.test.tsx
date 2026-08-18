@@ -36,7 +36,7 @@ describe('LoginOverlay', () => {
     render(<LoginOverlay />);
 
     expect(screen.getByRole('tab', { name: /login/i })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByText(/login with your existing commander profile/i)).toBeInTheDocument();
+    expect(screen.getByText(/login with your existing profile/i)).toBeInTheDocument();
   });
 
   it('shows suggestion to create profile when username does not exist', () => {
