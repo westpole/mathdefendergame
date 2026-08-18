@@ -40,3 +40,9 @@
 .field-label {
   color: $text-muted;
 }
+
+.center-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

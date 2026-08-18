@@ -11,9 +11,8 @@ export function StageMessageOverlay() {
 
   const title = stageMessage.success
     ? `Stage ${stageMessage.stage} Cleared!`
-    : stageMessage.lives > 0
-      ? 'Stage Lost'
-      : 'Stage Lost - No Lives Remaining';
+    : 'Stage Lost';
+  const remainingLifeLabel = stageMessage.lives === 1 ? 'life' : 'lives';
 
   return (
     <div className="overlay-screen overlay-screen--interactive">
@@ -24,11 +23,13 @@ export function StageMessageOverlay() {
         })}
       >
         <h1>{title}</h1>
-        <p>
-          {stageMessage.lives > 0
-            ? `You lost this stage and 1 life. Remaining lives: ${stageMessage.lives}.`
-            : 'You lost this stage and your last life. Continue to return home.'}
-        </p>
+
+        {!stageMessage.success && stageMessage.lives > 0 && (
+          <p>
+            {`You lost this stage and 1 life. Remaining ${remainingLifeLabel}: ${stageMessage.lives}.`}
+          </p>
+        )}
+
         {stageMessage.success && stageMessage.stageIncorrect === 0 && (
           <p>Perfect stage. Bonus life awarded.</p>
         )}

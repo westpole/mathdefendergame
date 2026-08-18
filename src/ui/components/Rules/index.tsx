@@ -1,11 +1,10 @@
 const rules = [
   'Type the answer and press Enter.',
-  'Escape exits the run back to menu.',
-  'You have 10 lives for retries.',
-  'The base shield absorbs 5 meteor hits.',
-  'A destroyed base costs 1 life.',
-  'Perfect stages earn 1 bonus life.',
-  'Progress through 28 stages of operations.',
+  'Press Escape to return to the menu.',
+  'You begin with 3 lives.',
+  'The base shield has 5 shield points before a life is lost.',
+  'Perfect stages award an extra life.',
+  'Clear 28 stages to win.',
 ];
 
 export function RulesOverlay() {

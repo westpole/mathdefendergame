@@ -1,20 +1,14 @@
-import { useState } from 'react';
-
-import { returnToMenu } from '@game/scenes/UIScene';
+import { startGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
 export function GameOverOverlay() {
-  const grade = useGameStore((state) => state.grade);
   const score = useGameStore((state) => state.score);
   const correctCount = useGameStore((state) => state.correctCount);
   const incorrectCount = useGameStore((state) => state.incorrectCount);
   const finalPerfScore = useGameStore((state) => state.finalPerfScore);
-  const saveScore = useGameStore((state) => state.saveScore);
-  const [name, setName] = useState('');
 
-  const saveAndReturn = () => {
-    saveScore(name.trim() || 'Anonymous', score, finalPerfScore, grade);
-    returnToMenu();
+  const handleStartNewGame = () => {
+    startGame();
   };
 
   return (
@@ -26,8 +20,6 @@ export function GameOverOverlay() {
           </div>
 
           <div className="stats-grid">
-            <span>Grade</span>
-            <strong>{grade}</strong>
             <span>Total Score</span>
             <strong>{score}</strong>
             <span>Correct</span>
@@ -37,21 +29,10 @@ export function GameOverOverlay() {
             <span>Accuracy</span>
             <strong>{finalPerfScore.toFixed(2)}%</strong>
           </div>
-          <label className="field-label" htmlFor="leaderboard-name">Save your result:</label>
-          <input
-            id="leaderboard-name"
-            className="text-input"
-            maxLength={10}
-            onChange={(event) => setName(event.target.value)}
-            placeholder="Your name"
-            value={name}
-          />
-          <div className="action-row">
-            <button className="secondary-button" onClick={returnToMenu} type="button">
-              Cancel
-            </button>
-            <button className="primary-button" onClick={saveAndReturn} type="button">
-              Save
+
+          <div className="action-row center-content">
+            <button className="primary-button" onClick={handleStartNewGame} type="button">
+              Start new game
             </button>
           </div>
         </section>
