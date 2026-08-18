@@ -1,7 +1,10 @@
 import { startGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
+import type { Grade } from '@shared/types';
 
-function toGradeTitle(grade: string): string {
+import { gradeIcons } from '../gradeIcons';
+
+function toGradeTitle(grade: Grade): string {
   return grade
     .split('-')
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
@@ -17,7 +20,7 @@ export function MainMenuOverlay() {
       <div className="overlay-panel">
         <div className="grade-icon-wrap">
           <img
-            src={`/src/assets/${grade}-icon.png`}
+            src={gradeIcons[grade]}
             alt={`${toGradeTitle(grade)} icon`}
             className="grade-icon"
             width={256}

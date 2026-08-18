@@ -4,6 +4,8 @@ import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
 import type { Grade } from '@shared/types';
 
+import { gradeIcons } from '../gradeIcons';
+
 const gradeOrder: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
 const EMPTY_HISTORY: Array<{ finalScore: number; finalPerfScore: number; correctAnswers: number }> = [];
 const gradeColorMap: Record<Exclude<Grade, 'major-general'>, string> = {
@@ -79,7 +81,7 @@ export function ProfileOverlay() {
               <img
                 alt={`${toGradeTitle(grade)} icon`}
                 className="profile-grade-icon"
-                src={`/src/assets/${grade}-icon.png`}
+                src={gradeIcons[grade]}
                 width={96}
               />
             </div>
