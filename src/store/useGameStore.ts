@@ -351,31 +351,9 @@ export const useGameStore = create<GameStoreState>()(
       markBootReady: () => set({ bootReady: true, phase: 'login' }),
       setGrade: (grade) => set({ grade }),
       syncHUD: (payload) => {
-        set((state) => {
-          const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
-
-          if (!activeProfile) {
-            return payload;
-          }
-
-          const nextScore = payload.score ?? state.score;
-          const nextStage = payload.stage ?? state.stage;
-          const nextGrade = payload.grade ?? state.grade;
-
-          return {
-            ...payload,
-            profiles: {
-              ...state.profiles,
-              [activeProfile.username]: {
-                ...activeProfile,
-                bestScore: Math.max(activeProfile.bestScore, nextScore),
-                highestStage: Math.max(activeProfile.highestStage, nextStage),
-                preferredGrade: nextGrade,
-                updatedAt: Date.now(),
-              },
-            },
-          };
-        });
+        // Keep HUD updates local to UI state to avoid frequent profile/localStorage writes.
+        // Profile syncs (bestScore/highestStage) are already handled in showGameOver/saveScore.
+        set(payload);
       },
       showStageMessage: (stageMessage) => set({ phase: 'stage-message', stageMessage }),
       showGameOver: (payload) => {
