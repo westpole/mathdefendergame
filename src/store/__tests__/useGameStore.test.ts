@@ -4,6 +4,7 @@
  */
 
 import { gameStore } from '../useGameStore';
+import type { GameHistoryEntry } from '../../shared/types';
 
 describe('gameStore', () => {
   beforeEach(() => {
@@ -277,7 +278,7 @@ describe('gameStore', () => {
   });
 
   describe('game history', () => {
-    const baseHistoryEntry = {
+    const baseHistoryEntry: GameHistoryEntry = {
       key: 'history-1',
       playedAt: 1_700_000_000_000,
       correctAnswers: 10,
