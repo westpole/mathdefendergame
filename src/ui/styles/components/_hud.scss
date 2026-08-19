@@ -91,7 +91,7 @@
 
   &__label {
     font-size: 10px;
-    color: $text-muted;
+    color: $text-primary;
     text-align: center;
   }
 
@@ -99,23 +99,19 @@
     font-family: $font-display;
     font-size: 20px;
     line-height: 1.1;
-    margin-top: 2px;
-    color: $color-primary-yellow;
-  }
-
-  &--shield {
-    border-color: rgba($shield-fill, 0.5);
+    margin-top: 7px;
+    color: #000;
   }
 
   &--good {
-    border-color: rgba($color-success-green, 0.7);
+    background-color: rgba($color-success-green, 0.8);
   }
 
   &--warn {
-    border-color: rgba($color-warning-yellow, 0.8);
+    background-color: rgba($color-warning-yellow, 0.8);
   }
 
   &--danger {
-    border-color: rgba($color-danger-red, 0.8);
+    background-color: rgba($color-danger-red, 0.8);
   }
 }

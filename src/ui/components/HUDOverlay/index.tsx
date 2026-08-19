@@ -13,13 +13,13 @@ export function HUDOverlay() {
   const stageShieldMax = GAME_CONFIG.stageShieldMax;
   const stageTarget = GAME_CONFIG.grades[grade].stageClearCorrectAnswers;
   const clampedShield = Math.max(0, Math.min(stageShieldMax, shield));
-  const livesTone = lives > 1 ? 'good' : lives > 0 ? 'warn' : 'danger';
+  const shieldsTone = clampedShield >= 4 ? 'good' : clampedShield >= 2 ? 'warn' : 'danger';
+  const livesTone = lives > 2 ? 'good' : lives > 1 ? 'warn' : 'danger';
 
   return (
     <div className="hud-layer">
       <section className="hud-panel hud-panel--left">
         <strong>Score: {score}</strong>
-        <span>Grade: {grade}</span>
         <strong>Goal: Correct {stageScore}/{stageTarget}</strong>
       </section>
 
@@ -31,7 +31,11 @@ export function HUDOverlay() {
 
       <section className="hud-panel hud-panel--right">
         <div className="status-squares">
-          <div className="status-square status-square--shield">
+          <div className={clsx('status-square status-square--shield', {
+              'status-square--good': shieldsTone === 'good',
+              'status-square--warn': shieldsTone === 'warn',
+              'status-square--danger': shieldsTone === 'danger',
+            })}>
             <span className="status-square__label">Base Shield</span>
             <strong className="status-square__value">{clampedShield}</strong>
           </div>
