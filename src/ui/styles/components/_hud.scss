@@ -45,8 +45,7 @@
   }
 
   &--left {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    align-items: flex-end;
   }
 
   &--center {
@@ -100,7 +99,7 @@
     font-size: 20px;
     line-height: 1.1;
     margin-top: 7px;
-    color: #000;
+    color: $color-text-dashboard;
   }
 
   &--good {
@@ -113,5 +112,49 @@
 
   &--danger {
     background-color: rgba($color-danger-red, 0.8);
+  }
+
+  &--streak {
+    color: $text-secondary;
+    background-color: rgba($bg-dark-panel, 0.7);
+  }
+}
+
+.streak-reward-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: $z-hud + 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.streak-reward-overlay__panel {
+  width: min(92%, 520px);
+  padding: $spacing-lg $spacing-xl;
+  border-radius: $radius-lg;
+  border: 1px solid rgba(234, 179, 8, 0.55);
+  background: rgba(15, 23, 42, 0.92);
+  box-shadow: $shadow-panel;
+  text-align: center;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  h2 {
+    font-family: $font-display;
+    font-size: 22px;
+    line-height: 1.2;
+    color: $color-primary-yellow;
+  }
+
+  p {
+    margin-top: $spacing-md;
+    font-size: 16px;
+    line-height: 1.45;
+    color: $text-secondary;
   }
 }

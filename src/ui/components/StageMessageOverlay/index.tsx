@@ -31,9 +31,14 @@ export function StageMessageOverlay() {
         )}
 
         {stageMessage.success && stageMessage.stageIncorrect === 0 && (
-          <p>Perfect stage. Bonus life awarded.</p>
+          <p>Perfect work. You saved your town.</p>
         )}
-        <button autoFocus className="primary-button" onClick={continueGame} type="button">
+
+        {stageMessage.success && stageMessage.stageIncorrect > 0 && (
+          <p>You cleared the stage, but made {stageMessage.stageIncorrect} mistake{stageMessage.stageIncorrect > 1 ? 's' : ''}.</p>
+        )}
+
+        <button className="primary-button" onClick={continueGame} type="button">
           Continue
         </button>
       </div>

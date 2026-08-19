@@ -40,6 +40,10 @@ interface StageMessageState {
   stageIncorrect: number;
 }
 
+interface StreakRewardMessageState {
+  message: string;
+}
+
 const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
 const GUEST_HISTORY_BUCKET = '__guest__';
 const MAX_HISTORY_ENTRIES_PER_PROFILE = 50;
@@ -59,18 +63,22 @@ export interface GameStoreState {
   inputBuffer: string;
   correctCount: number;
   incorrectCount: number;
+  streak: number;
   finalPerfScore: number;
   ddaHeatState: DDAHeatState;
   ddaMathTier: DDAMathTier;
   ddaSpeedMultiplier: number;
   ddaIsCooloffActive: boolean;
   stageMessage: StageMessageState | null;
+  streakRewardMessage: StreakRewardMessageState | null;
   leaderboard: Record<Grade, ScoreEntry[]>;
   gameHistoryByProfile: HistoryByProfile;
   markBootReady: () => void;
   setGrade: (grade: Grade) => void;
-  syncHUD: (payload: Partial<Pick<GameStoreState, 'grade' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'inputBuffer' | 'correctCount' | 'incorrectCount' | 'finalPerfScore' | 'ddaHeatState' | 'ddaMathTier' | 'ddaSpeedMultiplier' | 'ddaIsCooloffActive'>>) => void;
+  syncHUD: (payload: Partial<Pick<GameStoreState, 'grade' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'inputBuffer' | 'correctCount' | 'incorrectCount' | 'streak' | 'finalPerfScore' | 'ddaHeatState' | 'ddaMathTier' | 'ddaSpeedMultiplier' | 'ddaIsCooloffActive'>>) => void;
   showStageMessage: (payload: StageMessageState) => void;
+  showStreakRewardMessage: (payload: StreakRewardMessageState) => void;
+  clearStreakRewardMessage: () => void;
   showGameOver: (payload: Pick<GameStoreState, 'grade' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   startPlaying: () => void;
   returnToMenu: () => void;
@@ -334,12 +342,14 @@ const initialState = {
   inputBuffer: '',
   correctCount: 0,
   incorrectCount: 0,
+  streak: 0,
   finalPerfScore: 0,
   ddaHeatState: 'BALANCED' as DDAHeatState,
   ddaMathTier: 1 as DDAMathTier,
   ddaSpeedMultiplier: 1,
   ddaIsCooloffActive: false,
   stageMessage: null,
+  streakRewardMessage: null,
   leaderboard: createEmptyLeaderboard(),
   gameHistoryByProfile: {},
 };
@@ -356,17 +366,20 @@ export const useGameStore = create<GameStoreState>()(
         set(payload);
       },
       showStageMessage: (stageMessage) => set({ phase: 'stage-message', stageMessage }),
+      showStreakRewardMessage: (streakRewardMessage) => set({ streakRewardMessage }),
+      clearStreakRewardMessage: () => set({ streakRewardMessage: null }),
       showGameOver: (payload) => {
         set((state) => {
           const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
 
           if (!activeProfile) {
-            return { phase: 'gameover', stageMessage: null, ...payload };
+            return { phase: 'gameover', stageMessage: null, streakRewardMessage: null, ...payload };
           }
 
           return {
             phase: 'gameover',
             stageMessage: null,
+            streakRewardMessage: null,
             ...payload,
             profiles: {
               ...state.profiles,
@@ -381,7 +394,7 @@ export const useGameStore = create<GameStoreState>()(
           };
         });
       },
-      startPlaying: () => set({ phase: 'playing', stageMessage: null }),
+      startPlaying: () => set({ phase: 'playing', stageMessage: null, streakRewardMessage: null }),
       returnToMenu: () => set({
         ...initialState,
         bootReady: true,

@@ -21,6 +21,7 @@ export class GameScene extends Phaser.Scene {
 
   private meteorTexts: Map<number, Phaser.GameObjects.Text> = new Map();
   private particleGraphics!: Phaser.GameObjects.Graphics;
+  private streakRewardTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly handleKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape') {
       this.cleanupAndGoMenu();
@@ -53,6 +54,7 @@ export class GameScene extends Phaser.Scene {
     this.gameLogic = new Game({
       onHUDUpdate: () => this.updateHUD(),
       onFinishStage: (success) => this.handleFinishStage(success),
+      onStreakReward: (lives) => this.handleStreakReward(lives),
       onGameOver: (reason) => this.handleGameOver(reason),
       onShake: () => this.cameras.main.shake(500, 0.01),
     });
@@ -157,6 +159,27 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private handleStreakReward(lives: number): void {
+    if (this.streakRewardTimer) {
+      clearTimeout(this.streakRewardTimer);
+      this.streakRewardTimer = null;
+    }
+
+    gameStore.getState().showStreakRewardMessage({
+      message: `Congratulations! +1 life awarded for a 30 streak. Lives: ${lives}`,
+    });
+
+    this.streakRewardTimer = setTimeout(() => {
+      this.streakRewardTimer = null;
+      gameStore.getState().clearStreakRewardMessage();
+      this.gameLogic.resumeAfterStreakReward();
+
+      if (this.gameLogic.state === 'playing') {
+        gameStore.getState().startPlaying();
+      }
+    }, 3000);
+  }
+
   public continueFromOverlay(): void {
     this.gameLogic.resumeFromMessage();
     this.clearTransientRenderables();
@@ -168,6 +191,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private cleanupAndGoMenu(): void {
+    this.clearStreakRewardTimer();
     this.clearTransientRenderables();
     gameStore.getState().returnToMenu();
     this.scene.stop();
@@ -180,7 +204,18 @@ export class GameScene extends Phaser.Scene {
   private handleShutdown(): void {
     this.input.keyboard?.off('keydown', this.handleKeyDown, this);
     this.scale.off('resize', this.handleResize, this);
+    this.clearStreakRewardTimer();
+    gameStore.getState().clearStreakRewardMessage();
     this.clearTransientRenderables();
+  }
+
+  private clearStreakRewardTimer(): void {
+    if (!this.streakRewardTimer) {
+      return;
+    }
+
+    clearTimeout(this.streakRewardTimer);
+    this.streakRewardTimer = null;
   }
 
   private clearTransientRenderables(): void {

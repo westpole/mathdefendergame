@@ -3,7 +3,7 @@ const rules = [
   'Press Escape to return to the menu.',
   'You begin with 3 lives.',
   'The base shield has 5 shield points before a life is lost.',
-  'Perfect stages award an extra life.',
+  'Reach 30 correct answers in a row to earn 1 extra life.',
   'Clear 28 stages to win.',
 ];
 

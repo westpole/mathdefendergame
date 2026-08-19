@@ -24,6 +24,7 @@ import { generateMath } from './utilities/mathGen';
 export interface GameCallbacks {
   onHUDUpdate: () => void;
   onFinishStage: (success: boolean) => void;
+  onStreakReward: (lives: number) => void;
   onGameOver: (reason: GameOverReason) => void;
   onShake: () => void;
 }
@@ -69,6 +70,7 @@ export class Game {
   incorrectCount: number = 0;
   stageIncorrect: number = 0;
   stageCorrect: number = 0;
+  streak: number = 0;
 
   lastSpawn: number = 0;
   scoreAtStageStart: number = 0;
@@ -80,6 +82,7 @@ export class Game {
 
   // Tracks whether the last stage transition was a success (used by resumeFromMessage)
   private lastStageSuccess: boolean = true;
+  private pendingStageClearAfterStreakReward: boolean = false;
   private pendingGameOver: boolean = false;
   private pendingGameOverReason: GameOverReason = 'lives-depleted';
   private dda: DDAController;
@@ -105,6 +108,7 @@ export class Game {
     this.incorrectCount = 0;
     this.stageIncorrect = 0;
     this.stageCorrect = 0;
+    this.streak = 0;
     this.meteors = [];
     this.particles = [];
     this.inputBuffer = '';
@@ -114,6 +118,7 @@ export class Game {
     this.scoreAtStageStart = 0;
     this.livesAtStageStart = GAME_CONFIG.initialLives;
     this.lastStageSuccess = true;
+    this.pendingStageClearAfterStreakReward = false;
     this.pendingGameOver = false;
     this.pendingGameOverReason = 'lives-depleted';
     this.applyGradeBaseline('trainee');
@@ -186,12 +191,31 @@ export class Game {
       this.stageScore += 1;
       this.stageCorrect += 1;
       this.correctCount++;
+      this.streak += 1;
       this.inputBuffer = '';
       this.syncGradeFromScore();
 
+      let streakRewardTriggered = false;
+
+      if (this.streak >= 30) {
+        this.lives += 1;
+        this.streak = 0;
+        streakRewardTriggered = true;
+      }
+
       const stageTarget = GAME_CONFIG.grades[this.grade].stageClearCorrectAnswers;
       if (this.stageCorrect >= stageTarget) {
+        if (streakRewardTriggered) {
+          this.pendingStageClearAfterStreakReward = true;
+          this.pauseForStreakReward();
+          return;
+        }
         this.finishStage(true);
+        return;
+      }
+
+      if (streakRewardTriggered) {
+        this.pauseForStreakReward();
         return;
       }
     } else {
@@ -205,6 +229,7 @@ export class Game {
       this.recordOperationAttempt(oldestMeteor?.op, latencyMs, true);
       this.incorrectCount++;
       this.stageIncorrect++;
+      this.streak = 0;
       this.score = Math.max(0, this.score - GAME_CONFIG.scorePenaltyPerIncorrectAnswer);
       this.syncGradeFromScore();
       this.inputBuffer = '';
@@ -219,6 +244,7 @@ export class Game {
     const latencyMs = impactMeteor ? Math.max(0, Date.now() - impactMeteor.spawnTimeMs) : 0;
     this.dda.recordSample({ isCorrect: false, latencyMs, baseHit: true });
     this.recordOperationAttempt(impactMeteor?.op, latencyMs, true);
+    this.streak = 0;
     this.shield--;
     this.cb.onHUDUpdate();
     this.syncStore();
@@ -250,10 +276,6 @@ export class Game {
       if (this.stageIncorrect === 0) {
         this.score += GAME_CONFIG.grades[this.grade].cleanStageBonusPoints;
         this.syncGradeFromScore();
-      }
-
-      if (this.stageIncorrect === 0) {
-        this.lives += 1; // Perfect bonus – applied before the UI callback reads lives
       }
       // Notify UI (game.stage still points to the cleared stage at this moment)
       this.cb.onFinishStage(true);
@@ -302,6 +324,22 @@ export class Game {
       this.score = this.scoreAtStageStart;
       this.livesAtStageStart = this.lives;
       this.syncGradeFromScore();
+    }
+
+    this.state = 'playing';
+    this.cb.onHUDUpdate();
+    this.syncStore();
+  }
+
+  resumeAfterStreakReward(): void {
+    if (this.state !== 'paused') {
+      return;
+    }
+
+    if (this.pendingStageClearAfterStreakReward) {
+      this.pendingStageClearAfterStreakReward = false;
+      this.finishStage(true);
+      return;
     }
 
     this.state = 'playing';
@@ -386,12 +424,20 @@ export class Game {
       inputBuffer: this.inputBuffer,
       correctCount: this.correctCount,
       incorrectCount: this.incorrectCount,
+      streak: this.streak,
       finalPerfScore: this.finalPerfScore,
       ddaHeatState: this.dda.getDifficultyState().heatState,
       ddaMathTier: this.dda.getDifficultyState().mathTier,
       ddaSpeedMultiplier: this.dda.getDifficultyState().fallSpeedMultiplier,
       ddaIsCooloffActive: this.dda.getDifficultyState().isCooloffActive,
     });
+  }
+
+  private pauseForStreakReward(): void {
+    this.state = 'paused';
+    this.cb.onHUDUpdate();
+    this.syncStore();
+    this.cb.onStreakReward(this.lives);
   }
 
   private syncGradeFromScore(): void {

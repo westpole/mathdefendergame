@@ -9,6 +9,7 @@ import { gameStore } from '@store/useGameStore';
 interface Callbacks {
   onHUDUpdate: () => void;
   onFinishStage: (success: boolean) => void;
+  onStreakReward: (lives: number) => void;
   onGameOver: (reason: 'victory' | 'lives-depleted') => void;
   onShake: () => void;
 }
@@ -22,6 +23,7 @@ describe('Game', () => {
     mockCallbacks = {
       onHUDUpdate: vi.fn(),
       onFinishStage: vi.fn(),
+      onStreakReward: vi.fn(),
       onGameOver: vi.fn(),
       onShake: vi.fn(),
     };
@@ -208,6 +210,29 @@ describe('Game', () => {
       expect(mockCallbacks.onShake).toHaveBeenCalled();
     });
 
+    it('should reset streak on incorrect answer', () => {
+      (game as any).streak = 12;
+      game.inputBuffer = '99999';
+
+      game.checkAnswer();
+
+      expect((game as any).streak).toBe(0);
+    });
+
+    it('should award a life and reset streak at 30 correct answers in a row', () => {
+      const initialLives = game.lives;
+      (game as any).streak = 29;
+      const meteor = game.meteors[0];
+      game.inputBuffer = meteor.answer.toString();
+
+      game.checkAnswer();
+
+      expect(game.lives).toBe(initialLives + 1);
+      expect((game as any).streak).toBe(0);
+      expect(game.state).toBe('paused');
+      expect(mockCallbacks.onStreakReward).toHaveBeenCalledWith(initialLives + 1);
+    });
+
     it('should not reduce score below zero on wrong answers', () => {
       game.score = 0;
       game.inputBuffer = '99999';
@@ -319,13 +344,13 @@ describe('Game', () => {
       expect(game.particles.length).toBeGreaterThan(0);
     });
 
-    it('should award bonus life for perfect stage', () => {
+    it('should not award bonus life for a perfect stage without the streak threshold', () => {
       game.stageIncorrect = 0;
       const initialLives = game.lives;
 
       game.finishStage(true);
 
-      expect(game.lives).toBe(initialLives + 1);
+      expect(game.lives).toBe(initialLives);
     });
 
     it('should not award bonus life when stage has errors', () => {
@@ -345,7 +370,7 @@ describe('Game', () => {
       expect(game.stage).toBe(initialStage + 1);
     });
 
-    it('should update checkpoints on success', () => {
+    it('should update checkpoints on success without a streak bonus', () => {
       game.score = 100;
       game.lives = 8;
       game.grade = 'trainee';
@@ -353,7 +378,7 @@ describe('Game', () => {
       game.finishStage(true);
 
       expect(game.scoreAtStageStart).toBe(105);
-      expect(game.livesAtStageStart).toBe(9); // includes bonus
+      expect(game.livesAtStageStart).toBe(8);
     });
 
     it('should trigger game over when reaching stage 29', () => {
@@ -473,6 +498,35 @@ describe('Game', () => {
       game.resumeFromMessage();
 
       expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+  });
+
+  describe('resumeAfterStreakReward', () => {
+    it('returns to playing state after a streak reward pause', () => {
+      game.state = 'paused';
+
+      game.resumeAfterStreakReward();
+
+      expect(game.state).toBe('playing');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+
+    it('finishes the stage after reward pause when stage clear was pending', () => {
+      game.spawnMeteor();
+      game.state = 'playing';
+      game.stageCorrect = 6;
+      game.streak = 29;
+
+      game.inputBuffer = game.meteors[0].answer.toString();
+      game.checkAnswer();
+
+      expect(game.state).toBe('paused');
+      expect(mockCallbacks.onFinishStage).not.toHaveBeenCalled();
+
+      game.resumeAfterStreakReward();
+
+      expect(game.state).toBe('message');
+      expect(mockCallbacks.onFinishStage).toHaveBeenCalledWith(true);
     });
   });
 

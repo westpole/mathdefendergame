@@ -66,6 +66,6 @@ export type DDAHeatState =
 
 export type DDAMathTier = 1 | 2 | 3 | 4;
 
-export type GameState = 'start' | 'playing' | 'message' | 'gameover';
+export type GameState = 'start' | 'playing' | 'paused' | 'message' | 'gameover';
 
 export type GameOverReason = 'victory' | 'lives-depleted';

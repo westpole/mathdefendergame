@@ -9,6 +9,7 @@ type GameScenePrivate = {
   handleKeyDown: (e: KeyboardEvent) => void;
   meteorTexts: Map<number, Phaser.GameObjects.Text>;
   handleShutdown: () => void;
+  handleStreakReward: (lives: number) => void;
 };
 
 const mockGameState = vi.hoisted(() => ({
@@ -31,6 +32,7 @@ const mockGameState = vi.hoisted(() => ({
     update: ReturnType<typeof vi.fn>;
     checkAnswer: ReturnType<typeof vi.fn>;
     resumeFromMessage: ReturnType<typeof vi.fn>;
+    resumeAfterStreakReward: ReturnType<typeof vi.fn>;
     setGrade: ReturnType<typeof vi.fn>;
   },
   lastCallbacks: undefined as GameCallbacks | undefined,
@@ -72,6 +74,9 @@ vi.mock('../../main', () => ({
     update = vi.fn();
     checkAnswer = vi.fn();
     resumeFromMessage = vi.fn();
+    resumeAfterStreakReward = vi.fn(() => {
+      this.state = 'playing';
+    });
     setGrade = vi.fn((grade: string) => {
       this.grade = grade;
     });
@@ -105,6 +110,8 @@ function setupScene() {
   const startPlaying = vi.fn();
   const syncHUD = vi.fn();
   const showStageMessage = vi.fn();
+  const showStreakRewardMessage = vi.fn();
+  const clearStreakRewardMessage = vi.fn();
   const showGameOver = vi.fn();
   const returnToMenu = vi.fn();
   const state = {
@@ -122,6 +129,7 @@ function setupScene() {
     incorrectCount: 0,
     finalPerfScore: 0,
     stageMessage: null,
+    streakRewardMessage: null,
     leaderboard: { trainee: [], cadet: [], commander: [], 'major-general': [] },
     markBootReady: vi.fn(),
     setGrade: vi.fn(),
@@ -131,6 +139,8 @@ function setupScene() {
     startPlaying,
     syncHUD,
     showStageMessage,
+    showStreakRewardMessage,
+    clearStreakRewardMessage,
     showGameOver,
     returnToMenu,
   } as unknown as ReturnType<typeof gameStore.getState>;
@@ -179,18 +189,28 @@ function setupScene() {
 
   return {
     scene,
-    store: { startPlaying, syncHUD, showStageMessage, showGameOver, returnToMenu },
+    store: {
+      startPlaying,
+      syncHUD,
+      showStageMessage,
+      showStreakRewardMessage,
+      clearStreakRewardMessage,
+      showGameOver,
+      returnToMenu,
+    },
     phaser: { graphics, keyboard, scale, add, events, stop, shake, textObjects },
   };
 }
 
 describe('GameScene', () => {
   beforeEach(() => {
+    vi.useFakeTimers();
     mockGameState.lastInstance = undefined;
     mockGameState.lastCallbacks = undefined;
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.restoreAllMocks();
   });
 
@@ -266,7 +286,7 @@ describe('GameScene', () => {
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: 'Enter' } as KeyboardEvent);
     expect(mockGameState.lastInstance?.checkAnswer).toHaveBeenCalledTimes(1);
 
-    mockGameState.lastInstance!.state = 'message';
+    mockGameState.lastInstance!.state = 'paused';
     mockGameState.lastInstance!.inputBuffer = '42';
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: '9' } as KeyboardEvent);
     expect(mockGameState.lastInstance?.inputBuffer).toBe('42');
@@ -349,6 +369,25 @@ describe('GameScene', () => {
     mockGameState.lastCallbacks?.onGameOver('lives-depleted');
     expect(store.returnToMenu).toHaveBeenCalledTimes(1);
     expect(phaser.stop).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows a timed streak reward message and resumes game after 3 seconds', () => {
+    const { scene, store } = setupScene();
+
+    scene.init({ grade: 'trainee' });
+
+    mockGameState.lastInstance!.state = 'paused';
+    mockGameState.lastCallbacks?.onStreakReward(6);
+
+    expect(store.showStreakRewardMessage).toHaveBeenCalledWith({
+      message: 'Congratulations! +1 life awarded for a 30 streak. Lives: 6',
+    });
+
+    vi.advanceTimersByTime(3000);
+
+    expect(store.clearStreakRewardMessage).toHaveBeenCalledTimes(1);
+    expect(mockGameState.lastInstance?.resumeAfterStreakReward).toHaveBeenCalledTimes(1);
+    expect(store.startPlaying).toHaveBeenCalledTimes(2);
   });
 
   it('resumes from overlay, clears renderables, and restarts play unless the game is over', () => {

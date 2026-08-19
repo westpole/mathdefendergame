@@ -28,6 +28,7 @@ describe('HUDOverlay Component', () => {
       ddaSpeedMultiplier: 1.5,
       ddaIsCooloffActive: true,
       stageMessage: null,
+      streakRewardMessage: null,
       leaderboard: {
         trainee: [],
         cadet: [],
@@ -46,6 +47,15 @@ describe('HUDOverlay Component', () => {
     render(<HUDOverlay />);
     expect(screen.getByText('Lives')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  it('should render streak correctly', () => {
+    gameStore.setState({ streak: 12 } as any);
+
+    render(<HUDOverlay />);
+
+    expect(screen.getByText('Streak')).toBeInTheDocument();
+    expect(screen.getByText('12')).toBeInTheDocument();
   });
 
   it('should render the base shield label', () => {
@@ -68,10 +78,10 @@ describe('HUDOverlay Component', () => {
     expect(livesSquare).toHaveClass('status-square--warn');
   });
 
-  it('should render numeric status squares for shield and lives', () => {
+  it('should render numeric status squares for shield, lives, and streak', () => {
     render(<HUDOverlay />);
 
-    expect(document.querySelectorAll('.status-square')).toHaveLength(2);
+    expect(document.querySelectorAll('.status-square')).toHaveLength(3);
   });
 
   it('should update when store state changes', () => {
@@ -83,5 +93,18 @@ describe('HUDOverlay Component', () => {
     });
 
     expect(screen.getByText(/2000/)).toBeInTheDocument();
+  });
+
+  it('should render streak reward message when present', () => {
+    gameStore.setState({
+      streakRewardMessage: {
+        message: 'Congratulations! +1 life awarded for a 30 streak. Lives: 4',
+      },
+    });
+
+    render(<HUDOverlay />);
+
+    expect(screen.getByRole('status')).toHaveTextContent('Streak Bonus');
+    expect(screen.getByText(/\+1 life awarded for a 30 streak/i)).toBeInTheDocument();
   });
 });
