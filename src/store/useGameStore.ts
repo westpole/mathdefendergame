@@ -12,10 +12,11 @@ import type {
   ScoreEntry,
 } from '@shared/types';
 
-type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'stage-message' | 'gameover';
+type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'paused' | 'stage-message' | 'gameover';
 type MenuView = 'home' | 'profile' | 'rules';
 type LegacyDifficulty = 'child' | 'student' | 'adult';
 type HistoryByProfile = Record<string, GameHistoryEntry[]>;
+type PauseOverlayReason = 'escape' | 'window-close';
 
 export interface PlayerProfile {
   username: string;
@@ -42,6 +43,18 @@ interface StageMessageState {
 
 interface StreakRewardMessageState {
   message: string;
+}
+
+interface PauseOverlayState {
+  reason: PauseOverlayReason;
+  isSavingBeforeClose: boolean;
+}
+
+interface PrematureGameEndPayload {
+  grade: Grade;
+  score: number;
+  stage: number;
+  historyEntry: GameHistoryEntry;
 }
 
 const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
@@ -71,6 +84,7 @@ export interface GameStoreState {
   ddaIsCooloffActive: boolean;
   stageMessage: StageMessageState | null;
   streakRewardMessage: StreakRewardMessageState | null;
+  pauseOverlay: PauseOverlayState | null;
   leaderboard: Record<Grade, ScoreEntry[]>;
   gameHistoryByProfile: HistoryByProfile;
   markBootReady: () => void;
@@ -79,7 +93,11 @@ export interface GameStoreState {
   showStageMessage: (payload: StageMessageState) => void;
   showStreakRewardMessage: (payload: StreakRewardMessageState) => void;
   clearStreakRewardMessage: () => void;
+  showPauseOverlay: (reason: PauseOverlayReason) => void;
+  hidePauseOverlay: () => void;
+  showSavingBeforeClose: () => void;
   showGameOver: (payload: Pick<GameStoreState, 'grade' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
+  persistPrematureGameEnd: (payload: PrematureGameEndPayload) => void;
   startPlaying: () => void;
   returnToMenu: () => void;
   openMenuView: (menuView: MenuView) => void;
@@ -350,6 +368,7 @@ const initialState = {
   ddaIsCooloffActive: false,
   stageMessage: null,
   streakRewardMessage: null,
+  pauseOverlay: null,
   leaderboard: createEmptyLeaderboard(),
   gameHistoryByProfile: {},
 };
@@ -368,6 +387,31 @@ export const useGameStore = create<GameStoreState>()(
       showStageMessage: (stageMessage) => set({ phase: 'stage-message', stageMessage }),
       showStreakRewardMessage: (streakRewardMessage) => set({ streakRewardMessage }),
       clearStreakRewardMessage: () => set({ streakRewardMessage: null }),
+      showPauseOverlay: (reason) => set({
+        phase: 'paused',
+        stageMessage: null,
+        streakRewardMessage: null,
+        pauseOverlay: {
+          reason,
+          isSavingBeforeClose: false,
+        },
+      }),
+      hidePauseOverlay: () => set((state) => ({
+        phase: state.bootReady ? 'playing' : state.phase,
+        pauseOverlay: null,
+      })),
+      showSavingBeforeClose: () => set((state) => ({
+        phase: 'paused',
+        pauseOverlay: state.pauseOverlay
+          ? {
+            ...state.pauseOverlay,
+            isSavingBeforeClose: true,
+          }
+          : {
+            reason: 'window-close',
+            isSavingBeforeClose: true,
+          },
+      })),
       showGameOver: (payload) => {
         set((state) => {
           const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
@@ -380,6 +424,7 @@ export const useGameStore = create<GameStoreState>()(
             phase: 'gameover',
             stageMessage: null,
             streakRewardMessage: null,
+            pauseOverlay: null,
             ...payload,
             profiles: {
               ...state.profiles,
@@ -394,7 +439,44 @@ export const useGameStore = create<GameStoreState>()(
           };
         });
       },
-      startPlaying: () => set({ phase: 'playing', stageMessage: null, streakRewardMessage: null }),
+      persistPrematureGameEnd: (payload) => {
+        set((state) => {
+          const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
+          const profileKey = state.activeUsername ?? GUEST_HISTORY_BUCKET;
+          const historyForProfile = state.gameHistoryByProfile[profileKey] ?? [];
+
+          const nextState: Partial<GameStoreState> = {
+            score: payload.score,
+            grade: payload.grade,
+            stage: payload.stage,
+            gameHistoryByProfile: {
+              ...state.gameHistoryByProfile,
+              [profileKey]: sortAndTrimHistory([...historyForProfile, payload.historyEntry]),
+            },
+          };
+
+          if (activeProfile) {
+            nextState.profiles = {
+              ...state.profiles,
+              [activeProfile.username]: {
+                ...activeProfile,
+                bestScore: Math.max(activeProfile.bestScore, payload.score),
+                highestStage: Math.max(activeProfile.highestStage, payload.stage),
+                preferredGrade: payload.grade,
+                updatedAt: Date.now(),
+              },
+            };
+          }
+
+          return nextState;
+        });
+      },
+      startPlaying: () => set({
+        phase: 'playing',
+        stageMessage: null,
+        streakRewardMessage: null,
+        pauseOverlay: null,
+      }),
       returnToMenu: () => set({
         ...initialState,
         bootReady: true,
@@ -403,6 +485,7 @@ export const useGameStore = create<GameStoreState>()(
         grade: get().grade,
         leaderboard: get().leaderboard,
         profiles: get().profiles,
+        gameHistoryByProfile: get().gameHistoryByProfile,
         activeUsername: get().activeUsername,
       }),
       openMenuView: (menuView) => set({
@@ -414,6 +497,7 @@ export const useGameStore = create<GameStoreState>()(
         grade: get().grade,
         leaderboard: get().leaderboard,
         profiles: get().profiles,
+        gameHistoryByProfile: get().gameHistoryByProfile,
         activeUsername: get().activeUsername,
       }),
       loginProfile: (username, password) => {
@@ -581,4 +665,4 @@ export const useGameStore = create<GameStoreState>()(
 );
 
 export const gameStore = useGameStore;
-export type { MenuView, OverlayPhase, StageMessageState };
+export type { MenuView, OverlayPhase, StageMessageState, PauseOverlayReason };

@@ -1,10 +1,17 @@
 import { useEffect } from 'react';
 
-import { destroyGame, ensurePhaserGame } from '@game/scenes/UIScene';
+import {
+  destroyGame,
+  ensurePhaserGame,
+  onElectronCloseCancelled,
+  onElectronCloseConfirmed,
+  onElectronCloseRequested,
+} from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 import { GameOverOverlay } from '@ui/components/GameOverOverlay';
 import { HUDOverlay } from '@ui/components/HUDOverlay';
 import { MainMenuOverlay } from '@ui/components/MainMenuOverlay';
+import { PauseOverlay } from '@ui/components/PauseOverlay';
 import { StageMessageOverlay } from '@ui/components/StageMessageOverlay';
 import { Loading } from '@ui/components/Loading';
 import { ProfileOverlay } from '@ui/components/ProfileOverlay';
@@ -22,7 +29,26 @@ export function App() {
   useEffect(() => {
     const game = ensurePhaserGame();
 
+    const handleCloseRequested = () => {
+      onElectronCloseRequested();
+    };
+
+    const handleCloseConfirmed = () => {
+      onElectronCloseConfirmed();
+    };
+
+    const handleCloseCancelled = () => {
+      onElectronCloseCancelled();
+    };
+
+    window.addEventListener('electron-close-requested', handleCloseRequested);
+    window.addEventListener('electron-close-confirmed', handleCloseConfirmed);
+    window.addEventListener('electron-close-cancelled', handleCloseCancelled);
+
     return () => {
+      window.removeEventListener('electron-close-requested', handleCloseRequested);
+      window.removeEventListener('electron-close-confirmed', handleCloseConfirmed);
+      window.removeEventListener('electron-close-cancelled', handleCloseCancelled);
       destroyGame(game);
     };
   }, []);
@@ -39,6 +65,7 @@ export function App() {
         {isStartPhase && menuView === 'rules' && <RulesOverlay />}
         {isStartPhase && <StartMenuControls />}
         {bootReady && phase === 'playing' && <HUDOverlay />}
+        {bootReady && phase === 'paused' && <PauseOverlay />}
         {bootReady && phase === 'stage-message' && <StageMessageOverlay />}
         {bootReady && phase === 'gameover' && <GameOverOverlay />}
       </div>

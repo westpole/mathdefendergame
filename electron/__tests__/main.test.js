@@ -4,7 +4,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { BrowserWindow, app, Menu, ipcMain } from 'electron';
+import { BrowserWindow, app, Menu, dialog, ipcMain } from 'electron';
 import * as mainProcess from '../main.js';
 
 // Mock electron modules are set up in vitest-electron.setup.ts
@@ -20,6 +20,7 @@ function createRuntimeOptions({ argv = ['node', 'electron'], isPackaged = false,
       app,
       BrowserWindow,
       Menu,
+      dialog,
       ipcMain,
     },
   };
@@ -129,6 +130,45 @@ describe('Electron Main Process', () => {
         title: 'Math Defender',
         backgroundColor: '#1e2326',
       });
+    });
+
+    it('should prevent close and show confirmation dialog before closing', async () => {
+      dialog.showMessageBox.mockResolvedValueOnce({ response: 0 });
+
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+
+      expect(closeHandler).toBeTypeOf('function');
+
+      const event = { preventDefault: vi.fn() };
+      closeHandler(event);
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+      expect(dialog.showMessageBox).toHaveBeenCalledTimes(1);
+      expect(win.webContents.executeJavaScript).toHaveBeenCalled();
+      expect(win.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('should resume gameplay flow when close confirmation is canceled', async () => {
+      dialog.showMessageBox.mockResolvedValueOnce({ response: 1 });
+
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+
+      expect(closeHandler).toBeTypeOf('function');
+
+      const event = { preventDefault: vi.fn() };
+      closeHandler(event);
+      await Promise.resolve();
+      await Promise.resolve();
+
+      expect(dialog.showMessageBox).toHaveBeenCalledTimes(1);
+      expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
+        expect.stringContaining('electron-close-cancelled'),
+      );
+      expect(win.close).not.toHaveBeenCalled();
     });
 
     it('should create a window when the app activates with no open windows', () => {

@@ -33,6 +33,9 @@ const mockGameState = vi.hoisted(() => ({
     checkAnswer: ReturnType<typeof vi.fn>;
     resumeFromMessage: ReturnType<typeof vi.fn>;
     resumeAfterStreakReward: ReturnType<typeof vi.fn>;
+    pauseForManualEndPrompt: ReturnType<typeof vi.fn>;
+    resumeFromManualPause: ReturnType<typeof vi.fn>;
+    buildPrematureEndSnapshot: ReturnType<typeof vi.fn>;
     setGrade: ReturnType<typeof vi.fn>;
   },
   lastCallbacks: undefined as GameCallbacks | undefined,
@@ -77,6 +80,37 @@ vi.mock('../../main', () => ({
     resumeAfterStreakReward = vi.fn(() => {
       this.state = 'playing';
     });
+    pauseForManualEndPrompt = vi.fn(() => {
+      this.state = 'paused';
+    });
+    resumeFromManualPause = vi.fn(() => {
+      this.state = 'playing';
+    });
+    buildPrematureEndSnapshot = vi.fn(() => ({
+      grade: this.grade,
+      score: this.score,
+      stage: this.stage,
+      correctCount: this.correctCount,
+      incorrectCount: this.incorrectCount,
+      finalPerfScore: this.finalPerfScore,
+      historyEntry: {
+        key: 'history-entry',
+        playedAt: Date.now(),
+        correctAnswers: this.correctCount,
+        incorrectAnswers: this.incorrectCount,
+        averageAnswerTimeMs: 0,
+        mostProblematicOperation: null,
+        operationStats: {
+          '+': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+          '-': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+          '*': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+          '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+        },
+        gradeAtFinish: this.grade,
+        finalScore: this.score,
+        finalPerfScore: this.finalPerfScore,
+      },
+    }));
     setGrade = vi.fn((grade: string) => {
       this.grade = grade;
     });
@@ -113,6 +147,10 @@ function setupScene() {
   const showStreakRewardMessage = vi.fn();
   const clearStreakRewardMessage = vi.fn();
   const showGameOver = vi.fn();
+  const showPauseOverlay = vi.fn();
+  const showSavingBeforeClose = vi.fn();
+  const persistPrematureGameEnd = vi.fn();
+  const openMenuView = vi.fn();
   const returnToMenu = vi.fn();
   const state = {
     phase: 'playing' as const,
@@ -142,6 +180,10 @@ function setupScene() {
     showStreakRewardMessage,
     clearStreakRewardMessage,
     showGameOver,
+    showPauseOverlay,
+    showSavingBeforeClose,
+    persistPrematureGameEnd,
+    openMenuView,
     returnToMenu,
   } as unknown as ReturnType<typeof gameStore.getState>;
 
@@ -196,6 +238,10 @@ function setupScene() {
       showStreakRewardMessage,
       clearStreakRewardMessage,
       showGameOver,
+      showPauseOverlay,
+      showSavingBeforeClose,
+      persistPrematureGameEnd,
+      openMenuView,
       returnToMenu,
     },
     phaser: { graphics, keyboard, scale, add, events, stop, shake, textObjects },
@@ -275,7 +321,7 @@ describe('GameScene', () => {
     expect(mockGameState.lastInstance?.inputBuffer).toBe('12-45');
   });
 
-  it('submits entered answers and ignores gameplay keys outside the playing state', () => {
+  it('submits entered answers and pauses with ESC while ignoring gameplay keys outside playing state', () => {
     const { scene, store, phaser } = setupScene();
 
     scene.init({ grade: 'trainee' });
@@ -292,7 +338,27 @@ describe('GameScene', () => {
     expect(mockGameState.lastInstance?.inputBuffer).toBe('42');
 
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: 'Escape' } as KeyboardEvent);
-    expect(store.returnToMenu).toHaveBeenCalledTimes(1);
+    expect(mockGameState.lastInstance?.pauseForManualEndPrompt).toHaveBeenCalledTimes(1);
+    expect(store.showPauseOverlay).toHaveBeenCalledWith('escape');
+    expect(store.returnToMenu).not.toHaveBeenCalled();
+    expect(phaser.stop).not.toHaveBeenCalled();
+  });
+
+  it('persists and exits to profile when ending game early from pause prompt', () => {
+    const { scene, store, phaser } = setupScene();
+
+    scene.init({ grade: 'commander' });
+    mockGameState.lastInstance!.state = 'playing';
+    mockGameState.lastInstance!.score = 222;
+
+    scene.endGameEarly();
+
+    expect(mockGameState.lastInstance?.buildPrematureEndSnapshot).toHaveBeenCalledTimes(1);
+    expect(store.persistPrematureGameEnd).toHaveBeenCalledWith(expect.objectContaining({
+      grade: 'commander',
+      score: 222,
+    }));
+    expect(store.openMenuView).toHaveBeenCalledWith('profile');
     expect(phaser.stop).toHaveBeenCalledTimes(1);
   });
 

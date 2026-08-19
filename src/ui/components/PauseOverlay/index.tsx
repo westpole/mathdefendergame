@@ -1,0 +1,53 @@
+import { endGameEarly, resumePausedGame } from '@game/scenes/UIScene';
+import { useGameStore } from '@store/useGameStore';
+
+export function PauseOverlay() {
+  const pauseOverlay = useGameStore((state) => state.pauseOverlay);
+
+  if (!pauseOverlay) {
+    return null;
+  }
+
+  if (pauseOverlay.isSavingBeforeClose) {
+    return (
+      <div className="overlay-screen overlay-screen--interactive">
+        <div className="overlay-panel modal-panel accent-success">
+          <h1>Saving progress</h1>
+          <p>Saving data before closing...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const isWindowClosePrompt = pauseOverlay.reason === 'window-close';
+  const title = isWindowClosePrompt ? 'Confirm Exit' : 'Game Paused';
+  const message = isWindowClosePrompt
+    ? 'Are you sure you want to end this game?'
+    : 'Game paused. You can resume any time or end this game.';
+
+  return (
+    <div className="overlay-screen overlay-screen--interactive">
+      <div className="overlay-panel modal-panel accent-danger">
+        <h1>{title}</h1>
+        <p>{message}</p>
+
+        <div className="action-row">
+          <button
+            className="secondary-button"
+            onClick={resumePausedGame}
+            type="button"
+          >
+            {isWindowClosePrompt ? 'Keep playing' : 'Resume'}
+          </button>
+          <button
+            className="primary-button"
+            onClick={() => endGameEarly({ closeApp: isWindowClosePrompt })}
+            type="button"
+          >
+            {isWindowClosePrompt ? 'End game and close' : 'End game'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

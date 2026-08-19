@@ -625,6 +625,60 @@ describe('Game', () => {
     });
   });
 
+  describe('premature end', () => {
+    it('rolls back in-progress stage stats before persisting snapshot', () => {
+      game.state = 'playing';
+      game.grade = 'commander';
+      game.scoreAtStageStart = 100;
+      game.livesAtStageStart = 7;
+      game.correctCountAtStageStart = 20;
+      game.incorrectCountAtStageStart = 5;
+      game.roundResolvedAnswerCountAtStageStart = 25;
+      game.roundTotalAnswerLatencyMsAtStageStart = 20_000;
+      game.roundOperationTelemetryAtStageStart = {
+        '+': { attempts: 10, incorrect: 2, totalLatencyMs: 8_000 },
+        '-': { attempts: 8, incorrect: 1, totalLatencyMs: 6_000 },
+        '*': { attempts: 4, incorrect: 1, totalLatencyMs: 4_000 },
+        '/': { attempts: 3, incorrect: 1, totalLatencyMs: 2_000 },
+      };
+
+      game.score = 128;
+      game.lives = 6;
+      game.correctCount = 27;
+      game.incorrectCount = 9;
+      game.stageIncorrect = 4;
+      game.stageCorrect = 7;
+      game.roundResolvedAnswerCount = 36;
+      game.roundTotalAnswerLatencyMs = 30_000;
+
+      const snapshot = game.buildPrematureEndSnapshot();
+
+      expect(snapshot.score).toBe(100);
+      expect(snapshot.correctCount).toBe(20);
+      expect(snapshot.incorrectCount).toBe(5);
+      expect(snapshot.finalPerfScore).toBe(80);
+      expect(snapshot.historyEntry.finalScore).toBe(100);
+      expect(snapshot.historyEntry.correctAnswers).toBe(20);
+      expect(snapshot.historyEntry.incorrectAnswers).toBe(5);
+      expect(snapshot.historyEntry.averageAnswerTimeMs).toBe(800);
+    });
+
+    it('keeps current stats when ending during stage message', () => {
+      game.state = 'message';
+      game.grade = 'cadet';
+      game.score = 90;
+      game.correctCount = 18;
+      game.incorrectCount = 2;
+
+      const snapshot = game.buildPrematureEndSnapshot();
+
+      expect(snapshot.score).toBe(90);
+      expect(snapshot.correctCount).toBe(18);
+      expect(snapshot.incorrectCount).toBe(2);
+      expect(snapshot.finalPerfScore).toBe(90);
+    });
+  });
+
   describe('update', () => {
     beforeEach(() => {
       game.state = 'playing';

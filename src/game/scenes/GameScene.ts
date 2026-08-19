@@ -10,6 +10,7 @@ import Phaser from 'phaser';
 import { Game } from '@game/main';
 import { GAME_CONFIG } from '@game/config';
 import { gameStore } from '@store/useGameStore';
+import type { PauseOverlayReason } from '@store/useGameStore';
 import type { GameOverReason, Grade } from '@shared/types';
 
 function colorToInt(hex: string): number {
@@ -24,7 +25,7 @@ export class GameScene extends Phaser.Scene {
   private streakRewardTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly handleKeyDown = (e: KeyboardEvent): void => {
     if (e.key === 'Escape') {
-      this.cleanupAndGoMenu();
+      this.pauseForManualEndPrompt('escape');
       return;
     }
     if (this.gameLogic.state !== 'playing') return;
@@ -190,11 +191,47 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private cleanupAndGoMenu(): void {
+  public pauseForManualEndPrompt(reason: PauseOverlayReason): void {
+    if (this.gameLogic.state !== 'playing' && this.gameLogic.state !== 'paused') {
+      return;
+    }
+
+    this.gameLogic.pauseForManualEndPrompt();
+    gameStore.getState().showPauseOverlay(reason);
+  }
+
+  public resumeFromManualPausePrompt(): void {
+    this.gameLogic.resumeFromManualPause();
+
+    if (this.gameLogic.state === 'playing') {
+      gameStore.getState().startPlaying();
+    }
+  }
+
+  public endGameEarly(options?: { closeApp?: boolean }): void {
     this.clearStreakRewardTimer();
     this.clearTransientRenderables();
-    gameStore.getState().returnToMenu();
+
+    if (options?.closeApp) {
+      gameStore.getState().showSavingBeforeClose();
+    }
+
+    const snapshot = this.gameLogic.buildPrematureEndSnapshot();
+    gameStore.getState().persistPrematureGameEnd({
+      grade: snapshot.grade,
+      score: snapshot.score,
+      stage: snapshot.stage,
+      historyEntry: snapshot.historyEntry,
+    });
+
     this.scene.stop();
+
+    if (options?.closeApp) {
+      window.dispatchEvent(new CustomEvent('math-defender-close-ready'));
+      return;
+    }
+
+    gameStore.getState().openMenuView('profile');
   }
 
   private handleResize(gameSize: Phaser.Structs.Size): void {
@@ -221,6 +258,6 @@ export class GameScene extends Phaser.Scene {
   private clearTransientRenderables(): void {
     this.meteorTexts.forEach(t => t.destroy());
     this.meteorTexts.clear();
-    this.particleGraphics.clear();
+    this.particleGraphics?.clear();
   }
 }

@@ -24,6 +24,7 @@ vi.mock('electron', () => {
     },
     dialog: {
       showOpenDialog: vi.fn().mockResolvedValue({ canceled: false, filePaths: [] }),
+      showMessageBox: vi.fn().mockResolvedValue({ response: 1 }),
     },
     BrowserWindow: Object.assign(
       vi.fn().mockImplementation(function mockBrowserWindow() {
@@ -37,7 +38,7 @@ vi.mock('electron', () => {
         webContents: {
           openDevTools: vi.fn(),
           send: vi.fn(),
-          executeJavaScript: vi.fn(),
+          executeJavaScript: vi.fn().mockResolvedValue(true),
         },
       };
       }),

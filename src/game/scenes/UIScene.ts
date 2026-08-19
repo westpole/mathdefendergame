@@ -80,6 +80,39 @@ export function continueGame(): void {
   }
 }
 
+export function pauseGameForManualEnd(reason: 'escape' | 'window-close'): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.pauseForManualEndPrompt(reason);
+}
+
+export function resumePausedGame(): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.resumeFromManualPausePrompt();
+}
+
+export function endGameEarly(options?: { closeApp?: boolean }): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    if (options?.closeApp) {
+      window.dispatchEvent(new CustomEvent('math-defender-close-ready'));
+    }
+    return;
+  }
+
+  scene.endGameEarly(options);
+}
+
 export function returnToMenu(): void {
   const game = ensurePhaserGame();
 
@@ -98,6 +131,32 @@ export function openMenuView(menuView: MenuView): void {
   }
 
   gameStore.getState().openMenuView(menuView);
+}
+
+export function onElectronCloseRequested(): void {
+  pauseGameForManualEnd('window-close');
+}
+
+export function onElectronCloseConfirmed(): void {
+  const state = gameStore.getState();
+
+  if (state.phase === 'playing' || state.phase === 'paused' || state.phase === 'stage-message') {
+    endGameEarly({ closeApp: true });
+    return;
+  }
+
+  state.showSavingBeforeClose();
+  window.dispatchEvent(new CustomEvent('math-defender-close-ready'));
+}
+
+export function onElectronCloseCancelled(): void {
+  const state = gameStore.getState();
+
+  if (state.phase !== 'paused' || state.pauseOverlay?.reason !== 'window-close') {
+    return;
+  }
+
+  resumePausedGame();
 }
 
 function getGameScene(): GameScene | null {

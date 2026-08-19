@@ -29,6 +29,16 @@ export interface GameCallbacks {
   onShake: () => void;
 }
 
+export interface PrematureEndSnapshot {
+  grade: Grade;
+  score: number;
+  stage: number;
+  correctCount: number;
+  incorrectCount: number;
+  finalPerfScore: number;
+  historyEntry: GameHistoryEntry;
+}
+
 type RoundOperationTelemetry = Record<MathOperation, {
   attempts: number;
   incorrect: number;
@@ -43,6 +53,15 @@ function createEmptyRoundOperationTelemetry(): RoundOperationTelemetry {
     '-': { attempts: 0, incorrect: 0, totalLatencyMs: 0 },
     '*': { attempts: 0, incorrect: 0, totalLatencyMs: 0 },
     '/': { attempts: 0, incorrect: 0, totalLatencyMs: 0 },
+  };
+}
+
+function cloneRoundOperationTelemetry(source: RoundOperationTelemetry): RoundOperationTelemetry {
+  return {
+    '+': { ...source['+'] },
+    '-': { ...source['-'] },
+    '*': { ...source['*'] },
+    '/': { ...source['/'] },
   };
 }
 
@@ -79,6 +98,11 @@ export class Game {
   roundResolvedAnswerCount: number = 0;
   roundTotalAnswerLatencyMs: number = 0;
   roundOperationTelemetry: RoundOperationTelemetry = createEmptyRoundOperationTelemetry();
+  correctCountAtStageStart: number = 0;
+  incorrectCountAtStageStart: number = 0;
+  roundResolvedAnswerCountAtStageStart: number = 0;
+  roundTotalAnswerLatencyMsAtStageStart: number = 0;
+  roundOperationTelemetryAtStageStart: RoundOperationTelemetry = createEmptyRoundOperationTelemetry();
 
   // Tracks whether the last stage transition was a success (used by resumeFromMessage)
   private lastStageSuccess: boolean = true;
@@ -123,6 +147,7 @@ export class Game {
     this.pendingGameOverReason = 'lives-depleted';
     this.applyGradeBaseline('trainee');
     this.syncGradeFromScore();
+    this.captureStageCheckpoint();
     this.canvasHeight = GAME_CONFIG.CANVAS_HEIGHT;
     this.state = 'start';
     this.syncStore();
@@ -285,6 +310,7 @@ export class Game {
       this.stage++;
       this.scoreAtStageStart = this.score;
       this.livesAtStageStart = this.lives;
+      this.captureStageCheckpoint();
 
       if (this.stage > 28) {
         // Pre-calculate final score; let continueFromMessage handle the transition
@@ -331,6 +357,52 @@ export class Game {
     this.syncStore();
   }
 
+  pauseForManualEndPrompt(): void {
+    if (this.state === 'gameover' || this.state === 'message') {
+      return;
+    }
+
+    this.state = 'paused';
+    this.cb.onHUDUpdate();
+    this.syncStore();
+  }
+
+  resumeFromManualPause(): void {
+    if (this.state !== 'paused') {
+      return;
+    }
+
+    this.state = 'playing';
+    this.cb.onHUDUpdate();
+    this.syncStore();
+  }
+
+  buildPrematureEndSnapshot(): PrematureEndSnapshot {
+    const shouldRollbackCurrentStage = this.state === 'playing' || this.state === 'paused';
+
+    if (shouldRollbackCurrentStage) {
+      this.rollbackCurrentStageProgress();
+    }
+
+    const total = this.correctCount + this.incorrectCount;
+    const accuracy = total > 0 ? (this.correctCount / total) * 100 : 0;
+    this.finalPerfScore = parseFloat(accuracy.toFixed(2));
+
+    const historyEntry = this.buildGameHistoryEntry();
+
+    this.syncStore();
+
+    return {
+      grade: this.grade,
+      score: this.score,
+      stage: this.stage,
+      correctCount: this.correctCount,
+      incorrectCount: this.incorrectCount,
+      finalPerfScore: this.finalPerfScore,
+      historyEntry,
+    };
+  }
+
   resumeAfterStreakReward(): void {
     if (this.state !== 'paused') {
       return;
@@ -353,23 +425,7 @@ export class Game {
     const total = this.correctCount + this.incorrectCount;
     const accuracy = total > 0 ? (this.correctCount / total) * 100 : 0;
     this.finalPerfScore = parseFloat(accuracy.toFixed(2));
-    const averageAnswerTimeMs = this.roundResolvedAnswerCount > 0
-      ? Math.round(this.roundTotalAnswerLatencyMs / this.roundResolvedAnswerCount)
-      : 0;
-    const operationStats = this.buildOperationHistoryStats();
-
-    const historyEntry: GameHistoryEntry = {
-      key: `game_history_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`,
-      playedAt: Date.now(),
-      correctAnswers: this.correctCount,
-      incorrectAnswers: this.incorrectCount,
-      averageAnswerTimeMs,
-      mostProblematicOperation: this.resolveMostProblematicOperation(operationStats),
-      operationStats,
-      gradeAtFinish: this.grade,
-      finalScore: this.score,
-      finalPerfScore: this.finalPerfScore,
-    };
+    const historyEntry = this.buildGameHistoryEntry();
 
     gameStore.getState().addGameHistory(historyEntry);
 
@@ -502,6 +558,56 @@ export class Game {
     }
 
     return operationStats;
+  }
+
+  private buildGameHistoryEntry(): GameHistoryEntry {
+    const averageAnswerTimeMs = this.roundResolvedAnswerCount > 0
+      ? Math.round(this.roundTotalAnswerLatencyMs / this.roundResolvedAnswerCount)
+      : 0;
+    const operationStats = this.buildOperationHistoryStats();
+
+    return {
+      key: `game_history_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`,
+      playedAt: Date.now(),
+      correctAnswers: this.correctCount,
+      incorrectAnswers: this.incorrectCount,
+      averageAnswerTimeMs,
+      mostProblematicOperation: this.resolveMostProblematicOperation(operationStats),
+      operationStats,
+      gradeAtFinish: this.grade,
+      finalScore: this.score,
+      finalPerfScore: this.finalPerfScore,
+    };
+  }
+
+  private captureStageCheckpoint(): void {
+    this.correctCountAtStageStart = this.correctCount;
+    this.incorrectCountAtStageStart = this.incorrectCount;
+    this.roundResolvedAnswerCountAtStageStart = this.roundResolvedAnswerCount;
+    this.roundTotalAnswerLatencyMsAtStageStart = this.roundTotalAnswerLatencyMs;
+    this.roundOperationTelemetryAtStageStart = cloneRoundOperationTelemetry(this.roundOperationTelemetry);
+  }
+
+  private rollbackCurrentStageProgress(): void {
+    this.score = this.scoreAtStageStart;
+    this.lives = this.livesAtStageStart;
+    this.correctCount = this.correctCountAtStageStart;
+    this.incorrectCount = this.incorrectCountAtStageStart;
+    this.roundResolvedAnswerCount = this.roundResolvedAnswerCountAtStageStart;
+    this.roundTotalAnswerLatencyMs = this.roundTotalAnswerLatencyMsAtStageStart;
+    this.roundOperationTelemetry = cloneRoundOperationTelemetry(this.roundOperationTelemetryAtStageStart);
+    this.stageScore = 0;
+    this.stageCorrect = 0;
+    this.stageIncorrect = 0;
+    this.streak = 0;
+    this.meteors = [];
+    this.particles = [];
+    this.inputBuffer = '';
+    this.shield = GAME_CONFIG.stageShieldMax;
+    this.pendingStageClearAfterStreakReward = false;
+    this.pendingGameOver = false;
+    this.pendingGameOverReason = 'lives-depleted';
+    this.syncGradeFromScore();
   }
 
   private resolveMostProblematicOperation(
