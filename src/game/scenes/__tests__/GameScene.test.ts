@@ -171,7 +171,7 @@ function setupScene() {
     leaderboard: { trainee: [], cadet: [], commander: [], 'major-general': [] },
     markBootReady: vi.fn(),
     setGrade: vi.fn(),
-    openMenuView: vi.fn(),
+    openMenuView,
     saveScore: vi.fn(),
     getScores: vi.fn(() => []),
     startPlaying,
@@ -183,7 +183,6 @@ function setupScene() {
     showPauseOverlay,
     showSavingBeforeClose,
     persistPrematureGameEnd,
-    openMenuView,
     returnToMenu,
   } as unknown as ReturnType<typeof gameStore.getState>;
 

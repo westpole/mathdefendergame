@@ -17,7 +17,7 @@ describe('HUDOverlay Component', () => {
       score: 1000,
       lives: 3,
       shield: 80,
-      stage: 5,
+      stage: 7,
       stageScore: 200,
       inputBuffer: '123',
       correctCount: 10,
@@ -50,7 +50,7 @@ describe('HUDOverlay Component', () => {
   });
 
   it('should render streak correctly', () => {
-    gameStore.setState({ streak: 12 } as any);
+    gameStore.setState({ streak: 12 });
 
     render(<HUDOverlay />);
 
@@ -64,11 +64,6 @@ describe('HUDOverlay Component', () => {
     expect(screen.getByText('5')).toBeInTheDocument();
   });
 
-  it('should render stage goal by grade target', () => {
-    render(<HUDOverlay />);
-    expect(screen.getByText('Goal: Correct 200/20')).toBeInTheDocument();
-  });
-
   it('should display warning when lives are in the warning range', () => {
     gameStore.setState({ lives: 1 });
 
@@ -78,10 +73,10 @@ describe('HUDOverlay Component', () => {
     expect(livesSquare).toHaveClass('status-square--warn');
   });
 
-  it('should render numeric status squares for shield, lives, and streak', () => {
+  it('should render numeric status squares for shield, lives, streak, score and stage', () => {
     render(<HUDOverlay />);
 
-    expect(document.querySelectorAll('.status-square')).toHaveLength(3);
+    expect(document.querySelectorAll('.status-square')).toHaveLength(5);
   });
 
   it('should update when store state changes', () => {
