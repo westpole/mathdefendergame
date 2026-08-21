@@ -46,6 +46,7 @@ type RoundOperationTelemetry = Record<MathOperation, {
 }>;
 
 const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
+const GUEST_HISTORY_BUCKET = '__guest__';
 
 function createEmptyRoundOperationTelemetry(): RoundOperationTelemetry {
   return {
@@ -67,6 +68,14 @@ function cloneRoundOperationTelemetry(source: RoundOperationTelemetry): RoundOpe
 
 function isMathOperation(value: unknown): value is MathOperation {
   return value === '+' || value === '-' || value === '*' || value === '/';
+}
+
+function getLifetimeScoreBeforeCurrentRun(
+  activeUsername: string | null,
+  gameHistoryByProfile: Record<string, GameHistoryEntry[]>,
+): number {
+  const profileKey = activeUsername ?? GUEST_HISTORY_BUCKET;
+  return (gameHistoryByProfile[profileKey] ?? []).reduce((sum, entry) => sum + entry.finalScore, 0);
 }
 
 export class Game {
@@ -109,6 +118,7 @@ export class Game {
   private pendingStageClearAfterStreakReward: boolean = false;
   private pendingGameOver: boolean = false;
   private pendingGameOverReason: GameOverReason = 'lives-depleted';
+  private lifetimeScoreAtRunStart: number = 0;
   private dda: DDAController;
 
   private readonly cb: GameCallbacks;
@@ -123,9 +133,15 @@ export class Game {
   }
 
   reset(startingScore = 0): void {
+    const storeState = gameStore.getState();
+
     this.lives = GAME_CONFIG.initialLives;
     this.shield = GAME_CONFIG.stageShieldMax;
     this.score = Math.max(0, startingScore);
+    this.lifetimeScoreAtRunStart = getLifetimeScoreBeforeCurrentRun(
+      storeState.activeUsername,
+      storeState.gameHistoryByProfile,
+    );
     this.stage = 1;
     this.stageScore = 0;
     this.correctCount = 0;
@@ -497,7 +513,7 @@ export class Game {
   }
 
   private syncGradeFromScore(): void {
-    const nextGrade = resolveGradeFromScore(this.score);
+    const nextGrade = resolveGradeFromScore(this.getLifetimeProgressScore());
 
     if (nextGrade === this.grade) {
       return;
@@ -509,6 +525,10 @@ export class Game {
   private applyGradeBaseline(grade: Grade): void {
     this.grade = grade;
     this.dda = new DDAController(getDDAConfigForGrade(grade));
+  }
+
+  private getLifetimeProgressScore(): number {
+    return Math.max(0, this.lifetimeScoreAtRunStart + this.score);
   }
 
   private getOldestMeteor(): Meteor | null {

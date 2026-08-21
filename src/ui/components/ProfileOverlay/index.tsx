@@ -7,7 +7,11 @@ import type { Grade } from '@shared/types';
 import { gradeIcons } from '../gradeIcons';
 
 const gradeOrder: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
-const EMPTY_HISTORY: Array<{ finalScore: number; finalPerfScore: number; correctAnswers: number }> = [];
+const EMPTY_HISTORY: Array<{
+  finalScore: number;
+  correctAnswers: number;
+  incorrectAnswers: number;
+}> = [];
 const gradeColorMap: Record<Exclude<Grade, 'major-general'>, string> = {
   trainee: '#ef4444',
   cadet: '#facc15',
@@ -27,20 +31,27 @@ function formatScore(value: number): string {
 
 export function ProfileOverlay() {
   const activeUsername = useGameStore((state) => state.activeUsername);
+  const phase = useGameStore((state) => state.phase);
   const grade = useGameStore((state) => state.grade);
   const currentScore = useGameStore((state) => state.score);
   const correctCount = useGameStore((state) => state.correctCount);
-  const profile = useGameStore((state) => (state.activeUsername ? state.profiles[state.activeUsername] ?? null : null));
   const history = useGameStore((state) => {
     const key = state.activeUsername ?? '__guest__';
     return state.gameHistoryByProfile[key] ?? EMPTY_HISTORY;
   });
+  const incorrectCount = useGameStore((state) => state.incorrectCount);
+
+  const hasUncommittedRunStats = phase === 'playing' || phase === 'paused' || phase === 'stage-message';
 
   const stats = useMemo(() => {
     const totalScore = history.reduce((sum, entry) => sum + entry.finalScore, 0);
     const gameCount = history.length;
-    const averageAccuracy = gameCount > 0
-      ? history.reduce((sum, entry) => sum + entry.finalPerfScore, 0) / gameCount
+    const historyCorrectAnswers = history.reduce((sum, entry) => sum + entry.correctAnswers, 0);
+    const historyIncorrectAnswers = history.reduce((sum, entry) => sum + entry.incorrectAnswers, 0);
+    const totalCorrectAnswers = historyCorrectAnswers + (hasUncommittedRunStats ? correctCount : 0);
+    const totalIncorrectAnswers = historyIncorrectAnswers + (hasUncommittedRunStats ? incorrectCount : 0);
+    const averageAccuracy = totalCorrectAnswers + totalIncorrectAnswers > 0
+      ? (totalCorrectAnswers / (totalCorrectAnswers + totalIncorrectAnswers)) * 100
       : 0;
     const activeStreak = history.length > 0
       ? Math.max(...history.map((entry) => entry.correctAnswers), correctCount)
@@ -52,16 +63,16 @@ export function ProfileOverlay() {
       averageAccuracy,
       activeStreak,
     };
-  }, [correctCount, history]);
+  }, [correctCount, hasUncommittedRunStats, history, incorrectCount]);
 
-  const scoreDisplay = Math.max(currentScore, profile?.bestScore ?? 0, stats.totalScore, 0);
+  const progressScore = Math.max(stats.totalScore + (hasUncommittedRunStats ? Math.max(currentScore, 0) : 0), 0);
   const currentIndex = gradeOrder.indexOf(grade);
   const currentThreshold = GAME_CONFIG.grades[grade].thresholdScore;
   const nextGrade = currentIndex < gradeOrder.length - 1 ? gradeOrder[currentIndex + 1] : null;
   const nextThreshold = nextGrade ? GAME_CONFIG.grades[nextGrade].thresholdScore : null;
-  const pointsLeft = nextThreshold !== null ? Math.max(nextThreshold - scoreDisplay, 0) : 0;
+  const pointsLeft = nextThreshold !== null ? Math.max(nextThreshold - progressScore, 0) : 0;
   const progressRatio = nextThreshold !== null && nextThreshold > currentThreshold
-    ? Math.min(Math.max((scoreDisplay - currentThreshold) / (nextThreshold - currentThreshold), 0), 1)
+    ? Math.min(Math.max((progressScore - currentThreshold) / (nextThreshold - currentThreshold), 0), 1)
     : 0;
   const trackColor = grade === 'trainee' ? gradeColorMap.trainee
     : grade === 'cadet' ? gradeColorMap.cadet
@@ -94,7 +105,7 @@ export function ProfileOverlay() {
               <div className="profile-stat-grid">
                 <div className="profile-stat">
                   <span className="profile-stat-label">Total Score</span>
-                  <strong>{formatScore(stats.totalScore || scoreDisplay)}</strong>
+                  <strong>{formatScore(stats.totalScore)}</strong>
                 </div>
                 <div className="profile-stat">
                   <span className="profile-stat-label">Games</span>
@@ -115,7 +126,7 @@ export function ProfileOverlay() {
           <div className="profile-progress-section">
             {grade === 'major-general' ? (
               <div className="profile-major-general-box" style={{ backgroundColor: '#4b5563', color: '#fff' }}>
-                <span>{formatScore(scoreDisplay)}</span>
+                <span>{formatScore(progressScore)}</span>
               </div>
             ) : (
               <>

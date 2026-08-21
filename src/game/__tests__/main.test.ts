@@ -168,6 +168,47 @@ describe('Game', () => {
       expect(game.score).toBe(751);
       expect(game.grade).toBe('major-general');
     });
+
+    it('carries grade progress across completed games', () => {
+      gameStore.setState({
+        activeUsername: 'PilotOne',
+        gameHistoryByProfile: {
+          PilotOne: [
+            {
+              key: 'history-1',
+              playedAt: 1,
+              correctAnswers: 10,
+              incorrectAnswers: 0,
+              averageAnswerTimeMs: 1000,
+              mostProblematicOperation: null,
+              operationStats: {
+                '+': { attempts: 4, incorrect: 0, avgTimeMs: 900 },
+                '-': { attempts: 3, incorrect: 0, avgTimeMs: 950 },
+                '*': { attempts: 2, incorrect: 0, avgTimeMs: 980 },
+                '/': { attempts: 1, incorrect: 0, avgTimeMs: 1000 },
+              },
+              gradeAtFinish: 'cadet',
+              finalScore: 350,
+              finalPerfScore: 90,
+            },
+          ],
+        },
+      });
+
+      game.reset();
+
+      expect(game.grade).toBe('cadet');
+
+      game.spawnMeteor();
+      game.state = 'playing';
+
+      const meteor = game.meteors[0];
+      game.inputBuffer = meteor.answer.toString();
+      game.checkAnswer();
+
+      expect(game.score).toBe(1);
+      expect(game.grade).toBe('commander');
+    });
   });
 
   describe('checkAnswer', () => {

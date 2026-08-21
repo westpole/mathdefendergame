@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import { GAME_CONFIG } from '@game/config';
+import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
 import type {
   DDAMathTier,
   DDAHeatState,
@@ -243,6 +243,29 @@ function resolveActiveProfile(
   return profiles[activeUsername] ?? null;
 }
 
+function getHistoryForProfile(
+  activeUsername: string | null,
+  gameHistoryByProfile: HistoryByProfile,
+): GameHistoryEntry[] {
+  const profileKey = activeUsername ?? GUEST_HISTORY_BUCKET;
+  return gameHistoryByProfile[profileKey] ?? [];
+}
+
+function getLifetimeScoreForProfile(
+  activeUsername: string | null,
+  gameHistoryByProfile: HistoryByProfile,
+): number {
+  return getHistoryForProfile(activeUsername, gameHistoryByProfile)
+    .reduce((sum, entry) => sum + entry.finalScore, 0);
+}
+
+function resolveLifetimeGrade(
+  activeUsername: string | null,
+  gameHistoryByProfile: HistoryByProfile,
+): Grade {
+  return resolveGradeFromScore(getLifetimeScoreForProfile(activeUsername, gameHistoryByProfile));
+}
+
 function isGrade(value: unknown): value is Grade {
   return value === 'trainee' || value === 'cadet' || value === 'commander' || value === 'major-general';
 }
@@ -415,9 +438,17 @@ export const useGameStore = create<GameStoreState>()(
       showGameOver: (payload) => {
         set((state) => {
           const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
+          const resolvedGrade = resolveLifetimeGrade(state.activeUsername, state.gameHistoryByProfile);
 
           if (!activeProfile) {
-            return { phase: 'gameover', stageMessage: null, streakRewardMessage: null, ...payload };
+            return {
+              phase: 'gameover',
+              stageMessage: null,
+              streakRewardMessage: null,
+              pauseOverlay: null,
+              ...payload,
+              grade: resolvedGrade,
+            };
           }
 
           return {
@@ -426,13 +457,14 @@ export const useGameStore = create<GameStoreState>()(
             streakRewardMessage: null,
             pauseOverlay: null,
             ...payload,
+            grade: resolvedGrade,
             profiles: {
               ...state.profiles,
               [activeProfile.username]: {
                 ...activeProfile,
                 bestScore: Math.max(activeProfile.bestScore, payload.score),
                 highestStage: Math.max(activeProfile.highestStage, state.stage),
-                preferredGrade: payload.grade,
+                preferredGrade: resolvedGrade,
                 updatedAt: Date.now(),
               },
             },
@@ -444,15 +476,18 @@ export const useGameStore = create<GameStoreState>()(
           const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
           const profileKey = state.activeUsername ?? GUEST_HISTORY_BUCKET;
           const historyForProfile = state.gameHistoryByProfile[profileKey] ?? [];
+          const nextHistoryForProfile = sortAndTrimHistory([...historyForProfile, payload.historyEntry]);
+          const nextGameHistoryByProfile = {
+            ...state.gameHistoryByProfile,
+            [profileKey]: nextHistoryForProfile,
+          };
+          const resolvedGrade = resolveLifetimeGrade(state.activeUsername, nextGameHistoryByProfile);
 
           const nextState: Partial<GameStoreState> = {
             score: payload.score,
-            grade: payload.grade,
+            grade: resolvedGrade,
             stage: payload.stage,
-            gameHistoryByProfile: {
-              ...state.gameHistoryByProfile,
-              [profileKey]: sortAndTrimHistory([...historyForProfile, payload.historyEntry]),
-            },
+            gameHistoryByProfile: nextGameHistoryByProfile,
           };
 
           if (activeProfile) {
@@ -462,7 +497,7 @@ export const useGameStore = create<GameStoreState>()(
                 ...activeProfile,
                 bestScore: Math.max(activeProfile.bestScore, payload.score),
                 highestStage: Math.max(activeProfile.highestStage, payload.stage),
-                preferredGrade: payload.grade,
+                preferredGrade: resolvedGrade,
                 updatedAt: Date.now(),
               },
             };
@@ -526,9 +561,11 @@ export const useGameStore = create<GameStoreState>()(
           };
         }
 
+        const resolvedGrade = resolveLifetimeGrade(normalizedUsername, get().gameHistoryByProfile);
+
         set({
           activeUsername: normalizedUsername,
-          grade: profile.preferredGrade,
+          grade: resolvedGrade,
           phase: 'start',
           menuView: 'home',
         });

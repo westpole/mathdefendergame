@@ -154,6 +154,50 @@ describe('gameStore', () => {
       expect(gameStore.getState().phase).toBe('start');
     });
 
+    it('derives the login grade from cumulative game history', () => {
+      gameStore.setState({
+        phase: 'login',
+        activeUsername: null,
+        profiles: {
+          PilotOne: {
+            username: 'PilotOne',
+            password: 'Abc12345',
+            bestScore: 200,
+            highestStage: 4,
+            preferredGrade: 'trainee',
+            createdAt: 1,
+            updatedAt: 2,
+          },
+        },
+        gameHistoryByProfile: {
+          PilotOne: [
+            {
+              key: 'history-1',
+              playedAt: 1,
+              correctAnswers: 20,
+              incorrectAnswers: 2,
+              averageAnswerTimeMs: 1000,
+              mostProblematicOperation: '+',
+              operationStats: {
+                '+': { attempts: 6, incorrect: 1, avgTimeMs: 1100 },
+                '-': { attempts: 5, incorrect: 1, avgTimeMs: 1000 },
+                '*': { attempts: 5, incorrect: 0, avgTimeMs: 950 },
+                '/': { attempts: 4, incorrect: 0, avgTimeMs: 980 },
+              },
+              gradeAtFinish: 'commander',
+              finalScore: 400,
+              finalPerfScore: 91,
+            },
+          ],
+        },
+      });
+
+      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12345');
+
+      expect(result.success).toBe(true);
+      expect(gameStore.getState().grade).toBe('commander');
+    });
+
     it('shows create profile suggestion when username is not found', () => {
       const result = gameStore.getState().loginProfile('GhostPilot', 'Abc12345');
 
