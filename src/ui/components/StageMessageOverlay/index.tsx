@@ -1,9 +1,28 @@
 import { clsx } from 'clsx';
+import { useEffect } from 'react';
 import { continueGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
 export function StageMessageOverlay() {
   const stageMessage = useGameStore((state) => state.stageMessage);
+
+  useEffect(() => {
+    if (!stageMessage) {
+      return undefined;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && !event.repeat) {
+        continueGame();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [stageMessage]);
 
   if (!stageMessage) {
     return null;

@@ -75,4 +75,12 @@ describe('StageMessageOverlay', () => {
 
     expect(uiSceneMocks.continueGame).toHaveBeenCalledTimes(1);
   });
+
+  it('continues the game when Enter is pressed while the overlay is shown', () => {
+    render(<StageMessageOverlay />);
+
+    fireEvent.keyDown(window, { key: 'Enter' });
+
+    expect(uiSceneMocks.continueGame).toHaveBeenCalledTimes(1);
+  });
 });
