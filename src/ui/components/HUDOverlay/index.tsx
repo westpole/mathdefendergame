@@ -14,7 +14,7 @@ export function HUDOverlay() {
   const stageShieldMax = GAME_CONFIG.stageShieldMax;
   const clampedShield = Math.max(0, Math.min(stageShieldMax, shield));
   const shieldsTone = clampedShield >= 4 ? 'good' : clampedShield >= 2 ? 'warn' : 'danger';
-  const livesTone = lives > 2 ? 'good' : lives > 0 ? 'warn' : 'danger';
+  const livesTone = lives > 2 ? 'good' : lives > 1 ? 'warn' : 'danger';
 
   return (
     <>

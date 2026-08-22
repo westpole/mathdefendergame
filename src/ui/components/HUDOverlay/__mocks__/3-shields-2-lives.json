@@ -1,0 +1,24 @@
+{
+  "grade": "trainee",
+  "score": 5,
+  "lives": 2,
+  "shield": 3,
+  "stage": 1,
+  "stageScore": 5,
+  "inputBuffer": "12",
+  "correctCount": 5,
+  "incorrectCount": 0,
+  "finalPerfScore": 5,
+  "ddaHeatState": "FLOW",
+  "ddaMathTier": 3,
+  "ddaSpeedMultiplier": 1.5,
+  "ddaIsCooloffActive": true,
+  "stageMessage": null,
+  "streakRewardMessage": null,
+  "leaderboard": {
+    "trainee": [],
+    "cadet": [],
+    "commander": [],
+    "major-general": []
+  }
+}

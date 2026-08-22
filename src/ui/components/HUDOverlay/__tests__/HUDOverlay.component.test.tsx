@@ -6,35 +6,27 @@
 import { act, render, screen } from '@testing-library/react';
 
 import { gameStore } from '@store/useGameStore';
+import type { GameStoreState } from '@store/useGameStore';
+
+import fullShieldsLives from '../__mocks__/full-shields-lives.json';
 
 import { HUDOverlay } from '../index';
+
+const baseHudState = fullShieldsLives as Partial<GameStoreState>;
 
 describe('HUDOverlay Component', () => {
   beforeEach(() => {
     // Set initial state for the game store before each test
     gameStore.setState({
+      ...baseHudState,
       grade: 'major-general',
       score: 1000,
-      lives: 3,
-      shield: 80,
       stage: 7,
       stageScore: 200,
       inputBuffer: '123',
       correctCount: 10,
       incorrectCount: 2,
       finalPerfScore: 85,
-      ddaHeatState: 'FLOW',
-      ddaMathTier: 3,
-      ddaSpeedMultiplier: 1.5,
-      ddaIsCooloffActive: true,
-      stageMessage: null,
-      streakRewardMessage: null,
-      leaderboard: {
-        trainee: [],
-        cadet: [],
-        commander: [],
-        'major-general': [],
-      },
     });
   });
 

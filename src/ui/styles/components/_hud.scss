@@ -114,7 +114,9 @@
     background-color: rgba($color-danger-red, 0.8);
   }
 
-  &--streak {
+  &--streak,
+  &--score,
+  &--stage {
     color: $text-secondary;
     background-color: rgba($bg-dark-panel, 0.7);
   }

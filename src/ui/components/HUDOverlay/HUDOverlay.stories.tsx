@@ -4,8 +4,11 @@ import { useGameStore } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 
 import { HUDOverlay } from '.';
-import startGameMock from './__mocks__/start.json';
-import inProgressGameMock from './__mocks__/inProgress.json';
+import fullShieldsLives from './__mocks__/full-shields-lives.json';
+import lost1shield from './__mocks__/4-shields-3-lives.json';
+import lost2shields1life from './__mocks__/3-shields-2-lives.json';
+import lost3shields2lives from './__mocks__/2-shields-1-lives.json';
+import lost4shields2lives from './__mocks__/1-shields-1-lives.json';
 
 interface StoryArgs {
   initialState: Record<string, unknown>;
@@ -39,16 +42,37 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  name: 'HUD overlay on start',
+export const fullShieldsLivesStory: Story = {
+  name: 'HUD: 5 shields and 3 lives',
   args: {
-    initialState: startGameMock,
+    initialState: fullShieldsLives,
   },
 };
 
-export const inProgress: Story = {
-  name: 'HUD overlay in progress',
+export const lost1shieldStory: Story = {
+  name: 'HUD: 4 shields and 3 lives',
   args: {
-    initialState: inProgressGameMock,
+    initialState: lost1shield,
+  },
+};
+
+export const lost2shields1lifeStory: Story = {
+  name: 'HUD: 3 shields and 2 lives',
+  args: {
+    initialState: lost2shields1life,
+  },
+};
+
+export const lost3shields2livesStory: Story = {
+  name: 'HUD: 2 shields and 1 life',
+  args: {
+    initialState: lost3shields2lives,
+  },
+};
+
+export const lost4shields2livesStory: Story = {
+  name: 'HUD: 1 shield and 1 life',
+  args: {
+    initialState: lost4shields2lives,
   },
 };

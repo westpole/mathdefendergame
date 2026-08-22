@@ -12,6 +12,16 @@ interface StoryArgs {
   initialState: StageMessageState;
 }
 
+const wonWithMistakeState: StageMessageState = {
+  ...wonMock,
+  stageIncorrect: 1,
+};
+
+const lostLastLifeState: StageMessageState = {
+  ...lostAnotherLifeMock,
+  lives: 1,
+};
+
 const meta = {
   title: 'Screens/StageMessageOverlay',
   component: StageMessageOverlay,
@@ -41,15 +51,29 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const WonStage: Story = {
-  name: 'You won stage',
+  name: 'You won stage (clean)',
   args: {
     initialState: wonMock
   },
 };
 
-export const LostAnotherLifeStage: Story = {
-  name: 'You lost another life',
+export const WonStageWithMistake: Story = {
+  name: 'You won stage (with mistake)',
+  args: {
+    initialState: wonWithMistakeState
+  },
+};
+
+export const LostStage: Story = {
+  name: 'You lost stage',
   args: {
     initialState: lostAnotherLifeMock
+  },
+};
+
+export const LostStageLastLife: Story = {
+  name: 'You lost stage (last life)',
+  args: {
+    initialState: lostLastLifeState
   },
 };
