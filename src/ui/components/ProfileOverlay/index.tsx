@@ -11,6 +11,7 @@ const EMPTY_HISTORY: Array<{
   finalScore: number;
   correctAnswers: number;
   incorrectAnswers: number;
+  averageAnswerTimeMs: number;
 }> = [];
 const gradeColorMap: Record<Exclude<Grade, 'major-general'>, string> = {
   trainee: '#ef4444',
@@ -27,6 +28,13 @@ function toGradeTitle(grade: Grade): string {
 
 function formatScore(value: number): string {
   return value.toLocaleString();
+}
+
+function formatApm(value: number): string {
+  return value.toLocaleString(undefined, {
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  });
 }
 
 export function ProfileOverlay() {
@@ -48,10 +56,18 @@ export function ProfileOverlay() {
     const gameCount = history.length;
     const historyCorrectAnswers = history.reduce((sum, entry) => sum + entry.correctAnswers, 0);
     const historyIncorrectAnswers = history.reduce((sum, entry) => sum + entry.incorrectAnswers, 0);
+    const historyResolvedAnswers = historyCorrectAnswers + historyIncorrectAnswers;
+    const totalResolvedAnswerTimeMs = history.reduce(
+      (sum, entry) => sum + ((entry.correctAnswers + entry.incorrectAnswers) * entry.averageAnswerTimeMs),
+      0,
+    );
     const totalCorrectAnswers = historyCorrectAnswers + (hasUncommittedRunStats ? correctCount : 0);
     const totalIncorrectAnswers = historyIncorrectAnswers + (hasUncommittedRunStats ? incorrectCount : 0);
     const averageAccuracy = totalCorrectAnswers + totalIncorrectAnswers > 0
       ? (totalCorrectAnswers / (totalCorrectAnswers + totalIncorrectAnswers)) * 100
+      : 0;
+    const averageAnswersPerMinute = historyResolvedAnswers > 0 && totalResolvedAnswerTimeMs > 0
+      ? (historyCorrectAnswers * 60_000) / totalResolvedAnswerTimeMs
       : 0;
     const activeStreak = history.length > 0
       ? Math.max(...history.map((entry) => entry.correctAnswers), correctCount)
@@ -60,6 +76,7 @@ export function ProfileOverlay() {
     return {
       totalScore,
       gameCount,
+      averageAnswersPerMinute,
       averageAccuracy,
       activeStreak,
     };
@@ -104,8 +121,8 @@ export function ProfileOverlay() {
 
               <div className="profile-stat-grid">
                 <div className="profile-stat">
-                  <span className="profile-stat-label">Total Score</span>
-                  <strong>{formatScore(stats.totalScore)}</strong>
+                  <span className="profile-stat-label">Avg. APM</span>
+                  <strong>{formatApm(stats.averageAnswersPerMinute)}</strong>
                 </div>
                 <div className="profile-stat">
                   <span className="profile-stat-label">Games</span>

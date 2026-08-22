@@ -91,7 +91,8 @@ describe('ProfileOverlay', () => {
   it('uses completed game history for profile progress in the menu', () => {
     render(<ProfileOverlay />);
 
-    expect(screen.getByText('350')).toBeInTheDocument();
+    expect(screen.getByText('Avg. APM')).toBeInTheDocument();
+    expect(screen.getByText('55.7')).toBeInTheDocument();
     expect(screen.getByText('88%')).toBeInTheDocument();
     expect(screen.getByText('1 pts to next grade')).toBeInTheDocument();
   });
@@ -105,7 +106,7 @@ describe('ProfileOverlay', () => {
 
     render(<ProfileOverlay />);
 
-    expect(screen.getByText('350')).toBeInTheDocument();
+    expect(screen.getByText('55.7')).toBeInTheDocument();
     expect(screen.getByText('86%')).toBeInTheDocument();
     expect(screen.getByText('381 pts to next grade')).toBeInTheDocument();
   });
