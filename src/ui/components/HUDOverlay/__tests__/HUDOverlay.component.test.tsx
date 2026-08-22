@@ -57,12 +57,21 @@ describe('HUDOverlay Component', () => {
   });
 
   it('should display warning when lives are in the warning range', () => {
-    gameStore.setState({ lives: 1 });
+    gameStore.setState({ lives: 2 });
 
     render(<HUDOverlay />);
     const livesSquare = document.querySelector('.status-square--lives');
 
     expect(livesSquare).toHaveClass('status-square--warn');
+  });
+
+  it('should display warning when lives are in the danger range', () => {
+    gameStore.setState({ lives: 1 });
+
+    render(<HUDOverlay />);
+    const livesSquare = document.querySelector('.status-square--lives');
+
+    expect(livesSquare).toHaveClass('status-square--danger');
   });
 
   it('should render numeric status squares for shield, lives, streak, score and stage', () => {
