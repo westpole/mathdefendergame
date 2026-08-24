@@ -5,17 +5,18 @@ import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/base-store-state.json';
 
-import commanderRexMock from './__mocks__/commanderRex.json';
-import generalVossMock from './__mocks__/generalVoss.json';
-import { ProfileOverlay } from '.';
+import escapePauseMock from './__mocks__/escape-pause.json';
+import savingBeforeCloseMock from './__mocks__/saving-before-close.json';
+import windowCloseMock from './__mocks__/window-close.json';
+import { PauseOverlay } from '.';
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
 }
 
 const meta = {
-  title: 'Screens/ProfileOverlay',
-  component: ProfileOverlay,
+  title: 'Screens/PauseOverlay',
+  component: PauseOverlay,
   tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
@@ -28,37 +29,40 @@ const meta = {
         useGameStore.setState({
           ...baseStoreState,
           ...initialState,
-          profiles: initialState.profiles ?? baseStoreState.profiles,
-          gameHistoryByProfile: initialState.gameHistoryByProfile ?? baseStoreState.gameHistoryByProfile,
-          leaderboard: initialState.leaderboard ?? baseStoreState.leaderboard,
+          pauseOverlay: initialState.pauseOverlay ?? baseStoreState.pauseOverlay,
         });
       }, [initialState]);
 
       return (
         <GameCanvas>
-          <section style={{ width: '80%', margin: '3em auto' }}>
-            <Story />
-          </section>
+          <Story />
         </GameCanvas>
       );
     },
   ],
-} satisfies Meta<typeof ProfileOverlay>;
+} satisfies Meta<typeof PauseOverlay>;
 
 export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  name: 'Commander profile',
+export const EscapePause: Story = {
+  name: 'Pause prompt',
   args: {
-    initialState: commanderRexMock,
+    initialState: escapePauseMock,
   },
 };
 
-export const MajorGeneral: Story = {
-  name: 'Major General profile',
+export const WindowClosePrompt: Story = {
+  name: 'Window close prompt',
   args: {
-    initialState: generalVossMock,
+    initialState: windowCloseMock,
+  },
+};
+
+export const SavingBeforeClose: Story = {
+  name: 'Saving before close',
+  args: {
+    initialState: savingBeforeCloseMock,
   },
 };

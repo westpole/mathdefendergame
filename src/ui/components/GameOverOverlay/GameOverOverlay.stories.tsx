@@ -9,6 +9,7 @@ import {
   StageMessageState,
 } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
+import baseStoreState from '@ui/components/__mocks__/base-store-state.json';
 
 import { GameOverOverlay } from '.';
 import result from './__mocks__/result.json';
@@ -33,17 +34,24 @@ interface StoryArgs {
 const meta = {
   title: 'Screens/GameOverOverlay',
   component: GameOverOverlay,
+  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
   },
   decorators: [
     (Story, context) => {
-      const syncHUD = useGameStore((state) => state.syncHUD);
-      const initialState = (context.args as StoryArgs).initialState;
+      const { initialState } = context.args as StoryArgs;
 
       useEffect(() => {
-        syncHUD(initialState);
-      }, [syncHUD, initialState]);
+        useGameStore.setState({
+          ...baseStoreState,
+          ...initialState,
+          profiles: initialState.profiles ?? baseStoreState.profiles,
+          gameHistoryByProfile: initialState.gameHistoryByProfile ?? baseStoreState.gameHistoryByProfile,
+          leaderboard: initialState.leaderboard ?? baseStoreState.leaderboard,
+          stageMessage: initialState.stageMessage ?? baseStoreState.stageMessage,
+        });
+      }, [initialState]);
 
       return (
         <GameCanvas>
@@ -64,6 +72,6 @@ export const GameOverResults: Story = {
     initialState: {
       ...reusableInitialState,
       ...result,
-    }
+    },
   },
 };

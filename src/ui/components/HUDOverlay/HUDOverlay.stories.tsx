@@ -1,7 +1,8 @@
 import { useEffect } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useGameStore } from '@store/useGameStore';
+import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
+import baseStoreState from '@ui/components/__mocks__/base-store-state.json';
 
 import { HUDOverlay } from '.';
 import fullShieldsLives from './__mocks__/full-shields-lives.json';
@@ -11,23 +12,32 @@ import lost3shields2lives from './__mocks__/2-shields-1-lives.json';
 import lost4shields2lives from './__mocks__/1-shields-1-lives.json';
 
 interface StoryArgs {
-  initialState: Record<string, unknown>;
+  initialState: Partial<GameStoreState>;
 }
 
 const meta = {
   title: 'Screens/HUDOverlay',
   component: HUDOverlay,
+  tags: ['autodocs'],
   parameters: {
     layout: 'fullscreen',
   },
   decorators: [
     (Story, context) => {
-      const syncHUD = useGameStore((state) => state.syncHUD);
-      const initialState = (context.args as StoryArgs).initialState;
+      const { initialState } = context.args as StoryArgs;
 
       useEffect(() => {
-        syncHUD(initialState);
-      }, [syncHUD, initialState]);
+        useGameStore.setState({
+          ...baseStoreState,
+          ...initialState,
+          profiles: initialState.profiles ?? baseStoreState.profiles,
+          gameHistoryByProfile: initialState.gameHistoryByProfile ?? baseStoreState.gameHistoryByProfile,
+          leaderboard: initialState.leaderboard ?? baseStoreState.leaderboard,
+          stageMessage: initialState.stageMessage ?? baseStoreState.stageMessage,
+          streakRewardMessage: initialState.streakRewardMessage ?? baseStoreState.streakRewardMessage,
+          pauseOverlay: initialState.pauseOverlay ?? baseStoreState.pauseOverlay,
+        });
+      }, [initialState]);
 
       return (
         <GameCanvas>

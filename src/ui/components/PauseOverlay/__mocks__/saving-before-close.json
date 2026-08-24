@@ -1,0 +1,7 @@
+{
+  "phase": "paused",
+  "pauseOverlay": {
+    "reason": "window-close",
+    "isSavingBeforeClose": true
+  }
+}
