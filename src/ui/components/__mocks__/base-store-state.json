@@ -1,0 +1,32 @@
+{
+  "phase": "booting",
+  "menuView": "home",
+  "bootReady": false,
+  "activeUsername": null,
+  "profiles": {},
+  "grade": "trainee",
+  "score": 0,
+  "lives": 10,
+  "shield": 5,
+  "stage": 1,
+  "stageScore": 0,
+  "inputBuffer": "",
+  "correctCount": 0,
+  "incorrectCount": 0,
+  "streak": 0,
+  "finalPerfScore": 0,
+  "ddaHeatState": "BALANCED",
+  "ddaMathTier": 1,
+  "ddaSpeedMultiplier": 1,
+  "ddaIsCooloffActive": false,
+  "stageMessage": null,
+  "streakRewardMessage": null,
+  "pauseOverlay": null,
+  "leaderboard": {
+    "trainee": [],
+    "cadet": [],
+    "commander": [],
+    "major-general": []
+  },
+  "gameHistoryByProfile": {}
+}

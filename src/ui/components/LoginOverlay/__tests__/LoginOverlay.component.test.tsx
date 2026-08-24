@@ -1,35 +1,22 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
 import { gameStore } from '@store/useGameStore';
+import type { GameStoreState } from '@store/useGameStore';
 
 import { LoginOverlay } from '../index';
 
+import baseStoreState from '../../__mocks__/base-store-state.json';
+
+function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
+  gameStore.setState({
+    ...(structuredClone(baseStoreState) as Partial<GameStoreState>),
+    ...partialState,
+  });
+}
+
 describe('LoginOverlay', () => {
   beforeEach(() => {
-    gameStore.setState({
-      phase: 'login',
-      menuView: 'home',
-      bootReady: true,
-      activeUsername: null,
-      profiles: {},
-      grade: 'trainee',
-      score: 0,
-      lives: 10,
-      shield: 5,
-      stage: 1,
-      stageScore: 0,
-      inputBuffer: '',
-      correctCount: 0,
-      incorrectCount: 0,
-      finalPerfScore: 0,
-      stageMessage: null,
-      leaderboard: {
-        trainee: [],
-        cadet: [],
-        commander: [],
-        'major-general': [],
-      },
-    });
+    setMockStoreState({ bootReady: true, phase: 'login' });
   });
 
   it('shows login tab by default', () => {
