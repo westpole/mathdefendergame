@@ -80,15 +80,49 @@ function createWindow(options = {}) {
     }
   };
 
+  const shouldConfirmClose = async () => {
+    if (win.isDestroyed()) {
+      return false;
+    }
+
+    try {
+      return await win.webContents.executeJavaScript(`
+        new Promise((resolve) => {
+          const timeout = setTimeout(() => resolve(false), 500);
+          window.addEventListener(
+            'math-defender-close-query-result',
+            (event) => {
+              clearTimeout(timeout);
+              resolve(Boolean(event.detail?.shouldConfirm));
+            },
+            { once: true },
+          );
+          window.dispatchEvent(new CustomEvent('electron-close-query'));
+        });
+      `);
+    } catch {
+      return false;
+    }
+  };
+
   const handleCloseIntent = async () => {
     if (closeFlowInProgress || allowWindowClose) {
       return;
     }
 
     closeFlowInProgress = true;
-    notifyRenderer('electron-close-requested');
 
     try {
+      const confirmClose = await shouldConfirmClose();
+
+      if (!confirmClose) {
+        allowWindowClose = true;
+        win.close();
+        return;
+      }
+
+      notifyRenderer('electron-close-requested');
+
       const confirmation = await dialog.showMessageBox(win, {
         type: 'question',
         buttons: ['End game', 'Keep playing'],

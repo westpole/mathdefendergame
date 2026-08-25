@@ -137,10 +137,16 @@ export function onElectronCloseRequested(): void {
   pauseGameForManualEnd('window-close');
 }
 
+export function shouldConfirmElectronClose(): boolean {
+  const { phase } = gameStore.getState();
+
+  return phase === 'playing' || phase === 'paused' || phase === 'stage-message';
+}
+
 export function onElectronCloseConfirmed(): void {
   const state = gameStore.getState();
 
-  if (state.phase === 'playing' || state.phase === 'paused' || state.phase === 'stage-message') {
+  if (shouldConfirmElectronClose()) {
     endGameEarly({ closeApp: true });
     return;
   }

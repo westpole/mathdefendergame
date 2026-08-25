@@ -26,6 +26,13 @@ function createRuntimeOptions({ argv = ['node', 'electron'], isPackaged = false,
   };
 }
 
+async function flushCloseFlow() {
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
+}
+
 describe('Electron Main Process', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -133,36 +140,62 @@ describe('Electron Main Process', () => {
     });
 
     it('should prevent close and show confirmation dialog before closing', async () => {
+      BrowserWindow.mockClear();
       dialog.showMessageBox.mockResolvedValueOnce({ response: 0 });
 
       const win = mainProcess.createWindow(createRuntimeOptions());
+      win.webContents.executeJavaScript
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true);
       const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
 
       expect(closeHandler).toBeTypeOf('function');
 
       const event = { preventDefault: vi.fn() };
       closeHandler(event);
-      await Promise.resolve();
-      await Promise.resolve();
+      await flushCloseFlow();
 
       expect(event.preventDefault).toHaveBeenCalledTimes(1);
       expect(dialog.showMessageBox).toHaveBeenCalledTimes(1);
-      expect(win.webContents.executeJavaScript).toHaveBeenCalled();
+      expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
+        expect.stringContaining('electron-close-query'),
+      );
+      expect(win.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('should close immediately without confirmation when no game is running', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      win.webContents.executeJavaScript.mockResolvedValueOnce(false);
+      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+
+      expect(closeHandler).toBeTypeOf('function');
+
+      const event = { preventDefault: vi.fn() };
+      closeHandler(event);
+      await flushCloseFlow();
+
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+      expect(dialog.showMessageBox).not.toHaveBeenCalled();
       expect(win.close).toHaveBeenCalledTimes(1);
     });
 
     it('should resume gameplay flow when close confirmation is canceled', async () => {
+      BrowserWindow.mockClear();
       dialog.showMessageBox.mockResolvedValueOnce({ response: 1 });
 
       const win = mainProcess.createWindow(createRuntimeOptions());
+      win.webContents.executeJavaScript
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true);
       const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
 
       expect(closeHandler).toBeTypeOf('function');
 
       const event = { preventDefault: vi.fn() };
       closeHandler(event);
-      await Promise.resolve();
-      await Promise.resolve();
+      await flushCloseFlow();
 
       expect(dialog.showMessageBox).toHaveBeenCalledTimes(1);
       expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(

@@ -5,6 +5,7 @@ import {
   ensurePhaserGame,
   onElectronCloseCancelled,
   onElectronCloseConfirmed,
+  shouldConfirmElectronClose,
   onElectronCloseRequested,
 } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
@@ -34,6 +35,14 @@ export function App() {
       onElectronCloseRequested();
     };
 
+    const handleCloseQuery = () => {
+      window.dispatchEvent(new CustomEvent('math-defender-close-query-result', {
+        detail: {
+          shouldConfirm: shouldConfirmElectronClose(),
+        },
+      }));
+    };
+
     const handleCloseConfirmed = () => {
       onElectronCloseConfirmed();
     };
@@ -42,11 +51,13 @@ export function App() {
       onElectronCloseCancelled();
     };
 
+    window.addEventListener('electron-close-query', handleCloseQuery);
     window.addEventListener('electron-close-requested', handleCloseRequested);
     window.addEventListener('electron-close-confirmed', handleCloseConfirmed);
     window.addEventListener('electron-close-cancelled', handleCloseCancelled);
 
     return () => {
+      window.removeEventListener('electron-close-query', handleCloseQuery);
       window.removeEventListener('electron-close-requested', handleCloseRequested);
       window.removeEventListener('electron-close-confirmed', handleCloseConfirmed);
       window.removeEventListener('electron-close-cancelled', handleCloseCancelled);
