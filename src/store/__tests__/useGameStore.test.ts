@@ -380,7 +380,7 @@ describe('gameStore', () => {
       expect(history[1].key).toBe('older-entry');
     });
 
-    it('limits history to 50 entries per profile', () => {
+    it('keeps full history per profile', () => {
       gameStore.setState({ activeUsername: 'PilotOne' });
 
       for (let i = 0; i < 55; i++) {
@@ -392,9 +392,9 @@ describe('gameStore', () => {
       }
 
       const history = gameStore.getState().getGameHistory('PilotOne', 100);
-      expect(history).toHaveLength(50);
+      expect(history).toHaveLength(55);
       expect(history[0].key).toBe('history-54');
-      expect(history[49].key).toBe('history-5');
+      expect(history[54].key).toBe('history-0');
     });
   });
 });

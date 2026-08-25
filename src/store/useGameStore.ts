@@ -59,7 +59,6 @@ interface PrematureGameEndPayload {
 
 const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
 const GUEST_HISTORY_BUCKET = '__guest__';
-const MAX_HISTORY_ENTRIES_PER_PROFILE = 50;
 
 export interface GameStoreState {
   phase: OverlayPhase;
@@ -132,10 +131,9 @@ function createEmptyOperationHistoryStats(): Record<MathOperation, OperationHist
   };
 }
 
-function sortAndTrimHistory(entries: GameHistoryEntry[]): GameHistoryEntry[] {
+function sortHistory(entries: GameHistoryEntry[]): GameHistoryEntry[] {
   return [...entries]
-    .sort((left, right) => right.playedAt - left.playedAt)
-    .slice(0, MAX_HISTORY_ENTRIES_PER_PROFILE);
+    .sort((left, right) => right.playedAt - left.playedAt);
 }
 
 function isMathOperation(value: unknown): value is MathOperation {
@@ -212,7 +210,7 @@ function migrateGameHistoryByProfile(rawHistoryByProfile: unknown): HistoryByPro
       continue;
     }
 
-    migrated[profileKey] = sortAndTrimHistory(entries.map((entry) => normalizeHistoryEntry(entry)));
+    migrated[profileKey] = sortHistory(entries.map((entry) => normalizeHistoryEntry(entry)));
   }
 
   return migrated;
@@ -476,7 +474,7 @@ export const useGameStore = create<GameStoreState>()(
           const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
           const profileKey = state.activeUsername ?? GUEST_HISTORY_BUCKET;
           const historyForProfile = state.gameHistoryByProfile[profileKey] ?? [];
-          const nextHistoryForProfile = sortAndTrimHistory([...historyForProfile, payload.historyEntry]);
+          const nextHistoryForProfile = sortHistory([...historyForProfile, payload.historyEntry]);
           const nextGameHistoryByProfile = {
             ...state.gameHistoryByProfile,
             [profileKey]: nextHistoryForProfile,
@@ -660,7 +658,7 @@ export const useGameStore = create<GameStoreState>()(
           return {
             gameHistoryByProfile: {
               ...state.gameHistoryByProfile,
-              [profileKey]: sortAndTrimHistory([...historyForProfile, entry]),
+              [profileKey]: sortHistory([...historyForProfile, entry]),
             },
           };
         });
