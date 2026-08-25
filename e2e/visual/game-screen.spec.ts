@@ -26,9 +26,7 @@ test.describe('Visual Regression Tests', () => {
       }
 
       e2e.setSeed(12345);
-      const state = e2e.getStoreState();
-      state.setGrade('trainee');
-      state.startPlaying();
+      e2e.startGame();
     });
 
     // Wait for game scene to initialize

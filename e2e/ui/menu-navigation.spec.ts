@@ -5,9 +5,10 @@ import type { E2EWindow } from '../types';
 async function loginToStartMenu(page: Page) {
   const username = `Pilot${Date.now()}`;
 
+  await page.getByRole('tab', { name: 'Create profile' }).click();
   await page.getByLabel('Username').fill(username);
   await page.getByLabel('Password').fill('Abc12345');
-  await page.getByRole('button', { name: 'Login' }).click();
+  await page.getByRole('button', { name: 'Create profile' }).click();
   await expect(page.getByTestId('main-menu')).toBeVisible();
 }
 

@@ -1,5 +1,11 @@
 import { useGameStore } from '../../src/store/useGameStore';
 import type { GameStoreState } from '../../src/store/useGameStore';
+import {
+  endGameEarly,
+  pauseGameForManualEnd,
+  shouldConfirmElectronClose,
+  startGame,
+} from '../../src/game/scenes/UIScene';
 
 // Define the test bridge interface locally to avoid import issues
 interface E2ETestBridge {
@@ -7,6 +13,9 @@ interface E2ETestBridge {
   setStoreState: (partial: Partial<GameStoreState>) => void;
   getScene: (key: string) => Phaser.Scene | null;
   isSceneReady: (key: string) => boolean;
+  startGame: () => void;
+  endActiveGame: () => boolean;
+  mockSavingBeforeClose: () => boolean;
   setSeed: (seed: number) => void;
   freezeTime: () => void;
   stepFrame: () => void;
@@ -44,6 +53,35 @@ export function installTestBridge(phaserGame: Phaser.Game) {
 
       // Fall back to Phaser lifecycle state for scenes without custom flags.
       return scene.scene.isActive() || scene.scene.isPaused();
+    },
+    startGame: () => {
+      startGame();
+    },
+    endActiveGame: () => {
+      if (!shouldConfirmElectronClose()) {
+        return false;
+      }
+
+      endGameEarly();
+      return true;
+    },
+    mockSavingBeforeClose: () => {
+      const state = useGameStore.getState();
+
+      if (!shouldConfirmElectronClose()) {
+        startGame();
+      }
+
+      const hasGameScene = phaserGame.scene.isActive('GameScene') || phaserGame.scene.isPaused('GameScene');
+
+      if (!hasGameScene) {
+        return false;
+      }
+
+      pauseGameForManualEnd('window-close');
+      state.showSavingBeforeClose();
+
+      return true;
     },
     setSeed: (seed: number) => {
       phaserGame.registry.set('rngSeed', seed);

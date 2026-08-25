@@ -27,11 +27,9 @@ test.describe('Game Start Flow', () => {
   test('can start a new game via store', async ({ page }) => {
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
 
-    // Set grade and start game via store
+    // Start the game through the owning scene layer
     await page.evaluate(() => {
-      const state = (window as E2EWindow).__e2e!.getStoreState();
-      state.setGrade('trainee');
-      state.startPlaying();
+      (window as E2EWindow).__e2e!.startGame();
     });
 
     // Verify state changed
@@ -45,9 +43,7 @@ test.describe('Game Start Flow', () => {
 
     // Start a game first
     await page.evaluate(() => {
-      const state = (window as E2EWindow).__e2e!.getStoreState();
-      state.setGrade('trainee');
-      state.startPlaying();
+      (window as E2EWindow).__e2e!.startGame();
     });
 
     // Wait a bit for scene to start
@@ -78,5 +74,33 @@ test.describe('Game Start Flow', () => {
     });
 
     expect(seed).toBe(12345);
+  });
+
+  test('can mock saving before closing while a game is active', async ({ page }) => {
+    await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
+
+    await page.evaluate(() => {
+      (window as E2EWindow).__e2e!.startGame();
+    });
+
+    await page.waitForTimeout(250);
+
+    const mocked = await page.evaluate(() => (window as E2EWindow).__e2e!.mockSavingBeforeClose());
+
+    expect(mocked).toBe(true);
+
+    const overlayState = await page.evaluate(() => {
+      const state = (window as E2EWindow).__e2e!.getStoreState();
+
+      return {
+        phase: state.phase,
+        isSavingBeforeClose: state.pauseOverlay?.isSavingBeforeClose ?? false,
+        reason: state.pauseOverlay?.reason ?? null,
+      };
+    });
+
+    expect(overlayState.phase).toBe('paused');
+    expect(overlayState.isSavingBeforeClose).toBe(true);
+    expect(overlayState.reason).toBe('window-close');
   });
 });

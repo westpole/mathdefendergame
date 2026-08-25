@@ -26,9 +26,7 @@ test.describe('Store and Phaser Synchronization', () => {
 
     // Start game
     await page.evaluate(() => {
-      const state = (window as E2EWindow).__e2e!.getStoreState();
-      state.setGrade('trainee');
-      state.startPlaying();
+      (window as E2EWindow).__e2e!.startGame();
     });
 
     // Wait for idle state
