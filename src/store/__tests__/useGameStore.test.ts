@@ -107,6 +107,11 @@ describe('gameStore', () => {
       expect(gameStore.getState().menuView).toBe('profile');
     });
 
+    it('should switch to performance view', () => {
+      gameStore.getState().openMenuView('performance');
+      expect(gameStore.getState().menuView).toBe('performance');
+    });
+
     it('should return to home menu', () => {
       gameStore.getState().openMenuView('rules');
       gameStore.getState().openMenuView('home');

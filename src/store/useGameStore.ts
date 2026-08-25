@@ -13,7 +13,7 @@ import type {
 } from '@shared/types';
 
 type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'paused' | 'stage-message' | 'gameover';
-type MenuView = 'home' | 'profile' | 'rules';
+type MenuView = 'home' | 'profile' | 'performance' | 'rules';
 type LegacyDifficulty = 'child' | 'student' | 'adult';
 type HistoryByProfile = Record<string, GameHistoryEntry[]>;
 type PauseOverlayReason = 'escape' | 'window-close';

@@ -6,6 +6,7 @@ import { useGameStore } from '@store/useGameStore';
 const menuItems = [
   { label: 'Play Game', view: 'home' },
   { label: 'Profile', view: 'profile' },
+  { label: 'Performance', view: 'performance' },
   { label: 'Rules', view: 'rules' },
 ] as const;
 

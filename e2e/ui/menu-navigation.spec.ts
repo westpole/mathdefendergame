@@ -31,6 +31,7 @@ test.describe('Menu Navigation', () => {
     await expect(page.getByTestId('start-menu-options')).toBeVisible();
     await expect(page.getByTestId('menu-option-home')).toBeVisible();
     await expect(page.getByTestId('menu-option-profile')).toBeVisible();
+    await expect(page.getByTestId('menu-option-performance')).toBeVisible();
     await expect(page.getByTestId('menu-option-rules')).toBeVisible();
   });
 
@@ -60,5 +61,19 @@ test.describe('Menu Navigation', () => {
 
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
     expect(state.menuView).toBe('rules');
+  });
+
+  test('can navigate to the performance view from the React menu', async ({ page }) => {
+    await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
+    await loginToStartMenu(page);
+
+    await page.getByTestId('menu-toggle-button').click();
+    await page.getByTestId('menu-option-performance').click();
+
+    await expect(page.getByTestId('performance-overlay')).toBeVisible();
+    await expect(page.getByTestId('start-menu-options')).toHaveCount(0);
+
+    const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
+    expect(state.menuView).toBe('performance');
   });
 });

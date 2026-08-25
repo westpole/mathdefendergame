@@ -82,6 +82,22 @@ describe('App start menu controls', () => {
     expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
   });
 
+  it('renders the performance page when the menu view is set to performance', () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        menuView: 'performance',
+        phase: 'start',
+      });
+    });
+
+    render(<App />);
+
+    expect(screen.getByTestId('performance-overlay')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'PERFORMANCE' })).toBeInTheDocument();
+  });
+
   it('renders the profile page when the menu view is set to profile', () => {
     act(() => {
       setMockStoreState({

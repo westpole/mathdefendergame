@@ -14,6 +14,7 @@ import { MainMenuOverlay } from '@ui/components/MainMenuOverlay';
 import { PauseOverlay } from '@ui/components/PauseOverlay';
 import { StageMessageOverlay } from '@ui/components/StageMessageOverlay';
 import { Loading } from '@ui/components/Loading';
+import { PerformanceOverlay } from '@ui/components/PerformanceOverlay';
 import { ProfileOverlay } from '@ui/components/ProfileOverlay';
 import { RulesOverlay } from '@ui/components/Rules';
 import { CitySceneLayout } from '@ui/components/CitySceneLayout';
@@ -62,6 +63,7 @@ export function App() {
         {bootReady && phase === 'login' && <LoginOverlay />}
         {isStartPhase && menuView === 'home' && <MainMenuOverlay />}
         {isStartPhase && menuView === 'profile' && <ProfileOverlay />}
+        {isStartPhase && menuView === 'performance' && <PerformanceOverlay />}
         {isStartPhase && menuView === 'rules' && <RulesOverlay />}
         {isStartPhase && <StartMenuControls />}
         {bootReady && phase === 'playing' && <HUDOverlay />}
