@@ -9,7 +9,7 @@ import {
   StageMessageState,
 } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
-import baseStoreState from '@ui/components/__mocks__/base-store-state.json';
+import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 
 import { GameOverOverlay } from '.';
 import result from './__mocks__/result.json';

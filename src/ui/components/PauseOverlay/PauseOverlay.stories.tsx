@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
-import baseStoreState from '@ui/components/__mocks__/base-store-state.json';
+import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 
 import escapePauseMock from './__mocks__/escape-pause.json';
 import savingBeforeCloseMock from './__mocks__/saving-before-close.json';

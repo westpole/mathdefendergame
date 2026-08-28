@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
-import baseStoreState from '@ui/components/__mocks__/base-store-state.json';
+import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { StageMessageState, useGameStore } from '@store/useGameStore';
 
 import wonMock from './__mocks__/won.json';
