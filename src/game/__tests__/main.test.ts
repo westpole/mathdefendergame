@@ -252,24 +252,24 @@ describe('Game', () => {
     });
 
     it('should reset streak on incorrect answer', () => {
-      (game as any).streak = 12;
+      game.streak = 12;
       game.inputBuffer = '99999';
 
       game.checkAnswer();
 
-      expect((game as any).streak).toBe(0);
+      expect(game.streak).toBe(0);
     });
 
     it('should award a life and reset streak at 30 correct answers in a row', () => {
       const initialLives = game.lives;
-      (game as any).streak = 29;
+      game.streak = 29;
       const meteor = game.meteors[0];
       game.inputBuffer = meteor.answer.toString();
 
       game.checkAnswer();
 
       expect(game.lives).toBe(initialLives + 1);
-      expect((game as any).streak).toBe(0);
+      expect(game.streak).toBe(0);
       expect(game.state).toBe('paused');
       expect(mockCallbacks.onStreakReward).toHaveBeenCalledWith(initialLives + 1);
     });
