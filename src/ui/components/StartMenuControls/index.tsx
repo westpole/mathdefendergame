@@ -1,21 +1,28 @@
 import { useState } from 'react';
 
-import { openMenuView } from '@game/scenes/UIScene';
+import { openMenuView, startGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
 const menuItems = [
-  { label: 'Play Game', view: 'home' },
-  { label: 'Profile', view: 'profile' },
-  { label: 'Performance', view: 'performance' },
-  { label: 'Rules', view: 'rules' },
+  { id: 'home', label: 'Home', type: 'view', view: 'home' },
+  { id: 'play', label: 'Play Game', type: 'start' },
+  { id: 'profile', label: 'Profile', type: 'view', view: 'profile' },
+  { id: 'performance', label: 'Performance', type: 'view', view: 'performance' },
+  { id: 'rules', label: 'Rules', type: 'view', view: 'rules' },
 ] as const;
 
 export function StartMenuControls() {
   const activeView = useGameStore((state) => state.menuView);
   const [isOpen, setIsOpen] = useState(false);
 
-  const handleMenuSelect = (view: (typeof menuItems)[number]['view']) => {
-    openMenuView(view);
+  const handleMenuSelect = (item: (typeof menuItems)[number]) => {
+    if (item.type === 'start') {
+      startGame();
+      setIsOpen(false);
+      return;
+    }
+
+    openMenuView(item.view);
     setIsOpen(false);
   };
 
@@ -42,11 +49,11 @@ export function StartMenuControls() {
         >
           {menuItems.map((item) => (
             <button
-              key={item.view}
-              aria-current={activeView === item.view ? 'page' : undefined}
+              key={item.id}
+              aria-current={item.type === 'view' && activeView === item.view ? 'page' : undefined}
               className="secondary-button start-menu-option"
-              data-testid={`menu-option-${item.view}`}
-              onClick={() => handleMenuSelect(item.view)}
+              data-testid={`menu-option-${item.id}`}
+              onClick={() => handleMenuSelect(item)}
               role="menuitem"
               type="button"
             >

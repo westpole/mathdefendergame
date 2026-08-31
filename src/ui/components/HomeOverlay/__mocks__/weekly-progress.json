@@ -1,0 +1,80 @@
+{
+  "phase": "start",
+  "menuView": "home",
+  "bootReady": true,
+  "activeUsername": "CommanderRex",
+  "grade": "commander",
+  "score": 0,
+  "profiles": {
+    "CommanderRex": {
+      "username": "CommanderRex",
+      "password": "Abc12345",
+      "bestScore": 355,
+      "highestStage": 18,
+      "preferredGrade": "commander",
+      "createdAt": 1787000000000,
+      "updatedAt": 1787000000000
+    }
+  },
+  "gameHistoryByProfile": {
+    "CommanderRex": [
+      {
+        "key": "week-1",
+        "playedAt": 1787832000000,
+        "correctAnswers": 18,
+        "incorrectAnswers": 4,
+        "averageAnswerTimeMs": 1750,
+        "mostProblematicOperation": "*",
+        "operationStats": {
+          "+": { "attempts": 6, "incorrect": 1, "avgTimeMs": 1600 },
+          "-": { "attempts": 6, "incorrect": 1, "avgTimeMs": 1800 },
+          "*": { "attempts": 5, "incorrect": 2, "avgTimeMs": 1950 },
+          "/": { "attempts": 5, "incorrect": 0, "avgTimeMs": 1700 }
+        },
+        "gradeAtFinish": "commander",
+        "finalScore": 310,
+        "finalPerfScore": 82
+      },
+      {
+        "key": "week-2",
+        "playedAt": 1788062400000,
+        "correctAnswers": 20,
+        "incorrectAnswers": 5,
+        "averageAnswerTimeMs": 1680,
+        "mostProblematicOperation": "-",
+        "operationStats": {
+          "+": { "attempts": 7, "incorrect": 1, "avgTimeMs": 1550 },
+          "-": { "attempts": 7, "incorrect": 2, "avgTimeMs": 1750 },
+          "*": { "attempts": 6, "incorrect": 1, "avgTimeMs": 1820 },
+          "/": { "attempts": 5, "incorrect": 1, "avgTimeMs": 1650 }
+        },
+        "gradeAtFinish": "commander",
+        "finalScore": 355,
+        "finalPerfScore": 80
+      },
+      {
+        "key": "older-run",
+        "playedAt": 1786903200000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 6,
+        "averageAnswerTimeMs": 2100,
+        "mostProblematicOperation": "/",
+        "operationStats": {
+          "+": { "attempts": 5, "incorrect": 1, "avgTimeMs": 1900 },
+          "-": { "attempts": 4, "incorrect": 2, "avgTimeMs": 2050 },
+          "*": { "attempts": 5, "incorrect": 1, "avgTimeMs": 2150 },
+          "/": { "attempts": 4, "incorrect": 2, "avgTimeMs": 2300 }
+        },
+        "gradeAtFinish": "cadet",
+        "finalScore": 120,
+        "finalPerfScore": 66
+      }
+    ]
+  },
+  "leaderboard": {
+    "trainee": [],
+    "cadet": [],
+    "commander": [],
+    "major-general": []
+  }
+}

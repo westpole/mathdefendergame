@@ -82,6 +82,45 @@ describe('App start menu controls', () => {
     expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
   });
 
+  it('routes the Home menu option back to the Home overlay', () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        menuView: 'profile',
+        phase: 'start',
+      });
+    });
+
+    render(<App />);
+
+    fireEvent.click(screen.getByTestId('menu-toggle-button'));
+    fireEvent.click(screen.getByTestId('menu-option-home'));
+
+    expect(uiSceneMocks.openMenuView).toHaveBeenCalledWith('home');
+    expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
+  });
+
+  it('starts the game from the start menu play action', () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        phase: 'start',
+      });
+    });
+
+    render(<App />);
+
+    fireEvent.click(screen.getByTestId('menu-toggle-button'));
+  fireEvent.click(screen.getByTestId('menu-option-play'));
+
+    expect(uiSceneMocks.startGame).toHaveBeenCalledTimes(1);
+    expect(uiSceneMocks.openMenuView).not.toHaveBeenCalledWith('home');
+    expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
+  });
+
   it('renders the performance page when the menu view is set to performance', () => {
     act(() => {
       setMockStoreState({
