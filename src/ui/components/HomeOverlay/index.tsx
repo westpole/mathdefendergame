@@ -5,7 +5,7 @@ import { buildGradeProgressSummary, buildWeeklyProgressReport } from '@store/sel
 import { useGameStore } from '@store/useGameStore';
 import type { Grade } from '@shared/types';
 
-import { gradeIcons } from '../gradeIcons';
+import { ProfileIcon } from '@ui/components/ProfileIcon';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -53,14 +53,7 @@ export function HomeOverlay() {
     <div className="overlay-screen overlay-screen--interactive" data-testid="main-menu">
       <div className="overlay-panel home-report-panel" data-testid="home-weekly-report">
         <div className="home-report-header">
-          <div className="grade-icon-wrap home-report-grade-icon-wrap">
-            <img
-              src={gradeIcons[displayGrade]}
-              alt={`${toGradeTitle(displayGrade)} icon`}
-              className="grade-icon home-report-grade-icon"
-              width={160}
-            />
-          </div>
+          <ProfileIcon label={`${toGradeTitle(grade)} icon`} size={120} />
 
           <div className="home-report-copy">
             <p className="home-report-eyebrow">Weekly Progress Report</p>
