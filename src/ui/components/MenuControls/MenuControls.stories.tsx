@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 
-import { StartMenuControls } from '.';
+import { MenuControls } from '.';
 
 const meta = {
-  title: 'Screens/StartMenuControls',
-  component: StartMenuControls,
+  title: 'Screens/MenuControls',
+  component: MenuControls,
   parameters: {
     layout: 'fullscreen',
   },
@@ -17,7 +17,7 @@ const meta = {
       </GameCanvas>
     ),
   ],
-} satisfies Meta<typeof StartMenuControls>;
+} satisfies Meta<typeof MenuControls>;
 
 export default meta;
 

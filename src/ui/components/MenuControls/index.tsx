@@ -11,7 +11,7 @@ const menuItems = [
   { id: 'rules', label: 'Rules', type: 'view', view: 'rules' },
 ] as const;
 
-export function StartMenuControls() {
+export function MenuControls() {
   const activeView = useGameStore((state) => state.menuView);
   const [isOpen, setIsOpen] = useState(false);
 

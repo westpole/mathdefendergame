@@ -20,7 +20,7 @@ import { ProfileOverlay } from '@ui/components/ProfileOverlay';
 import { RulesOverlay } from '@ui/components/Rules';
 import { GameBgLayout } from '@ui/components/GameBgLayout';
 import { LoginOverlay } from '@ui/components/LoginOverlay';
-import { StartMenuControls } from '@ui/components/StartMenuControls';
+import { MenuControls } from '@ui/components/MenuControls';
 
 export function App() {
   const phase = useGameStore((state) => state.phase);
@@ -76,7 +76,7 @@ export function App() {
         {isStartPhase && menuView === 'profile' && <ProfileOverlay />}
         {isStartPhase && menuView === 'performance' && <PerformanceOverlay />}
         {isStartPhase && menuView === 'rules' && <RulesOverlay />}
-        {isStartPhase && <StartMenuControls />}
+        {isStartPhase && <MenuControls />}
         {bootReady && phase === 'playing' && <HUDOverlay />}
         {bootReady && phase === 'paused' && <PauseOverlay />}
         {bootReady && phase === 'stage-message' && <StageMessageOverlay />}

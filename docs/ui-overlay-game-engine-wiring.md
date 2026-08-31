@@ -23,7 +23,7 @@ flowchart TD
     M --> PR["ProfileOverlay<br/>menuView: profile"]
     M --> PF["PerformanceOverlay<br/>menuView: performance"]
     M --> RU["RulesOverlay<br/>menuView: rules"]
-    M --> MC["StartMenuControls"]
+    M --> MC["MenuControls"]
 
     MC -->|"openMenuView(view)"| U
     MM -->|Start Defense| U["UIScene facade<br/>startGame / continueGame / resumePausedGame / endGameEarly / openMenuView"]
