@@ -18,7 +18,7 @@ import { Loading } from '@ui/components/Loading';
 import { PerformanceOverlay } from '@ui/components/PerformanceOverlay';
 import { ProfileOverlay } from '@ui/components/ProfileOverlay';
 import { RulesOverlay } from '@ui/components/Rules';
-import { CitySceneLayout } from '@ui/components/CitySceneLayout';
+import { GameBgLayout } from '@ui/components/GameBgLayout';
 import { LoginOverlay } from '@ui/components/LoginOverlay';
 import { StartMenuControls } from '@ui/components/StartMenuControls';
 
@@ -68,7 +68,7 @@ export function App() {
   return (
     <div id="app-shell">
       <div id="game-container" />
-      <CitySceneLayout />
+      <GameBgLayout />
       <div id="ui-overlay">
         {!bootReady && <Loading />}
         {bootReady && phase === 'login' && <LoginOverlay />}
