@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { openMenuView, startGame } from '@game/scenes/UIScene';
+import { logOff, openMenuView, startGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
 const menuItems = [
@@ -9,6 +9,7 @@ const menuItems = [
   { id: 'profile', label: 'Profile', type: 'view', view: 'profile' },
   { id: 'performance', label: 'Performance', type: 'view', view: 'performance' },
   { id: 'rules', label: 'Rules', type: 'view', view: 'rules' },
+  { id: 'logoff', label: 'Log off', type: 'logoff' },
 ] as const;
 
 export function MenuControls() {
@@ -18,6 +19,12 @@ export function MenuControls() {
   const handleMenuSelect = (item: (typeof menuItems)[number]) => {
     if (item.type === 'start') {
       startGame();
+      setIsOpen(false);
+      return;
+    }
+
+    if (item.type === 'logoff') {
+      logOff();
       setIsOpen(false);
       return;
     }

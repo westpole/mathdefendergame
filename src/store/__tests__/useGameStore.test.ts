@@ -193,6 +193,17 @@ describe('gameStore', () => {
       expect(gameStore.getState().rememberedUsername).toBe('PilotOne');
     });
 
+    it('logs off by clearing active and remembered login credentials', () => {
+      gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345', true);
+
+      gameStore.getState().logOff();
+
+      expect(gameStore.getState().phase).toBe('login');
+      expect(gameStore.getState().activeUsername).toBeNull();
+      expect(gameStore.getState().rememberedUsername).toBeNull();
+      expect(gameStore.getState().profiles.PilotOne).toBeTruthy();
+    });
+
     it('derives the login grade from cumulative game history', () => {
       gameStore.setState({
         phase: 'login',

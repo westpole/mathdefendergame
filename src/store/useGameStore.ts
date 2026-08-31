@@ -101,6 +101,7 @@ export interface GameStoreState {
   startPlaying: () => void;
   returnToMenu: () => void;
   openMenuView: (menuView: MenuView) => void;
+  logOff: () => void;
   loginProfile: (username: string, password: string, keepLoggedIn: boolean) => LoginResult;
   createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;
   getActiveProfile: () => PlayerProfile | null;
@@ -559,6 +560,16 @@ export const useGameStore = create<GameStoreState>()(
         gameHistoryByProfile: get().gameHistoryByProfile,
         activeUsername: get().activeUsername,
         rememberedUsername: get().rememberedUsername,
+      }),
+      logOff: () => set({
+        ...initialState,
+        bootReady: true,
+        phase: 'login',
+        leaderboard: get().leaderboard,
+        profiles: get().profiles,
+        gameHistoryByProfile: get().gameHistoryByProfile,
+        activeUsername: null,
+        rememberedUsername: null,
       }),
       loginProfile: (username, password, keepLoggedIn) => {
         const normalizedUsername = username.trim();

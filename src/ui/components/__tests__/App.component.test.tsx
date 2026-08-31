@@ -10,6 +10,7 @@ import baseStoreState from '../__mocks__/base-store-state.json';
 const uiSceneMocks = vi.hoisted(() => ({
   destroyGame: vi.fn(),
   ensurePhaserGame: vi.fn(() => ({ id: 'game-instance' })),
+  logOff: vi.fn(),
   onElectronCloseCancelled: vi.fn(),
   onElectronCloseConfirmed: vi.fn(),
   onElectronCloseRequested: vi.fn(),
@@ -20,6 +21,7 @@ const uiSceneMocks = vi.hoisted(() => ({
 vi.mock('@game/scenes/UIScene', () => ({
   destroyGame: uiSceneMocks.destroyGame,
   ensurePhaserGame: uiSceneMocks.ensurePhaserGame,
+  logOff: uiSceneMocks.logOff,
   onElectronCloseCancelled: uiSceneMocks.onElectronCloseCancelled,
   onElectronCloseConfirmed: uiSceneMocks.onElectronCloseConfirmed,
   onElectronCloseRequested: uiSceneMocks.onElectronCloseRequested,
@@ -73,6 +75,7 @@ describe('App start menu controls', () => {
     render(<App />);
 
     fireEvent.click(screen.getByTestId('menu-toggle-button'));
+    expect(screen.getByTestId('menu-option-logoff')).toBeVisible();
 
     expect(screen.getByTestId('start-menu-options')).toBeVisible();
 
@@ -114,10 +117,30 @@ describe('App start menu controls', () => {
     render(<App />);
 
     fireEvent.click(screen.getByTestId('menu-toggle-button'));
-  fireEvent.click(screen.getByTestId('menu-option-play'));
+    fireEvent.click(screen.getByTestId('menu-option-play'));
 
     expect(uiSceneMocks.startGame).toHaveBeenCalledTimes(1);
     expect(uiSceneMocks.openMenuView).not.toHaveBeenCalledWith('home');
+    expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
+  });
+
+  it('routes the Log off menu option through UIScene', () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        phase: 'start',
+      });
+    });
+
+    render(<App />);
+
+    fireEvent.click(screen.getByTestId('menu-toggle-button'));
+    fireEvent.click(screen.getByTestId('menu-option-logoff'));
+
+    expect(uiSceneMocks.logOff).toHaveBeenCalledTimes(1);
+    expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
+    expect(uiSceneMocks.openMenuView).not.toHaveBeenCalled();
     expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
   });
 
