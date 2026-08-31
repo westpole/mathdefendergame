@@ -3,6 +3,7 @@
   "menuView": "home",
   "bootReady": false,
   "activeUsername": null,
+  "rememberedUsername": null,
   "profiles": {},
   "grade": "trainee",
   "score": 0,
