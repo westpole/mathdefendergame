@@ -19,7 +19,7 @@ flowchart TD
     O --> SM["StageMessageOverlay<br/>phase: stage-message"]
     O --> GO["GameOverOverlay<br/>phase: gameover"]
 
-    M --> MM["MainMenuOverlay<br/>menuView: home"]
+    M --> MM["HomeOverlay<br/>menuView: home"]
     M --> PR["ProfileOverlay<br/>menuView: profile"]
     M --> PF["PerformanceOverlay<br/>menuView: performance"]
     M --> RU["RulesOverlay<br/>menuView: rules"]

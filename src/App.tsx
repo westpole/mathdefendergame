@@ -11,7 +11,7 @@ import {
 import { useGameStore } from '@store/useGameStore';
 import { GameOverOverlay } from '@ui/components/GameOverOverlay';
 import { HUDOverlay } from '@ui/components/HUDOverlay';
-import { MainMenuOverlay } from '@ui/components/MainMenuOverlay';
+import { HomeOverlay } from '@ui/components/HomeOverlay';
 import { PauseOverlay } from '@ui/components/PauseOverlay';
 import { StageMessageOverlay } from '@ui/components/StageMessageOverlay';
 import { Loading } from '@ui/components/Loading';
@@ -72,7 +72,7 @@ export function App() {
       <div id="ui-overlay">
         {!bootReady && <Loading />}
         {bootReady && phase === 'login' && <LoginOverlay />}
-        {isStartPhase && menuView === 'home' && <MainMenuOverlay />}
+        {isStartPhase && menuView === 'home' && <HomeOverlay />}
         {isStartPhase && menuView === 'profile' && <ProfileOverlay />}
         {isStartPhase && menuView === 'performance' && <PerformanceOverlay />}
         {isStartPhase && menuView === 'rules' && <RulesOverlay />}

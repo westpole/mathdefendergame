@@ -11,7 +11,7 @@ function toGradeTitle(grade: Grade): string {
     .join(' ');
 }
 
-export function MainMenuOverlay() {
+export function HomeOverlay() {
   const activeUsername = useGameStore((state) => state.activeUsername);
   const grade = useGameStore((state) => state.grade);
 
