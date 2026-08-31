@@ -58,33 +58,66 @@
   flex-wrap: wrap;
 }
 
-.start-menu-shell {
+.menu-shell {
   position: absolute;
   top: $spacing-lg;
   left: $spacing-lg;
-  z-index: $z-hud + 1;
+  z-index: $z-menu-overlay;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $spacing-sm;
   pointer-events: auto;
 }
 
-.start-menu-button,
-.start-menu-option {
-  min-width: 180px;
+.menu-button,
+.menu-close-button {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  min-height: 52px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-menu-icon;
 }
 
-.start-menu-options {
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-menu-overlay;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  @include glassmorphism-panel;
+}
+
+.menu-panel {
+  width: min(92vw, 460px);
   display: flex;
   flex-direction: column;
   gap: $spacing-sm;
-  padding: $spacing-sm;
-  border: 1px solid $border-panel;
-  border-radius: $radius-lg;
-  @include glassmorphism-panel;
+  padding: $spacing-lg;
+  pointer-events: auto;
+}
 
-  .start-menu-option {
+.menu-close-button {
+  align-self: flex-end;
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  .menu-option {
+    width: 100%;
+    text-align: left;
     justify-content: flex-start;
   }
 }
@@ -468,13 +501,13 @@
 }
 
 @media (max-width: $breakpoint-mobile) {
-  .start-menu-shell {
+  .menu-shell {
     top: $spacing-sm;
     left: $spacing-sm;
   }
 
-  .start-menu-button,
-  .start-menu-option {
+  .menu-button,
+  .menu-option {
     min-width: 160px;
   }
 }

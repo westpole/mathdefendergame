@@ -60,7 +60,7 @@ describe('App start menu controls', () => {
     rerender(<App />);
 
     expect(screen.getByTestId('menu-toggle-button')).toBeVisible();
-    expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
   it('opens the React menu and routes menu selections through UIScene', () => {
@@ -75,14 +75,37 @@ describe('App start menu controls', () => {
     render(<App />);
 
     fireEvent.click(screen.getByTestId('menu-toggle-button'));
+    expect(screen.getByTestId('menu-overlay')).toBeVisible();
+    expect(screen.getByTestId('menu-close-button')).toBeVisible();
     expect(screen.getByTestId('menu-option-logoff')).toBeVisible();
 
-    expect(screen.getByTestId('start-menu-options')).toBeVisible();
+    expect(screen.getByTestId('menu-options')).toBeVisible();
 
     fireEvent.click(screen.getByTestId('menu-option-profile'));
 
     expect(uiSceneMocks.openMenuView).toHaveBeenCalledWith('profile');
-    expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
+  });
+
+  it('closes the start menu with the dedicated close action', () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        phase: 'start',
+      });
+    });
+
+    render(<App />);
+
+    fireEvent.click(screen.getByTestId('menu-toggle-button'));
+    expect(screen.getByTestId('menu-overlay')).toBeVisible();
+    expect(screen.getByTestId('menu-options')).toBeVisible();
+
+    fireEvent.click(screen.getByTestId('menu-close-button'));
+
+    expect(screen.queryByTestId('menu-overlay')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
   it('routes the Home menu option back to the Home overlay', () => {
@@ -102,7 +125,7 @@ describe('App start menu controls', () => {
 
     expect(uiSceneMocks.openMenuView).toHaveBeenCalledWith('home');
     expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
-    expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
   it('starts the game from the start menu play action', () => {
@@ -121,7 +144,7 @@ describe('App start menu controls', () => {
 
     expect(uiSceneMocks.startGame).toHaveBeenCalledTimes(1);
     expect(uiSceneMocks.openMenuView).not.toHaveBeenCalledWith('home');
-    expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
   it('routes the Log off menu option through UIScene', () => {
@@ -141,7 +164,7 @@ describe('App start menu controls', () => {
     expect(uiSceneMocks.logOff).toHaveBeenCalledTimes(1);
     expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
     expect(uiSceneMocks.openMenuView).not.toHaveBeenCalled();
-    expect(screen.queryByTestId('start-menu-options')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
   it('renders the performance page when the menu view is set to performance', () => {
