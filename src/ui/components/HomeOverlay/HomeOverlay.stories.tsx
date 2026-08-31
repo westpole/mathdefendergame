@@ -2,11 +2,11 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 
-import { MainMenuOverlay } from '.';
+import { HomeOverlay } from '.';
 
 const meta = {
-  title: 'Screens/MainMenuOverlay',
-  component: MainMenuOverlay,
+  title: 'Screens/HomeOverlay',
+  component: HomeOverlay,
   parameters: {
     layout: 'fullscreen',
   },
@@ -17,7 +17,7 @@ const meta = {
       </GameCanvas>
     ),
   ],
-} satisfies Meta<typeof MainMenuOverlay>;
+} satisfies Meta<typeof HomeOverlay>;
 
 export default meta;
 
