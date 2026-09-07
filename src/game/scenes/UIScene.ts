@@ -100,6 +100,16 @@ export function resumePausedGame(): void {
   scene.resumeFromManualPausePrompt();
 }
 
+export function cancelElectronClose(): void {
+  const state = gameStore.getState();
+
+  if (state.phase === 'paused' && state.pauseOverlay?.reason === 'window-close') {
+    resumePausedGame();
+  }
+
+  window.dispatchEvent(new CustomEvent('math-defender-close-cancelled'));
+}
+
 export function endGameEarly(options?: { closeApp?: boolean }): void {
   const scene = getGameScene();
 

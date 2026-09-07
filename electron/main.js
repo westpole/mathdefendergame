@@ -32,7 +32,7 @@ function buildMenu(options = {}) {
 
 function createWindow(options = {}) {
   const { electron, argv } = getRuntimeContext(options);
-  const { app, BrowserWindow, Menu, dialog } = electron;
+  const { app, BrowserWindow, Menu } = electron;
   const isDev = !app.isPackaged && argv.includes('--dev');
   const isDebug = argv.includes('--inspect');
   const win = new BrowserWindow({
@@ -105,6 +105,33 @@ function createWindow(options = {}) {
     }
   };
 
+  const waitForRendererCloseDecision = async () => {
+    if (win.isDestroyed()) {
+      return 'cancelled';
+    }
+
+    try {
+      return await win.webContents.executeJavaScript(`
+        new Promise((resolve) => {
+          const timeout = setTimeout(() => resolve('cancelled'), 5000);
+          const handleReady = () => {
+            clearTimeout(timeout);
+            resolve('ready');
+          };
+          const handleCancelled = () => {
+            clearTimeout(timeout);
+            resolve('cancelled');
+          };
+
+          window.addEventListener('math-defender-close-ready', handleReady, { once: true });
+          window.addEventListener('math-defender-close-cancelled', handleCancelled, { once: true });
+        });
+      `);
+    } catch {
+      return 'cancelled';
+    }
+  };
+
   const handleCloseIntent = async () => {
     if (closeFlowInProgress || allowWindowClose) {
       return;
@@ -123,37 +150,13 @@ function createWindow(options = {}) {
 
       notifyRenderer('electron-close-requested');
 
-      const confirmation = await dialog.showMessageBox(win, {
-        type: 'question',
-        buttons: ['End game', 'Keep playing'],
-        defaultId: 1,
-        cancelId: 1,
-        title: 'End this game?',
-        message: 'Are you sure you want to end this game?',
-        detail: 'Completed stages will be saved to your profile before the app closes.',
-      });
+      const closeDecision = await waitForRendererCloseDecision();
 
-      if (confirmation.response !== 0) {
-        notifyRenderer('electron-close-cancelled');
+      if (closeDecision !== 'ready') {
         return;
       }
 
-      const rendererReady = await win.webContents.executeJavaScript(`
-        new Promise((resolve) => {
-          const timeout = setTimeout(() => resolve(false), 5000);
-          window.addEventListener(
-            'math-defender-close-ready',
-            () => {
-              clearTimeout(timeout);
-              resolve(true);
-            },
-            { once: true },
-          );
-          window.dispatchEvent(new CustomEvent('electron-close-confirmed'));
-        });
-      `);
-
-      if (rendererReady && !win.isDestroyed()) {
+      if (!win.isDestroyed()) {
         allowWindowClose = true;
         win.close();
       }

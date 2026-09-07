@@ -1,4 +1,4 @@
-import { endGameEarly, resumePausedGame } from '@game/scenes/UIScene';
+import { cancelElectronClose, endGameEarly, resumePausedGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
 export function PauseOverlay() {
@@ -24,6 +24,7 @@ export function PauseOverlay() {
   const message = isWindowClosePrompt
     ? 'Are you sure you want to end this game?'
     : 'Game paused. You can resume any time or end this game.';
+  const handleResume = isWindowClosePrompt ? cancelElectronClose : resumePausedGame;
 
   return (
     <div className="overlay-screen overlay-screen--interactive">
@@ -34,7 +35,7 @@ export function PauseOverlay() {
         <div className="action-row">
           <button
             className="secondary-button"
-            onClick={resumePausedGame}
+            onClick={handleResume}
             type="button"
           >
             {isWindowClosePrompt ? 'Keep playing' : 'Resume'}
