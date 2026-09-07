@@ -1,18 +1,5 @@
 # Web-First Mobile Plan With Optional Electron Wrapper
 
-## Review Of Current `src/ui/styles` Setup
-
-The current style setup is organized well at the file-structure level.
-
-- `src/ui/styles/index.scss` is a single entrypoint that composes variables, mixins, reset, layout, utilities, and component partials.
-- Shared tokens live in `src/ui/styles/_variables.scss`.
-- Reusable breakpoint and layout helpers live in `src/ui/styles/_mixins.scss`.
-- UI surfaces are split into focused partials such as menu, overlay, HUD, forms, buttons, and tabs.
-
-That part should be preserved.
-
-The main issues are not SCSS organization. The issues are desktop-first assumptions inside the current styles and runtime behavior.
-
 ### Current Constraints
 
 1. The shell uses fixed viewport sizing.

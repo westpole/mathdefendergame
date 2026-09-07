@@ -138,6 +138,7 @@ export default defineConfig({
           setupFiles: ['./vitest-react.setup.ts'],
           include: [
             'src/ui/**/*.{test,spec}.{ts,tsx}',
+            'src/platform/**/*.test.ts',
             'src/store/**/*.test.ts',
           ],
         }

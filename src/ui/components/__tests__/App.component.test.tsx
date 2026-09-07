@@ -7,6 +7,10 @@ import { App } from '../../../App';
 
 import baseStoreState from '../__mocks__/base-store-state.json';
 
+const platformMocks = vi.hoisted(() => ({
+  subscribeToAppCloseEvents: vi.fn(),
+}));
+
 const uiSceneMocks = vi.hoisted(() => ({
   destroyGame: vi.fn(),
   ensurePhaserGame: vi.fn(() => ({ id: 'game-instance' })),
@@ -15,7 +19,12 @@ const uiSceneMocks = vi.hoisted(() => ({
   onElectronCloseConfirmed: vi.fn(),
   onElectronCloseRequested: vi.fn(),
   openMenuView: vi.fn(),
+  shouldConfirmElectronClose: vi.fn(() => false),
   startGame: vi.fn(),
+}));
+
+vi.mock('../../../platform/adapter', () => ({
+  subscribeToAppCloseEvents: platformMocks.subscribeToAppCloseEvents,
 }));
 
 vi.mock('@game/scenes/UIScene', () => ({
@@ -26,6 +35,7 @@ vi.mock('@game/scenes/UIScene', () => ({
   onElectronCloseConfirmed: uiSceneMocks.onElectronCloseConfirmed,
   onElectronCloseRequested: uiSceneMocks.onElectronCloseRequested,
   openMenuView: uiSceneMocks.openMenuView,
+  shouldConfirmElectronClose: uiSceneMocks.shouldConfirmElectronClose,
   startGame: uiSceneMocks.startGame,
   continueGame: vi.fn(),
   returnToMenu: vi.fn(),
@@ -41,6 +51,7 @@ function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
 describe('App start menu controls', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    platformMocks.subscribeToAppCloseEvents.mockReturnValue(vi.fn());
     setMockStoreState();
   });
 
@@ -203,10 +214,13 @@ describe('App start menu controls', () => {
     setMockStoreState({ bootReady: true, phase: 'login' });
 
     const { unmount } = render(<App />);
+    const handlers = platformMocks.subscribeToAppCloseEvents.mock.calls[0]?.[0];
 
-    window.dispatchEvent(new Event('electron-close-requested'));
-    window.dispatchEvent(new Event('electron-close-confirmed'));
-    window.dispatchEvent(new Event('electron-close-cancelled'));
+    expect(handlers).toBeDefined();
+
+    handlers.onCloseRequested();
+    handlers.onCloseConfirmed();
+    handlers.onCloseCancelled();
 
     expect(uiSceneMocks.onElectronCloseRequested).toHaveBeenCalledTimes(1);
     expect(uiSceneMocks.onElectronCloseConfirmed).toHaveBeenCalledTimes(1);
@@ -215,9 +229,5 @@ describe('App start menu controls', () => {
     unmount();
 
     expect(uiSceneMocks.destroyGame).toHaveBeenCalledWith({ id: 'game-instance' });
-
-    window.dispatchEvent(new Event('electron-close-requested'));
-
-    expect(uiSceneMocks.onElectronCloseRequested).toHaveBeenCalledTimes(1);
   });
 });

@@ -12,6 +12,7 @@ import { GAME_CONFIG } from '@game/config';
 import { gameStore } from '@store/useGameStore';
 import type { PauseOverlayReason } from '@store/useGameStore';
 import type { GameOverReason, Grade } from '@shared/types';
+import { notifyAppCloseReady } from '../../platform/adapter';
 
 function colorToInt(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
@@ -227,7 +228,7 @@ export class GameScene extends Phaser.Scene {
     this.scene.stop();
 
     if (options?.closeApp) {
-      window.dispatchEvent(new CustomEvent('math-defender-close-ready'));
+      notifyAppCloseReady();
       return;
     }
 

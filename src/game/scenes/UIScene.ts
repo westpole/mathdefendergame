@@ -11,6 +11,7 @@ import Phaser from 'phaser';
 import { gameStore } from '@store/useGameStore';
 import type { MenuView } from '@store/useGameStore';
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
+import { notifyAppCloseCancelled, notifyAppCloseReady } from '../../platform/adapter';
 
 import { BootScene } from './BootScene';
 import { GameScene } from './GameScene';
@@ -107,7 +108,7 @@ export function cancelElectronClose(): void {
     resumePausedGame();
   }
 
-  window.dispatchEvent(new CustomEvent('math-defender-close-cancelled'));
+  notifyAppCloseCancelled();
 }
 
 export function endGameEarly(options?: { closeApp?: boolean }): void {
@@ -115,7 +116,7 @@ export function endGameEarly(options?: { closeApp?: boolean }): void {
 
   if (!scene) {
     if (options?.closeApp) {
-      window.dispatchEvent(new CustomEvent('math-defender-close-ready'));
+      notifyAppCloseReady();
     }
     return;
   }
@@ -172,7 +173,7 @@ export function onElectronCloseConfirmed(): void {
   }
 
   state.showSavingBeforeClose();
-  window.dispatchEvent(new CustomEvent('math-defender-close-ready'));
+  notifyAppCloseReady();
 }
 
 export function onElectronCloseCancelled(): void {

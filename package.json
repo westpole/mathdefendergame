@@ -6,7 +6,8 @@
   "author": "Stanislav Spuzyak",
   "main": "electron/main.js",
   "scripts": {
-    "dev": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron . --dev\"",
+    "dev:web": "vite",
+    "dev:win": "concurrently -k \"vite\" \"wait-on http://localhost:5173 && electron . --dev\"",
     "start:prod": "electron .",
     "start:debug": "electron . --inspect",
     "test:ui": "vitest --ui --config vitest.config.ts",
