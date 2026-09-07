@@ -139,15 +139,14 @@ describe('Electron Main Process', () => {
       });
     });
 
-    it('should prevent close and show confirmation dialog before closing', async () => {
+    it('should prevent close, delegate confirmation to the renderer, and close when ready', async () => {
       BrowserWindow.mockClear();
-      dialog.showMessageBox.mockResolvedValueOnce({ response: 0 });
 
       const win = mainProcess.createWindow(createRuntimeOptions());
       win.webContents.executeJavaScript
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(true)
-        .mockResolvedValueOnce(true);
+        .mockResolvedValueOnce('ready');
       const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
 
       expect(closeHandler).toBeTypeOf('function');
@@ -157,9 +156,12 @@ describe('Electron Main Process', () => {
       await flushCloseFlow();
 
       expect(event.preventDefault).toHaveBeenCalledTimes(1);
-      expect(dialog.showMessageBox).toHaveBeenCalledTimes(1);
+      expect(dialog.showMessageBox).not.toHaveBeenCalled();
       expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
         expect.stringContaining('electron-close-query'),
+      );
+      expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
+        expect.stringContaining('math-defender-close-cancelled'),
       );
       expect(win.close).toHaveBeenCalledTimes(1);
     });
@@ -180,15 +182,14 @@ describe('Electron Main Process', () => {
       expect(win.close).toHaveBeenCalledTimes(1);
     });
 
-    it('should resume gameplay flow when close confirmation is canceled', async () => {
+    it('should keep the window open when the renderer cancels the close flow', async () => {
       BrowserWindow.mockClear();
-      dialog.showMessageBox.mockResolvedValueOnce({ response: 1 });
 
       const win = mainProcess.createWindow(createRuntimeOptions());
       win.webContents.executeJavaScript
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(true)
-        .mockResolvedValueOnce(true);
+        .mockResolvedValueOnce('cancelled');
       const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
 
       expect(closeHandler).toBeTypeOf('function');
@@ -197,9 +198,9 @@ describe('Electron Main Process', () => {
       closeHandler(event);
       await flushCloseFlow();
 
-      expect(dialog.showMessageBox).toHaveBeenCalledTimes(1);
+      expect(dialog.showMessageBox).not.toHaveBeenCalled();
       expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
-        expect.stringContaining('electron-close-cancelled'),
+        expect.stringContaining('electron-close-requested'),
       );
       expect(win.close).not.toHaveBeenCalled();
     });
