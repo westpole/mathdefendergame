@@ -50,13 +50,14 @@
 
   &--center {
     min-width: 140px;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     background: url('../../../assets/radar-screen.png') no-repeat center center;
     background-size: cover;
 
     @include mobile {
-      align-items: flex-start;
+      align-items: stretch;
     }
   }
 }
@@ -66,14 +67,80 @@
   font-size: 1.8em;
   font-weight: 700;
   color: $color-primary-yellow;
-  width: 7vw;
+  min-width: 7vw;
   @include flex-center;
+
+  @include mobile {
+    min-height: 40px;
+    width: 100%;
+  }
+}
+
+.mobile-input-panel {
+  display: none;
+  width: 100%;
+
+  @include mobile {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+}
+
+.mobile-input-panel__label {
+  font-size: 12px;
+  color: $text-secondary;
+}
+
+.mobile-input-panel__field {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-md;
+  background: rgba(0, 0, 0, 0.45);
+  color: $text-primary;
+  font-family: $font-display;
+  font-size: 20px;
+}
+
+.mobile-input-panel__keypad {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: $spacing-xs;
+}
+
+.mobile-input-panel__key {
+  min-height: 44px;
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-md;
+  background: rgba(15, 23, 42, 0.88);
+  color: $text-primary;
+  font-family: $font-display;
+  font-size: 16px;
+}
+
+.mobile-input-panel__key--secondary {
+  background: rgba(71, 85, 105, 0.88);
+}
+
+.mobile-input-panel__key--primary {
+  background: rgba($color-success-green, 0.85);
+  color: $bg-dark-base;
+}
+
+.mobile-input-panel__pause {
+  width: 100%;
 }
 
 .status-squares {
   display: flex;
   gap: $spacing-sm;
   align-items: center;
+
+  @include mobile {
+    flex-wrap: wrap;
+  }
 }
 
 .status-square {

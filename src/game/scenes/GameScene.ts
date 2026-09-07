@@ -29,22 +29,16 @@ export class GameScene extends Phaser.Scene {
       this.pauseForManualEndPrompt('escape');
       return;
     }
-    if (this.gameLogic.state !== 'playing') return;
-
     if (e.key === 'Backspace') {
-      this.gameLogic.inputBuffer = this.gameLogic.inputBuffer.slice(0, -1);
-      this.updateHUD();
+      this.removeAnswerInputCharacter();
       return;
     }
     if ((e.key >= '0' && e.key <= '9') || e.key === '-') {
-      if (this.gameLogic.inputBuffer.length < 5) {
-        this.gameLogic.inputBuffer += e.key;
-        this.updateHUD();
-      }
+      this.appendAnswerInputCharacter(e.key);
       return;
     }
-    if (e.key === 'Enter' && this.gameLogic.inputBuffer.length > 0) {
-      this.gameLogic.checkAnswer();
+    if (e.key === 'Enter') {
+      this.submitAnswerInput();
     }
   };
 
@@ -190,6 +184,22 @@ export class GameScene extends Phaser.Scene {
     if (this.gameLogic.state !== 'gameover') {
       gameStore.getState().startPlaying();
     }
+  }
+
+  public setAnswerInputBuffer(nextValue: string): void {
+    this.gameLogic.setInputBuffer(nextValue);
+  }
+
+  public appendAnswerInputCharacter(char: string): void {
+    this.gameLogic.appendInputCharacter(char);
+  }
+
+  public removeAnswerInputCharacter(): void {
+    this.gameLogic.removeLastInputCharacter();
+  }
+
+  public submitAnswerInput(): void {
+    this.gameLogic.submitInputBuffer();
   }
 
   public pauseForManualEndPrompt(reason: PauseOverlayReason): void {

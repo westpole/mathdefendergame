@@ -3,7 +3,9 @@
  * Tests the game HUD with React Testing Library
  */
 
-import { act, render, screen } from '@testing-library/react';
+import { act, render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { gameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/useGameStore';
@@ -12,10 +14,28 @@ import fullShieldsLives from '../__mocks__/full-shields-lives.json';
 
 import { HUDOverlay } from '../index';
 
+const uiSceneMocks = vi.hoisted(() => ({
+  appendAnswerInputCharacter: vi.fn<(char: string) => void>(),
+  pauseGameForManualEnd: vi.fn<(reason: 'escape' | 'window-close') => void>(),
+  removeAnswerInputCharacter: vi.fn<() => void>(),
+  setAnswerInputBuffer: vi.fn<(nextValue: string) => void>(),
+  submitAnswerInput: vi.fn<() => void>(),
+}));
+
+vi.mock('@game/scenes/UIScene', () => ({
+  appendAnswerInputCharacter: uiSceneMocks.appendAnswerInputCharacter,
+  pauseGameForManualEnd: uiSceneMocks.pauseGameForManualEnd,
+  removeAnswerInputCharacter: uiSceneMocks.removeAnswerInputCharacter,
+  setAnswerInputBuffer: uiSceneMocks.setAnswerInputBuffer,
+  submitAnswerInput: uiSceneMocks.submitAnswerInput,
+}));
+
 const baseHudState = fullShieldsLives as Partial<GameStoreState>;
 
 describe('HUDOverlay Component', () => {
   beforeEach(() => {
+    vi.clearAllMocks();
+
     // Set initial state for the game store before each test
     gameStore.setState({
       ...baseHudState,
@@ -38,7 +58,10 @@ describe('HUDOverlay Component', () => {
   it('should render lives correctly', () => {
     render(<HUDOverlay />);
     expect(screen.getByText('Lives')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
+
+    const livesSquare = document.querySelector('.status-square--lives');
+    expect(livesSquare).not.toBeNull();
+    expect(within(livesSquare as HTMLElement).getByText('3')).toBeInTheDocument();
   });
 
   it('should render streak correctly', () => {
@@ -53,7 +76,10 @@ describe('HUDOverlay Component', () => {
   it('should render the base shield label', () => {
     render(<HUDOverlay />);
     expect(screen.getByText('Base Shield')).toBeInTheDocument();
-    expect(screen.getByText('5')).toBeInTheDocument();
+
+    const shieldSquare = document.querySelector('.status-square--shield');
+    expect(shieldSquare).not.toBeNull();
+    expect(within(shieldSquare as HTMLElement).getByText('5')).toBeInTheDocument();
   });
 
   it('should display warning when lives are in the warning range', () => {
@@ -102,5 +128,23 @@ describe('HUDOverlay Component', () => {
 
     expect(screen.getByRole('status')).toHaveTextContent('Streak Bonus');
     expect(screen.getByText(/\+1 life awarded for a 30 streak/i)).toBeInTheDocument();
+  });
+
+  it('routes mobile answer controls through UIScene helpers', async () => {
+    const user = userEvent.setup();
+
+    render(<HUDOverlay />);
+
+    await user.type(screen.getByLabelText(/answer input/i), '-45');
+    await user.click(screen.getByRole('button', { name: 'Digit 7' }));
+    await user.click(screen.getByRole('button', { name: 'Backspace' }));
+    await user.click(screen.getByRole('button', { name: 'Submit answer' }));
+    await user.click(screen.getByRole('button', { name: 'Pause' }));
+
+    expect(uiSceneMocks.setAnswerInputBuffer).toHaveBeenCalled();
+    expect(uiSceneMocks.appendAnswerInputCharacter).toHaveBeenCalledWith('7');
+    expect(uiSceneMocks.removeAnswerInputCharacter).toHaveBeenCalledTimes(1);
+    expect(uiSceneMocks.submitAnswerInput).toHaveBeenCalledTimes(1);
+    expect(uiSceneMocks.pauseGameForManualEnd).toHaveBeenCalledWith('escape');
   });
 });

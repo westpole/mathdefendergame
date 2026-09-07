@@ -47,6 +47,7 @@ type RoundOperationTelemetry = Record<MathOperation, {
 
 const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
 const GUEST_HISTORY_BUCKET = '__guest__';
+const MAX_ANSWER_INPUT_LENGTH = 5;
 
 function createEmptyRoundOperationTelemetry(): RoundOperationTelemetry {
   return {
@@ -68,6 +69,23 @@ function cloneRoundOperationTelemetry(source: RoundOperationTelemetry): RoundOpe
 
 function isMathOperation(value: unknown): value is MathOperation {
   return value === '+' || value === '-' || value === '*' || value === '/';
+}
+
+function sanitizeAnswerInput(rawValue: string): string {
+  let nextValue = '';
+
+  for (const char of rawValue) {
+    if (char >= '0' && char <= '9') {
+      nextValue += char;
+      continue;
+    }
+
+    if (char === '-' && nextValue.length === 0) {
+      nextValue += char;
+    }
+  }
+
+  return nextValue.slice(0, MAX_ANSWER_INPUT_LENGTH);
 }
 
 function getLifetimeScoreBeforeCurrentRun(
@@ -212,6 +230,41 @@ export class Game {
         color: '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0'),
       });
     }
+  }
+
+  setInputBuffer(nextValue: string): void {
+    if (this.state !== 'playing') {
+      return;
+    }
+
+    this.inputBuffer = sanitizeAnswerInput(nextValue);
+    this.cb.onHUDUpdate();
+  }
+
+  appendInputCharacter(char: string): void {
+    if (this.state !== 'playing') {
+      return;
+    }
+
+    this.inputBuffer = sanitizeAnswerInput(`${this.inputBuffer}${char}`);
+    this.cb.onHUDUpdate();
+  }
+
+  removeLastInputCharacter(): void {
+    if (this.state !== 'playing') {
+      return;
+    }
+
+    this.inputBuffer = this.inputBuffer.slice(0, -1);
+    this.cb.onHUDUpdate();
+  }
+
+  submitInputBuffer(): void {
+    if (this.state !== 'playing' || this.inputBuffer.length === 0 || this.inputBuffer === '-') {
+      return;
+    }
+
+    this.checkAnswer();
   }
 
   checkAnswer(): void {

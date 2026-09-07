@@ -31,6 +31,10 @@ const mockGameState = vi.hoisted(() => ({
     setCanvasHeight: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     checkAnswer: ReturnType<typeof vi.fn>;
+    setInputBuffer: ReturnType<typeof vi.fn>;
+    appendInputCharacter: ReturnType<typeof vi.fn>;
+    removeLastInputCharacter: ReturnType<typeof vi.fn>;
+    submitInputBuffer: ReturnType<typeof vi.fn>;
     resumeFromMessage: ReturnType<typeof vi.fn>;
     resumeAfterStreakReward: ReturnType<typeof vi.fn>;
     pauseForManualEndPrompt: ReturnType<typeof vi.fn>;
@@ -76,6 +80,49 @@ vi.mock('../../main', () => ({
     setCanvasHeight = vi.fn();
     update = vi.fn();
     checkAnswer = vi.fn();
+    setInputBuffer = vi.fn((nextValue: string) => {
+      if (this.state !== 'playing') {
+        return;
+      }
+
+      this.inputBuffer = nextValue;
+      mockGameState.lastCallbacks?.onHUDUpdate();
+    });
+    appendInputCharacter = vi.fn((char: string) => {
+      if (this.state !== 'playing') {
+        return;
+      }
+
+      if (char >= '0' && char <= '9') {
+        this.inputBuffer = `${this.inputBuffer}${char}`.slice(0, 5);
+        mockGameState.lastCallbacks?.onHUDUpdate();
+        return;
+      }
+
+      if (char === '-' && this.inputBuffer.length === 0) {
+        this.inputBuffer = '-';
+        mockGameState.lastCallbacks?.onHUDUpdate();
+      }
+    });
+    removeLastInputCharacter = vi.fn(() => {
+      if (this.state !== 'playing') {
+        return;
+      }
+
+      this.inputBuffer = this.inputBuffer.slice(0, -1);
+      mockGameState.lastCallbacks?.onHUDUpdate();
+    });
+    submitInputBuffer = vi.fn(() => {
+      if (this.state !== 'playing') {
+        return;
+      }
+
+      if (this.inputBuffer.length === 0 || this.inputBuffer === '-') {
+        return;
+      }
+
+      this.checkAnswer();
+    });
     resumeFromMessage = vi.fn();
     resumeAfterStreakReward = vi.fn(() => {
       this.state = 'playing';
@@ -298,7 +345,7 @@ describe('GameScene', () => {
     expect(store.syncHUD).toHaveBeenCalledWith({ inputBuffer: '' });
   });
 
-  it('updates the HUD input buffer on backspace and accepts numeric input up to five chars', () => {
+  it('updates the HUD input buffer on backspace and keeps answer input sanitized', () => {
     const { scene, store } = setupScene();
 
     scene.init({ grade: 'trainee' });
@@ -314,10 +361,10 @@ describe('GameScene', () => {
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: '5' } as KeyboardEvent);
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: '6' } as KeyboardEvent);
 
-    expect(mockGameState.lastInstance?.inputBuffer).toBe('12-45');
+    expect(mockGameState.lastInstance?.inputBuffer).toBe('12456');
 
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: '7' } as KeyboardEvent);
-    expect(mockGameState.lastInstance?.inputBuffer).toBe('12-45');
+    expect(mockGameState.lastInstance?.inputBuffer).toBe('12456');
   });
 
   it('submits entered answers and pauses with ESC while ignoring gameplay keys outside playing state', () => {
@@ -329,6 +376,7 @@ describe('GameScene', () => {
     mockGameState.lastInstance!.inputBuffer = '42';
 
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: 'Enter' } as KeyboardEvent);
+    expect(mockGameState.lastInstance?.submitInputBuffer).toHaveBeenCalledTimes(1);
     expect(mockGameState.lastInstance?.checkAnswer).toHaveBeenCalledTimes(1);
 
     mockGameState.lastInstance!.state = 'paused';

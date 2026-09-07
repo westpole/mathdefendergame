@@ -1,6 +1,17 @@
+import type { ChangeEvent } from 'react';
+
 import { clsx } from 'clsx';
+import {
+  appendAnswerInputCharacter,
+  pauseGameForManualEnd,
+  removeAnswerInputCharacter,
+  setAnswerInputBuffer,
+  submitAnswerInput,
+} from '@game/scenes/UIScene';
 import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
+
+const mobileKeypadValues = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '0'];
 
 export function HUDOverlay() {
   const score = useGameStore((state) => state.score);
@@ -15,6 +26,10 @@ export function HUDOverlay() {
   const clampedShield = Math.max(0, Math.min(stageShieldMax, shield));
   const shieldsTone = clampedShield >= 4 ? 'good' : clampedShield >= 2 ? 'warn' : 'danger';
   const livesTone = lives > 2 ? 'good' : lives > 1 ? 'warn' : 'danger';
+
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setAnswerInputBuffer(event.target.value);
+  };
 
   return (
     <>
@@ -34,8 +49,70 @@ export function HUDOverlay() {
         </section>
 
         <section className="hud-panel hud-panel--center">
-          <div className="input-preview">
-            {inputBuffer}
+          <div className="input-preview">{inputBuffer}</div>
+
+          <div className="mobile-input-panel" data-testid="mobile-input-panel">
+            <label className="mobile-input-panel__label" htmlFor="mobile-answer-input">
+              Answer input
+            </label>
+            <input
+              aria-label="Answer input"
+              autoComplete="off"
+              className="mobile-input-panel__field"
+              enterKeyHint="done"
+              id="mobile-answer-input"
+              inputMode="numeric"
+              onChange={handleInputChange}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault();
+                  submitAnswerInput();
+                }
+              }}
+              pattern="-?[0-9]*"
+              spellCheck={false}
+              type="text"
+              value={inputBuffer}
+            />
+
+            <div className="mobile-input-panel__keypad" aria-label="Answer keypad" role="group">
+              {mobileKeypadValues.map((keyValue) => (
+                <button
+                  aria-label={keyValue === '-' ? 'Negative sign' : `Digit ${keyValue}`}
+                  className="mobile-input-panel__key"
+                  key={keyValue}
+                  onClick={() => appendAnswerInputCharacter(keyValue)}
+                  type="button"
+                >
+                  {keyValue}
+                </button>
+              ))}
+
+              <button
+                aria-label="Backspace"
+                className="mobile-input-panel__key mobile-input-panel__key--secondary"
+                onClick={removeAnswerInputCharacter}
+                type="button"
+              >
+                Del
+              </button>
+              <button
+                aria-label="Submit answer"
+                className="mobile-input-panel__key mobile-input-panel__key--primary"
+                onClick={submitAnswerInput}
+                type="button"
+              >
+                Enter
+              </button>
+            </div>
+
+            <button
+              className="mobile-input-panel__pause secondary-button"
+              onClick={() => pauseGameForManualEnd('escape')}
+              type="button"
+            >
+              Pause
+            </button>
           </div>
         </section>
 

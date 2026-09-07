@@ -81,6 +81,46 @@ export function continueGame(): void {
   }
 }
 
+export function setAnswerInputBuffer(nextValue: string): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.setAnswerInputBuffer(nextValue);
+}
+
+export function appendAnswerInputCharacter(char: string): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.appendAnswerInputCharacter(char);
+}
+
+export function removeAnswerInputCharacter(): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.removeAnswerInputCharacter();
+}
+
+export function submitAnswerInput(): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.submitAnswerInput();
+}
+
 export function pauseGameForManualEnd(reason: 'escape' | 'window-close'): void {
   const scene = getGameScene();
 

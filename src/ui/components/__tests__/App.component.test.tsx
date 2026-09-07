@@ -12,6 +12,8 @@ const platformMocks = vi.hoisted(() => ({
 }));
 
 const uiSceneMocks = vi.hoisted(() => ({
+  appendAnswerInputCharacter: vi.fn(),
+  continueGame: vi.fn(),
   destroyGame: vi.fn(),
   ensurePhaserGame: vi.fn(() => ({ id: 'game-instance' })),
   logOff: vi.fn(),
@@ -19,8 +21,12 @@ const uiSceneMocks = vi.hoisted(() => ({
   onElectronCloseConfirmed: vi.fn(),
   onElectronCloseRequested: vi.fn(),
   openMenuView: vi.fn(),
+  pauseGameForManualEnd: vi.fn(),
+  removeAnswerInputCharacter: vi.fn(),
+  setAnswerInputBuffer: vi.fn(),
   shouldConfirmElectronClose: vi.fn(() => false),
   startGame: vi.fn(),
+  submitAnswerInput: vi.fn(),
 }));
 
 vi.mock('../../../platform/adapter', () => ({
@@ -28,6 +34,8 @@ vi.mock('../../../platform/adapter', () => ({
 }));
 
 vi.mock('@game/scenes/UIScene', () => ({
+  appendAnswerInputCharacter: uiSceneMocks.appendAnswerInputCharacter,
+  continueGame: uiSceneMocks.continueGame,
   destroyGame: uiSceneMocks.destroyGame,
   ensurePhaserGame: uiSceneMocks.ensurePhaserGame,
   logOff: uiSceneMocks.logOff,
@@ -35,9 +43,12 @@ vi.mock('@game/scenes/UIScene', () => ({
   onElectronCloseConfirmed: uiSceneMocks.onElectronCloseConfirmed,
   onElectronCloseRequested: uiSceneMocks.onElectronCloseRequested,
   openMenuView: uiSceneMocks.openMenuView,
+  pauseGameForManualEnd: uiSceneMocks.pauseGameForManualEnd,
+  removeAnswerInputCharacter: uiSceneMocks.removeAnswerInputCharacter,
+  setAnswerInputBuffer: uiSceneMocks.setAnswerInputBuffer,
   shouldConfirmElectronClose: uiSceneMocks.shouldConfirmElectronClose,
   startGame: uiSceneMocks.startGame,
-  continueGame: vi.fn(),
+  submitAnswerInput: uiSceneMocks.submitAnswerInput,
   returnToMenu: vi.fn(),
 }));
 
