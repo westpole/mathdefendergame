@@ -65,6 +65,7 @@ export interface GameStoreState {
   menuView: MenuView;
   bootReady: boolean;
   activeUsername: string | null;
+  rememberedUsername: string | null;
   profiles: Record<string, PlayerProfile>;
   grade: Grade;
   score: number;
@@ -100,8 +101,9 @@ export interface GameStoreState {
   startPlaying: () => void;
   returnToMenu: () => void;
   openMenuView: (menuView: MenuView) => void;
-  loginProfile: (username: string, password: string) => LoginResult;
-  createAndLoginProfile: (username: string, password: string) => LoginResult;
+  logOff: () => void;
+  loginProfile: (username: string, password: string, keepLoggedIn: boolean) => LoginResult;
+  createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;
   getActiveProfile: () => PlayerProfile | null;
   saveScore: (name: string, score: number, perfScore: number, grade: Grade) => void;
   getScores: (gradeFilter?: Grade | null) => ScoreEntry[];
@@ -371,6 +373,7 @@ const initialState = {
   menuView: 'home' as MenuView,
   bootReady: false,
   activeUsername: null as string | null,
+  rememberedUsername: null as string | null,
   profiles: {} as Record<string, PlayerProfile>,
   grade: 'trainee' as Grade,
   score: 0,
@@ -398,7 +401,30 @@ export const useGameStore = create<GameStoreState>()(
   persist(
     (set, get) => ({
       ...initialState,
-      markBootReady: () => set({ bootReady: true, phase: 'login' }),
+      markBootReady: () => {
+        const rememberedUsername = get().rememberedUsername;
+
+        if (rememberedUsername && get().profiles[rememberedUsername]) {
+          const resolvedGrade = resolveLifetimeGrade(rememberedUsername, get().gameHistoryByProfile);
+
+          set({
+            bootReady: true,
+            activeUsername: rememberedUsername,
+            grade: resolvedGrade,
+            phase: 'start',
+            menuView: 'home',
+          });
+
+          return;
+        }
+
+        set({
+          bootReady: true,
+          activeUsername: null,
+          rememberedUsername: null,
+          phase: 'login',
+        });
+      },
       setGrade: (grade) => set({ grade }),
       syncHUD: (payload) => {
         // Keep HUD updates local to UI state to avoid frequent profile/localStorage writes.
@@ -520,6 +546,7 @@ export const useGameStore = create<GameStoreState>()(
         profiles: get().profiles,
         gameHistoryByProfile: get().gameHistoryByProfile,
         activeUsername: get().activeUsername,
+        rememberedUsername: get().rememberedUsername,
       }),
       openMenuView: (menuView) => set({
         ...initialState,
@@ -532,8 +559,19 @@ export const useGameStore = create<GameStoreState>()(
         profiles: get().profiles,
         gameHistoryByProfile: get().gameHistoryByProfile,
         activeUsername: get().activeUsername,
+        rememberedUsername: get().rememberedUsername,
       }),
-      loginProfile: (username, password) => {
+      logOff: () => set({
+        ...initialState,
+        bootReady: true,
+        phase: 'login',
+        leaderboard: get().leaderboard,
+        profiles: get().profiles,
+        gameHistoryByProfile: get().gameHistoryByProfile,
+        activeUsername: null,
+        rememberedUsername: null,
+      }),
+      loginProfile: (username, password, keepLoggedIn) => {
         const normalizedUsername = username.trim();
 
         if (!normalizedUsername) {
@@ -563,6 +601,7 @@ export const useGameStore = create<GameStoreState>()(
 
         set({
           activeUsername: normalizedUsername,
+          rememberedUsername: keepLoggedIn ? normalizedUsername : null,
           grade: resolvedGrade,
           phase: 'start',
           menuView: 'home',
@@ -570,7 +609,7 @@ export const useGameStore = create<GameStoreState>()(
 
         return { success: true };
       },
-      createAndLoginProfile: (username, password) => {
+      createAndLoginProfile: (username, password, keepLoggedIn = false) => {
         const normalizedUsername = username.trim();
 
         if (!normalizedUsername) {
@@ -611,6 +650,7 @@ export const useGameStore = create<GameStoreState>()(
             [normalizedUsername]: profile,
           },
           activeUsername: normalizedUsername,
+          rememberedUsername: keepLoggedIn ? normalizedUsername : null,
           phase: 'start',
           menuView: 'home',
         }));
@@ -683,9 +723,9 @@ export const useGameStore = create<GameStoreState>()(
           leaderboard: migrateLeaderboard(rawState.leaderboard),
           profiles: migrateProfiles(rawState.profiles),
           gameHistoryByProfile: migrateGameHistoryByProfile(rawState.gameHistoryByProfile),
-          activeUsername:
-            typeof rawState.activeUsername === 'string' || rawState.activeUsername === null
-              ? rawState.activeUsername
+          rememberedUsername:
+            typeof rawState.rememberedUsername === 'string' || rawState.rememberedUsername === null
+              ? rawState.rememberedUsername
               : null,
         };
       },
@@ -693,7 +733,7 @@ export const useGameStore = create<GameStoreState>()(
         leaderboard: state.leaderboard,
         profiles: state.profiles,
         gameHistoryByProfile: state.gameHistoryByProfile,
-        activeUsername: state.activeUsername,
+        rememberedUsername: state.rememberedUsername,
       }),
     },
   ),

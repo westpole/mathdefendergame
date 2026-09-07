@@ -16,14 +16,17 @@ function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
 
 describe('LoginOverlay', () => {
   beforeEach(() => {
-    setMockStoreState({ bootReady: true, phase: 'login' });
+    setMockStoreState({ bootReady: true, phase: 'login', rememberedUsername: null });
   });
 
-  it('shows login tab by default', () => {
+  it('shows login state by default with keep me logged in option', () => {
     render(<LoginOverlay />);
 
-    expect(screen.getByRole('tab', { name: /login/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('button', { name: /^login$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create profile/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/keep me logged in/i)).toBeInTheDocument();
     expect(screen.getByText(/login with your existing profile/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toHaveFocus();
   });
 
   it('shows suggestion to create profile when username does not exist', () => {
@@ -32,54 +35,79 @@ describe('LoginOverlay', () => {
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: 'UnknownPilot' },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/^password$/i), {
       target: { value: 'Abc12345' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /login to game/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^login$/i }));
 
     expect(screen.getByRole('alert')).toHaveTextContent(/username not found/i);
     expect(screen.getByRole('alert')).toHaveTextContent(/create profile/i);
   });
 
-  it('shows validation error for invalid password when creating profile', () => {
+  it('switches to create profile and returns to login on cancel', () => {
     render(<LoginOverlay />);
 
-    fireEvent.click(screen.getByRole('tab', { name: /create profile/i }));
-
-    fireEvent.change(screen.getByLabelText(/username/i), {
-      target: { value: 'AcePilot' },
-    });
-    fireEvent.change(screen.getByLabelText(/password/i), {
-      target: { value: 'abcdef12' },
-    });
     fireEvent.click(screen.getByRole('button', { name: /create profile/i }));
 
-    expect(screen.getByRole('alert')).toHaveTextContent(/must be exactly 8 characters/i);
+    expect(screen.getByRole('button', { name: /^create$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/verify password/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/keep me logged in/i)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+
+    expect(screen.getByRole('button', { name: /^login$/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/keep me logged in/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/verify password/i)).not.toBeInTheDocument();
   });
 
-  it('creates profile from create profile tab when form is valid', () => {
+  it('shows validation error when verify password does not match', () => {
     render(<LoginOverlay />);
 
-    fireEvent.click(screen.getByRole('tab', { name: /create profile/i }));
+    fireEvent.click(screen.getByRole('button', { name: /create profile/i }));
 
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: 'AcePilot' },
     });
-    fireEvent.change(screen.getByLabelText(/password/i), {
+    fireEvent.change(screen.getByLabelText(/^password$/i), {
       target: { value: 'Abc12345' },
     });
+    fireEvent.change(screen.getByLabelText(/verify password/i), {
+      target: { value: 'Abc12344' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^create$/i }));
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/must match/i);
+  });
+
+  it('creates profile from create profile state when form is valid', () => {
+    render(<LoginOverlay />);
+
     fireEvent.click(screen.getByRole('button', { name: /create profile/i }));
+
+    fireEvent.change(screen.getByLabelText(/username/i), {
+      target: { value: 'AcePilot' },
+    });
+    fireEvent.change(screen.getByLabelText(/^password$/i), {
+      target: { value: 'Abc12345' },
+    });
+    fireEvent.change(screen.getByLabelText(/verify password/i), {
+      target: { value: 'Abc12345' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^create$/i }));
 
     const state = gameStore.getState();
     expect(state.phase).toBe('start');
     expect(state.activeUsername).toBe('AcePilot');
+    expect(state.rememberedUsername).toBeNull();
   });
 
-  it('logs in and navigates to start when username exists and password matches', () => {
+  it('logs in with keep me logged in enabled', () => {
     gameStore.getState().createAndLoginProfile('AcePilot', 'Abc12345');
     gameStore.setState({
       phase: 'login',
       activeUsername: null,
+      rememberedUsername: null,
     });
 
     render(<LoginOverlay />);
@@ -90,10 +118,12 @@ describe('LoginOverlay', () => {
     fireEvent.change(screen.getByLabelText(/password/i), {
       target: { value: 'Abc12345' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /login to game/i }));
+    fireEvent.click(screen.getByLabelText(/keep me logged in/i));
+    fireEvent.click(screen.getByRole('button', { name: /^login$/i }));
 
     const state = gameStore.getState();
     expect(state.phase).toBe('start');
     expect(state.activeUsername).toBe('AcePilot');
+    expect(state.rememberedUsername).toBe('AcePilot');
   });
 });

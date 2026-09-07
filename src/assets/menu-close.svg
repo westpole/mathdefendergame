@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Navy Blue Rounded Background -->
+  <rect width="256" height="256" rx="56" ry="56" fill="#b91c1c" />
+
+  <!-- Grey Close (X) Bar 1 -->
+  <rect x="52" y="116" width="152" height="24" rx="12" ry="12" fill="#ccc" transform="rotate(45 128 128)" />
+
+  <!-- Grey Close (X) Bar 2 -->
+  <rect x="52" y="116" width="152" height="24" rx="12" ry="12" fill="#ccc" transform="rotate(-45 128 128)" />
+</svg>

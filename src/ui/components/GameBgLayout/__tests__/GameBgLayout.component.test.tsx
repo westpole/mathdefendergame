@@ -1,10 +1,10 @@
 import { render } from '@testing-library/react';
 
-import { CitySceneLayout } from '../index';
+import { GameBgLayout } from '../index';
 
-describe('CitySceneLayout Component', () => {
+describe('GameBgLayout Component', () => {
   it('should render the city background layer', () => {
-    const { container } = render(<CitySceneLayout />);
+    const { container } = render(<GameBgLayout />);
     const cityBackgroundLayer = container.querySelector('.city-background-layer');
 
     expect(cityBackgroundLayer).toBeInTheDocument();
@@ -12,7 +12,7 @@ describe('CitySceneLayout Component', () => {
   });
 
   it('should render a div for the background layer', () => {
-    const { container } = render(<CitySceneLayout />);
+    const { container } = render(<GameBgLayout />);
     const cityBackgroundLayer = container.querySelector('.city-background-layer');
 
     expect(cityBackgroundLayer?.tagName).toBe('DIV');

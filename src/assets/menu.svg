@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <!-- Navy Blue Rounded Background -->
+  <rect width="256" height="256" rx="56" ry="56" fill="#ccc" />
+
+  <!-- Grey Horizontal Menu Lines -->
+  <rect x="52" y="66" width="152" height="24" rx="12" ry="12" fill="#111827" />
+  <rect x="52" y="116" width="152" height="24" rx="12" ry="12" fill="#111827" />
+  <rect x="52" y="166" width="152" height="24" rx="12" ry="12" fill="#111827" />
+</svg>

@@ -14,6 +14,7 @@ describe('gameStore', () => {
       menuView: 'home',
       bootReady: false,
       activeUsername: null,
+      rememberedUsername: null,
       profiles: {},
       grade: 'trainee',
       score: 0,
@@ -46,10 +47,32 @@ describe('gameStore', () => {
       expect(phase).toBe('booting');
     });
 
-    it('should transition to menu after boot', () => {
+    it('should transition to login after boot when no remembered profile exists', () => {
       gameStore.getState().markBootReady();
       expect(gameStore.getState().bootReady).toBe(true);
       expect(gameStore.getState().phase).toBe('login');
+    });
+
+    it('should restore remembered user after boot', () => {
+      gameStore.setState({
+        profiles: {
+          PilotOne: {
+            username: 'PilotOne',
+            password: 'Abc12345',
+            bestScore: 100,
+            highestStage: 3,
+            preferredGrade: 'trainee',
+            createdAt: 1,
+            updatedAt: 2,
+          },
+        },
+        rememberedUsername: 'PilotOne',
+      });
+
+      gameStore.getState().markBootReady();
+
+      expect(gameStore.getState().phase).toBe('start');
+      expect(gameStore.getState().activeUsername).toBe('PilotOne');
     });
 
     it('should start playing phase', () => {
@@ -152,11 +175,33 @@ describe('gameStore', () => {
       gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
       gameStore.setState({ phase: 'login', activeUsername: null });
 
-      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12345');
+      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12345', false);
 
       expect(result.success).toBe(true);
       expect(gameStore.getState().activeUsername).toBe('PilotOne');
       expect(gameStore.getState().phase).toBe('start');
+      expect(gameStore.getState().rememberedUsername).toBeNull();
+    });
+
+    it('remembers successful login when keep me logged in is selected', () => {
+      gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+      gameStore.setState({ phase: 'login', activeUsername: null, rememberedUsername: null });
+
+      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12345', true);
+
+      expect(result.success).toBe(true);
+      expect(gameStore.getState().rememberedUsername).toBe('PilotOne');
+    });
+
+    it('logs off by clearing active and remembered login credentials', () => {
+      gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345', true);
+
+      gameStore.getState().logOff();
+
+      expect(gameStore.getState().phase).toBe('login');
+      expect(gameStore.getState().activeUsername).toBeNull();
+      expect(gameStore.getState().rememberedUsername).toBeNull();
+      expect(gameStore.getState().profiles.PilotOne).toBeTruthy();
     });
 
     it('derives the login grade from cumulative game history', () => {
@@ -197,14 +242,14 @@ describe('gameStore', () => {
         },
       });
 
-      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12345');
+      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12345', false);
 
       expect(result.success).toBe(true);
       expect(gameStore.getState().grade).toBe('commander');
     });
 
     it('shows create profile suggestion when username is not found', () => {
-      const result = gameStore.getState().loginProfile('GhostPilot', 'Abc12345');
+      const result = gameStore.getState().loginProfile('GhostPilot', 'Abc12345', false);
 
       expect(result.success).toBe(false);
       expect(result.error).toMatch(/username not found/i);
@@ -215,7 +260,7 @@ describe('gameStore', () => {
       gameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
       gameStore.setState({ phase: 'login', activeUsername: null });
 
-      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12344');
+      const result = gameStore.getState().loginProfile('PilotOne', 'Abc12344', false);
 
       expect(result.success).toBe(false);
       expect(result.error).toMatch(/incorrect password/i);

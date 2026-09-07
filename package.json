@@ -39,13 +39,17 @@
     "build:win": "npm run build:web && electron-builder",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "release:guard": "node scripts/release-guard.mjs",
     "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 0",
     "git:commit": "git add . && git commit -m \"build: bump up to a new version\"",
     "git:push": "git push origin master && git push --tags",
     "which:version": "npx conventional-recommended-bump -p conventionalcommits",
     "release:commit": "npm run changelog && npm run git:commit && npm run git:push",
+    "prerelease:major": "npm run release:guard",
     "release:major": "npm version major && npm run release:commit",
+    "prerelease:minor": "npm run release:guard",
     "release:minor": "npm version minor && npm run release:commit",
+    "prerelease:patch": "npm run release:guard",
     "release:patch": "npm version patch && npm run release:commit"
   },
   "dependencies": {

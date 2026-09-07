@@ -156,7 +156,7 @@ export default preview;
 
 ## 6. Layout & Viewports
 
-- **`'fullscreen'` layout**: Use for screens/overlays that fill the viewport (HUDOverlay, GameOverOverlay, MainMenuOverlay).
+- **`'fullscreen'` layout**: Use for screens/overlays that fill the viewport (HUDOverlay, GameOverOverlay, HomeOverlay).
 - **`'centered'` layout**: Use for small, isolated components (buttons, cards, badges) to avoid edge-to-edge stretching.
 
 ## 7. Mock Data Files

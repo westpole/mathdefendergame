@@ -73,7 +73,9 @@ Use the release-win-game agent for a major release. Update the changelog, create
 
 Before invoking the agent, make sure:
 
+- you are currently on the `master` branch
 - the intended code changes are already merged or present in the working tree
+- there is at least one commit since the latest release tag
 - tests and linting have been run for the release candidate
 - you know the target release type
 - you are clear about whether the agent should push or stop for review
@@ -92,5 +94,7 @@ A successful run should leave you with some or all of the following, depending o
 ## Notes
 
 - Use the exact agent name: `release-win-game`.
+- The release workflow rejects the run with a message when the current branch is not `master`.
+- The release workflow rejects the run with a message when there are no commits since the latest release tag.
 - Be explicit about guardrails such as `stop before pushing` if you want a review checkpoint.
 - If you want human review before any irreversible git step, say so in the prompt.

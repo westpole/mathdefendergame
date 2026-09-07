@@ -133,6 +133,16 @@ export function openMenuView(menuView: MenuView): void {
   gameStore.getState().openMenuView(menuView);
 }
 
+export function logOff(): void {
+  const game = ensurePhaserGame();
+
+  if (game.scene.isActive('GameScene') || game.scene.isPaused('GameScene')) {
+    game.scene.stop('GameScene');
+  }
+
+  gameStore.getState().logOff();
+}
+
 export function onElectronCloseRequested(): void {
   pauseGameForManualEnd('window-close');
 }

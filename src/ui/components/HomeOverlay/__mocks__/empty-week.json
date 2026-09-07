@@ -1,0 +1,46 @@
+{
+  "phase": "start",
+  "menuView": "home",
+  "bootReady": true,
+  "activeUsername": "AcePilot",
+  "grade": "cadet",
+  "score": 0,
+  "profiles": {
+    "AcePilot": {
+      "username": "AcePilot",
+      "password": "Pass1234",
+      "bestScore": 220,
+      "highestStage": 9,
+      "preferredGrade": "cadet",
+      "createdAt": 1786000000000,
+      "updatedAt": 1786000000000
+    }
+  },
+  "gameHistoryByProfile": {
+    "AcePilot": [
+      {
+        "key": "older-run-1",
+        "playedAt": 1786406400000,
+        "correctAnswers": 14,
+        "incorrectAnswers": 4,
+        "averageAnswerTimeMs": 1800,
+        "mostProblematicOperation": "+",
+        "operationStats": {
+          "+": { "attempts": 5, "incorrect": 2, "avgTimeMs": 1900 },
+          "-": { "attempts": 5, "incorrect": 1, "avgTimeMs": 1750 },
+          "*": { "attempts": 4, "incorrect": 1, "avgTimeMs": 1800 },
+          "/": { "attempts": 4, "incorrect": 0, "avgTimeMs": 1700 }
+        },
+        "gradeAtFinish": "cadet",
+        "finalScore": 220,
+        "finalPerfScore": 78
+      }
+    ]
+  },
+  "leaderboard": {
+    "trainee": [],
+    "cadet": [],
+    "commander": [],
+    "major-general": []
+  }
+}

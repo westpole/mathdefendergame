@@ -28,10 +28,6 @@
   width: min(92%, 480px);
 }
 
-.login-tabs {
-  margin-top: $spacing-md;
-}
-
 .login-subtitle {
   margin: $spacing-md 0 1.5em 0 !important;
 }
@@ -50,6 +46,22 @@
   color: #fde68a;
   font-size: 13px;
   line-height: 1.4;
+}
+
+.checkbox-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  color: $text-primary;
+  font-size: 14px;
+  margin-top: 0.25em;
+}
+
+.login-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-sm;
+  margin-top: $spacing-sm;
 }
 
 // Modal Panel Sizing

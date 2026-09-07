@@ -19,7 +19,7 @@ export function MyComponent() {
 Add these to make E2E tests more reliable:
 
 **UI Overlays:**
-- ✅ `main-menu` - MainMenuOverlay (added)
+- ✅ `main-menu` - HomeOverlay (added)
 - `rules-overlay` - RulesOverlay
 - `game-over-overlay` - GameOverOverlay
 - `hud-overlay` - HUDOverlay

@@ -58,33 +58,66 @@
   flex-wrap: wrap;
 }
 
-.start-menu-shell {
+.menu-shell {
   position: absolute;
   top: $spacing-lg;
   left: $spacing-lg;
-  z-index: $z-hud + 1;
+  z-index: $z-menu-overlay;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: $spacing-sm;
   pointer-events: auto;
 }
 
-.start-menu-button,
-.start-menu-option {
-  min-width: 180px;
+.menu-button,
+.menu-close-button {
+  width: 52px;
+  height: 52px;
+  min-width: 52px;
+  min-height: 52px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: $z-menu-icon;
 }
 
-.start-menu-options {
+.menu-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-menu-overlay;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-lg;
+  @include glassmorphism-panel;
+}
+
+.menu-panel {
+  width: min(92vw, 460px);
   display: flex;
   flex-direction: column;
   gap: $spacing-sm;
-  padding: $spacing-sm;
-  border: 1px solid $border-panel;
-  border-radius: $radius-lg;
-  @include glassmorphism-panel;
+  padding: $spacing-lg;
+  pointer-events: auto;
+}
 
-  .start-menu-option {
+.menu-close-button {
+  align-self: flex-end;
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  .menu-option {
+    width: 100%;
+    text-align: left;
     justify-content: flex-start;
   }
 }
@@ -106,6 +139,142 @@
   display: block;
   margin: 0 auto 1em auto;
   border-radius: 50%;
+}
+
+.home-report-panel {
+  width: min(92%, 760px);
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.home-report-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xl;
+}
+
+.home-report-grade-icon-wrap {
+  flex-shrink: 0;
+}
+
+.home-report-grade-icon {
+  margin-bottom: 0;
+}
+
+.home-report-copy {
+  flex: 1;
+}
+
+.home-report-eyebrow {
+  margin: 0 0 $spacing-sm;
+  color: $text-muted;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.home-report-window {
+  margin: 0;
+  color: $text-secondary;
+  font-size: 0.82rem;
+  letter-spacing: 0.06em;
+}
+
+.home-report-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $spacing-sm;
+}
+
+.home-report-stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: $spacing-md;
+  background: rgba(15, 23, 42, 0.28);
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-lg;
+
+  strong {
+    color: $text-primary;
+    font-size: 1.2rem;
+  }
+}
+
+.home-report-stat-label {
+  color: $text-muted;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-report-empty-state {
+  padding: $spacing-lg;
+  border: 1px dashed $border-panel-light;
+  border-radius: $radius-lg;
+  color: $text-secondary;
+  text-align: center;
+}
+
+.home-report-progress-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.home-report-progress-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: $spacing-md;
+
+  h2 {
+    margin: 0;
+    color: $text-primary;
+    font-size: 1.1rem;
+  }
+}
+
+.home-report-progress-note,
+.home-report-latest-run {
+  margin: 0;
+  color: $text-secondary;
+  font-size: 0.82rem;
+}
+
+.home-report-progress-score {
+  color: $color-primary-yellow;
+  font-size: 1rem;
+}
+
+.home-report-progress-labels {
+  margin-top: 0;
+}
+
+.home-report-progress-fill--trainee,
+.home-report-progress-marker--trainee {
+  background-color: #ef4444;
+}
+
+.home-report-progress-fill--cadet,
+.home-report-progress-marker--cadet {
+  background-color: #facc15;
+}
+
+.home-report-progress-fill--commander,
+.home-report-progress-marker--commander {
+  background-color: #22c55e;
+}
+
+.home-report-progress-fill--major-general,
+.home-report-progress-marker--major-general,
+.home-report-major-general-box {
+  background-color: #4b5563;
+}
+
+.home-report-major-general-box {
+  color: $text-primary;
 }
 
 .profile-panel {
@@ -174,21 +343,22 @@
   gap: $spacing-xl;
 }
 
-.profile-grade-icon-wrap {
+.profile-icon {
   display: flex;
+  position: relative;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 120px;
-  height: 120px;
+  overflow: hidden;
 }
 
-.profile-grade-icon {
+.profile-icon img {
   display: block;
-  width: 120px;
-  height: 120px;
-  object-fit: contain;
-  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .profile-stat-list {
@@ -332,13 +502,13 @@
 }
 
 @media (max-width: $breakpoint-mobile) {
-  .start-menu-shell {
+  .menu-shell {
     top: $spacing-sm;
     left: $spacing-sm;
   }
 
-  .start-menu-button,
-  .start-menu-option {
+  .menu-button,
+  .menu-option {
     min-width: 160px;
   }
 }
@@ -359,6 +529,21 @@
 
   .profile-stat-grid {
     grid-template-columns: 1fr;
+  }
+
+  .home-report-header {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .home-report-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .home-report-progress-header {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .performance-table {
