@@ -1,4 +1,21 @@
 
+## [1.0.1](https://github.com/westpole/mathdefendergame/compare/v1.0.0...v1.0.1) (2026-09-07)
+
+### Features
+
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) add ProfileIcon component and replace grade icons in overlays with profile icons ([c01e9db](https://github.com/westpole/mathdefendergame/commit/c01e9db71ff9cfd74f574706731a529296cb5bbc))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) add web-first mobile migration plan with detailed separation strategy for Electron and browser builds ([973a974](https://github.com/westpole/mathdefendergame/commit/973a9748dfeb51f8b166db875001898f88292047))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) implement log off functionality and update related tests and components ([60aff1a](https://github.com/westpole/mathdefendergame/commit/60aff1a3f22e6d55ba31bae047f38fb4cfa00ecb))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) implement progress tracking and reporting features in HomeOverlay ([a02c92f](https://github.com/westpole/mathdefendergame/commit/a02c92feb715f0e10119274a73b833b0c0862bea))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) implement release guard to ensure valid release conditions and update related scripts ([c77c1a2](https://github.com/westpole/mathdefendergame/commit/c77c1a2edd82deb96dbc11ebecbd2768f76bd92a))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) implement remembered username functionality and update login overlay ([a9ba8d0](https://github.com/westpole/mathdefendergame/commit/a9ba8d023a8cb6b3b85dca784cd4270af8f5905c))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) replace CitySceneLayout with GameBgLayout and add related stories and tests ([bb2e019](https://github.com/westpole/mathdefendergame/commit/bb2e019ba7c25289fb992f088467fcb2a7d3f731))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) replace StartMenuControls with MenuControls and update related stories ([b5d2737](https://github.com/westpole/mathdefendergame/commit/b5d27377945f1ff2eecc6c8d70284235a79b816a))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) update GameBgLayout and HomeOverlay stories to reflect new component structure ([60738bc](https://github.com/westpole/mathdefendergame/commit/60738bc2759802a0aec6472ba46e5c46b821617b))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) update menu and close SVG styles for improved UI consistency ([34ad9ce](https://github.com/westpole/mathdefendergame/commit/34ad9ceb8173c6050b5b039c3cbcb6ca3387fe7c))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) update menu navigation and styles, add close functionality and icons ([e45a583](https://github.com/westpole/mathdefendergame/commit/e45a5837773be4f3e60ef5c75400961de2a8f820))
+* [#20](https://github.com/westpole/mathdefendergame/issues/20) update overlays to replace MainMenuOverlay with HomeOverlay and adjust related documentation ([2cfad93](https://github.com/westpole/mathdefendergame/commit/2cfad939eebb7ca1f807d813afffaf19381c0de7))
+
 ## [1.0.0](https://github.com/westpole/mathdefendergame/compare/v0.1.1...v1.0.0) (2026-08-28)
 
 ### Features
