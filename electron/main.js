@@ -8,10 +8,33 @@ function getRuntimeContext(options = {}) {
   };
 }
 
+function getArgValue(argv, prefix) {
+  return argv.find((arg) => arg.startsWith(prefix))?.slice(prefix.length) ?? null;
+}
+
+function resolveRendererEntry(options = {}) {
+  const { electron, argv } = getRuntimeContext(options);
+  const { app } = electron;
+  const explicitRendererUrl = options.rendererUrl ?? getArgValue(argv, '--renderer-url=');
+  const explicitRendererBuildDir = options.rendererBuildDir ?? getArgValue(argv, '--renderer-build-dir=');
+
+  if (!app.isPackaged && explicitRendererUrl) {
+    return {
+      type: 'url',
+      target: explicitRendererUrl,
+    };
+  }
+
+  return {
+    type: 'file',
+    target: path.join(__dirname, `../${explicitRendererBuildDir ?? 'build'}/index.html`),
+  };
+}
+
 function buildMenu(options = {}) {
   const { electron, argv } = getRuntimeContext(options);
   const { app, Menu } = electron;
-  const isDev = !app.isPackaged && argv.includes('--dev');
+  const isDev = !app.isPackaged && resolveRendererEntry(options).type === 'url';
   const isDebug = argv.includes('--inspect');
   const template = [];
 
@@ -33,7 +56,8 @@ function buildMenu(options = {}) {
 function createWindow(options = {}) {
   const { electron, argv } = getRuntimeContext(options);
   const { app, BrowserWindow, Menu } = electron;
-  const isDev = !app.isPackaged && argv.includes('--dev');
+  const rendererEntry = resolveRendererEntry(options);
+  const isDev = !app.isPackaged && rendererEntry.type === 'url';
   const isDebug = argv.includes('--inspect');
   const win = new BrowserWindow({
     width: 900,
@@ -51,9 +75,9 @@ function createWindow(options = {}) {
   Menu.setApplicationMenu(buildMenu(options));
 
   if (isDev) {
-    win.loadURL('http://localhost:5173');
+    win.loadURL(rendererEntry.target);
   } else {
-    win.loadFile(path.join(__dirname, '../build/index.html'));
+    win.loadFile(rendererEntry.target);
   }
 
   // Open DevTools in debug mode (localhost only, not in packaged app)
@@ -201,5 +225,6 @@ if (process.type === 'browser') {
 module.exports = {
   buildMenu,
   createWindow,
+  resolveRendererEntry,
   initializeApp,
 };

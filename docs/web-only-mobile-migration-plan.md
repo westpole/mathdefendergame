@@ -111,6 +111,15 @@ Why this matters:
 
 - It makes mobile web deployment and Windows packaging two outputs from the same renderer instead of competing app modes.
 
+Current repo mapping:
+
+1. `dev:web` runs the renderer only with Vite.
+2. `dev:electron` runs the renderer plus the Electron wrapper against the Vite URL.
+3. `start:electron` loads the built renderer through Electron.
+4. `build:web` remains the primary production renderer build.
+5. `build:web:e2e` creates the E2E-flavored renderer build without packaging.
+6. `build:win` packages Electron around the existing web build output.
+
 ### Phase 3: Fix The App Shell For Mobile Browsers
 
 Goal: make the root layout stable on phones and tablets.

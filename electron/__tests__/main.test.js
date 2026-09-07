@@ -63,7 +63,7 @@ describe('Electron Main Process', () => {
     });
 
     it('should include developer tools menu in development mode', () => {
-      mainProcess.buildMenu(createRuntimeOptions({ argv: ['node', 'electron', '--dev'] }));
+      mainProcess.buildMenu(createRuntimeOptions({ argv: ['node', 'electron', '--renderer-url=http://localhost:5173'] }));
 
       expect(Menu.buildFromTemplate).toHaveBeenCalledWith(expect.arrayContaining([
         expect.objectContaining({
@@ -95,7 +95,9 @@ describe('Electron Main Process', () => {
 
   describe('Window management', () => {
     it('should load URL in development mode', () => {
-      const win = mainProcess.createWindow(createRuntimeOptions({ argv: ['node', 'electron', '--dev'] }));
+      const win = mainProcess.createWindow(
+        createRuntimeOptions({ argv: ['node', 'electron', '--renderer-url=http://localhost:5173'] }),
+      );
 
       expect(win.loadURL).toHaveBeenCalledWith('http://localhost:5173');
     });
@@ -104,6 +106,14 @@ describe('Electron Main Process', () => {
       const win = mainProcess.createWindow(createRuntimeOptions());
 
       expect(win.loadFile).toHaveBeenCalledWith(expect.stringMatching(/build[\\/]index\.html$/));
+    });
+
+    it('should allow overriding the renderer build directory for file-based runs', () => {
+      const win = mainProcess.createWindow(
+        createRuntimeOptions({ argv: ['node', 'electron', '--renderer-build-dir=dist-web'] }),
+      );
+
+      expect(win.loadFile).toHaveBeenCalledWith(expect.stringMatching(/dist-web[\\/]index\.html$/));
     });
 
     it('should open dev tools when requested', () => {
