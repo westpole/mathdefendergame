@@ -7,6 +7,7 @@ import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import escapePauseMock from './__mocks__/escape-pause.json';
+import backgroundPauseMock from './__mocks__/background-pause.json';
 import savingBeforeCloseMock from './__mocks__/saving-before-close.json';
 import windowCloseMock from './__mocks__/window-close.json';
 import { PauseOverlay } from '.';
@@ -59,6 +60,13 @@ export const WindowClosePrompt: Story = {
   name: 'Window close prompt',
   args: {
     initialState: windowCloseMock,
+  },
+};
+
+export const BackgroundPause: Story = {
+  name: 'Background pause prompt',
+  args: {
+    initialState: backgroundPauseMock,
   },
 };
 

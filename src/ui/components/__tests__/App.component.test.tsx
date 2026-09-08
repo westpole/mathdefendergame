@@ -7,6 +7,8 @@ import { App } from '../../../App';
 
 import baseStoreState from '../__mocks__/base-store-state.json';
 
+const originalVisibilityState = document.visibilityState;
+
 const platformMocks = vi.hoisted(() => ({
   subscribeToAppCloseEvents: vi.fn(),
 }));
@@ -59,11 +61,23 @@ function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
   });
 }
 
+function setVisibilityState(visibilityState: DocumentVisibilityState) {
+  Object.defineProperty(document, 'visibilityState', {
+    configurable: true,
+    value: visibilityState,
+  });
+}
+
 describe('App start menu controls', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     platformMocks.subscribeToAppCloseEvents.mockReturnValue(vi.fn());
+    setVisibilityState('visible');
     setMockStoreState();
+  });
+
+  afterEach(() => {
+    setVisibilityState(originalVisibilityState);
   });
 
   it('shows the loading overlay until boot completes and only shows the menu button in the start phase', () => {
@@ -240,5 +254,31 @@ describe('App start menu controls', () => {
     unmount();
 
     expect(uiSceneMocks.destroyGame).toHaveBeenCalledWith({ id: 'game-instance' });
+  });
+
+  it('pauses active gameplay when the document is hidden', () => {
+    setMockStoreState({ bootReady: true, phase: 'playing' });
+
+    render(<App />);
+
+    act(() => {
+      setVisibilityState('hidden');
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(uiSceneMocks.pauseGameForManualEnd).toHaveBeenCalledWith('background');
+  });
+
+  it('does not trigger a background pause outside active gameplay', () => {
+    setMockStoreState({ bootReady: true, phase: 'start' });
+
+    render(<App />);
+
+    act(() => {
+      setVisibilityState('hidden');
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(uiSceneMocks.pauseGameForManualEnd).not.toHaveBeenCalled();
   });
 });

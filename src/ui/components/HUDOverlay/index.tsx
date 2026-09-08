@@ -11,7 +11,7 @@ import {
 import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
 
-const mobileKeypadValues = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '-', '0'];
+const mobileKeypadValues = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
 export function HUDOverlay() {
   const score = useGameStore((state) => state.score);

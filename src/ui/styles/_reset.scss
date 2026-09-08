@@ -7,6 +7,11 @@
   --app-shell-block-padding: clamp(12px, 3vh, 28px);
 }
 
+:root[data-app-orientation='landscape'] {
+  --app-shell-inline-padding: clamp(12px, 3vw, 24px);
+  --app-shell-block-padding: clamp(8px, 2vh, 16px);
+}
+
 @media (orientation: landscape) and (max-height: 720px) {
   :root {
     --app-shell-inline-padding: clamp(12px, 3vw, 24px);
@@ -24,7 +29,11 @@
 
 html {
   width: 100%;
+  min-width: 100%;
   min-height: 100%;
+  background-color: $bg-dark-base;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -38,9 +47,19 @@ body {
   align-items: center;
   width: 100%;
   min-height: var(--app-viewport-height);
+  overscroll-behavior: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #root {
   width: 100%;
   min-height: var(--app-viewport-height);
+}
+
+button,
+input,
+select,
+textarea {
+  touch-action: manipulation;
 }

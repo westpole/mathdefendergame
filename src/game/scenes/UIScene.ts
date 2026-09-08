@@ -9,7 +9,7 @@
 import Phaser from 'phaser';
 
 import { gameStore } from '@store/useGameStore';
-import type { MenuView } from '@store/useGameStore';
+import type { MenuView, PauseOverlayReason } from '@store/useGameStore';
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
 import { notifyAppCloseCancelled, notifyAppCloseReady } from '../../platform/adapter';
 
@@ -121,7 +121,7 @@ export function submitAnswerInput(): void {
   scene.submitAnswerInput();
 }
 
-export function pauseGameForManualEnd(reason: 'escape' | 'window-close'): void {
+export function pauseGameForManualEnd(reason: PauseOverlayReason): void {
   const scene = getGameScene();
 
   if (!scene) {

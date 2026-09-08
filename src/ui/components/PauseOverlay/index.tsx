@@ -20,10 +20,13 @@ export function PauseOverlay() {
   }
 
   const isWindowClosePrompt = pauseOverlay.reason === 'window-close';
+  const isBackgroundPause = pauseOverlay.reason === 'background';
   const title = isWindowClosePrompt ? 'Confirm Exit' : 'Game Paused';
   const message = isWindowClosePrompt
     ? 'Are you sure you want to end this game?'
-    : 'Game paused. You can resume any time or end this game.';
+    : isBackgroundPause
+      ? 'Game paused because this tab moved to the background. Resume when you are ready or end this game.'
+      : 'Game paused. You can resume any time or end this game.';
   const handleResume = isWindowClosePrompt ? cancelElectronClose : resumePausedGame;
 
   return (

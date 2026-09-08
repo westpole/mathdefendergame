@@ -16,9 +16,11 @@ function installViewportCssVars() {
     const viewport = window.visualViewport;
     const viewportHeight = viewport?.height ?? window.innerHeight;
     const viewportWidth = viewport?.width ?? window.innerWidth;
+    const orientation = viewportWidth > viewportHeight ? 'landscape' : 'portrait';
 
     documentElement.style.setProperty('--app-viewport-height', `${Math.round(viewportHeight)}px`);
     documentElement.style.setProperty('--app-viewport-width', `${Math.round(viewportWidth)}px`);
+    documentElement.dataset.appOrientation = orientation;
   };
 
   syncViewportCssVars();

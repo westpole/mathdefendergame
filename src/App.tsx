@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 
 import {
   destroyGame,
@@ -7,6 +7,7 @@ import {
   onElectronCloseConfirmed,
   shouldConfirmElectronClose,
   onElectronCloseRequested,
+  pauseGameForManualEnd,
 } from '@game/scenes/UIScene';
 import { subscribeToAppCloseEvents } from './platform/adapter';
 import { useGameStore } from '@store/useGameStore';
@@ -28,6 +29,13 @@ export function App() {
   const bootReady = useGameStore((state) => state.bootReady);
   const menuView = useGameStore((state) => state.menuView);
   const isStartPhase = bootReady && phase === 'start';
+  const handleVisibilityChange = useEffectEvent(() => {
+    if (document.visibilityState !== 'hidden' || phase !== 'playing') {
+      return;
+    }
+
+    pauseGameForManualEnd('background');
+  });
 
   useEffect(() => {
     const game = ensurePhaserGame();
@@ -41,6 +49,14 @@ export function App() {
     return () => {
       unsubscribe();
       destroyGame(game);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 
