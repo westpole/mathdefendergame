@@ -4,12 +4,14 @@ import { useEffect } from 'react';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
+import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import commanderRexMock from '../ProfileOverlay/__mocks__/commanderRex.json';
 import { PerformanceOverlay } from '.';
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
+  frame?: StoryFrame;
 }
 
 const meta = {
@@ -21,7 +23,7 @@ const meta = {
   },
   decorators: [
     (Story, context) => {
-      const { initialState } = context.args as StoryArgs;
+      const { initialState, frame } = context.args as StoryArgs;
 
       useEffect(() => {
         useGameStore.setState({
@@ -34,10 +36,8 @@ const meta = {
       }, [initialState]);
 
       return (
-        <GameCanvas>
-          <section style={{ width: '80%', margin: '3em auto' }}>
-            <Story />
-          </section>
+        <GameCanvas height={frame?.height} width={frame?.width}>
+          <Story />
         </GameCanvas>
       );
     },
@@ -50,6 +50,18 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   args: {
+    initialState: {
+      ...commanderRexMock,
+      menuView: 'performance',
+      phase: 'start',
+    },
+  },
+};
+
+export const MobilePerformance: Story = {
+  name: 'Mobile performance report',
+  args: {
+    frame: mobileStoryFrame,
     initialState: {
       ...commanderRexMock,
       menuView: 'performance',

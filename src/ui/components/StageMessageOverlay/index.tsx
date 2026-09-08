@@ -57,9 +57,11 @@ export function StageMessageOverlay() {
           <p>You cleared the stage, but made {stageMessage.stageIncorrect} mistake{stageMessage.stageIncorrect > 1 ? 's' : ''}.</p>
         )}
 
-        <button className="primary-button" onClick={continueGame} type="button">
-          Continue
-        </button>
+        <div className="action-row">
+          <button className="primary-button" onClick={continueGame} type="button">
+            Continue
+          </button>
+        </div>
       </div>
     </div>
   );

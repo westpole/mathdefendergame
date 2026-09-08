@@ -28,7 +28,7 @@
 }
 
 .menu-page-panel {
-  width: min(760px, 100%);
+  width: min(100%, 760px);
   overflow: auto;
 }
 
@@ -98,7 +98,7 @@
 }
 
 .menu-panel {
-  width: min(92vw, 460px);
+  width: min(100%, 460px);
   display: flex;
   flex-direction: column;
   gap: $spacing-sm;
@@ -142,7 +142,7 @@
 }
 
 .home-report-panel {
-  width: min(92%, 760px);
+  width: min(100%, 760px);
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
@@ -164,6 +164,10 @@
 
 .home-report-copy {
   flex: 1;
+
+  h1 {
+    overflow-wrap: anywhere;
+  }
 }
 
 .home-report-eyebrow {
@@ -278,11 +282,11 @@
 }
 
 .profile-panel {
-  width: min(760px, 100%);
+  width: min(100%, 760px);
 }
 
 .performance-panel {
-  width: min(860px, 100%);
+  width: min(100%, 860px);
 }
 
 .performance-subtitle {
@@ -458,6 +462,27 @@
   opacity: 0.9;
 }
 
+.profile-progress-fill--trainee,
+.profile-progress-marker--trainee {
+  background-color: #ef4444;
+}
+
+.profile-progress-fill--cadet,
+.profile-progress-marker--cadet {
+  background-color: #facc15;
+}
+
+.profile-progress-fill--commander,
+.profile-progress-marker--commander {
+  background-color: #22c55e;
+}
+
+.profile-progress-fill--major-general,
+.profile-progress-marker--major-general,
+.profile-major-general-box--major-general {
+  background-color: #4b5563;
+}
+
 .profile-progress-marker {
   position: absolute;
   top: 50%;
@@ -487,6 +512,7 @@
   font-size: 1.15rem;
   font-weight: 700;
   text-align: center;
+  color: $text-primary;
 }
 
 // Rules List
@@ -522,6 +548,20 @@
     overflow-y: auto;
   }
 
+  .menu-page-panel,
+  .home-report-panel,
+  .profile-panel,
+  .performance-panel {
+    width: 100%;
+  }
+
+  .menu-page-header,
+  .home-report-progress-header,
+  .profile-identity-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .profile-header {
     flex-direction: column;
     align-items: stretch;
@@ -537,13 +577,28 @@
     text-align: center;
   }
 
+  .home-report-copy,
+  .profile-stat-list {
+    text-align: left;
+  }
+
   .home-report-stat-grid {
     grid-template-columns: 1fr;
   }
 
-  .home-report-progress-header {
-    flex-direction: column;
-    align-items: flex-start;
+  .profile-progress-labels {
+    grid-template-columns: 1fr;
+    text-align: left;
+
+    span:nth-child(2),
+    span:last-child {
+      justify-self: start;
+      text-align: left;
+    }
+  }
+
+  .profile-progress-bar {
+    height: 22px;
   }
 
   .performance-table {

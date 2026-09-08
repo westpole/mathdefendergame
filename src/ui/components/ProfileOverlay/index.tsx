@@ -13,11 +13,6 @@ const EMPTY_HISTORY: Array<{
   incorrectAnswers: number;
   averageAnswerTimeMs: number;
 }> = [];
-const gradeColorMap: Record<Exclude<Grade, 'major-general'>, string> = {
-  trainee: '#ef4444',
-  cadet: '#facc15',
-  commander: '#22c55e',
-};
 
 function toGradeTitle(grade: Grade): string {
   return grade
@@ -91,15 +86,17 @@ export function ProfileOverlay() {
   const progressRatio = nextThreshold !== null && nextThreshold > currentThreshold
     ? Math.min(Math.max((progressScore - currentThreshold) / (nextThreshold - currentThreshold), 0), 1)
     : 0;
-  const trackColor = grade === 'trainee' ? gradeColorMap.trainee
-    : grade === 'cadet' ? gradeColorMap.cadet
-    : grade === 'commander' ? gradeColorMap.commander
-    : '#4b5563';
+  const progressTone = grade === 'trainee'
+    ? 'trainee'
+    : grade === 'cadet'
+      ? 'cadet'
+      : grade === 'commander'
+        ? 'commander'
+        : 'major-general';
 
   return (
-    <div className="grid-container" data-testid="profile-overlay">
-      <div className="contentBox">
-        <section className="overlay-panel menu-page-panel profile-panel">
+    <div className="overlay-screen overlay-screen--interactive" data-testid="profile-overlay">
+      <section className="overlay-panel menu-page-panel profile-panel">
           <div className="overlay-header">
             <h1>PROFILE</h1>
           </div>
@@ -135,7 +132,7 @@ export function ProfileOverlay() {
 
           <div className="profile-progress-section">
             {grade === 'major-general' ? (
-              <div className="profile-major-general-box" style={{ backgroundColor: '#4b5563', color: '#fff' }}>
+              <div className="profile-major-general-box profile-major-general-box--major-general">
                 <span>{formatScore(progressScore)}</span>
               </div>
             ) : (
@@ -146,14 +143,14 @@ export function ProfileOverlay() {
                   <span>{formatScore(nextThreshold ?? currentThreshold)}</span>
                 </div>
 
-                <div className="profile-progress-bar" style={{ width: '100%', height: '25px' }}>
+                <div className="profile-progress-bar">
                   <div
-                    className="profile-progress-fill"
-                    style={{ width: `${progressRatio * 100}%`, backgroundColor: trackColor }}
+                    className={`profile-progress-fill profile-progress-fill--${progressTone}`}
+                    style={{ width: `${progressRatio * 100}%` }}
                   />
                   <div
-                    className="profile-progress-marker"
-                    style={{ left: `${progressRatio * 100}%`, backgroundColor: trackColor }}
+                    className={`profile-progress-marker profile-progress-marker--${progressTone}`}
+                    style={{ left: `${progressRatio * 100}%` }}
                   />
                 </div>
 
@@ -163,8 +160,7 @@ export function ProfileOverlay() {
               </>
             )}
           </div>
-        </section>
-      </div>
+      </section>
     </div>
   );
 }

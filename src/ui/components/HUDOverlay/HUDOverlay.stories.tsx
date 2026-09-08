@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
+import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import { HUDOverlay } from '.';
 import fullShieldsLives from './__mocks__/full-shields-lives.json';
@@ -13,6 +14,7 @@ import lost4shields2lives from './__mocks__/1-shields-1-lives.json';
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
+  frame?: StoryFrame;
 }
 
 const meta = {
@@ -24,7 +26,7 @@ const meta = {
   },
   decorators: [
     (Story, context) => {
-      const { initialState } = context.args as StoryArgs;
+      const { initialState, frame } = context.args as StoryArgs;
 
       useEffect(() => {
         useGameStore.setState({
@@ -40,7 +42,7 @@ const meta = {
       }, [initialState]);
 
       return (
-        <GameCanvas>
+        <GameCanvas height={frame?.height} width={frame?.width}>
           <Story />
         </GameCanvas>
       );
@@ -84,5 +86,17 @@ export const lost4shields2livesStory: Story = {
   name: 'HUD: 1 shield and 1 life',
   args: {
     initialState: lost4shields2lives,
+  },
+};
+
+export const mobileKeypadLayoutStory: Story = {
+  name: 'Mobile HUD keypad layout',
+  args: {
+    frame: mobileStoryFrame,
+    initialState: {
+      ...fullShieldsLives,
+      inputBuffer: '-45',
+      streak: 18,
+    },
   },
 };

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
+import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import escapePauseMock from './__mocks__/escape-pause.json';
 import savingBeforeCloseMock from './__mocks__/saving-before-close.json';
@@ -12,6 +13,7 @@ import { PauseOverlay } from '.';
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
+  frame?: StoryFrame;
 }
 
 const meta = {
@@ -23,7 +25,7 @@ const meta = {
   },
   decorators: [
     (Story, context) => {
-      const { initialState } = context.args as StoryArgs;
+      const { initialState, frame } = context.args as StoryArgs;
 
       useEffect(() => {
         useGameStore.setState({
@@ -34,7 +36,7 @@ const meta = {
       }, [initialState]);
 
       return (
-        <GameCanvas>
+        <GameCanvas height={frame?.height} width={frame?.width}>
           <Story />
         </GameCanvas>
       );
@@ -64,5 +66,13 @@ export const SavingBeforeClose: Story = {
   name: 'Saving before close',
   args: {
     initialState: savingBeforeCloseMock,
+  },
+};
+
+export const MobileWindowClosePrompt: Story = {
+  name: 'Mobile window close prompt',
+  args: {
+    frame: mobileStoryFrame,
+    initialState: windowCloseMock,
   },
 };

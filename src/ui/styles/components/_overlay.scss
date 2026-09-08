@@ -5,6 +5,10 @@
 .overlay-screen {
   @include absolute-fill;
   @include flex-center;
+  padding: $spacing-lg;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 .overlay-screen--interactive {
@@ -16,7 +20,8 @@
 }
 
 .overlay-panel {
-  width: min(92%, 440px);
+  width: min(100%, 440px);
+  max-height: 100%;
   padding: $spacing-xl;
   border: 1px solid $border-panel;
   border-radius: $radius-xl;
@@ -40,6 +45,11 @@
     line-height: 1.5em;
     color: $text-secondary;
   }
+
+  @include mobile {
+    padding: $spacing-lg;
+    border-radius: $radius-lg;
+  }
 }
 
 .overlay-content {
@@ -54,4 +64,16 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2em;
+}
+
+@include mobile {
+  .overlay-screen {
+    align-items: flex-start;
+    justify-content: center;
+    padding: $spacing-md;
+  }
+
+  .overlay-header {
+    margin-bottom: $spacing-lg;
+  }
 }

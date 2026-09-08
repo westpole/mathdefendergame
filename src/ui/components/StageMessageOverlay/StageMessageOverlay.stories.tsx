@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
+import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 import { StageMessageState, useGameStore } from '@store/useGameStore';
 
 import wonMock from './__mocks__/won.json';
@@ -11,6 +12,7 @@ import { StageMessageOverlay } from '.';
 
 interface StoryArgs {
   initialState: StageMessageState;
+  frame?: StoryFrame;
 }
 
 const wonWithMistakeState: StageMessageState = {
@@ -32,7 +34,7 @@ const meta = {
   },
   decorators: [
     (Story, context) => {
-      const { initialState } = context.args as StoryArgs;
+      const { initialState, frame } = context.args as StoryArgs;
 
       useEffect(() => {
         useGameStore.setState({
@@ -43,7 +45,7 @@ const meta = {
       }, [initialState]);
 
       return (
-        <GameCanvas>
+        <GameCanvas height={frame?.height} width={frame?.width}>
           <Story />
         </GameCanvas>
       );
@@ -79,6 +81,14 @@ export const LostStage: Story = {
 export const LostStageLastLife: Story = {
   name: 'You lost stage (last life)',
   args: {
+    initialState: lostLastLifeState,
+  },
+};
+
+export const MobileLostStageLastLife: Story = {
+  name: 'Mobile lost stage (last life)',
+  args: {
+    frame: mobileStoryFrame,
     initialState: lostLastLifeState,
   },
 };
