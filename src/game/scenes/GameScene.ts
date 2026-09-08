@@ -74,7 +74,7 @@ export class GameScene extends Phaser.Scene {
 
     // ── Window resize listener ────────────────────────────────────────────────
     this.scale.on('resize', this.handleResize, this);
-    this.gameLogic.setCanvasHeight(this.scale.height);
+    this.gameLogic.setCanvasSize(this.scale.width, this.scale.height);
 
     // Initial HUD paint
     this.updateHUD();
@@ -246,7 +246,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleResize(gameSize: Phaser.Structs.Size): void {
-    this.gameLogic.setCanvasHeight(gameSize.height);
+    this.gameLogic.setCanvasSize(gameSize.width, gameSize.height);
   }
 
   private handleShutdown(): void {

@@ -8,6 +8,7 @@ import { GameScene } from '../GameScene';
 type GameScenePrivate = {
   handleKeyDown: (e: KeyboardEvent) => void;
   meteorTexts: Map<number, Phaser.GameObjects.Text>;
+  handleResize: (size: { width: number; height: number }) => void;
   handleShutdown: () => void;
   handleStreakReward: (lives: number) => void;
 };
@@ -28,7 +29,7 @@ const mockGameState = vi.hoisted(() => ({
     meteors: MockMeteor[];
     particles: MockParticle[];
     reset: ReturnType<typeof vi.fn>;
-    setCanvasHeight: ReturnType<typeof vi.fn>;
+    setCanvasSize: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     checkAnswer: ReturnType<typeof vi.fn>;
     setInputBuffer: ReturnType<typeof vi.fn>;
@@ -77,7 +78,7 @@ vi.mock('../../main', () => ({
     particles: MockParticle[] = [];
 
     reset = vi.fn();
-    setCanvasHeight = vi.fn();
+  setCanvasSize = vi.fn();
     update = vi.fn();
     checkAnswer = vi.fn();
     setInputBuffer = vi.fn((nextValue: string) => {
@@ -241,6 +242,7 @@ function setupScene() {
     off: vi.fn(),
   };
   const scale = {
+    width: 540,
     height: 720,
     on: vi.fn(),
     off: vi.fn(),
@@ -341,8 +343,18 @@ describe('GameScene', () => {
     expect(phaser.keyboard.off).toHaveBeenCalledWith('keydown', expect.any(Function), scene);
     expect(phaser.keyboard.on).toHaveBeenCalledWith('keydown', expect.any(Function), scene);
     expect(phaser.scale.on).toHaveBeenCalledWith('resize', expect.any(Function), scene);
-    expect(mockGameState.lastInstance?.setCanvasHeight).toHaveBeenCalledWith(720);
+    expect(mockGameState.lastInstance?.setCanvasSize).toHaveBeenCalledWith(540, 720);
     expect(store.syncHUD).toHaveBeenCalledWith({ inputBuffer: '' });
+  });
+
+  it('updates the live canvas size when Phaser resizes', () => {
+    const { scene } = setupScene();
+
+    scene.init({ grade: 'trainee' });
+
+    (scene as unknown as GameScenePrivate).handleResize({ width: 390, height: 844 });
+
+    expect(mockGameState.lastInstance?.setCanvasSize).toHaveBeenCalledWith(390, 844);
   });
 
   it('updates the HUD input buffer on backspace and keeps answer input sanitized', () => {

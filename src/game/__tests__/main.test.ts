@@ -3,6 +3,7 @@
  * Tests core gameplay mechanics without Phaser rendering
  */
 
+import { GAME_CONFIG, getDangerZoneOffset, getMeteorSpawnPadding } from '../config';
 import { Game } from '../main';
 import { gameStore } from '@store/useGameStore';
 
@@ -53,6 +54,18 @@ describe('Game', () => {
     it('should create a new meteor', () => {
       game.spawnMeteor();
       expect(game.meteors.length).toBe(1);
+    });
+
+    it('should keep spawned meteors inside the live canvas width bounds', () => {
+      game.setCanvasSize(360, GAME_CONFIG.CANVAS_HEIGHT);
+
+      game.spawnMeteor();
+
+      const meteor = game.meteors[0];
+      const padding = getMeteorSpawnPadding(360);
+
+      expect(meteor.x).toBeGreaterThanOrEqual(padding);
+      expect(meteor.x).toBeLessThanOrEqual(360 - padding);
     });
 
     it('should create meteor with valid properties', () => {
@@ -117,6 +130,17 @@ describe('Game', () => {
     it('should create many particles for celebration', () => {
       game.createConfetti();
       expect(game.particles.length).toBeGreaterThanOrEqual(50);
+    });
+
+    it('should center confetti on the live canvas size', () => {
+      game.setCanvasSize(360, 780);
+
+      game.createConfetti();
+
+      expect(game.particles[0]).toMatchObject({
+        x: 180,
+        y: 390,
+      });
     });
   });
 
@@ -749,9 +773,10 @@ describe('Game', () => {
     });
 
     it('should hit base when meteor reaches danger zone', () => {
+      game.setCanvasSize(GAME_CONFIG.CANVAS_WIDTH, GAME_CONFIG.CANVAS_HEIGHT);
       game.spawnMeteor();
       const meteor = game.meteors[0];
-      meteor.y = 601; // Past danger zone (CANVAS_HEIGHT - dangerZone = 700 - 100 = 600)
+      meteor.y = GAME_CONFIG.CANVAS_HEIGHT - getDangerZoneOffset(GAME_CONFIG.CANVAS_HEIGHT) + 1;
       meteor.speed = 0.1; // Small speed to ensure it stays past danger zone
       const initialShield = game.shield;
 
