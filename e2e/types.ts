@@ -7,10 +7,12 @@ export type E2EWindow = Window & typeof globalThis & {
     getStoreState: () => {
       setGrade: (grade: string) => void;
       startPlaying: () => void;
+      createAndLoginProfile?: (username: string, password: string, keepLoggedIn?: boolean) => { success: boolean; error?: string };
       phase: string;
       grade: string;
       score: number;
       lives: number;
+      inputBuffer: string;
       menuView: string;
       pauseOverlay: {
         reason: string;
@@ -27,5 +29,6 @@ export type E2EWindow = Window & typeof globalThis & {
     getScene: (sceneKey: string) => any | null;
     waitForIdle: () => Promise<boolean>;
     freezeTime: () => void;
+    stepFrame: () => void;
   };
 };

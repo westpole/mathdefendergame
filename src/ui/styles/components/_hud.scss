@@ -5,6 +5,7 @@
 .hud-layer {
   position: absolute;
   z-index: $z-hud;
+  pointer-events: auto;
   bottom: 0;
   left: 0;
   right: 0;
@@ -88,6 +89,12 @@
   width: 100%;
 
   @include mobile {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  @media (orientation: landscape) and (max-height: $breakpoint-mobile) {
     display: flex;
     flex-direction: column;
     gap: $spacing-sm;

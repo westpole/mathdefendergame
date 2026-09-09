@@ -200,11 +200,14 @@ test('navigate through menus', async ({ page }) => {
 ## Build and Run
 
 ```bash
-# Build for E2E mode (includes test bridge)
-npm run build:e2e
-
 # Run all tests
 npm run test:e2e
+
+# Run the web-first mobile browser lane
+npm run test:e2e:web
+
+# Run the Electron wrapper lane
+npm run test:e2e:electron
 
 # Run specific suite
 npm run test:e2e -- e2e/game
@@ -242,8 +245,8 @@ The test bridge also logs to the browser console, which you can see in Playwrigh
 
 ## Notes
 
-- Tests run against the **built** app, not dev server
-- Always rebuild with `npm run build:e2e` before running tests
+- Tests run against the built E2E renderer bundle, which Playwright serves automatically
+- Electron wrapper tests load the same built renderer from disk
 - Use fixed RNG seeds for reproducible game state tests
 - Visual tests have 1% pixel diff tolerance
 - Electron windows don't parallelize well - tests run sequentially
