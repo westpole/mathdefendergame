@@ -24,6 +24,7 @@ HUD telemetry exposes the live DDA state:
 * Development:
   - [General information](/docs/general.md)
   - [Tests (unit and components)](/docs/tests.md)
+  - [Mobile device testing](/docs/mobile-device-testing.md)
   - [Eslint and TypeScript](/docs/lint.md)
   - [Using the `release-win-game` agent](/docs/release-win-game-agent.md)
 * Project config:

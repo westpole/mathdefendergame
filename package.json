@@ -7,6 +7,7 @@
   "main": "electron/main.js",
   "scripts": {
     "dev:web": "vite",
+    "dev:web:mobile": "vite --host 0.0.0.0 --port 5173",
     "dev:electron": "concurrently -k \"npm:dev:web\" \"wait-on http://localhost:5173 && electron . --renderer-url=http://localhost:5173\"",
     "start:electron": "electron .",
     "start:electron:debug": "electron . --inspect",
@@ -19,6 +20,7 @@
     "test:react": "vitest run --config vitest.config.ts --project=react",
     "test:storybook": "vitest run --config vitest.config.ts --project=storybook",
     "build:web:e2e": "vite build --mode e2e",
+    "preview:web:mobile": "vite preview --host 0.0.0.0 --port 4173",
     "build:e2e": "npm run build:web:e2e && electron-builder --dir",
     "test:e2e": "playwright test",
     "test:e2e:web": "playwright test --project=web-mobile-portrait --project=web-mobile-landscape",
