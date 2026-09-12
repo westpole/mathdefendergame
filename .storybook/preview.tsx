@@ -17,6 +17,14 @@ const preview: Preview = {
       // 'off' - skip a11y checks entirely
       test: "todo",
     },
+
+    backgrounds: {
+      options: {
+        light: { name: 'Light', value: '#ffffff' },
+        'custom-gray': { name: 'Custom Gray', value: '#f0f2f5' },
+        dark: { name: 'Dark', value: '#333333' },
+      },
+    },
   },
 };
 
