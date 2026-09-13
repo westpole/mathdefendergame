@@ -9,10 +9,7 @@
   min-height: var(--app-viewport-height);
   height: var(--app-viewport-height);
   margin: 0 auto;
-  padding-top: max(env(safe-area-inset-top, 0px), var(--app-shell-block-padding));
-  padding-right: max(env(safe-area-inset-right, 0px), var(--app-shell-inline-padding));
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--app-shell-block-padding));
-  padding-left: max(env(safe-area-inset-left, 0px), var(--app-shell-inline-padding));
+  padding: var(--app-shell-block-padding) 0;
 }
 
 #game-container,
@@ -46,7 +43,15 @@
   z-index: $z-city-bg;
   bottom: 0;
   width: 100%;
-  height: 300px;
-  background: url('../../assets/math-defender-city-bg.png') repeat-x top;
-  background-size: cover;
+  height: 100vh;
+  background: url('../../assets/math-defender-city-bg.png') repeat-x bottom;
 }
+
+// @media (hover: none) and (pointer: coarse) {
+//   #app-shell {
+//     padding-top: max(env(safe-area-inset-top, 0px), var(--app-shell-block-padding));
+//     padding-right: max(env(safe-area-inset-right, 0px), var(--app-shell-inline-padding));
+//     padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--app-shell-block-padding));
+//     padding-left: max(env(safe-area-inset-left, 0px), var(--app-shell-inline-padding));
+//   }
+// }
