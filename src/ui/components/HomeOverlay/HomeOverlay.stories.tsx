@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import emptyWeekMock from './__mocks__/empty-week.json';
 import weeklyProgressMock from './__mocks__/weekly-progress.json';
@@ -75,7 +75,7 @@ export const EmptyWeek: Story = {
 export const MobileWeeklyProgress: Story = {
   name: 'Mobile weekly progress',
   args: {
-    frame: mobileStoryFrame,
+    frame: popularMobileStoryFrame,
     initialState: weeklyProgressMock,
   },
 };

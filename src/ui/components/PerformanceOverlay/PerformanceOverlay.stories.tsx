@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import commanderRexMock from '../ProfileOverlay/__mocks__/commanderRex.json';
 import { PerformanceOverlay } from '.';
@@ -61,7 +61,7 @@ export const Default: Story = {
 export const MobilePerformance: Story = {
   name: 'Mobile performance report',
   args: {
-    frame: mobileStoryFrame,
+    frame: popularMobileStoryFrame,
     initialState: {
       ...commanderRexMock,
       menuView: 'performance',

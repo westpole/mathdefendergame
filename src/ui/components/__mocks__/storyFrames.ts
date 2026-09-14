@@ -17,3 +17,8 @@ export const maximumMobileStoryFrame: StoryFrame = {
   width: 430,
   height: 932,
 };
+
+export const popularMobileStoryFrame: StoryFrame = {
+  width: 393,
+  height: 852,
+};

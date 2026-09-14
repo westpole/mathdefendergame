@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import { HUDOverlay } from '.';
 import fullShieldsLives from './__mocks__/full-shields-lives.json';
@@ -92,7 +92,7 @@ export const lost4shields2livesStory: Story = {
 export const mobileKeypadLayoutStory: Story = {
   name: 'Mobile HUD keypad layout',
   args: {
-    frame: mobileStoryFrame,
+    frame: popularMobileStoryFrame,
     initialState: {
       ...fullShieldsLives,
       inputBuffer: '-45',

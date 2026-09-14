@@ -5,7 +5,7 @@ import { useGameStore, type GameStoreState } from '@store/useGameStore';
 
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import { LoginOverlay } from '.';
 
@@ -61,7 +61,7 @@ export const Default: Story = {
 export const MobileLogin: Story = {
   name: 'Mobile login form',
   args: {
-    frame: mobileStoryFrame,
+    frame: popularMobileStoryFrame,
     initialState: {
       bootReady: true,
       phase: 'login',

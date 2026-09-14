@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import commanderRexMock from './__mocks__/commanderRex.json';
 import generalVossMock from './__mocks__/generalVoss.json';
@@ -66,7 +66,7 @@ export const MajorGeneral: Story = {
 export const MobileProfile: Story = {
   name: 'Mobile commander profile',
   args: {
-    frame: mobileStoryFrame,
+    frame: popularMobileStoryFrame,
     initialState: commanderRexMock,
   },
 };

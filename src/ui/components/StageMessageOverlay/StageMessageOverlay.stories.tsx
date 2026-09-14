@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 import { StageMessageState, useGameStore } from '@store/useGameStore';
 
 import wonMock from './__mocks__/won.json';
@@ -88,7 +88,7 @@ export const LostStageLastLife: Story = {
 export const MobileLostStageLastLife: Story = {
   name: 'Mobile lost stage (last life)',
   args: {
-    frame: mobileStoryFrame,
+    frame: popularMobileStoryFrame,
     initialState: lostLastLifeState,
   },
 };

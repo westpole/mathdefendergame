@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import escapePauseMock from './__mocks__/escape-pause.json';
 import backgroundPauseMock from './__mocks__/background-pause.json';
@@ -80,7 +80,7 @@ export const SavingBeforeClose: Story = {
 export const MobileWindowClosePrompt: Story = {
   name: 'Mobile window close prompt',
   args: {
-    frame: mobileStoryFrame,
+    frame: popularMobileStoryFrame,
     initialState: windowCloseMock,
   },
 };

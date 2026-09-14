@@ -10,7 +10,7 @@ import {
 } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { mobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import { GameOverOverlay } from '.';
 import result from './__mocks__/result.json';
@@ -81,7 +81,7 @@ export const GameOverResults: Story = {
 export const MobileGameOverResults: Story = {
   name: 'Mobile game over results',
   args: {
-    frame: mobileStoryFrame,
+    frame: popularMobileStoryFrame,
     initialState: {
       ...reusableInitialState,
       ...result,
