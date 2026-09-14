@@ -48,12 +48,28 @@
     align-items: flex-start;
 
     @include mobile {
-      align-items: flex-start;
+      position: fixed;
+      top: 5px;
+      right: 3px;
+      font-size: 0.75rem;
+      background: none;
+      padding: 0;
+      border: none;
     }
   }
 
   &--left {
     align-items: flex-end;
+
+    @include mobile {
+      position: fixed;
+      top: 5px;
+      left: 3px;
+      font-size: 0.75rem;
+      background: none;
+      padding: 0;
+      border: none;
+    }
   }
 
   &--center {
@@ -159,11 +175,13 @@
   @include mobile {
     flex-wrap: wrap;
     width: 100%;
+    flex-direction: column;
   }
 
   @container (max-width: #{$breakpoint-mobile}) {
     flex-wrap: wrap;
     width: 100%;
+    flex-direction: column;
   }
 }
 
@@ -181,14 +199,20 @@
 
   @include mobile {
     flex: 1 1 calc(50% - #{$spacing-sm});
-    width: auto;
-    min-height: 58px;
+    border-radius: 2px;
+    padding: 2px;
+    min-height: fit-content;
+    width: 50px;
+    overflow: hidden;
   }
 
   @container (max-width: #{$breakpoint-mobile}) {
     flex: 1 1 calc(50% - #{$spacing-sm});
-    width: auto;
-    min-height: 58px;
+    border-radius: 2px;
+    padding: 2px;
+    min-height: fit-content;
+    width: 50px;
+    overflow: hidden;
   }
 
   &__label {
@@ -200,7 +224,7 @@
   &__value {
     font-family: $font-display;
     font-size: clamp(1rem, 4vw, 1.25rem);
-    line-height: 1.1;
+    line-height: 1;
     margin-top: 7px;
     color: $color-text-dashboard;
   }
