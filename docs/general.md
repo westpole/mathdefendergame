@@ -1,0 +1,18 @@
+# General Information
+
+## Grade Progression and DDA Baseline
+
+Grades are derived from earned score. The active grade is the highest grade whose threshold is less than or equal to the current score.
+
+| Grade | Score Threshold | Base Fall Speed (px/s) | Spawn Rate (ms) | Target Latency (ms) | Damping Alpha | Baseline Math Tier |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| trainee | 0 | 36 | 2700 | 2600 | 0.12 | 1 |
+| cadet | 101 | 52 | 2300 | 2300 | 0.13 | 2 |
+| commander | 351 | 72 | 1900 | 2000 | 0.15 | 3 |
+| major-general | 751 | 92 | 1500 | 1700 | 0.17 | 4 |
+
+HUD telemetry exposes the live DDA state:
+- Speed multiplier (`ddaSpeedMultiplier`)
+- Cooloff state (`ddaIsCooloffActive`)
+- DDA heat state (`ddaHeatState`)
+- Math tier (`ddaMathTier`)
