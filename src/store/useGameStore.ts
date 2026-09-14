@@ -16,7 +16,7 @@ type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'paused' | 'stag
 type MenuView = 'home' | 'profile' | 'performance' | 'rules';
 type LegacyDifficulty = 'child' | 'student' | 'adult';
 type HistoryByProfile = Record<string, GameHistoryEntry[]>;
-type PauseOverlayReason = 'escape' | 'window-close';
+type PauseOverlayReason = 'escape' | 'window-close' | 'background';
 
 export interface PlayerProfile {
   username: string;

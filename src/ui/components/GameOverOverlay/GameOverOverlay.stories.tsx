@@ -10,6 +10,7 @@ import {
 } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import { GameOverOverlay } from '.';
 import result from './__mocks__/result.json';
@@ -29,6 +30,7 @@ const reusableInitialState: Partial<GameStoreState> = {
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
+  frame?: StoryFrame;
 }
 
 const meta = {
@@ -40,7 +42,7 @@ const meta = {
   },
   decorators: [
     (Story, context) => {
-      const { initialState } = context.args as StoryArgs;
+      const { initialState, frame } = context.args as StoryArgs;
 
       useEffect(() => {
         useGameStore.setState({
@@ -54,7 +56,7 @@ const meta = {
       }, [initialState]);
 
       return (
-        <GameCanvas>
+        <GameCanvas height={frame?.height} width={frame?.width}>
           <Story />
         </GameCanvas>
       );
@@ -69,6 +71,17 @@ type Story = StoryObj<typeof meta>;
 export const GameOverResults: Story = {
   name: 'Game Over Results',
   args: {
+    initialState: {
+      ...reusableInitialState,
+      ...result,
+    },
+  },
+};
+
+export const MobileGameOverResults: Story = {
+  name: 'Mobile game over results',
+  args: {
+    frame: popularMobileStoryFrame,
     initialState: {
       ...reusableInitialState,
       ...result,

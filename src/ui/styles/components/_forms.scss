@@ -4,9 +4,13 @@
 // Form Styles
 .stats-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: $spacing-sm $spacing-lg;
-  margin: 0 1em 2em 1em;
+  margin: 0 0 $spacing-lg;
+
+  strong {
+    justify-self: end;
+  }
 }
 
 .text-input {
@@ -25,7 +29,7 @@
 }
 
 .login-panel {
-  width: min(92%, 480px);
+  width: min(100%, 480px);
 }
 
 .login-subtitle {
@@ -55,6 +59,7 @@
   color: $text-primary;
   font-size: 14px;
   margin-top: 0.25em;
+  flex-wrap: wrap;
 }
 
 .login-actions {
@@ -68,7 +73,7 @@
 .modal-panel,
 .gameover-panel,
 .gameover-board {
-  width: min(92%, 460px);
+  width: min(100%, 460px);
 }
 
 .modal-panel,
@@ -76,4 +81,21 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
+}
+
+@include mobile {
+  .stats-grid {
+    gap: $spacing-xs $spacing-md;
+  }
+
+  .login-actions,
+  .action-row {
+    width: 100%;
+  }
+
+  .login-actions > button,
+  .action-row > button {
+    flex: 1 1 100%;
+    width: 100%;
+  }
 }

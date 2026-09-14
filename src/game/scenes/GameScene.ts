@@ -12,6 +12,7 @@ import { GAME_CONFIG } from '@game/config';
 import { gameStore } from '@store/useGameStore';
 import type { PauseOverlayReason } from '@store/useGameStore';
 import type { GameOverReason, Grade } from '@shared/types';
+import { notifyAppCloseReady } from '../../platform/adapter';
 
 function colorToInt(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
@@ -28,23 +29,24 @@ export class GameScene extends Phaser.Scene {
       this.pauseForManualEndPrompt('escape');
       return;
     }
-    if (this.gameLogic.state !== 'playing') return;
-
     if (e.key === 'Backspace') {
-      this.gameLogic.inputBuffer = this.gameLogic.inputBuffer.slice(0, -1);
-      this.updateHUD();
+      this.removeAnswerInputCharacter();
       return;
     }
     if ((e.key >= '0' && e.key <= '9') || e.key === '-') {
-      if (this.gameLogic.inputBuffer.length < 5) {
-        this.gameLogic.inputBuffer += e.key;
-        this.updateHUD();
-      }
+      this.appendAnswerInputCharacter(e.key);
       return;
     }
-    if (e.key === 'Enter' && this.gameLogic.inputBuffer.length > 0) {
-      this.gameLogic.checkAnswer();
+    if (e.key === 'Enter') {
+      this.submitAnswerInput();
     }
+  };
+  private readonly handlePointerDown = (pointer: Phaser.Input.Pointer): void => {
+    if (!pointer.wasTouch) {
+      return;
+    }
+
+    this.pauseForManualEndPrompt('escape');
   };
 
   constructor() {
@@ -76,10 +78,12 @@ export class GameScene extends Phaser.Scene {
     // ── Keyboard input ────────────────────────────────────────────────────────
     this.input.keyboard?.off('keydown', this.handleKeyDown, this);
     this.input.keyboard?.on('keydown', this.handleKeyDown, this);
+    this.input.off('pointerdown', this.handlePointerDown, this);
+    this.input.on('pointerdown', this.handlePointerDown, this);
 
     // ── Window resize listener ────────────────────────────────────────────────
     this.scale.on('resize', this.handleResize, this);
-    this.gameLogic.setCanvasHeight(this.scale.height);
+    this.gameLogic.setCanvasSize(this.scale.width, this.scale.height);
 
     // Initial HUD paint
     this.updateHUD();
@@ -191,6 +195,22 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  public setAnswerInputBuffer(nextValue: string): void {
+    this.gameLogic.setInputBuffer(nextValue);
+  }
+
+  public appendAnswerInputCharacter(char: string): void {
+    this.gameLogic.appendInputCharacter(char);
+  }
+
+  public removeAnswerInputCharacter(): void {
+    this.gameLogic.removeLastInputCharacter();
+  }
+
+  public submitAnswerInput(): void {
+    this.gameLogic.submitInputBuffer();
+  }
+
   public pauseForManualEndPrompt(reason: PauseOverlayReason): void {
     if (this.gameLogic.state !== 'playing' && this.gameLogic.state !== 'paused') {
       return;
@@ -227,7 +247,7 @@ export class GameScene extends Phaser.Scene {
     this.scene.stop();
 
     if (options?.closeApp) {
-      window.dispatchEvent(new CustomEvent('math-defender-close-ready'));
+      notifyAppCloseReady();
       return;
     }
 
@@ -235,11 +255,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleResize(gameSize: Phaser.Structs.Size): void {
-    this.gameLogic.setCanvasHeight(gameSize.height);
+    this.gameLogic.setCanvasSize(gameSize.width, gameSize.height);
   }
 
   private handleShutdown(): void {
     this.input.keyboard?.off('keydown', this.handleKeyDown, this);
+    this.input.off('pointerdown', this.handlePointerDown, this);
     this.scale.off('resize', this.handleResize, this);
     this.clearStreakRewardTimer();
     gameStore.getState().clearStreakRewardMessage();

@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import commanderRexMock from './__mocks__/commanderRex.json';
 import generalVossMock from './__mocks__/generalVoss.json';
@@ -11,6 +12,7 @@ import { ProfileOverlay } from '.';
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
+  frame?: StoryFrame;
 }
 
 const meta = {
@@ -22,7 +24,7 @@ const meta = {
   },
   decorators: [
     (Story, context) => {
-      const { initialState } = context.args as StoryArgs;
+      const { initialState, frame } = context.args as StoryArgs;
 
       useEffect(() => {
         useGameStore.setState({
@@ -35,10 +37,8 @@ const meta = {
       }, [initialState]);
 
       return (
-        <GameCanvas>
-          <section style={{ width: '80%', margin: '3em auto' }}>
-            <Story />
-          </section>
+        <GameCanvas height={frame?.height} width={frame?.width}>
+          <Story />
         </GameCanvas>
       );
     },
@@ -60,5 +60,13 @@ export const MajorGeneral: Story = {
   name: 'Major General profile',
   args: {
     initialState: generalVossMock,
+  },
+};
+
+export const MobileProfile: Story = {
+  name: 'Mobile commander profile',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: commanderRexMock,
   },
 };

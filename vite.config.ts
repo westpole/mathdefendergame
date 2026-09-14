@@ -32,7 +32,9 @@ export default defineConfig(({ mode }) => ({
     },
   },
   server: {
-    port: 5173
+    host: true,      // or '0.0.0.0'
+    port: 5173,
+    strictPort: true,
   },
   define: {
     __E2E__: mode === 'e2e',

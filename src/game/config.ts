@@ -11,6 +11,10 @@ interface GradeConfig {
   mathTier: DDAMathTier;
 }
 
+const DANGER_ZONE_HEIGHT_RATIO = 100 / 700;
+const METEOR_SPAWN_HORIZONTAL_PADDING_RATIO = 60 / 700;
+const MIN_METEOR_SPAWN_PADDING = 40;
+
 export const GAME_CONFIG = {
   grades: {
     trainee: {
@@ -64,15 +68,23 @@ export const GAME_CONFIG = {
     '/': '#d97706', // Brown/Orange
   } as Record<string, string>,
 
-  dangerZone: 100, // px from bottom
+  dangerZone: 100, // px from bottom on the legacy 700px-tall layout
   initialLives: 3,
   stageShieldMax: 5,
   scorePerCorrectAnswer: 1,
   scorePenaltyPerIncorrectAnswer: 1,
 
-  CANVAS_WIDTH: 700,
-  CANVAS_HEIGHT: 700,
+  CANVAS_WIDTH: 540,
+  CANVAS_HEIGHT: 900,
 };
+
+export function getDangerZoneOffset(canvasHeight: number): number {
+  return Math.round(canvasHeight * DANGER_ZONE_HEIGHT_RATIO);
+}
+
+export function getMeteorSpawnPadding(canvasWidth: number): number {
+  return Math.max(MIN_METEOR_SPAWN_PADDING, Math.round(canvasWidth * METEOR_SPAWN_HORIZONTAL_PADDING_RATIO));
+}
 
 export function resolveGradeFromScore(score: number): Grade {
   let resolved: Grade = 'trainee';

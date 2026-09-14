@@ -1,6 +1,6 @@
 # E2E Testing Setup
 
-This directory contains end-to-end tests for the Math Defender game using Playwright to test the Electron app with Phaser 4, React 19, and Zustand integration.
+This directory contains end-to-end tests for the Math Defender game using Playwright to validate the shared E2E renderer build in both the browser shell and the Electron wrapper.
 
 ## Architecture
 
@@ -11,27 +11,33 @@ Exposes a `window.__e2e` API for tests to:
 - **Deterministic testing**: Set RNG seed, freeze time, step frames
 - **Sync utilities**: Wait for game idle state
 
-### Fixtures (`fixtures/electron-app.ts`)
+### Fixtures (`fixtures/browser-app.ts`, `fixtures/electron-app.ts`)
 Provides base test fixtures:
+- `browser-app.ts`: Opens the built web app through Playwright's browser context
 - `electronApp`: Launches the Electron app in test mode
 - `page`: The main window with test bridge installed
 
 ## Test Structure
 
 Tests are organized by concern:
+- **`mobile/`**: Mobile web viewport, touch input, and overlay layout coverage
 - **`ui/`**: React overlay and menu navigation tests
 - **`game/`**: Phaser game logic and state tests
 - **`integration/`**: Store ↔ Phaser synchronization tests
+- **`electron/`**: Thin Electron wrapper smoke coverage
 - **`visual/`**: Visual regression tests (screenshots)
 
 ## Running Tests
 
 ```bash
-# Build the app for E2E mode
-npm run build:e2e
-
 # Run all tests
 npm run test:e2e
+
+# Run the web-first mobile browser lane only
+npm run test:e2e:web
+
+# Run the Electron-only lane
+npm run test:e2e:electron
 
 # Run specific test suite
 npm run test:e2e -- e2e/game
@@ -115,8 +121,9 @@ test('menu matches snapshot', async ({ page }) => {
 
 ## Notes
 
-- Tests run against the **built** Electron app using `electron/main.js`
-- Build with `npm run build:e2e` before running tests
+- Playwright starts from the **built** E2E renderer bundle automatically via `vite preview`
+- Browser-shell tests use the preview server at `http://127.0.0.1:4173`
+- Electron tests load the same built renderer from disk through `electron/main.js`
 - Visual tests have stricter pixel diff thresholds (1%)
 - Use fixed RNG seeds for reproducible game state tests
 - Playwright doesn't parallelize Electron windows as well as browser contexts

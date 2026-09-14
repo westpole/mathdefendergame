@@ -12,9 +12,8 @@ export function GameOverOverlay() {
   };
 
   return (
-    <div className="grid-container">
-      <div className="contentBox">
-        <section className="overlay-panel gameover-panel accent-danger">
+    <div className="overlay-screen overlay-screen--interactive">
+      <section className="overlay-panel gameover-panel accent-danger">
           <div className="overlay-header">
             <h1>Game Over</h1>
           </div>
@@ -35,8 +34,7 @@ export function GameOverOverlay() {
               Start new game
             </button>
           </div>
-        </section>
-      </div>
+      </section>
     </div>
   );
 }

@@ -17,7 +17,7 @@ import type {
   Particle,
 } from '@shared/types';
 
-import { GAME_CONFIG } from './config';
+import { GAME_CONFIG, getDangerZoneOffset, getMeteorSpawnPadding } from './config';
 import { DDAController, type DDAConfiguration } from './utilities/DDAController';
 import { generateMath } from './utilities/mathGen';
 
@@ -47,6 +47,7 @@ type RoundOperationTelemetry = Record<MathOperation, {
 
 const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
 const GUEST_HISTORY_BUCKET = '__guest__';
+const MAX_ANSWER_INPUT_LENGTH = 5;
 
 function createEmptyRoundOperationTelemetry(): RoundOperationTelemetry {
   return {
@@ -70,6 +71,23 @@ function isMathOperation(value: unknown): value is MathOperation {
   return value === '+' || value === '-' || value === '*' || value === '/';
 }
 
+function sanitizeAnswerInput(rawValue: string): string {
+  let nextValue = '';
+
+  for (const char of rawValue) {
+    if (char >= '0' && char <= '9') {
+      nextValue += char;
+      continue;
+    }
+
+    if (char === '-' && nextValue.length === 0) {
+      nextValue += char;
+    }
+  }
+
+  return nextValue.slice(0, MAX_ANSWER_INPUT_LENGTH);
+}
+
 function getLifetimeScoreBeforeCurrentRun(
   activeUsername: string | null,
   gameHistoryByProfile: Record<string, GameHistoryEntry[]>,
@@ -88,6 +106,7 @@ export class Game {
   stageScore: number = 0;
 
   grade: Grade = 'trainee';
+  canvasWidth: number = GAME_CONFIG.CANVAS_WIDTH;
   canvasHeight: number = GAME_CONFIG.CANVAS_HEIGHT;
 
   meteors: Meteor[] = [];
@@ -164,21 +183,25 @@ export class Game {
     this.applyGradeBaseline('trainee');
     this.syncGradeFromScore();
     this.captureStageCheckpoint();
+    this.canvasWidth = GAME_CONFIG.CANVAS_WIDTH;
     this.canvasHeight = GAME_CONFIG.CANVAS_HEIGHT;
     this.state = 'start';
     this.syncStore();
   }
 
-  setCanvasHeight(height: number): void {
+  setCanvasSize(width: number, height: number): void {
+    this.canvasWidth = width;
     this.canvasHeight = height;
   }
 
   spawnMeteor(): void {
     const difficultyState = this.dda.getDifficultyState();
     const expr = generateMath(this.stage, difficultyState.mathTier);
+    const horizontalPadding = getMeteorSpawnPadding(this.canvasWidth);
+    const playableWidth = Math.max(1, this.canvasWidth - horizontalPadding * 2);
 
     this.meteors.push({
-      x: Math.random() * (GAME_CONFIG.CANVAS_WIDTH - 120) + 60,
+      x: Math.random() * playableWidth + horizontalPadding,
       y: -50,
       text: expr.text,
       answer: expr.answer,
@@ -204,14 +227,49 @@ export class Game {
   createConfetti(): void {
     for (let i = 0; i < 50; i++) {
       this.particles.push({
-        x: GAME_CONFIG.CANVAS_WIDTH / 2,
-        y: GAME_CONFIG.CANVAS_HEIGHT / 2,
+        x: this.canvasWidth / 2,
+        y: this.canvasHeight / 2,
         vx: (Math.random() - 0.5) * 15,
         vy: (Math.random() - 0.5) * 15,
         life: 2.0,
         color: '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0'),
       });
     }
+  }
+
+  setInputBuffer(nextValue: string): void {
+    if (this.state !== 'playing') {
+      return;
+    }
+
+    this.inputBuffer = sanitizeAnswerInput(nextValue);
+    this.cb.onHUDUpdate();
+  }
+
+  appendInputCharacter(char: string): void {
+    if (this.state !== 'playing') {
+      return;
+    }
+
+    this.inputBuffer = sanitizeAnswerInput(`${this.inputBuffer}${char}`);
+    this.cb.onHUDUpdate();
+  }
+
+  removeLastInputCharacter(): void {
+    if (this.state !== 'playing') {
+      return;
+    }
+
+    this.inputBuffer = this.inputBuffer.slice(0, -1);
+    this.cb.onHUDUpdate();
+  }
+
+  submitInputBuffer(): void {
+    if (this.state !== 'playing' || this.inputBuffer.length === 0 || this.inputBuffer === '-') {
+      return;
+    }
+
+    this.checkAnswer();
   }
 
   checkAnswer(): void {
@@ -461,7 +519,7 @@ export class Game {
       this.lastSpawn = Date.now();
     }
 
-    const dangerY = this.canvasHeight - GAME_CONFIG.dangerZone;
+    const dangerY = this.canvasHeight - getDangerZoneOffset(this.canvasHeight);
 
     for (let i = this.meteors.length - 1; i >= 0; i--) {
       const m = this.meteors[i];

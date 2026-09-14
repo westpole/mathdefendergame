@@ -7,7 +7,9 @@ import { GameScene } from '../GameScene';
 
 type GameScenePrivate = {
   handleKeyDown: (e: KeyboardEvent) => void;
+  handlePointerDown: (pointer: { wasTouch?: boolean }) => void;
   meteorTexts: Map<number, Phaser.GameObjects.Text>;
+  handleResize: (size: { width: number; height: number }) => void;
   handleShutdown: () => void;
   handleStreakReward: (lives: number) => void;
 };
@@ -28,9 +30,13 @@ const mockGameState = vi.hoisted(() => ({
     meteors: MockMeteor[];
     particles: MockParticle[];
     reset: ReturnType<typeof vi.fn>;
-    setCanvasHeight: ReturnType<typeof vi.fn>;
+    setCanvasSize: ReturnType<typeof vi.fn>;
     update: ReturnType<typeof vi.fn>;
     checkAnswer: ReturnType<typeof vi.fn>;
+    setInputBuffer: ReturnType<typeof vi.fn>;
+    appendInputCharacter: ReturnType<typeof vi.fn>;
+    removeLastInputCharacter: ReturnType<typeof vi.fn>;
+    submitInputBuffer: ReturnType<typeof vi.fn>;
     resumeFromMessage: ReturnType<typeof vi.fn>;
     resumeAfterStreakReward: ReturnType<typeof vi.fn>;
     pauseForManualEndPrompt: ReturnType<typeof vi.fn>;
@@ -73,9 +79,52 @@ vi.mock('../../main', () => ({
     particles: MockParticle[] = [];
 
     reset = vi.fn();
-    setCanvasHeight = vi.fn();
+  setCanvasSize = vi.fn();
     update = vi.fn();
     checkAnswer = vi.fn();
+    setInputBuffer = vi.fn((nextValue: string) => {
+      if (this.state !== 'playing') {
+        return;
+      }
+
+      this.inputBuffer = nextValue;
+      mockGameState.lastCallbacks?.onHUDUpdate();
+    });
+    appendInputCharacter = vi.fn((char: string) => {
+      if (this.state !== 'playing') {
+        return;
+      }
+
+      if (char >= '0' && char <= '9') {
+        this.inputBuffer = `${this.inputBuffer}${char}`.slice(0, 5);
+        mockGameState.lastCallbacks?.onHUDUpdate();
+        return;
+      }
+
+      if (char === '-' && this.inputBuffer.length === 0) {
+        this.inputBuffer = '-';
+        mockGameState.lastCallbacks?.onHUDUpdate();
+      }
+    });
+    removeLastInputCharacter = vi.fn(() => {
+      if (this.state !== 'playing') {
+        return;
+      }
+
+      this.inputBuffer = this.inputBuffer.slice(0, -1);
+      mockGameState.lastCallbacks?.onHUDUpdate();
+    });
+    submitInputBuffer = vi.fn(() => {
+      if (this.state !== 'playing') {
+        return;
+      }
+
+      if (this.inputBuffer.length === 0 || this.inputBuffer === '-') {
+        return;
+      }
+
+      this.checkAnswer();
+    });
     resumeFromMessage = vi.fn();
     resumeAfterStreakReward = vi.fn(() => {
       this.state = 'playing';
@@ -193,7 +242,13 @@ function setupScene() {
     on: vi.fn(),
     off: vi.fn(),
   };
+  const input = {
+    keyboard,
+    on: vi.fn(),
+    off: vi.fn(),
+  };
   const scale = {
+    width: 540,
     height: 720,
     on: vi.fn(),
     off: vi.fn(),
@@ -216,13 +271,13 @@ function setupScene() {
   const scene = new GameScene();
   (scene as unknown as {
     add: typeof add;
-    input: { keyboard: typeof keyboard };
+    input: typeof input;
     scale: typeof scale;
     events: typeof events;
     scene: { stop: typeof stop };
     cameras: { main: { shake: typeof shake } };
   }).add = add;
-  (scene as unknown as { input: { keyboard: typeof keyboard } }).input = { keyboard };
+  (scene as unknown as { input: typeof input }).input = input;
   (scene as unknown as { scale: typeof scale }).scale = scale;
   (scene as unknown as { events: typeof events }).events = events;
   (scene as unknown as { scene: { stop: typeof stop } }).scene = { stop };
@@ -243,7 +298,7 @@ function setupScene() {
       openMenuView,
       returnToMenu,
     },
-    phaser: { graphics, keyboard, scale, add, events, stop, shake, textObjects },
+    phaser: { graphics, input, keyboard, scale, add, events, stop, shake, textObjects },
   };
 }
 
@@ -293,12 +348,24 @@ describe('GameScene', () => {
     expect(phaser.graphics.setDepth).toHaveBeenCalledWith(6);
     expect(phaser.keyboard.off).toHaveBeenCalledWith('keydown', expect.any(Function), scene);
     expect(phaser.keyboard.on).toHaveBeenCalledWith('keydown', expect.any(Function), scene);
+    expect(phaser.input.off).toHaveBeenCalledWith('pointerdown', expect.any(Function), scene);
+    expect(phaser.input.on).toHaveBeenCalledWith('pointerdown', expect.any(Function), scene);
     expect(phaser.scale.on).toHaveBeenCalledWith('resize', expect.any(Function), scene);
-    expect(mockGameState.lastInstance?.setCanvasHeight).toHaveBeenCalledWith(720);
+    expect(mockGameState.lastInstance?.setCanvasSize).toHaveBeenCalledWith(540, 720);
     expect(store.syncHUD).toHaveBeenCalledWith({ inputBuffer: '' });
   });
 
-  it('updates the HUD input buffer on backspace and accepts numeric input up to five chars', () => {
+  it('updates the live canvas size when Phaser resizes', () => {
+    const { scene } = setupScene();
+
+    scene.init({ grade: 'trainee' });
+
+    (scene as unknown as GameScenePrivate).handleResize({ width: 390, height: 844 });
+
+    expect(mockGameState.lastInstance?.setCanvasSize).toHaveBeenCalledWith(390, 844);
+  });
+
+  it('updates the HUD input buffer on backspace and keeps answer input sanitized', () => {
     const { scene, store } = setupScene();
 
     scene.init({ grade: 'trainee' });
@@ -314,10 +381,10 @@ describe('GameScene', () => {
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: '5' } as KeyboardEvent);
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: '6' } as KeyboardEvent);
 
-    expect(mockGameState.lastInstance?.inputBuffer).toBe('12-45');
+    expect(mockGameState.lastInstance?.inputBuffer).toBe('12456');
 
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: '7' } as KeyboardEvent);
-    expect(mockGameState.lastInstance?.inputBuffer).toBe('12-45');
+    expect(mockGameState.lastInstance?.inputBuffer).toBe('12456');
   });
 
   it('submits entered answers and pauses with ESC while ignoring gameplay keys outside playing state', () => {
@@ -329,6 +396,7 @@ describe('GameScene', () => {
     mockGameState.lastInstance!.inputBuffer = '42';
 
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: 'Enter' } as KeyboardEvent);
+    expect(mockGameState.lastInstance?.submitInputBuffer).toHaveBeenCalledTimes(1);
     expect(mockGameState.lastInstance?.checkAnswer).toHaveBeenCalledTimes(1);
 
     mockGameState.lastInstance!.state = 'paused';
@@ -341,6 +409,20 @@ describe('GameScene', () => {
     expect(store.showPauseOverlay).toHaveBeenCalledWith('escape');
     expect(store.returnToMenu).not.toHaveBeenCalled();
     expect(phaser.stop).not.toHaveBeenCalled();
+  });
+
+  it('pauses from touch input on the game canvas without reacting to mouse clicks', () => {
+    const { scene, store } = setupScene();
+
+    scene.init({ grade: 'trainee' });
+    mockGameState.lastInstance!.state = 'playing';
+
+    (scene as unknown as GameScenePrivate).handlePointerDown({ wasTouch: false });
+    expect(mockGameState.lastInstance?.pauseForManualEndPrompt).not.toHaveBeenCalled();
+
+    (scene as unknown as GameScenePrivate).handlePointerDown({ wasTouch: true });
+    expect(mockGameState.lastInstance?.pauseForManualEndPrompt).toHaveBeenCalledTimes(1);
+    expect(store.showPauseOverlay).toHaveBeenCalledWith('escape');
   });
 
   it('persists and exits to profile when ending game early from pause prompt', () => {

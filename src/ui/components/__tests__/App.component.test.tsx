@@ -7,7 +7,15 @@ import { App } from '../../../App';
 
 import baseStoreState from '../__mocks__/base-store-state.json';
 
+const originalVisibilityState = document.visibilityState;
+
+const platformMocks = vi.hoisted(() => ({
+  subscribeToAppCloseEvents: vi.fn(),
+}));
+
 const uiSceneMocks = vi.hoisted(() => ({
+  appendAnswerInputCharacter: vi.fn(),
+  continueGame: vi.fn(),
   destroyGame: vi.fn(),
   ensurePhaserGame: vi.fn(() => ({ id: 'game-instance' })),
   logOff: vi.fn(),
@@ -15,10 +23,21 @@ const uiSceneMocks = vi.hoisted(() => ({
   onElectronCloseConfirmed: vi.fn(),
   onElectronCloseRequested: vi.fn(),
   openMenuView: vi.fn(),
+  pauseGameForManualEnd: vi.fn(),
+  removeAnswerInputCharacter: vi.fn(),
+  setAnswerInputBuffer: vi.fn(),
+  shouldConfirmElectronClose: vi.fn(() => false),
   startGame: vi.fn(),
+  submitAnswerInput: vi.fn(),
+}));
+
+vi.mock('../../../platform/adapter', () => ({
+  subscribeToAppCloseEvents: platformMocks.subscribeToAppCloseEvents,
 }));
 
 vi.mock('@game/scenes/UIScene', () => ({
+  appendAnswerInputCharacter: uiSceneMocks.appendAnswerInputCharacter,
+  continueGame: uiSceneMocks.continueGame,
   destroyGame: uiSceneMocks.destroyGame,
   ensurePhaserGame: uiSceneMocks.ensurePhaserGame,
   logOff: uiSceneMocks.logOff,
@@ -26,8 +45,12 @@ vi.mock('@game/scenes/UIScene', () => ({
   onElectronCloseConfirmed: uiSceneMocks.onElectronCloseConfirmed,
   onElectronCloseRequested: uiSceneMocks.onElectronCloseRequested,
   openMenuView: uiSceneMocks.openMenuView,
+  pauseGameForManualEnd: uiSceneMocks.pauseGameForManualEnd,
+  removeAnswerInputCharacter: uiSceneMocks.removeAnswerInputCharacter,
+  setAnswerInputBuffer: uiSceneMocks.setAnswerInputBuffer,
+  shouldConfirmElectronClose: uiSceneMocks.shouldConfirmElectronClose,
   startGame: uiSceneMocks.startGame,
-  continueGame: vi.fn(),
+  submitAnswerInput: uiSceneMocks.submitAnswerInput,
   returnToMenu: vi.fn(),
 }));
 
@@ -38,10 +61,23 @@ function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
   });
 }
 
+function setVisibilityState(visibilityState: DocumentVisibilityState) {
+  Object.defineProperty(document, 'visibilityState', {
+    configurable: true,
+    value: visibilityState,
+  });
+}
+
 describe('App start menu controls', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    platformMocks.subscribeToAppCloseEvents.mockReturnValue(vi.fn());
+    setVisibilityState('visible');
     setMockStoreState();
+  });
+
+  afterEach(() => {
+    setVisibilityState(originalVisibilityState);
   });
 
   it('shows the loading overlay until boot completes and only shows the menu button in the start phase', () => {
@@ -203,10 +239,13 @@ describe('App start menu controls', () => {
     setMockStoreState({ bootReady: true, phase: 'login' });
 
     const { unmount } = render(<App />);
+    const handlers = platformMocks.subscribeToAppCloseEvents.mock.calls[0]?.[0];
 
-    window.dispatchEvent(new Event('electron-close-requested'));
-    window.dispatchEvent(new Event('electron-close-confirmed'));
-    window.dispatchEvent(new Event('electron-close-cancelled'));
+    expect(handlers).toBeDefined();
+
+    handlers.onCloseRequested();
+    handlers.onCloseConfirmed();
+    handlers.onCloseCancelled();
 
     expect(uiSceneMocks.onElectronCloseRequested).toHaveBeenCalledTimes(1);
     expect(uiSceneMocks.onElectronCloseConfirmed).toHaveBeenCalledTimes(1);
@@ -215,9 +254,31 @@ describe('App start menu controls', () => {
     unmount();
 
     expect(uiSceneMocks.destroyGame).toHaveBeenCalledWith({ id: 'game-instance' });
+  });
 
-    window.dispatchEvent(new Event('electron-close-requested'));
+  it('pauses active gameplay when the document is hidden', () => {
+    setMockStoreState({ bootReady: true, phase: 'playing' });
 
-    expect(uiSceneMocks.onElectronCloseRequested).toHaveBeenCalledTimes(1);
+    render(<App />);
+
+    act(() => {
+      setVisibilityState('hidden');
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(uiSceneMocks.pauseGameForManualEnd).toHaveBeenCalledWith('background');
+  });
+
+  it('does not trigger a background pause outside active gameplay', () => {
+    setMockStoreState({ bootReady: true, phase: 'start' });
+
+    render(<App />);
+
+    act(() => {
+      setVisibilityState('hidden');
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+
+    expect(uiSceneMocks.pauseGameForManualEnd).not.toHaveBeenCalled();
   });
 });

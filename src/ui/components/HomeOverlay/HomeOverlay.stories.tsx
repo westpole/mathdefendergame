@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
+import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import emptyWeekMock from './__mocks__/empty-week.json';
 import weeklyProgressMock from './__mocks__/weekly-progress.json';
@@ -13,6 +14,7 @@ const STORY_NOW = Date.UTC(2026, 7, 31, 12, 0, 0);
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
+  frame?: StoryFrame;
 }
 
 const meta = {
@@ -24,7 +26,7 @@ const meta = {
   },
   decorators: [
     (Story, context) => {
-      const { initialState } = context.args as StoryArgs;
+      const { initialState, frame } = context.args as StoryArgs;
 
       useEffect(() => {
         const originalDateNow = Date.now;
@@ -44,7 +46,7 @@ const meta = {
       }, [initialState]);
 
       return (
-        <GameCanvas>
+        <GameCanvas height={frame?.height} width={frame?.width}>
           <Story />
         </GameCanvas>
       );
@@ -67,5 +69,13 @@ export const EmptyWeek: Story = {
   name: 'No weekly activity',
   args: {
     initialState: emptyWeekMock,
+  },
+};
+
+export const MobileWeeklyProgress: Story = {
+  name: 'Mobile weekly progress',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: weeklyProgressMock,
   },
 };

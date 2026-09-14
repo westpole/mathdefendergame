@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useEffectEvent } from 'react';
 
 import {
   destroyGame,
@@ -7,7 +7,9 @@ import {
   onElectronCloseConfirmed,
   shouldConfirmElectronClose,
   onElectronCloseRequested,
+  pauseGameForManualEnd,
 } from '@game/scenes/UIScene';
+import { subscribeToAppCloseEvents } from './platform/adapter';
 import { useGameStore } from '@store/useGameStore';
 import { GameOverOverlay } from '@ui/components/GameOverOverlay';
 import { HUDOverlay } from '@ui/components/HUDOverlay';
@@ -27,41 +29,34 @@ export function App() {
   const bootReady = useGameStore((state) => state.bootReady);
   const menuView = useGameStore((state) => state.menuView);
   const isStartPhase = bootReady && phase === 'start';
+  const handleVisibilityChange = useEffectEvent(() => {
+    if (document.visibilityState !== 'hidden' || phase !== 'playing') {
+      return;
+    }
+
+    pauseGameForManualEnd('background');
+  });
 
   useEffect(() => {
     const game = ensurePhaserGame();
-
-    const handleCloseRequested = () => {
-      onElectronCloseRequested();
-    };
-
-    const handleCloseQuery = () => {
-      window.dispatchEvent(new CustomEvent('math-defender-close-query-result', {
-        detail: {
-          shouldConfirm: shouldConfirmElectronClose(),
-        },
-      }));
-    };
-
-    const handleCloseConfirmed = () => {
-      onElectronCloseConfirmed();
-    };
-
-    const handleCloseCancelled = () => {
-      onElectronCloseCancelled();
-    };
-
-    window.addEventListener('electron-close-query', handleCloseQuery);
-    window.addEventListener('electron-close-requested', handleCloseRequested);
-    window.addEventListener('electron-close-confirmed', handleCloseConfirmed);
-    window.addEventListener('electron-close-cancelled', handleCloseCancelled);
+    const unsubscribe = subscribeToAppCloseEvents({
+      onCloseRequested: onElectronCloseRequested,
+      onCloseConfirmed: onElectronCloseConfirmed,
+      onCloseCancelled: onElectronCloseCancelled,
+      shouldConfirmClose: shouldConfirmElectronClose,
+    });
 
     return () => {
-      window.removeEventListener('electron-close-query', handleCloseQuery);
-      window.removeEventListener('electron-close-requested', handleCloseRequested);
-      window.removeEventListener('electron-close-confirmed', handleCloseConfirmed);
-      window.removeEventListener('electron-close-cancelled', handleCloseCancelled);
+      unsubscribe();
       destroyGame(game);
+    };
+  }, []);
+
+  useEffect(() => {
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, []);
 

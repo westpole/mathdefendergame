@@ -21,9 +21,8 @@ export function PerformanceOverlay() {
   const hasPerformanceData = rows.some((row) => row.attempts > 0);
 
   return (
-    <div className="grid-container" data-testid="performance-overlay">
-      <div className="contentBox">
-        <section className="overlay-panel menu-page-panel performance-panel">
+    <div className="overlay-screen overlay-screen--interactive" data-testid="performance-overlay">
+      <section className="overlay-panel menu-page-panel performance-panel">
           <div className="overlay-header">
             <h1>PERFORMANCE</h1>
           </div>
@@ -60,8 +59,7 @@ export function PerformanceOverlay() {
               Complete a run to unlock operator performance insights.
             </div>
           )}
-        </section>
-      </div>
+      </section>
     </div>
   );
 }

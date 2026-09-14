@@ -9,8 +9,9 @@
 import Phaser from 'phaser';
 
 import { gameStore } from '@store/useGameStore';
-import type { MenuView } from '@store/useGameStore';
+import type { MenuView, PauseOverlayReason } from '@store/useGameStore';
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
+import { notifyAppCloseCancelled, notifyAppCloseReady } from '../../platform/adapter';
 
 import { BootScene } from './BootScene';
 import { GameScene } from './GameScene';
@@ -80,7 +81,47 @@ export function continueGame(): void {
   }
 }
 
-export function pauseGameForManualEnd(reason: 'escape' | 'window-close'): void {
+export function setAnswerInputBuffer(nextValue: string): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.setAnswerInputBuffer(nextValue);
+}
+
+export function appendAnswerInputCharacter(char: string): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.appendAnswerInputCharacter(char);
+}
+
+export function removeAnswerInputCharacter(): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.removeAnswerInputCharacter();
+}
+
+export function submitAnswerInput(): void {
+  const scene = getGameScene();
+
+  if (!scene) {
+    return;
+  }
+
+  scene.submitAnswerInput();
+}
+
+export function pauseGameForManualEnd(reason: PauseOverlayReason): void {
   const scene = getGameScene();
 
   if (!scene) {
@@ -107,7 +148,7 @@ export function cancelElectronClose(): void {
     resumePausedGame();
   }
 
-  window.dispatchEvent(new CustomEvent('math-defender-close-cancelled'));
+  notifyAppCloseCancelled();
 }
 
 export function endGameEarly(options?: { closeApp?: boolean }): void {
@@ -115,7 +156,7 @@ export function endGameEarly(options?: { closeApp?: boolean }): void {
 
   if (!scene) {
     if (options?.closeApp) {
-      window.dispatchEvent(new CustomEvent('math-defender-close-ready'));
+      notifyAppCloseReady();
     }
     return;
   }
@@ -172,7 +213,7 @@ export function onElectronCloseConfirmed(): void {
   }
 
   state.showSavingBeforeClose();
-  window.dispatchEvent(new CustomEvent('math-defender-close-ready'));
+  notifyAppCloseReady();
 }
 
 export function onElectronCloseCancelled(): void {
