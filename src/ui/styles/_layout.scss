@@ -5,6 +5,7 @@
 #app-shell {
   position: relative;
   overflow: hidden;
+  container-type: inline-size;
   width: 100%;
   min-height: var(--app-viewport-height);
   height: var(--app-viewport-height);

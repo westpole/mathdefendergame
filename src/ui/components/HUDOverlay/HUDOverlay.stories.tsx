@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useGameStore, type GameStoreState } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import { minimumDesktopStoryFrame, popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import { HUDOverlay } from '.';
 import fullShieldsLives from './__mocks__/full-shields-lives.json';
@@ -55,48 +55,81 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const fullShieldsLivesStory: Story = {
-  name: 'HUD: 5 shields and 3 lives',
+  name: 'Desktop: 5 shields and 3 lives',
   args: {
     initialState: fullShieldsLives,
+    frame: minimumDesktopStoryFrame,
   },
 };
 
 export const lost1shieldStory: Story = {
-  name: 'HUD: 4 shields and 3 lives',
+  name: 'Desktop: 4 shields and 3 lives',
   args: {
+    frame: minimumDesktopStoryFrame,
     initialState: lost1shield,
   },
 };
 
 export const lost2shields1lifeStory: Story = {
-  name: 'HUD: 3 shields and 2 lives',
+  name: 'Desktop: 3 shields and 2 lives',
   args: {
+    frame: minimumDesktopStoryFrame,
     initialState: lost2shields1life,
   },
 };
 
 export const lost3shields2livesStory: Story = {
-  name: 'HUD: 2 shields and 1 life',
+  name: 'Desktop: 2 shields and 1 life',
   args: {
+    frame: minimumDesktopStoryFrame,
     initialState: lost3shields2lives,
   },
 };
 
 export const lost4shields2livesStory: Story = {
-  name: 'HUD: 1 shield and 1 life',
+  name: 'Desktop: 1 shield and 1 life',
   args: {
+    frame: minimumDesktopStoryFrame,
     initialState: lost4shields2lives,
   },
 };
 
-export const mobileKeypadLayoutStory: Story = {
-  name: 'Mobile HUD keypad layout',
+export const mobilefullShieldsLivesStory: Story = {
+  name: 'Mobile: 5 shields and 3 lives',
   args: {
     frame: popularMobileStoryFrame,
-    initialState: {
-      ...fullShieldsLives,
-      inputBuffer: '-45',
-      streak: 18,
-    },
+    initialState: fullShieldsLives,
+  },
+};
+
+export const mobilelost1shieldStory: Story = {
+  name: 'Mobile: 4 shields and 3 lives',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: lost1shield,
+  },
+};
+
+export const mobilelost2shields1lifeStory: Story = {
+  name: 'Mobile: 3 shields and 2 lives',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: lost2shields1life,
+  },
+};
+
+export const mobilelost3shields2livesStory: Story = {
+  name: 'Mobile: 2 shields and 1 life',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: lost3shields2lives,
+  },
+};
+
+export const mobilelost4shields2livesStory: Story = {
+  name: 'Mobile: 1 shield and 1 life',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: lost4shields2lives,
   },
 };

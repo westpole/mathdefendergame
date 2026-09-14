@@ -20,6 +20,11 @@
     grid-template-columns: 1fr;
     margin: $spacing-xs;
   }
+
+  @container (max-width: #{$breakpoint-mobile}) {
+    grid-template-columns: 1fr;
+    margin: $spacing-xs;
+  }
 }
 
 .hud-panel {
@@ -63,9 +68,18 @@
       align-items: stretch;
       min-height: 0;
     }
+
+    @container (max-width: #{$breakpoint-mobile}) {
+      align-items: stretch;
+      min-height: 0;
+    }
   }
 
   @include mobile {
+    min-height: 0;
+  }
+
+  @container (max-width: #{$breakpoint-mobile}) {
     min-height: 0;
   }
 }
@@ -82,6 +96,11 @@
     min-height: 40px;
     width: 100%;
   }
+
+  @container (max-width: #{$breakpoint-mobile}) {
+    min-height: 40px;
+    width: 100%;
+  }
 }
 
 .mobile-input-panel {
@@ -89,6 +108,12 @@
   width: 100%;
 
   @include mobile {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  @container (max-width: #{$breakpoint-mobile}) {
     display: flex;
     flex-direction: column;
     gap: $spacing-sm;
@@ -156,6 +181,11 @@
     flex-wrap: wrap;
     width: 100%;
   }
+
+  @container (max-width: #{$breakpoint-mobile}) {
+    flex-wrap: wrap;
+    width: 100%;
+  }
 }
 
 .status-square {
@@ -171,6 +201,12 @@
   padding: 6px;
 
   @include mobile {
+    flex: 1 1 calc(50% - #{$spacing-sm});
+    width: auto;
+    min-height: 58px;
+  }
+
+  @container (max-width: #{$breakpoint-mobile}) {
     flex: 1 1 calc(50% - #{$spacing-sm});
     width: auto;
     min-height: 58px;

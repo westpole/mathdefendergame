@@ -4,7 +4,7 @@ export interface StoryFrame {
 }
 
 export const minimumDesktopStoryFrame: StoryFrame = {
-  width: 700,
+  width: 800,
   height: 700,
 };
 
