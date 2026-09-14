@@ -54,19 +54,18 @@ test.describe('Mobile web validation', () => {
     });
 
     await expect(page.getByTestId('mobile-input-panel')).toBeVisible();
-
-    const answerInput = page.getByLabel('Answer input');
+    const inputPreview = page.locator('.input-preview');
 
     await page.getByRole('button', { name: 'Digit 1' }).tap();
     await page.getByRole('button', { name: 'Digit 2' }).tap();
-    await expect(answerInput).toHaveValue('12');
+    await expect(inputPreview).toHaveText('12');
 
     const stateAfterDigits = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
 
     expect(stateAfterDigits.inputBuffer).toBe('12');
 
     await page.getByRole('button', { name: 'Backspace' }).tap();
-    await expect(answerInput).toHaveValue('1');
+    await expect(inputPreview).toHaveText('1');
 
     await page.getByRole('button', { name: 'Pause' }).tap();
     await expect(page.getByRole('heading', { name: 'Game Paused' })).toBeVisible();

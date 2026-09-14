@@ -17,14 +17,12 @@ import { HUDOverlay } from '../index';
 const uiSceneMocks = vi.hoisted(() => ({
   appendAnswerInputCharacter: vi.fn<(char: string) => void>(),
   removeAnswerInputCharacter: vi.fn<() => void>(),
-  setAnswerInputBuffer: vi.fn<(nextValue: string) => void>(),
   submitAnswerInput: vi.fn<() => void>(),
 }));
 
 vi.mock('@game/scenes/UIScene', () => ({
   appendAnswerInputCharacter: uiSceneMocks.appendAnswerInputCharacter,
   removeAnswerInputCharacter: uiSceneMocks.removeAnswerInputCharacter,
-  setAnswerInputBuffer: uiSceneMocks.setAnswerInputBuffer,
   submitAnswerInput: uiSceneMocks.submitAnswerInput,
 }));
 
@@ -57,7 +55,7 @@ describe('HUDOverlay Component', () => {
     render(<HUDOverlay />);
     expect(screen.getByText('Lives')).toBeInTheDocument();
 
-    const livesSquare = document.querySelector('.status-square--lives');
+    const livesSquare = document.querySelector('.status-item--lives');
     expect(livesSquare).not.toBeNull();
     expect(within(livesSquare as HTMLElement).getByText('3')).toBeInTheDocument();
   });
@@ -75,7 +73,7 @@ describe('HUDOverlay Component', () => {
     render(<HUDOverlay />);
     expect(screen.getByText('Base Shield')).toBeInTheDocument();
 
-    const shieldSquare = document.querySelector('.status-square--shield');
+    const shieldSquare = document.querySelector('.status-item--shield');
     expect(shieldSquare).not.toBeNull();
     expect(within(shieldSquare as HTMLElement).getByText('5')).toBeInTheDocument();
   });
@@ -84,24 +82,24 @@ describe('HUDOverlay Component', () => {
     gameStore.setState({ lives: 2 });
 
     render(<HUDOverlay />);
-    const livesSquare = document.querySelector('.status-square--lives');
+    const livesSquare = document.querySelector('.status-item--lives');
 
-    expect(livesSquare).toHaveClass('status-square--warn');
+    expect(livesSquare).toHaveClass('status-item--warn');
   });
 
   it('should display warning when lives are in the danger range', () => {
     gameStore.setState({ lives: 1 });
 
     render(<HUDOverlay />);
-    const livesSquare = document.querySelector('.status-square--lives');
+    const livesSquare = document.querySelector('.status-item--lives');
 
-    expect(livesSquare).toHaveClass('status-square--danger');
+    expect(livesSquare).toHaveClass('status-item--danger');
   });
 
   it('should render numeric status squares for shield, lives, streak, score and stage', () => {
     render(<HUDOverlay />);
 
-    expect(document.querySelectorAll('.status-square')).toHaveLength(5);
+    expect(document.querySelectorAll('.status-item')).toHaveLength(5);
   });
 
   it('should update when store state changes', () => {
@@ -128,19 +126,23 @@ describe('HUDOverlay Component', () => {
     expect(screen.getByText(/\+1 life awarded for a 30 streak/i)).toBeInTheDocument();
   });
 
-  it('routes mobile answer controls through UIScene helpers', async () => {
+  it('routes mobile keypad controls through UIScene helpers', async () => {
     const user = userEvent.setup();
 
     render(<HUDOverlay />);
 
-    await user.type(screen.getByLabelText(/answer input/i), '-45');
     await user.click(screen.getByRole('button', { name: 'Digit 7' }));
     await user.click(screen.getByRole('button', { name: 'Backspace' }));
     await user.click(screen.getByRole('button', { name: 'Submit answer' }));
 
-    expect(uiSceneMocks.setAnswerInputBuffer).toHaveBeenCalled();
     expect(uiSceneMocks.appendAnswerInputCharacter).toHaveBeenCalledWith('7');
     expect(uiSceneMocks.removeAnswerInputCharacter).toHaveBeenCalledTimes(1);
     expect(uiSceneMocks.submitAnswerInput).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not render the removed answer input field', () => {
+    render(<HUDOverlay />);
+
+    expect(screen.queryByLabelText(/answer input/i)).not.toBeInTheDocument();
   });
 });
