@@ -3,7 +3,6 @@ import type { ChangeEvent } from 'react';
 import { clsx } from 'clsx';
 import {
   appendAnswerInputCharacter,
-  pauseGameForManualEnd,
   removeAnswerInputCharacter,
   setAnswerInputBuffer,
   submitAnswerInput,
@@ -105,14 +104,6 @@ export function HUDOverlay() {
                 Enter
               </button>
             </div>
-
-            <button
-              className="mobile-input-panel__pause secondary-button"
-              onClick={() => pauseGameForManualEnd('escape')}
-              type="button"
-            >
-              Pause
-            </button>
           </div>
         </section>
 

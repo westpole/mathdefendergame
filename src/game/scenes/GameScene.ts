@@ -41,6 +41,13 @@ export class GameScene extends Phaser.Scene {
       this.submitAnswerInput();
     }
   };
+  private readonly handlePointerDown = (pointer: Phaser.Input.Pointer): void => {
+    if (!pointer.wasTouch) {
+      return;
+    }
+
+    this.pauseForManualEndPrompt('escape');
+  };
 
   constructor() {
     super({ key: 'GameScene' });
@@ -71,6 +78,8 @@ export class GameScene extends Phaser.Scene {
     // ── Keyboard input ────────────────────────────────────────────────────────
     this.input.keyboard?.off('keydown', this.handleKeyDown, this);
     this.input.keyboard?.on('keydown', this.handleKeyDown, this);
+    this.input.off('pointerdown', this.handlePointerDown, this);
+    this.input.on('pointerdown', this.handlePointerDown, this);
 
     // ── Window resize listener ────────────────────────────────────────────────
     this.scale.on('resize', this.handleResize, this);
@@ -251,6 +260,7 @@ export class GameScene extends Phaser.Scene {
 
   private handleShutdown(): void {
     this.input.keyboard?.off('keydown', this.handleKeyDown, this);
+    this.input.off('pointerdown', this.handlePointerDown, this);
     this.scale.off('resize', this.handleResize, this);
     this.clearStreakRewardTimer();
     gameStore.getState().clearStreakRewardMessage();

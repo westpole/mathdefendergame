@@ -7,6 +7,7 @@ import { GameScene } from '../GameScene';
 
 type GameScenePrivate = {
   handleKeyDown: (e: KeyboardEvent) => void;
+  handlePointerDown: (pointer: { wasTouch?: boolean }) => void;
   meteorTexts: Map<number, Phaser.GameObjects.Text>;
   handleResize: (size: { width: number; height: number }) => void;
   handleShutdown: () => void;
@@ -241,6 +242,11 @@ function setupScene() {
     on: vi.fn(),
     off: vi.fn(),
   };
+  const input = {
+    keyboard,
+    on: vi.fn(),
+    off: vi.fn(),
+  };
   const scale = {
     width: 540,
     height: 720,
@@ -265,13 +271,13 @@ function setupScene() {
   const scene = new GameScene();
   (scene as unknown as {
     add: typeof add;
-    input: { keyboard: typeof keyboard };
+    input: typeof input;
     scale: typeof scale;
     events: typeof events;
     scene: { stop: typeof stop };
     cameras: { main: { shake: typeof shake } };
   }).add = add;
-  (scene as unknown as { input: { keyboard: typeof keyboard } }).input = { keyboard };
+  (scene as unknown as { input: typeof input }).input = input;
   (scene as unknown as { scale: typeof scale }).scale = scale;
   (scene as unknown as { events: typeof events }).events = events;
   (scene as unknown as { scene: { stop: typeof stop } }).scene = { stop };
@@ -292,7 +298,7 @@ function setupScene() {
       openMenuView,
       returnToMenu,
     },
-    phaser: { graphics, keyboard, scale, add, events, stop, shake, textObjects },
+    phaser: { graphics, input, keyboard, scale, add, events, stop, shake, textObjects },
   };
 }
 
@@ -342,6 +348,8 @@ describe('GameScene', () => {
     expect(phaser.graphics.setDepth).toHaveBeenCalledWith(6);
     expect(phaser.keyboard.off).toHaveBeenCalledWith('keydown', expect.any(Function), scene);
     expect(phaser.keyboard.on).toHaveBeenCalledWith('keydown', expect.any(Function), scene);
+    expect(phaser.input.off).toHaveBeenCalledWith('pointerdown', expect.any(Function), scene);
+    expect(phaser.input.on).toHaveBeenCalledWith('pointerdown', expect.any(Function), scene);
     expect(phaser.scale.on).toHaveBeenCalledWith('resize', expect.any(Function), scene);
     expect(mockGameState.lastInstance?.setCanvasSize).toHaveBeenCalledWith(540, 720);
     expect(store.syncHUD).toHaveBeenCalledWith({ inputBuffer: '' });
@@ -401,6 +409,20 @@ describe('GameScene', () => {
     expect(store.showPauseOverlay).toHaveBeenCalledWith('escape');
     expect(store.returnToMenu).not.toHaveBeenCalled();
     expect(phaser.stop).not.toHaveBeenCalled();
+  });
+
+  it('pauses from touch input on the game canvas without reacting to mouse clicks', () => {
+    const { scene, store } = setupScene();
+
+    scene.init({ grade: 'trainee' });
+    mockGameState.lastInstance!.state = 'playing';
+
+    (scene as unknown as GameScenePrivate).handlePointerDown({ wasTouch: false });
+    expect(mockGameState.lastInstance?.pauseForManualEndPrompt).not.toHaveBeenCalled();
+
+    (scene as unknown as GameScenePrivate).handlePointerDown({ wasTouch: true });
+    expect(mockGameState.lastInstance?.pauseForManualEndPrompt).toHaveBeenCalledTimes(1);
+    expect(store.showPauseOverlay).toHaveBeenCalledWith('escape');
   });
 
   it('persists and exits to profile when ending game early from pause prompt', () => {

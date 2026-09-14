@@ -16,7 +16,6 @@ import { HUDOverlay } from '../index';
 
 const uiSceneMocks = vi.hoisted(() => ({
   appendAnswerInputCharacter: vi.fn<(char: string) => void>(),
-  pauseGameForManualEnd: vi.fn<(reason: 'escape' | 'window-close') => void>(),
   removeAnswerInputCharacter: vi.fn<() => void>(),
   setAnswerInputBuffer: vi.fn<(nextValue: string) => void>(),
   submitAnswerInput: vi.fn<() => void>(),
@@ -24,7 +23,6 @@ const uiSceneMocks = vi.hoisted(() => ({
 
 vi.mock('@game/scenes/UIScene', () => ({
   appendAnswerInputCharacter: uiSceneMocks.appendAnswerInputCharacter,
-  pauseGameForManualEnd: uiSceneMocks.pauseGameForManualEnd,
   removeAnswerInputCharacter: uiSceneMocks.removeAnswerInputCharacter,
   setAnswerInputBuffer: uiSceneMocks.setAnswerInputBuffer,
   submitAnswerInput: uiSceneMocks.submitAnswerInput,
@@ -139,12 +137,10 @@ describe('HUDOverlay Component', () => {
     await user.click(screen.getByRole('button', { name: 'Digit 7' }));
     await user.click(screen.getByRole('button', { name: 'Backspace' }));
     await user.click(screen.getByRole('button', { name: 'Submit answer' }));
-    await user.click(screen.getByRole('button', { name: 'Pause' }));
 
     expect(uiSceneMocks.setAnswerInputBuffer).toHaveBeenCalled();
     expect(uiSceneMocks.appendAnswerInputCharacter).toHaveBeenCalledWith('7');
     expect(uiSceneMocks.removeAnswerInputCharacter).toHaveBeenCalledTimes(1);
     expect(uiSceneMocks.submitAnswerInput).toHaveBeenCalledTimes(1);
-    expect(uiSceneMocks.pauseGameForManualEnd).toHaveBeenCalledWith('escape');
   });
 });
