@@ -48,7 +48,7 @@
   border: 1px solid rgba(234, 179, 8, 0.6);
   background: rgba(234, 179, 8, 0.22);
   color: #fde68a;
-  font-size: 13px;
+  font-size: $font-size-sm;
   line-height: 1.4;
 }
 
@@ -57,7 +57,7 @@
   align-items: center;
   gap: 0.5em;
   color: $text-primary;
-  font-size: 14px;
+  font-size: $font-size-body-sm;
   margin-top: 0.25em;
   flex-wrap: wrap;
 }

@@ -155,7 +155,7 @@
   background: rgba(15, 23, 42, 0.88);
   color: $text-primary;
   font-family: $font-display;
-  font-size: 16px;
+  font-size: $font-size-body;
 }
 
 .mobile-input-panel__key--secondary {
@@ -216,7 +216,7 @@
   }
 
   &__label {
-    font-size: 10px;
+    font-size: $font-size-xs;
     color: $text-primary;
     text-align: center;
   }
@@ -275,14 +275,14 @@
 
   h2 {
     font-family: $font-display;
-    font-size: 22px;
+    font-size: $font-size-lg;
     line-height: 1.2;
     color: $color-primary-yellow;
   }
 
   p {
     margin-top: $spacing-md;
-    font-size: 16px;
+    font-size: $font-size-body;
     line-height: 1.45;
     color: $text-secondary;
   }
@@ -292,11 +292,11 @@
     padding: $spacing-lg;
 
     h2 {
-      font-size: 18px;
+      font-size: $font-size-md;
     }
 
     p {
-      font-size: 14px;
+      font-size: $font-size-body-sm;
     }
   }
 }

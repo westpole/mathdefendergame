@@ -5,6 +5,7 @@
   --app-viewport-width: 100vw;
   --app-shell-inline-padding: clamp(12px, 4vw, 24px);
   --app-shell-block-padding: clamp(12px, 3vh, 28px);
+  --app-font-size-base: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
 }
 
 :root[data-app-orientation='landscape'] {
@@ -24,10 +25,10 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-size: 16px;
 }
 
 html {
+  font-size: 100%;
   width: 100%;
   min-width: 100%;
   min-height: 100%;
@@ -38,6 +39,8 @@ html {
 
 body {
   font-family: $font-primary;
+  font-size: var(--app-font-size-base);
+  line-height: 1.5;
   overflow: hidden;
   background-color: $bg-dark-base;
   color: $text-primary;
@@ -61,5 +64,6 @@ button,
 input,
 select,
 textarea {
+  font: inherit;
   touch-action: manipulation;
 }
