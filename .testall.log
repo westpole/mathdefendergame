@@ -1,0 +1,62 @@
+
+> mathdefendergame@1.0.1 test:all
+> vitest run --config vitest.config.ts
+
+
+ RUN  v4.1.10 E:/Dev/personal/mathDefenderGame
+
+1:41:04 p.m. [vite] [90m[2m(client)[22m[39m Re-optimizing dependencies because vite config has changed
+ ✓ |electron| electron/__tests__/main.test.js (19 tests) 25ms
+ ✓ |react| src/ui/components/Loading/__tests__/Loading.component.test.tsx (3 tests) 47ms
+ ✓ |phaser| src/game/utilities/__tests__/DDAController.test.ts (5 tests) 5ms
+ ✓ |phaser| src/game/utilities/__tests__/mathGen.test.ts (16 tests) 9ms
+1:41:06 p.m. [vite] [90m[2m(client)[22m[39m [optimizer] bundling dependencies...
+ ✓ |phaser| src/game/scenes/__tests__/UIScene.test.ts (6 tests) 2136ms
+     ✓ creates the Phaser game once and reuses the singleton  2127ms
+ ✓ |react| src/ui/components/StageMessageOverlay/__tests__/StageMessageOverlay.component.test.tsx (3 tests) 49ms
+ ✓ |react| src/ui/components/Rules/__tests__/Rules.component.test.tsx (1 test) 32ms
+ ✓ |phaser| src/game/__tests__/main.test.ts (77 tests) 33ms
+ ✓ |react| src/ui/components/LoginOverlay/__tests__/LoginOverlay.component.test.tsx (6 tests) 126ms
+ ✓ |react| src/store/__tests__/useGameStore.test.ts (32 tests) 19ms
+ ✓ |react| src/ui/components/PerformanceOverlay/__tests__/PerformanceOverlay.component.test.tsx (2 tests) 51ms
+ ✓ |react| src/ui/components/GameOverOverlay/__tests__/GameOverOverlay.component.test.tsx (1 test) 42ms
+ ✓ |react| src/ui/components/GameBgLayout/__tests__/GameBgLayout.component.test.tsx (2 tests) 24ms
+ ✓ |react| src/ui/components/ProfileOverlay/__tests__/ProfileOverlay.component.test.tsx (2 tests) 66ms
+ ✓ |react| src/ui/components/HomeOverlay/__tests__/HomeOverlay.component.test.tsx (2 tests) 85ms
+ ✓ |react| src/ui/components/HUDOverlay/__tests__/HUDOverlay.component.test.tsx (11 tests) 230ms
+ ✓ |react| src/platform/__tests__/adapter.test.ts (2 tests) 4ms
+ ✓ |react| src/ui/components/__tests__/App.component.test.tsx (11 tests) 121ms
+ ✓ |storybook (chromium)| src/ui/components/Loading/Loading.stories.tsx (1 test) 1426ms
+   ✓ Default  1422ms
+ ✓ |storybook (chromium)| src/ui/components/PerformanceOverlay/PerformanceOverlay.stories.tsx (2 tests) 1627ms
+   ✓ Default  1553ms
+ ✓ |storybook (chromium)| src/ui/components/Rules/Rules.stories.tsx (1 test) 1308ms
+   ✓ Default  1305ms
+ ✓ |storybook (chromium)| src/ui/components/LoginOverlay/LoginOverlay.stories.tsx (2 tests) 1836ms
+   ✓ Default  1769ms
+ ✓ |storybook (chromium)| src/ui/components/GameBgLayout/GameBgLayout.stories.tsx (3 tests) 1980ms
+   ✓ Desktop background layout  1917ms
+ ✓ |storybook (chromium)| src/ui/components/ProfileOverlay/ProfileOverlay.stories.tsx (3 tests) 1400ms
+   ✓ Commander profile  1274ms
+ ✓ |storybook (chromium)| src/ui/components/HomeOverlay/HomeOverlay.stories.tsx (3 tests) 1711ms
+   ✓ Weekly progress available  1550ms
+ ✓ |storybook (chromium)| src/ui/components/MenuControls/MenuControls.stories.tsx (1 test) 1636ms
+   ✓ Default  1632ms
+ ✓ |storybook (chromium)| src/ui/components/GameOverOverlay/GameOverOverlay.stories.tsx (2 tests) 1918ms
+   ✓ Game Over Results  1869ms
+ ✓ |phaser| src/game/scenes/__tests__/BootScene.test.ts (2 tests) 4ms
+ ✓ |phaser| src/game/scenes/__tests__/GameScene.test.ts (13 tests) 38ms
+ ✓ |storybook (chromium)| src/ui/components/PauseOverlay/PauseOverlay.stories.tsx (5 tests) 2261ms
+   ✓ Pause prompt  2103ms
+ ✓ |storybook (chromium)| src/ui/components/HUDOverlay/HUDOverlay.stories.tsx (10 tests) 2421ms
+   ✓ Desktop: 5 shields and 3 lives  1983ms
+ ✓ |storybook (chromium)| src/ui/components/StageMessageOverlay/StageMessageOverlay.stories.tsx (5 tests) 1213ms
+   ✓ You won stage (clean)  1085ms
+
+ Test Files  32 passed (32)
+      Tests  254 passed (254)
+   Start at  13:41:03
+   Duration  12.75s (transform 40.72s, setup 37.49s, import 67.42s, tests 23.88s, environment 19.83s)
+
+ HTML  Report is generated
+       You can run npx vite preview --outDir reports to see the test results.

@@ -1,4 +1,24 @@
 
+## [1.1.0](https://github.com/westpole/mathdefendergame/compare/v1.0.1...v1.1.0) (2026-09-17)
+
+### Features
+
+* [#31](https://github.com/westpole/mathdefendergame/issues/31) implement renderer-based close confirmation handling and cancel logic ([b0af50f](https://github.com/westpole/mathdefendergame/commit/b0af50f98262b39c982c337d63826ac6e3d79f2c))
+* [#34](https://github.com/westpole/mathdefendergame/issues/34) include setup for test on mobile device ([51d4e94](https://github.com/westpole/mathdefendergame/commit/51d4e94270445fb1bce4cea0ab4ac1cc9b704633))
+* [#36](https://github.com/westpole/mathdefendergame/issues/36) add npm-upgrade agent for safe and deterministic NPM package upgrades ([5a0bdd1](https://github.com/westpole/mathdefendergame/commit/5a0bdd1d32231ae444377df96c2ae9abc4279f69))
+* [#36](https://github.com/westpole/mathdefendergame/issues/36) add release-game agent for production workflows and update release-win-game agent for manual packaging ([5e9fd10](https://github.com/westpole/mathdefendergame/commit/5e9fd10d64b10b3d827aab53f468c9bf59ba27b1))
+* [#43](https://github.com/westpole/mathdefendergame/issues/43) add mobile background image and remove radar screen asset ([6aa7310](https://github.com/westpole/mathdefendergame/commit/6aa7310de330fbf33768cdbd3174ec815b1fea78))
+* [#43](https://github.com/westpole/mathdefendergame/issues/43) introduce build setup to generate single HTML file ([8cea36f](https://github.com/westpole/mathdefendergame/commit/8cea36fc246cc840738ad44fccff0136fea700ce))
+
+### Bug Fixes
+
+* [#34](https://github.com/westpole/mathdefendergame/issues/34) correct background image settings ([cc403e4](https://github.com/westpole/mathdefendergame/commit/cc403e4afe9b6c51d13c8e888970be07fdef5a8d))
+* [#34](https://github.com/westpole/mathdefendergame/issues/34) display mobile HUD in storybook ([9d35049](https://github.com/westpole/mathdefendergame/commit/9d35049abaef8127fe2776a6580e910e6680ec1f))
+* [#34](https://github.com/westpole/mathdefendergame/issues/34) fix the app shell for mobile browsers ([cb24503](https://github.com/westpole/mathdefendergame/commit/cb245038a23c3e3b049725218b6d9cc9f832830c))
+* [#34](https://github.com/westpole/mathdefendergame/issues/34) resolve issue with storybook build ([3fd9e15](https://github.com/westpole/mathdefendergame/commit/3fd9e150e9535f01ce8ba52b2621500dbc875ef6))
+* [#43](https://github.com/westpole/mathdefendergame/issues/43) update E2EWindow type to use GameStoreState for improved state management ([675a5d1](https://github.com/westpole/mathdefendergame/commit/675a5d19ef56b02bfc43df83e2fc2a0b67ae6d1e))
+* [#43](https://github.com/westpole/mathdefendergame/issues/43) update overlay styles for improved interaction and background color ([009f1d1](https://github.com/westpole/mathdefendergame/commit/009f1d108a03ce3ee80459b0be4e156ad87ce679))
+
 ## [1.0.1](https://github.com/westpole/mathdefendergame/compare/v1.0.0...v1.0.1) (2026-09-07)
 
 ### Features
