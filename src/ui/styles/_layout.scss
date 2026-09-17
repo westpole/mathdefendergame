@@ -48,11 +48,11 @@
   background: url('../../assets/math-defender-city-bg.png') repeat-x bottom;
 }
 
-// @media (hover: none) and (pointer: coarse) {
-//   #app-shell {
-//     padding-top: max(env(safe-area-inset-top, 0px), var(--app-shell-block-padding));
-//     padding-right: max(env(safe-area-inset-right, 0px), var(--app-shell-inline-padding));
-//     padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--app-shell-block-padding));
-//     padding-left: max(env(safe-area-inset-left, 0px), var(--app-shell-inline-padding));
-//   }
-// }
+@media screen and (max-width: $breakpoint-mobile) {
+  .city-background-layer {
+    background-image: url('../../assets/math-defender-city-bg-mobile.png');
+    background-size: 150%; /* Makes the image 150% the width of the screen */
+    background-position: bottom; /* Centers the oversized image */
+    background-repeat: no-repeat;
+  }
+}

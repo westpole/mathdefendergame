@@ -17,6 +17,7 @@
    * It is applied when the overlay is interactive (e.g., a modal or menu).
    */
   pointer-events: auto;
+  background-color: $bg-dark-overlay;
 }
 
 .overlay-panel {

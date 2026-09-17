@@ -1,10 +1,11 @@
 /// <reference types="vitest/config" />
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
+import { viteSingleFile } from 'vite-plugin-singlefile';
 import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react()],
+  plugins: [react(), ...(mode === 'e2e' ? [] : [viteSingleFile({ removeViteModuleLoader: true })])],
   base: './',
   // Required for Electron file:// protocol in production
   build: {
