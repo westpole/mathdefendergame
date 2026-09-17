@@ -15,7 +15,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Wait for web fonts (Press Start 2P, Roboto) to load before rendering menu
+    // Wait for web fonts (Roboto) to load before rendering menu
     document.fonts.ready.then(() => {
       gameStore.getState().markBootReady();
     });
