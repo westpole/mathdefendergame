@@ -42,7 +42,7 @@
     "deps:unused": "knip",
     "deps:check-updates": "npx npm-check-updates",
     "build:web": "npm run test:all && npm run typecheck && vite build",
-    "build:win": "npm run build:web && electron-builder",
+    "build:win": "rm -Rf ./dist/ && npm run build:web && electron-builder",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "release:guard": "node scripts/release-guard.mjs",
