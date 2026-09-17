@@ -1,6 +1,6 @@
-# Using the `release-win-game` Agent
+# Using the `release-game` Agent
 
-The `release-win-game` agent is the repo-specific agent for shipping a Windows release of Math Defender Game. Use it when you want Copilot to handle release-oriented work such as version bumps, changelog updates, release builds, tags, and push preparation.
+The `release-game` agent is the repo-specific agent for shipping a Web release of Math Defender Game. Use it when you want Copilot to handle release-oriented work such as version bumps, changelog updates, release builds, tags, and push preparation.
 
 ## When to Use It
 
@@ -9,7 +9,7 @@ Use this agent for requests like:
 - Prepare the next patch release.
 - Cut a minor release with short release notes.
 - Update the version, generate release notes, and create the release commit.
-- Build and validate the Windows release package before tagging.
+- Build and validate the Web release package before tagging.
 
 Do not use it for gameplay changes, UI work, Phaser scene updates, or general bug fixing. Those changes should be completed first, then released.
 
@@ -45,28 +45,28 @@ You can also include optional notes or constraints, for example:
 Use a direct instruction that includes the exact agent name and the release type.
 
 ```text
-Use the release-win-game agent to prepare a patch release.
+Use the release-game agent to prepare a patch release.
 ```
 
 With extra constraints:
 
 ```text
-Use the release-win-game agent to prepare a minor release.
-Include release notes for the new DDA tuning changes, update the changelog, build the Windows package, and stop before pushing.
+Use the release-game agent to prepare a minor release.
+Include release notes for the new DDA tuning changes, update the changelog, build the Web package, and stop before pushing.
 ```
 
 ## Good Requests
 
 ```text
-Use the release-win-game agent for a patch release.
+Use the release-game agent for a patch release.
 ```
 
 ```text
-Use the release-win-game agent for a minor release and draft concise release notes from the latest completed work.
+Use the release-game agent for a minor release and draft concise release notes from the latest completed work.
 ```
 
 ```text
-Use the release-win-game agent for a major release. Update the changelog, create the version bump commit and tag, but ask before pushing.
+Use the release-game agent for a major release. Update the changelog, create the version bump commit and tag, but ask before pushing.
 ```
 
 ## Recommended Preconditions
@@ -86,14 +86,14 @@ A successful run should leave you with some or all of the following, depending o
 
 - updated version metadata
 - updated changelog content
-- built Windows release artifacts
+- built Web release artifacts
 - a release commit
 - a release tag
 - a prepared or completed push
 
 ## Notes
 
-- Use the exact agent name: `release-win-game`.
+- Use the exact agent name: `release-game`.
 - The release workflow rejects the run with a message when the current branch is not `master`.
 - The release workflow rejects the run with a message when there are no commits since the latest release tag.
 - Be explicit about guardrails such as `stop before pushing` if you want a review checkpoint.

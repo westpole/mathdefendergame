@@ -7,7 +7,7 @@ The player defends a base from falling meteors containing math expressions by ty
 * Development and Release:
   - [General information](/docs/general.md)
   - [Mobile device testing](/docs/mobile-device-testing.md)
-  - [Using the `release-win-game` agent](/docs/release-win-game-agent.md)
+  - [Using the `release-game` agent](/docs/release-game-agent.md)
   - [Tips and Tricks](/docs/tips-and-tricks.md)
   - [Game Overview on engine and wiring](/docs/ui-overlay-game-engine-wiring.md)
 
