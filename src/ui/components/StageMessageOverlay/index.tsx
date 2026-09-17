@@ -34,7 +34,7 @@ export function StageMessageOverlay() {
   const remainingLifeLabel = stageMessage.lives === 1 ? 'life' : 'lives';
 
   return (
-    <div className="overlay-screen overlay-screen--interactive">
+    <div className="overlay-screen overlay-screen--interactive ">
       <div
         className={clsx('overlay-panel', 'modal-panel', {
           'accent-success': stageMessage.success,
