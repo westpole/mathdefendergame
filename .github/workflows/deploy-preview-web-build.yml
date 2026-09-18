@@ -34,17 +34,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # This step installs the missing browsers and system dependencies
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
       - name: Lint
         run: npm run lint
 
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Test Phaser
-        run: npm run test:phaser
+      - name: Run all unit/component tests
+        run: npm run test:all
 
-      - name: Test React
-        run: npm run test:react
+      - name: Run Web end-to-end tests
+        run: npm run test:e2e:web
 
       - name: Build web app
         run: npx vite build --mode production
