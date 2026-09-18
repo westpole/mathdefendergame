@@ -1,0 +1,36 @@
+name: PR Verify code quality and Run all Tests
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  run-tests:
+    name: Run All Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # This step installs the missing browsers and system dependencies
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Run all tests
+        run: npm run test:all
