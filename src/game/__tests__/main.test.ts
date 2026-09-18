@@ -5,7 +5,7 @@
 
 import { GAME_CONFIG, getDangerZoneOffset, getMeteorSpawnPadding } from '../config';
 import { Game } from '../main';
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 
 interface Callbacks {
   onHUDUpdate: () => void;
@@ -30,7 +30,7 @@ describe('Game', () => {
     };
 
     game = new Game(mockCallbacks);
-    gameStore.setState({ activeUsername: null, gameHistoryByProfile: {} });
+    useGameStore.setState({ activeUsername: null, gameHistoryByProfile: {} });
   });
 
   describe('initialization', () => {
@@ -194,7 +194,7 @@ describe('Game', () => {
     });
 
     it('carries grade progress across completed games', () => {
-      gameStore.setState({
+      useGameStore.setState({
         activeUsername: 'PilotOne',
         gameHistoryByProfile: {
           PilotOne: [
@@ -640,7 +640,7 @@ describe('Game', () => {
 
       game.gameOver();
 
-      const history = gameStore.getState().getGameHistory(null, 1);
+      const history = useGameStore.getState().getGameHistory(null, 1);
       expect(history).toHaveLength(1);
       expect(history[0].correctAnswers).toBe(8);
       expect(history[0].incorrectAnswers).toBe(2);
@@ -679,7 +679,7 @@ describe('Game', () => {
       game.hitBase(baseHitMeteor); // '-' incorrect, latency 200
       game.gameOver();
 
-      const history = gameStore.getState().getGameHistory(null, 1);
+      const history = useGameStore.getState().getGameHistory(null, 1);
       expect(history).toHaveLength(1);
       expect(history[0].averageAnswerTimeMs).toBe(567);
       expect(history[0].mostProblematicOperation).toBe('-');

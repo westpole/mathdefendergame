@@ -8,7 +8,7 @@
 
 import Phaser from 'phaser';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import type { MenuView, PauseOverlayReason } from '@store/useGameStore';
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
 import { notifyAppCloseCancelled, notifyAppCloseReady } from '../../platform/adapter';
@@ -59,7 +59,7 @@ export function destroyGame(game: Phaser.Game): void {
 
 export function startGame(): void {
   const game = ensurePhaserGame();
-  const state = gameStore.getState();
+  const state = useGameStore.getState();
   const startingScore = Math.max(0, state.score);
   const startingGrade = resolveGradeFromScore(startingScore);
 
@@ -142,7 +142,7 @@ export function resumePausedGame(): void {
 }
 
 export function cancelElectronClose(): void {
-  const state = gameStore.getState();
+  const state = useGameStore.getState();
 
   if (state.phase === 'paused' && state.pauseOverlay?.reason === 'window-close') {
     resumePausedGame();
@@ -171,7 +171,7 @@ export function returnToMenu(): void {
     game.scene.stop('GameScene');
   }
 
-  gameStore.getState().returnToMenu();
+  useGameStore.getState().returnToMenu();
 }
 
 export function openMenuView(menuView: MenuView): void {
@@ -181,7 +181,7 @@ export function openMenuView(menuView: MenuView): void {
     game.scene.stop('GameScene');
   }
 
-  gameStore.getState().openMenuView(menuView);
+  useGameStore.getState().openMenuView(menuView);
 }
 
 export function logOff(): void {
@@ -191,7 +191,7 @@ export function logOff(): void {
     game.scene.stop('GameScene');
   }
 
-  gameStore.getState().logOff();
+  useGameStore.getState().logOff();
 }
 
 export function onElectronCloseRequested(): void {
@@ -199,13 +199,13 @@ export function onElectronCloseRequested(): void {
 }
 
 export function shouldConfirmElectronClose(): boolean {
-  const { phase } = gameStore.getState();
+  const { phase } = useGameStore.getState();
 
   return phase === 'playing' || phase === 'paused' || phase === 'stage-message';
 }
 
 export function onElectronCloseConfirmed(): void {
-  const state = gameStore.getState();
+  const state = useGameStore.getState();
 
   if (shouldConfirmElectronClose()) {
     endGameEarly({ closeApp: true });
@@ -217,7 +217,7 @@ export function onElectronCloseConfirmed(): void {
 }
 
 export function onElectronCloseCancelled(): void {
-  const state = gameStore.getState();
+  const state = useGameStore.getState();
 
   if (state.phase !== 'paused' || state.pauseOverlay?.reason !== 'window-close') {
     return;

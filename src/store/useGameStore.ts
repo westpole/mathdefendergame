@@ -739,5 +739,4 @@ export const useGameStore = create<GameStoreState>()(
   ),
 );
 
-export const gameStore = useGameStore;
 export type { MenuView, OverlayPhase, StageMessageState, PauseOverlayReason };

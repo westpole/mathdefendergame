@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/useGameStore';
 
 import { HomeOverlay } from '..';
@@ -9,7 +9,7 @@ import { HomeOverlay } from '..';
 import baseStoreState from '../../__mocks__/base-store-state.json';
 
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
-  gameStore.setState({
+  useGameStore.setState({
     ...(structuredClone(baseStoreState) as Partial<GameStoreState>),
     ...partialState,
   });

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 
-import { gameStore, GameStoreState } from '@store/useGameStore';
+import { useGameStore, GameStoreState } from '@store/useGameStore';
 
 import { BootScene } from '../BootScene';
 
@@ -34,7 +34,7 @@ describe('BootScene', () => {
       value: { ready: fontsReady },
     });
 
-    vi.spyOn(gameStore, 'getState').mockReturnValue({
+    vi.spyOn(useGameStore, 'getState').mockReturnValue({
       markBootReady,
     } as unknown as GameStoreState);
 

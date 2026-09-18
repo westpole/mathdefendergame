@@ -9,7 +9,7 @@ import Phaser from 'phaser';
 
 import { Game } from '@game/main';
 import { GAME_CONFIG } from '@game/config';
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import type { PauseOverlayReason } from '@store/useGameStore';
 import type { GameOverReason, Grade } from '@shared/types';
 import { notifyAppCloseReady } from '../../platform/adapter';
@@ -65,7 +65,7 @@ export class GameScene extends Phaser.Scene {
     this.gameLogic.setGrade(data?.grade ?? 'trainee');
     this.gameLogic.state = 'playing';
     this.gameLogic.lastSpawn = Date.now();
-    gameStore.getState().startPlaying();
+    useGameStore.getState().startPlaying();
   }
 
   create(): void {
@@ -131,14 +131,14 @@ export class GameScene extends Phaser.Scene {
 
   // ── HUD update ────────────────────────────────────────────────────────────
   updateHUD(): void {
-    gameStore.getState().syncHUD({
+    useGameStore.getState().syncHUD({
       inputBuffer: this.gameLogic.inputBuffer,
     });
   }
 
   // ── Stage finish ──────────────────────────────────────────────────────────
   private handleFinishStage(success: boolean): void {
-    gameStore.getState().showStageMessage({
+    useGameStore.getState().showStageMessage({
       success,
       stage:          this.gameLogic.stage,
       stageIncorrect: this.gameLogic.stageIncorrect,
@@ -150,12 +150,12 @@ export class GameScene extends Phaser.Scene {
   // ── Game over (lives = 0) ─────────────────────────────────────────────────
   private handleGameOver(reason: GameOverReason): void {
     if (reason === 'lives-depleted') {
-      gameStore.getState().returnToMenu();
+      useGameStore.getState().returnToMenu();
       this.scene.stop();
       return;
     }
 
-    gameStore.getState().showGameOver({
+    useGameStore.getState().showGameOver({
       grade:          this.gameLogic.grade,
       score:          this.gameLogic.score,
       correctCount:   this.gameLogic.correctCount,
@@ -170,17 +170,17 @@ export class GameScene extends Phaser.Scene {
       this.streakRewardTimer = null;
     }
 
-    gameStore.getState().showStreakRewardMessage({
+    useGameStore.getState().showStreakRewardMessage({
       message: `Congratulations! +1 life awarded for a 30 streak. Lives: ${lives}`,
     });
 
     this.streakRewardTimer = setTimeout(() => {
       this.streakRewardTimer = null;
-      gameStore.getState().clearStreakRewardMessage();
+      useGameStore.getState().clearStreakRewardMessage();
       this.gameLogic.resumeAfterStreakReward();
 
       if (this.gameLogic.state === 'playing') {
-        gameStore.getState().startPlaying();
+        useGameStore.getState().startPlaying();
       }
     }, 3000);
   }
@@ -191,7 +191,7 @@ export class GameScene extends Phaser.Scene {
     this.updateHUD();
 
     if (this.gameLogic.state !== 'gameover') {
-      gameStore.getState().startPlaying();
+      useGameStore.getState().startPlaying();
     }
   }
 
@@ -217,14 +217,14 @@ export class GameScene extends Phaser.Scene {
     }
 
     this.gameLogic.pauseForManualEndPrompt();
-    gameStore.getState().showPauseOverlay(reason);
+    useGameStore.getState().showPauseOverlay(reason);
   }
 
   public resumeFromManualPausePrompt(): void {
     this.gameLogic.resumeFromManualPause();
 
     if (this.gameLogic.state === 'playing') {
-      gameStore.getState().startPlaying();
+      useGameStore.getState().startPlaying();
     }
   }
 
@@ -233,11 +233,11 @@ export class GameScene extends Phaser.Scene {
     this.clearTransientRenderables();
 
     if (options?.closeApp) {
-      gameStore.getState().showSavingBeforeClose();
+      useGameStore.getState().showSavingBeforeClose();
     }
 
     const snapshot = this.gameLogic.buildPrematureEndSnapshot();
-    gameStore.getState().persistPrematureGameEnd({
+    useGameStore.getState().persistPrematureGameEnd({
       grade: snapshot.grade,
       score: snapshot.score,
       stage: snapshot.stage,
@@ -251,7 +251,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    gameStore.getState().openMenuView('profile');
+    useGameStore.getState().openMenuView('profile');
   }
 
   private handleResize(gameSize: Phaser.Structs.Size): void {
@@ -263,7 +263,7 @@ export class GameScene extends Phaser.Scene {
     this.input.off('pointerdown', this.handlePointerDown, this);
     this.scale.off('resize', this.handleResize, this);
     this.clearStreakRewardTimer();
-    gameStore.getState().clearStreakRewardMessage();
+    useGameStore.getState().clearStreakRewardMessage();
     this.clearTransientRenderables();
   }
 

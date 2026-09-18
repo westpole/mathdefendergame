@@ -7,7 +7,7 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/useGameStore';
 
 import fullShieldsLives from '../__mocks__/full-shields-lives.json';
@@ -33,7 +33,7 @@ describe('HUDOverlay Component', () => {
     vi.clearAllMocks();
 
     // Set initial state for the game store before each test
-    gameStore.setState({
+    useGameStore.setState({
       ...baseHudState,
       grade: 'major-general',
       score: 1000,
@@ -61,7 +61,7 @@ describe('HUDOverlay Component', () => {
   });
 
   it('should render streak correctly', () => {
-    gameStore.setState({ streak: 12 });
+    useGameStore.setState({ streak: 12 });
 
     render(<HUDOverlay />);
 
@@ -79,7 +79,7 @@ describe('HUDOverlay Component', () => {
   });
 
   it('should display warning when lives are in the warning range', () => {
-    gameStore.setState({ lives: 2 });
+    useGameStore.setState({ lives: 2 });
 
     render(<HUDOverlay />);
     const livesSquare = document.querySelector('.status-item--lives');
@@ -88,7 +88,7 @@ describe('HUDOverlay Component', () => {
   });
 
   it('should display warning when lives are in the danger range', () => {
-    gameStore.setState({ lives: 1 });
+    useGameStore.setState({ lives: 1 });
 
     render(<HUDOverlay />);
     const livesSquare = document.querySelector('.status-item--lives');
@@ -107,14 +107,14 @@ describe('HUDOverlay Component', () => {
     expect(screen.getByText(/1000/)).toBeInTheDocument();
 
     act(() => {
-      gameStore.setState({ score: 2000 });
+      useGameStore.setState({ score: 2000 });
     });
 
     expect(screen.getByText(/2000/)).toBeInTheDocument();
   });
 
   it('should render streak reward message when present', () => {
-    gameStore.setState({
+    useGameStore.setState({
       streakRewardMessage: {
         message: 'Congratulations! +1 life awarded for a 30 streak. Lives: 4',
       },
