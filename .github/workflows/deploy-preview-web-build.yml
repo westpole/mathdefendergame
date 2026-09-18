@@ -37,8 +37,17 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test Phaser
+        run: npm run test:phaser
+
+      - name: Test React
+        run: npm run test:react
+
       - name: Build web app
-        run: npm run build:web
+        run: npx vite build --mode production
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
