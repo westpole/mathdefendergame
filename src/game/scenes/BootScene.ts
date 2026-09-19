@@ -7,7 +7,7 @@
  */
 import Phaser from 'phaser';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -17,7 +17,7 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     // Wait for web fonts (Roboto) to load before rendering menu
     document.fonts.ready.then(() => {
-      gameStore.getState().markBootReady();
+      useGameStore.getState().markBootReady();
     });
   }
 }

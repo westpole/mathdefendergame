@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/useGameStore';
 
 import { LoginOverlay } from '../index';
@@ -8,7 +8,7 @@ import { LoginOverlay } from '../index';
 import baseStoreState from '../../__mocks__/base-store-state.json';
 
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
-  gameStore.setState({
+  useGameStore.setState({
     ...(structuredClone(baseStoreState) as Partial<GameStoreState>),
     ...partialState,
   });
@@ -96,15 +96,15 @@ describe('LoginOverlay', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /^create$/i }));
 
-    const state = gameStore.getState();
+    const state = useGameStore.getState();
     expect(state.phase).toBe('start');
     expect(state.activeUsername).toBe('AcePilot');
     expect(state.rememberedUsername).toBeNull();
   });
 
   it('logs in with keep me logged in enabled', () => {
-    gameStore.getState().createAndLoginProfile('AcePilot', 'Abc12345');
-    gameStore.setState({
+    useGameStore.getState().createAndLoginProfile('AcePilot', 'Abc12345');
+    useGameStore.setState({
       phase: 'login',
       activeUsername: null,
       rememberedUsername: null,
@@ -121,7 +121,7 @@ describe('LoginOverlay', () => {
     fireEvent.click(screen.getByLabelText(/keep me logged in/i));
     fireEvent.click(screen.getByRole('button', { name: /^login$/i }));
 
-    const state = gameStore.getState();
+    const state = useGameStore.getState();
     expect(state.phase).toBe('start');
     expect(state.activeUsername).toBe('AcePilot');
     expect(state.rememberedUsername).toBe('AcePilot');

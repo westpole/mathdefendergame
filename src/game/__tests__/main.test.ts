@@ -5,7 +5,7 @@
 
 import { GAME_CONFIG, getDangerZoneOffset, getMeteorSpawnPadding } from '../config';
 import { Game } from '../main';
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 
 interface Callbacks {
   onHUDUpdate: () => void;
@@ -30,7 +30,7 @@ describe('Game', () => {
     };
 
     game = new Game(mockCallbacks);
-    gameStore.setState({ activeUsername: null, gameHistoryByProfile: {} });
+    useGameStore.setState({ activeUsername: null, gameHistoryByProfile: {} });
   });
 
   describe('initialization', () => {
@@ -102,6 +102,120 @@ describe('Game', () => {
       expect(game.shield).toBe(5);
       expect(game.stage).toBe(1);
       expect(game.meteors.length).toBe(0);
+    });
+  });
+
+  describe('input controls', () => {
+    beforeEach(() => {
+      game.state = 'playing';
+    });
+
+    it('sanitizes direct input to digits with an optional leading minus', () => {
+      game.setInputBuffer('-12abc3456');
+
+      expect(game.inputBuffer).toBe('-1234');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+
+    it('ignores direct input changes outside the playing state', () => {
+      game.state = 'message';
+
+      game.setInputBuffer('123');
+
+      expect(game.inputBuffer).toBe('');
+      expect(mockCallbacks.onHUDUpdate).not.toHaveBeenCalled();
+    });
+
+    it('appends sanitized characters while enforcing the max answer length', () => {
+      game.inputBuffer = '-123';
+
+      game.appendInputCharacter('4');
+      game.appendInputCharacter('5');
+      game.appendInputCharacter('x');
+
+      expect(game.inputBuffer).toBe('-1234');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalledTimes(3);
+    });
+
+    it('removes the last input character while playing', () => {
+      game.inputBuffer = '123';
+
+      game.removeLastInputCharacter();
+
+      expect(game.inputBuffer).toBe('12');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+
+    it('submits the current input buffer when it contains an answer', () => {
+      game.inputBuffer = '42';
+      const checkAnswerSpy = vi.spyOn(game, 'checkAnswer');
+
+      game.submitInputBuffer();
+
+      expect(checkAnswerSpy).toHaveBeenCalled();
+    });
+
+    it('does not submit empty, partial, or paused answers', () => {
+      const checkAnswerSpy = vi.spyOn(game, 'checkAnswer');
+
+      game.inputBuffer = '';
+      game.submitInputBuffer();
+
+      game.inputBuffer = '-';
+      game.submitInputBuffer();
+
+      game.state = 'paused';
+      game.inputBuffer = '42';
+      game.submitInputBuffer();
+
+      expect(checkAnswerSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('manual pause controls', () => {
+    it('pauses for the manual end prompt from active play', () => {
+      game.state = 'playing';
+
+      game.pauseForManualEndPrompt();
+
+      expect(game.state).toBe('paused');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+
+    it('does not pause when already showing a stage message or game over', () => {
+      game.state = 'message';
+      game.pauseForManualEndPrompt();
+      expect(game.state).toBe('message');
+
+      game.state = 'gameover';
+      game.pauseForManualEndPrompt();
+      expect(game.state).toBe('gameover');
+    });
+
+    it('resumes active play from a manual pause', () => {
+      game.state = 'paused';
+
+      game.resumeFromManualPause();
+
+      expect(game.state).toBe('playing');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+
+    it('does not resume when the game is not manually paused', () => {
+      game.state = 'playing';
+
+      game.resumeFromManualPause();
+
+      expect(game.state).toBe('playing');
+      expect(mockCallbacks.onHUDUpdate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('grade control', () => {
+    it('applies a grade baseline directly', () => {
+      game.setGrade('major-general');
+
+      expect(game.grade).toBe('major-general');
     });
   });
 
@@ -194,7 +308,7 @@ describe('Game', () => {
     });
 
     it('carries grade progress across completed games', () => {
-      gameStore.setState({
+      useGameStore.setState({
         activeUsername: 'PilotOne',
         gameHistoryByProfile: {
           PilotOne: [
@@ -640,7 +754,7 @@ describe('Game', () => {
 
       game.gameOver();
 
-      const history = gameStore.getState().getGameHistory(null, 1);
+      const history = useGameStore.getState().getGameHistory(null, 1);
       expect(history).toHaveLength(1);
       expect(history[0].correctAnswers).toBe(8);
       expect(history[0].incorrectAnswers).toBe(2);
@@ -679,7 +793,7 @@ describe('Game', () => {
       game.hitBase(baseHitMeteor); // '-' incorrect, latency 200
       game.gameOver();
 
-      const history = gameStore.getState().getGameHistory(null, 1);
+      const history = useGameStore.getState().getGameHistory(null, 1);
       expect(history).toHaveLength(1);
       expect(history[0].averageAnswerTimeMs).toBe(567);
       expect(history[0].mostProblematicOperation).toBe('-');

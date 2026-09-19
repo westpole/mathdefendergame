@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import { StageMessageOverlay } from '..';
 
 const uiSceneMocks = vi.hoisted(() => ({
@@ -20,7 +20,7 @@ vi.mock('@game/scenes/UIScene', () => ({
 describe('StageMessageOverlay', () => {
   beforeEach(() => {
     uiSceneMocks.continueGame.mockReset();
-    gameStore.setState({
+    useGameStore.setState({
       phase: 'stage-message',
       menuView: 'home',
       bootReady: true,

@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/useGameStore';
 
 import { PerformanceOverlay } from '..';
@@ -9,7 +9,7 @@ import { PerformanceOverlay } from '..';
 import profileMenuStore from '../../__mocks__/profile-menu-store.json';
 
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
-  gameStore.setState({
+  useGameStore.setState({
     ...(structuredClone(profileMenuStore) as Partial<GameStoreState>),
     ...partialState,
   });

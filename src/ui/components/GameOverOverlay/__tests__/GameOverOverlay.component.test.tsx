@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import { GameOverOverlay } from '..';
 
 vi.mock('@game/scenes/UIScene', () => ({
@@ -15,7 +15,7 @@ vi.mock('@game/scenes/UIScene', () => ({
 
 describe('GameOverOverlay', () => {
   beforeEach(() => {
-    gameStore.setState({
+    useGameStore.setState({
       phase: 'gameover',
       menuView: 'home',
       bootReady: true,

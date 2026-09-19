@@ -1,0 +1,7 @@
+# Snyk policy file
+version: v1.0.0
+exclude:
+  code:
+    # Exclude specific test/mock directories
+    - __tests__/**
+    - __mocks__/**

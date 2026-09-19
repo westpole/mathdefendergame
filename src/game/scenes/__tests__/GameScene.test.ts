@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 import type { GameCallbacks } from '@game/main';
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 
 import { GameScene } from '../GameScene';
 
@@ -233,9 +233,9 @@ function setupScene() {
     showSavingBeforeClose,
     persistPrematureGameEnd,
     returnToMenu,
-  } as unknown as ReturnType<typeof gameStore.getState>;
+  } as unknown as ReturnType<typeof useGameStore.getState>;
 
-  vi.spyOn(gameStore, 'getState').mockReturnValue(state);
+  vi.spyOn(useGameStore, 'getState').mockReturnValue(state);
 
   const graphics = createGraphicsStub();
   const keyboard = {

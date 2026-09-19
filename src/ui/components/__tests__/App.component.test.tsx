@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/useGameStore';
 import { App } from '../../../App';
 
@@ -55,7 +55,7 @@ vi.mock('@game/scenes/UIScene', () => ({
 }));
 
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
-  gameStore.setState({
+  useGameStore.setState({
     ...(structuredClone(baseStoreState) as Partial<GameStoreState>),
     ...partialState,
   });

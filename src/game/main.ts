@@ -5,7 +5,7 @@
  * It provides functions to start, continue, and return to the game menu.
  * It also handles scene transitions and game state management.
  */
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import type {
   GameHistoryEntry,
   GameOverReason,
@@ -152,7 +152,7 @@ export class Game {
   }
 
   reset(startingScore = 0): void {
-    const storeState = gameStore.getState();
+    const storeState = useGameStore.getState();
 
     this.lives = GAME_CONFIG.initialLives;
     this.shield = GAME_CONFIG.stageShieldMax;
@@ -501,7 +501,7 @@ export class Game {
     this.finalPerfScore = parseFloat(accuracy.toFixed(2));
     const historyEntry = this.buildGameHistoryEntry();
 
-    gameStore.getState().addGameHistory(historyEntry);
+    useGameStore.getState().addGameHistory(historyEntry);
 
     this.syncStore();
     this.cb.onGameOver(win ? 'victory' : 'lives-depleted');
@@ -544,7 +544,7 @@ export class Game {
   }
 
   private syncStore(): void {
-    gameStore.getState().syncHUD({
+    useGameStore.getState().syncHUD({
       grade: this.grade,
       score: this.score,
       lives: this.lives,
