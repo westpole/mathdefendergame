@@ -141,6 +141,16 @@
   }
 }
 
+.mobile-input-panel__pause {
+  min-height: 44px;
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-md;
+  background: rgba(30, 41, 59, 0.92);
+  color: $text-primary;
+  font-family: $font-display;
+  font-size: $font-size-body;
+}
+
 .mobile-input-panel__keypad {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

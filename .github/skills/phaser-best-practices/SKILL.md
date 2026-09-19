@@ -121,8 +121,8 @@ This project renders React as a DOM overlay on top of the Phaser canvas. Zustand
 - **Never use React hooks inside Phaser classes**: Hooks (`useGameStore`, `useState`, etc.) are only valid inside React function components. Inside a Phaser `Scene` or entity class, always use the raw store accessor:
   ```ts
   // ✅ Inside a Phaser Scene
-  import { gameStore } from '../store/useGameStore';
-  gameStore.getState().syncHUD({ score, lives });
+  import { useGameStore } from '../store/useGameStore';
+  useGameStore.getState().syncHUD({ score, lives });
 
   // ❌ Never inside a Phaser class
   const score = useGameStore((s) => s.score); // runtime error

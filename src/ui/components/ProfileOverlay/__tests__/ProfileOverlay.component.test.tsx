@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { gameStore } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/useGameStore';
 
 import { ProfileOverlay } from '..';
@@ -9,7 +9,7 @@ import { ProfileOverlay } from '..';
 import profileMenuStore from '../../__mocks__/profile-menu-store.json';
 
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
-  gameStore.setState({
+  useGameStore.setState({
     ...(structuredClone(profileMenuStore) as Partial<GameStoreState>),
     ...partialState,
   });
@@ -30,7 +30,7 @@ describe('ProfileOverlay', () => {
   });
 
   it('includes the active run score while a game is still in progress', () => {
-    gameStore.setState({
+    useGameStore.setState({
       phase: 'playing',
       grade: 'commander',
       score: 20,
