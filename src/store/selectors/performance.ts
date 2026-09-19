@@ -4,6 +4,12 @@ import type { GameStoreState } from '@store/useGameStore';
 
 const GUEST_HISTORY_BUCKET = '__guest__';
 const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
+const OPERATION_LABELS: Record<MathOperation, string> = {
+  '+': 'Addition (+)',
+  '-': 'Subtraction (-)',
+  '*': 'Multiplication (*)',
+  '/': 'Division (/)',
+};
 const EMPTY_HISTORY: GameHistoryEntry[] = [];
 
 interface PerformanceAggregate {
@@ -31,18 +37,7 @@ function createEmptyAggregate(): Record<MathOperation, PerformanceAggregate> {
 }
 
 function getOperationLabel(operation: MathOperation): string {
-  switch (operation) {
-    case '+':
-      return 'Addition (+)';
-    case '-':
-      return 'Subtraction (-)';
-    case '*':
-      return 'Multiplication (*)';
-    case '/':
-      return 'Division (/)';
-    default:
-      return operation;
-  }
+  return OPERATION_LABELS[operation];
 }
 
 function resolveMasteryRating(accuracy: number, avgSpeedSeconds: number, attempts: number): string {

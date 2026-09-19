@@ -105,6 +105,120 @@ describe('Game', () => {
     });
   });
 
+  describe('input controls', () => {
+    beforeEach(() => {
+      game.state = 'playing';
+    });
+
+    it('sanitizes direct input to digits with an optional leading minus', () => {
+      game.setInputBuffer('-12abc3456');
+
+      expect(game.inputBuffer).toBe('-1234');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+
+    it('ignores direct input changes outside the playing state', () => {
+      game.state = 'message';
+
+      game.setInputBuffer('123');
+
+      expect(game.inputBuffer).toBe('');
+      expect(mockCallbacks.onHUDUpdate).not.toHaveBeenCalled();
+    });
+
+    it('appends sanitized characters while enforcing the max answer length', () => {
+      game.inputBuffer = '-123';
+
+      game.appendInputCharacter('4');
+      game.appendInputCharacter('5');
+      game.appendInputCharacter('x');
+
+      expect(game.inputBuffer).toBe('-1234');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalledTimes(3);
+    });
+
+    it('removes the last input character while playing', () => {
+      game.inputBuffer = '123';
+
+      game.removeLastInputCharacter();
+
+      expect(game.inputBuffer).toBe('12');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+
+    it('submits the current input buffer when it contains an answer', () => {
+      game.inputBuffer = '42';
+      const checkAnswerSpy = vi.spyOn(game, 'checkAnswer');
+
+      game.submitInputBuffer();
+
+      expect(checkAnswerSpy).toHaveBeenCalled();
+    });
+
+    it('does not submit empty, partial, or paused answers', () => {
+      const checkAnswerSpy = vi.spyOn(game, 'checkAnswer');
+
+      game.inputBuffer = '';
+      game.submitInputBuffer();
+
+      game.inputBuffer = '-';
+      game.submitInputBuffer();
+
+      game.state = 'paused';
+      game.inputBuffer = '42';
+      game.submitInputBuffer();
+
+      expect(checkAnswerSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('manual pause controls', () => {
+    it('pauses for the manual end prompt from active play', () => {
+      game.state = 'playing';
+
+      game.pauseForManualEndPrompt();
+
+      expect(game.state).toBe('paused');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+
+    it('does not pause when already showing a stage message or game over', () => {
+      game.state = 'message';
+      game.pauseForManualEndPrompt();
+      expect(game.state).toBe('message');
+
+      game.state = 'gameover';
+      game.pauseForManualEndPrompt();
+      expect(game.state).toBe('gameover');
+    });
+
+    it('resumes active play from a manual pause', () => {
+      game.state = 'paused';
+
+      game.resumeFromManualPause();
+
+      expect(game.state).toBe('playing');
+      expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+
+    it('does not resume when the game is not manually paused', () => {
+      game.state = 'playing';
+
+      game.resumeFromManualPause();
+
+      expect(game.state).toBe('playing');
+      expect(mockCallbacks.onHUDUpdate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('grade control', () => {
+    it('applies a grade baseline directly', () => {
+      game.setGrade('major-general');
+
+      expect(game.grade).toBe('major-general');
+    });
+  });
+
   describe('createExplosion', () => {
     it('should create particles for explosion', () => {
       game.createExplosion(100, 200, '#ff0000');
