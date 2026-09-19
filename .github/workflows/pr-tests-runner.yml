@@ -36,4 +36,4 @@ jobs:
         run: npm run test:all
 
       - name: Run all end-to-end tests
-        run: npm run test:e2e
+        run: npm run test:e2e:web
