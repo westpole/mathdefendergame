@@ -4,10 +4,10 @@ import { useEffect } from 'react';
 import {
   MenuView,
   OverlayPhase,
-  useGameStore,
   GameStoreState,
   StageMessageState,
-} from '@store/useGameStore';
+} from '@store/types';
+import { useGameStore } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';

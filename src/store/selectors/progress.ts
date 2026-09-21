@@ -1,33 +1,7 @@
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
-import type { GameHistoryEntry, Grade } from '@shared/types';
-import type { GameStoreState } from '@store/useGameStore';
-
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-const ACTIVE_PROGRESS_PHASES = new Set<GameStoreState['phase']>(['playing', 'paused', 'stage-message']);
-
-export interface GradeProgressSummary {
-  effectiveGrade: Grade;
-  progressScore: number;
-  currentThreshold: number;
-  nextGrade: Grade | null;
-  nextThreshold: number | null;
-  pointsLeft: number;
-  progressRatio: number;
-}
-
-export interface WeeklyProgressReport {
-  averageAccuracy: number;
-  latestRunAt: number | null;
-  runsCompleted: number;
-  scoreEarned: number;
-}
-
-interface BuildGradeProgressInput {
-  currentScore: number;
-  grade: Grade;
-  history: GameHistoryEntry[];
-  phase: GameStoreState['phase'];
-}
+import type { GameHistoryEntry } from '@shared/types';
+import { WEEK_MS, ACTIVE_PROGRESS_PHASES } from '@store/const';
+import type { BuildGradeProgressInput, GradeProgressSummary, WeeklyProgressReport } from './types';
 
 export function buildGradeProgressSummary({
   currentScore,

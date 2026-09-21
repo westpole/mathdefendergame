@@ -9,7 +9,7 @@
 import Phaser from 'phaser';
 
 import { useGameStore } from '@store/useGameStore';
-import type { MenuView, PauseOverlayReason } from '@store/useGameStore';
+import type { MenuView, PauseOverlayReason } from '@store/types';
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
 import { notifyAppCloseCancelled, notifyAppCloseReady } from '../../platform/adapter';
 

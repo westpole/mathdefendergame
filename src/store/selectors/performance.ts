@@ -1,31 +1,11 @@
 import type { GameHistoryEntry, MathOperation } from '@shared/types';
 
-import type { GameStoreState } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
+import { OPERATION_LABELS, GUEST_HISTORY_BUCKET, MATH_OPERATIONS } from '@store/const';
 
-const GUEST_HISTORY_BUCKET = '__guest__';
-const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
-const OPERATION_LABELS: Record<MathOperation, string> = {
-  '+': 'Addition (+)',
-  '-': 'Subtraction (-)',
-  '*': 'Multiplication (*)',
-  '/': 'Division (/)',
-};
+import type { PerformanceAggregate, PerformanceRow } from './types';
+
 const EMPTY_HISTORY: GameHistoryEntry[] = [];
-
-interface PerformanceAggregate {
-  attempts: number;
-  incorrect: number;
-  totalLatencyMs: number;
-}
-
-export interface PerformanceRow {
-  operation: MathOperation;
-  label: string;
-  accuracy: number;
-  avgSpeedSeconds: number;
-  masteryRating: string;
-  attempts: number;
-}
 
 function createEmptyAggregate(): Record<MathOperation, PerformanceAggregate> {
   return {

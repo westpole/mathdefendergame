@@ -10,7 +10,7 @@ import Phaser from 'phaser';
 import { Game } from '@game/main';
 import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
-import type { PauseOverlayReason } from '@store/useGameStore';
+import type { PauseOverlayReason } from '@store/types';
 import type { GameOverReason, Grade } from '@shared/types';
 import { notifyAppCloseReady } from '../../platform/adapter';
 
