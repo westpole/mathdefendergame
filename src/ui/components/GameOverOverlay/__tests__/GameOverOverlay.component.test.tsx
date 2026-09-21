@@ -7,8 +7,8 @@ import { GameOverOverlay } from '..';
 vi.mock('@game/scenes/UIScene', () => ({
   startGame: vi.fn(),
   continueGame: vi.fn(),
-  returnToMenu: vi.fn(),
-  openMenuView: vi.fn(),
+  openMenu: vi.fn(),
+  openScreenView: vi.fn(),
   ensurePhaserGame: vi.fn(),
   destroyGame: vi.fn(),
 }));
@@ -17,7 +17,7 @@ describe('GameOverOverlay', () => {
   beforeEach(() => {
     useGameStore.setState({
       phase: 'gameover',
-      menuView: 'home',
+      screenView: 'home',
       bootReady: true,
       activeUsername: null,
       profiles: {},

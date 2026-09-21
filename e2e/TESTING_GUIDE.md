@@ -183,17 +183,17 @@ test('navigate through menus', async ({ page }) => {
 
   // Start at home
   let state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-  expect(state.menuView).toBe('home');
+  expect(state.screenView).toBe('home');
 
   // Open rules from the menu
   await page.click('[data-testid="rules-button"]');
   state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-  expect(state.menuView).toBe('rules');
+  expect(state.screenView).toBe('rules');
 
   // Back to home
   await page.click('[data-testid="back-button"]');
   state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-  expect(state.menuView).toBe('home');
+  expect(state.screenView).toBe('home');
 });
 ```
 

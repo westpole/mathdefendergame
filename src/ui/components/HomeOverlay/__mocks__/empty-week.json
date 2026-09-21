@@ -1,6 +1,6 @@
 {
   "phase": "start",
-  "menuView": "home",
+  "screenView": "home",
   "bootReady": true,
   "activeUsername": "AcePilot",
   "grade": "cadet",

@@ -52,7 +52,7 @@ export const Default: Story = {
   args: {
     initialState: {
       ...commanderRexMock,
-      menuView: 'performance',
+      screenView: 'performance',
       phase: 'start',
     },
   },
@@ -64,7 +64,7 @@ export const MobilePerformance: Story = {
     frame: popularMobileStoryFrame,
     initialState: {
       ...commanderRexMock,
-      menuView: 'performance',
+      screenView: 'performance',
       phase: 'start',
     },
   },

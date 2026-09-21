@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import menuCloseIcon from '@assets/menu-close.svg';
 import menuIcon from '@assets/menu.svg';
-import { logOff, openMenuView, startGame } from '@game/scenes/UIScene';
+import { logOff, openScreenView, startGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
 const menuItems = [
@@ -15,7 +15,7 @@ const menuItems = [
 ] as const;
 
 export function MenuControls() {
-  const activeView = useGameStore((state) => state.menuView);
+  const activeView = useGameStore((state) => state.screenView);
   const [isOpen, setIsOpen] = useState(false);
 
   const handleMenuSelect = (item: (typeof menuItems)[number]) => {
@@ -31,7 +31,7 @@ export function MenuControls() {
       return;
     }
 
-    openMenuView(item.view);
+    openScreenView(item.view);
     setIsOpen(false);
   };
 

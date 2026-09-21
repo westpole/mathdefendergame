@@ -42,7 +42,7 @@ export const useGameStore = create<GameStoreState>()(
             activeUsername: rememberedUsername,
             grade: resolvedGrade,
             phase: 'start',
-            menuView: 'home',
+            screenView: 'home',
           });
 
           return;
@@ -166,7 +166,7 @@ export const useGameStore = create<GameStoreState>()(
         streakRewardMessage: null,
         pauseOverlay: null,
       }),
-      returnToMenu: () => set({
+      openMenu: () => set({
         ...initialState,
         bootReady: true,
         phase: 'start',
@@ -178,11 +178,11 @@ export const useGameStore = create<GameStoreState>()(
         activeUsername: get().activeUsername,
         rememberedUsername: get().rememberedUsername,
       }),
-      openMenuView: (menuView) => set({
+      openScreenView: (screenView) => set({
         ...initialState,
         bootReady: true,
         phase: 'start',
-        menuView,
+        screenView,
         score: get().score,
         grade: get().grade,
         leaderboard: get().leaderboard,
@@ -234,7 +234,7 @@ export const useGameStore = create<GameStoreState>()(
           rememberedUsername: keepLoggedIn ? normalizedUsername : null,
           grade: resolvedGrade,
           phase: 'start',
-          menuView: 'home',
+          screenView: 'home',
         });
 
         return { success: true };
@@ -282,7 +282,7 @@ export const useGameStore = create<GameStoreState>()(
           activeUsername: normalizedUsername,
           rememberedUsername: keepLoggedIn ? normalizedUsername : null,
           phase: 'start',
-          menuView: 'home',
+          screenView: 'home',
         }));
 
         return { success: true };

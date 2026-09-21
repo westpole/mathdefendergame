@@ -30,7 +30,7 @@ describe('HomeOverlay', () => {
       activeUsername: 'AcePilot',
       bootReady: true,
       grade: 'cadet',
-      menuView: 'home',
+      screenView: 'home',
       phase: 'start',
       gameHistoryByProfile: {
         AcePilot: [
@@ -106,7 +106,7 @@ describe('HomeOverlay', () => {
       activeUsername: 'AcePilot',
       bootReady: true,
       grade: 'cadet',
-      menuView: 'home',
+      screenView: 'home',
       phase: 'start',
       gameHistoryByProfile: {
         AcePilot: [

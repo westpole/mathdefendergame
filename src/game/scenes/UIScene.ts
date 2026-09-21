@@ -9,7 +9,7 @@
 import Phaser from 'phaser';
 
 import { useGameStore } from '@store/useGameStore';
-import type { MenuView, PauseOverlayReason } from '@store/types';
+import type { ScreenView, PauseOverlayReason } from '@store/types';
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
 import { notifyAppCloseCancelled, notifyAppCloseReady } from '../../platform/adapter';
 
@@ -164,24 +164,24 @@ export function endGameEarly(options?: { closeApp?: boolean }): void {
   scene.endGameEarly(options);
 }
 
-export function returnToMenu(): void {
+export function openMenu(): void {
   const game = ensurePhaserGame();
 
   if (game.scene.isActive('GameScene') || game.scene.isPaused('GameScene')) {
     game.scene.stop('GameScene');
   }
 
-  useGameStore.getState().returnToMenu();
+  useGameStore.getState().openMenu();
 }
 
-export function openMenuView(menuView: MenuView): void {
+export function openScreenView(screenView: ScreenView): void {
   const game = ensurePhaserGame();
 
   if (game.scene.isActive('GameScene') || game.scene.isPaused('GameScene')) {
     game.scene.stop('GameScene');
   }
 
-  useGameStore.getState().openMenuView(menuView);
+  useGameStore.getState().openScreenView(screenView);
 }
 
 export function logOff(): void {

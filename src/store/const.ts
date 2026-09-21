@@ -9,7 +9,7 @@ import type {
 
 import type {
   OverlayPhase,
-  MenuView,
+  ScreenView,
   PlayerProfile,
   GameStoreState,
 } from './types';
@@ -25,7 +25,7 @@ export function createEmptyLeaderboard(): Record<Grade, ScoreEntry[]> {
 
 export const initialState = {
   phase: 'booting' as OverlayPhase,
-  menuView: 'home' as MenuView,
+  screenView: 'home' as ScreenView,
   bootReady: false,
   activeUsername: null as string | null,
   rememberedUsername: null as string | null,

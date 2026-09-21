@@ -27,7 +27,7 @@ import { MenuControls } from '@ui/components/MenuControls';
 export function App() {
   const phase = useGameStore((state) => state.phase);
   const bootReady = useGameStore((state) => state.bootReady);
-  const menuView = useGameStore((state) => state.menuView);
+  const screenView = useGameStore((state) => state.screenView);
   const isStartPhase = bootReady && phase === 'start';
   const handleVisibilityChange = useEffectEvent(() => {
     if (document.visibilityState !== 'hidden' || phase !== 'playing') {
@@ -67,10 +67,10 @@ export function App() {
       <div id="ui-overlay">
         {!bootReady && <Loading />}
         {bootReady && phase === 'login' && <LoginOverlay />}
-        {isStartPhase && menuView === 'home' && <HomeOverlay />}
-        {isStartPhase && menuView === 'profile' && <ProfileOverlay />}
-        {isStartPhase && menuView === 'performance' && <PerformanceOverlay />}
-        {isStartPhase && menuView === 'rules' && <RulesOverlay />}
+        {isStartPhase && screenView === 'home' && <HomeOverlay />}
+        {isStartPhase && screenView === 'profile' && <ProfileOverlay />}
+        {isStartPhase && screenView === 'performance' && <PerformanceOverlay />}
+        {isStartPhase && screenView === 'rules' && <RulesOverlay />}
         {isStartPhase && <MenuControls />}
         {bootReady && phase === 'playing' && <HUDOverlay />}
         {bootReady && phase === 'paused' && <PauseOverlay />}

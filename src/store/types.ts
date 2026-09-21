@@ -7,7 +7,7 @@ import type {
 } from '@shared/types';
 
 export type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'paused' | 'stage-message' | 'gameover';
-export type MenuView = 'home' | 'profile' | 'performance' | 'rules';
+export type ScreenView = 'home' | 'profile' | 'performance' | 'rules';
 export type HistoryByProfile = Record<string, GameHistoryEntry[]>;
 export type PauseOverlayReason = 'escape' | 'window-close' | 'background';
 
@@ -52,7 +52,7 @@ export interface PrematureGameEndPayload {
 
 export interface GameStoreState {
   phase: OverlayPhase;
-  menuView: MenuView;
+  screenView: ScreenView;
   bootReady: boolean;
   activeUsername: string | null;
   rememberedUsername: string | null;
@@ -89,8 +89,8 @@ export interface GameStoreState {
   showGameOver: (payload: Pick<GameStoreState, 'grade' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   persistPrematureGameEnd: (payload: PrematureGameEndPayload) => void;
   startPlaying: () => void;
-  returnToMenu: () => void;
-  openMenuView: (menuView: MenuView) => void;
+  openMenu: () => void;
+  openScreenView: (screenView: ScreenView) => void;
   logOff: () => void;
   loginProfile: (username: string, password: string, keepLoggedIn: boolean) => LoginResult;
   createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;

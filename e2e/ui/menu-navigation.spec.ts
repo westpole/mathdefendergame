@@ -62,7 +62,7 @@ test.describe('Menu Navigation', () => {
     await expect(page.getByTestId('menu-options')).toHaveCount(0);
 
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-    expect(state.menuView).toBe('profile');
+    expect(state.screenView).toBe('profile');
   });
 
   test('can navigate to rules view from the React menu', async ({ page }) => {
@@ -76,7 +76,7 @@ test.describe('Menu Navigation', () => {
     await expect(page.getByTestId('menu-options')).toHaveCount(0);
 
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-    expect(state.menuView).toBe('rules');
+    expect(state.screenView).toBe('rules');
   });
 
   test('can navigate to the performance view from the React menu', async ({ page }) => {
@@ -90,6 +90,6 @@ test.describe('Menu Navigation', () => {
     await expect(page.getByTestId('menu-options')).toHaveCount(0);
 
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-    expect(state.menuView).toBe('performance');
+    expect(state.screenView).toBe('performance');
   });
 });

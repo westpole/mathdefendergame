@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 
 import {
-  MenuView,
+  ScreenView,
   OverlayPhase,
   GameStoreState,
   StageMessageState,
@@ -17,7 +17,7 @@ import result from './__mocks__/result.json';
 
 const reusableInitialState: Partial<GameStoreState> = {
   phase: 'gameover' as OverlayPhase,
-  menuView: 'home' as MenuView,
+  screenView: 'home' as ScreenView,
   bootReady: false,
   stageMessage: {
     success: false,

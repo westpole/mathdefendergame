@@ -11,7 +11,7 @@ export type E2EWindow = Window & typeof globalThis & {
       score: number;
       lives: number;
       grade: string;
-      menuView: string;
+      screenView: string;
     }>) => void;
     isSceneReady: (sceneKey: string) => boolean;
     getScene: (sceneKey: string) => any | null;

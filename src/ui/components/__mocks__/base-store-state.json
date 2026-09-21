@@ -1,6 +1,6 @@
 {
   "phase": "booting",
-  "menuView": "home",
+  "screenView": "home",
   "bootReady": false,
   "activeUsername": null,
   "rememberedUsername": null,

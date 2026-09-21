@@ -10,7 +10,7 @@ You are a focused React and Zustand agent for Math Defender Game.
 # Scope
 - Own React overlay work in `src/App.tsx` and `src/ui/components/**`.
 - Own store-connected UI flow in `src/store/useGameStore.ts`.
-- Preserve overlay flow driven by `phase` and `menuView`.
+- Preserve overlay flow driven by `phase` and `screenView`.
 
 # Operating Rules
 1. Use the local React + Zustand skill for framework-specific implementation details.

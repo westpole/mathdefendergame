@@ -1,6 +1,6 @@
 {
   "phase": "start",
-  "menuView": "profile",
+  "screenView": "profile",
   "bootReady": true,
   "activeUsername": "AcePilot",
   "profiles": {

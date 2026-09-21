@@ -10,7 +10,7 @@ test.describe('Game Start Flow', () => {
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
 
     expect(state.phase).toBe('login');
-    expect(state.menuView).toBe('home');
+    expect(state.screenView).toBe('home');
   });
 
   test('should have Phaser game initialized', async ({ page }) => {

@@ -11,7 +11,7 @@ describe('useGameStore', () => {
     // Reset store state before each test
     useGameStore.setState({
       phase: 'booting',
-      menuView: 'home',
+      screenView: 'home',
       bootReady: false,
       activeUsername: null,
       rememberedUsername: null,
@@ -85,9 +85,9 @@ describe('useGameStore', () => {
 
     it('should return to menu', () => {
       useGameStore.getState().startPlaying();
-      useGameStore.getState().returnToMenu();
+      useGameStore.getState().openMenu();
       expect(useGameStore.getState().phase).toBe('start');
-      expect(useGameStore.getState().menuView).toBe('home');
+      expect(useGameStore.getState().screenView).toBe('home');
     });
 
     it('should reset transient gameplay state while preserving profile progress when returning to menu', () => {
@@ -131,11 +131,11 @@ describe('useGameStore', () => {
         },
       });
 
-      useGameStore.getState().returnToMenu();
+      useGameStore.getState().openMenu();
 
       const state = useGameStore.getState();
       expect(state.phase).toBe('start');
-      expect(state.menuView).toBe('home');
+      expect(state.screenView).toBe('home');
       expect(state.score).toBe(220);
       expect(state.grade).toBe('cadet');
       expect(state.activeUsername).toBe('PilotOne');
@@ -187,31 +187,31 @@ describe('useGameStore', () => {
 
   describe('menu navigation', () => {
     it('should switch to rules view', () => {
-      useGameStore.getState().openMenuView('rules');
-      expect(useGameStore.getState().menuView).toBe('rules');
+      useGameStore.getState().openScreenView('rules');
+      expect(useGameStore.getState().screenView).toBe('rules');
     });
 
     it('should switch to profile view', () => {
-      useGameStore.getState().openMenuView('profile');
-      expect(useGameStore.getState().menuView).toBe('profile');
+      useGameStore.getState().openScreenView('profile');
+      expect(useGameStore.getState().screenView).toBe('profile');
     });
 
     it('should switch to performance view', () => {
-      useGameStore.getState().openMenuView('performance');
-      expect(useGameStore.getState().menuView).toBe('performance');
+      useGameStore.getState().openScreenView('performance');
+      expect(useGameStore.getState().screenView).toBe('performance');
     });
 
     it('should return to home menu', () => {
-      useGameStore.getState().openMenuView('rules');
-      useGameStore.getState().openMenuView('home');
-      expect(useGameStore.getState().menuView).toBe('home');
+      useGameStore.getState().openScreenView('rules');
+      useGameStore.getState().openScreenView('home');
+      expect(useGameStore.getState().screenView).toBe('home');
     });
 
     it('should preserve profile state and clear transient overlays when opening a menu view', () => {
       useGameStore.setState({
         bootReady: true,
         phase: 'paused',
-        menuView: 'home',
+        screenView: 'home',
         activeUsername: 'PilotOne',
         rememberedUsername: 'PilotOne',
         profiles: {
@@ -238,11 +238,11 @@ describe('useGameStore', () => {
         pauseOverlay: { reason: 'background', isSavingBeforeClose: false },
       });
 
-      useGameStore.getState().openMenuView('performance');
+      useGameStore.getState().openScreenView('performance');
 
       const state = useGameStore.getState();
       expect(state.phase).toBe('start');
-      expect(state.menuView).toBe('performance');
+      expect(state.screenView).toBe('performance');
       expect(state.score).toBe(180);
       expect(state.grade).toBe('cadet');
       expect(state.activeUsername).toBe('PilotOne');
