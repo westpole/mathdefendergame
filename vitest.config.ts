@@ -107,7 +107,6 @@ export default defineConfig({
         'json',             // Outputs data for CI tools (SonarQube, etc.)
         'html',             // Generates an interactive local browser report
       ],
-      include: isElectronOnlyRun ? ['electron/**'] : ['src/**', 'electron/**'],
       exclude: [
         'src/**/*.d.ts',
         '**/*.stories.{ts,tsx}',
@@ -151,6 +150,9 @@ export default defineConfig({
           setupFiles: ['./vitest-phaser.setup.ts'],
           include: [
             'src/game/**/*.test.ts',
+            // @note: they are included here to ensure platform and store tests are also run in the phaser project
+            'src/platform/**/*.test.ts',
+            'src/store/**/*.test.ts',
           ],
         }
       },
