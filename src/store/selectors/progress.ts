@@ -3,6 +3,18 @@ import type { GameHistoryEntry } from '@shared/types';
 import { WEEK_MS, ACTIVE_PROGRESS_PHASES } from '@store/const';
 import type { BuildGradeProgressInput, GradeProgressSummary, WeeklyProgressReport } from './types';
 
+/**
+ * Builds a grade-progress summary that combines historical score data with the
+ * current in-progress score when the game is in an active progression phase.
+ *
+ * @param currentScore - The live score for the current run.
+ * @param grade - The player's current grade before applying historical progress.
+ * @param history - Prior runs used to calculate long-term progress.
+ * @param phase - The current gameplay phase used to determine whether the
+ * current score should contribute to progress.
+ * @returns A summary including the effective grade, thresholds, remaining points,
+ * and normalized progress toward the next grade.
+ */
 export function buildGradeProgressSummary({
   currentScore,
   grade,
@@ -36,6 +48,15 @@ export function buildGradeProgressSummary({
   };
 }
 
+/**
+ * Summarizes a player's recent weekly performance from a history list.
+ *
+ * @param history - The full game history to inspect.
+ * @param now - The reference timestamp used to determine the weekly window.
+ * Defaults to the current time.
+ * @returns A report covering total runs, average accuracy, latest run timestamp,
+ * and total score earned within the last week.
+ */
 export function buildWeeklyProgressReport(
   history: GameHistoryEntry[],
   now: number = Date.now(),
