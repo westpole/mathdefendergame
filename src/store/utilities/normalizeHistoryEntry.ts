@@ -1,6 +1,6 @@
 import type { GameHistoryEntry } from '@shared/types';
 
-import { isMathOperation, normalizeGrade } from '@store/utilities';
+import { isMathOperation, normalizeGrade } from '@store/utilities/general';
 
 import { normalizeOperationHistoryStats } from './normalizeOperationHistoryStats';
 

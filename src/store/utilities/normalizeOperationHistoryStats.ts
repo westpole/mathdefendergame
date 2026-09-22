@@ -1,6 +1,6 @@
 import { MATH_OPERATIONS } from '@store/const';
 import type { MathOperation, OperationHistoryStat } from '@shared/types';
-import { createEmptyOperationHistoryStats } from '@store/utilities';
+import { createEmptyOperationHistoryStats } from '@store/utilities/general';
 
 /**
  * Normalizes raw per-operation stats into the canonical record used by game history.

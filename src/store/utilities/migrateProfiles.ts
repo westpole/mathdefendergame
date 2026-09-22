@@ -1,5 +1,5 @@
 import type { PlayerProfile } from '@store/types';
-import { normalizeGrade } from '@store/utilities';
+import { normalizeGrade } from '@store/utilities/general';
 
 /**
  * Normalizes persisted profile data from legacy storage into the current PlayerProfile contract.

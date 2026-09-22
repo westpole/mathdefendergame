@@ -21,11 +21,11 @@ import {
   flattenLeaderboard,
   resolveActiveProfile,
   resolveLifetimeGrade,
-} from './utilities';
+} from './utilities/general';
 
-import { migrateLeaderboard } from './components/migrateLeaderboard';
-import { migrateProfiles } from './components/migrateProfiles';
-import { migrateGameHistoryByProfile } from './components/migrateGameHistoryByProfile';
+import { migrateLeaderboard } from './utilities/migrateLeaderboard';
+import { migrateProfiles } from './utilities/migrateProfiles';
+import { migrateGameHistoryByProfile } from './utilities/migrateGameHistoryByProfile';
 
 export const useGameStore = create<GameStoreState>()(
   persist(

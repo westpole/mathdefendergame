@@ -1,5 +1,5 @@
 import type { HistoryByProfile } from '@store/types';
-import { sortHistory } from '@store/utilities';
+import { sortHistory } from '@store/utilities/general';
 import { normalizeHistoryEntry } from './normalizeHistoryEntry';
 
 /**

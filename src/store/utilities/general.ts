@@ -5,7 +5,7 @@ import type {
   ScoreEntry,
   Grade,
 } from '@shared/types';
-import { gradeOrder, passwordPolicy, GUEST_HISTORY_BUCKET } from './const';
+import { gradeOrder, passwordPolicy, GUEST_HISTORY_BUCKET } from '../const';
 import type { PlayerProfile, HistoryByProfile } from '@store/types';
 import { resolveGradeFromScore } from '@game/config';
 

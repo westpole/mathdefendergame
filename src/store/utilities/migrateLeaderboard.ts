@@ -1,7 +1,7 @@
 import type { Grade, ScoreEntry } from '@shared/types';
 
 import { createEmptyLeaderboard } from '@store/const';
-import { normalizeGrade, sortAndTrimScores } from '@store/utilities';
+import { normalizeGrade, sortAndTrimScores } from '@store/utilities/general';
 
 /**
  * Normalizes the persisted per-grade leaderboard into the canonical scoreboard shape.
