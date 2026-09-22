@@ -13,7 +13,7 @@ Use this skill whenever tasked with increasing test coverage, hitting coverage t
 ### 1. Run Coverage
 Execute the Vitest coverage script to generate updated report artifacts:
 ```bash
-npm run test:coverage
+npm run test:all:coverage
 ```
 
 ### 2. Inspect Missing Coverage Data

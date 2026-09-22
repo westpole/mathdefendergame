@@ -1,34 +1,20 @@
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
-import type { GameHistoryEntry, Grade } from '@shared/types';
-import type { GameStoreState } from '@store/useGameStore';
+import type { GameHistoryEntry } from '@shared/types';
+import { WEEK_MS, ACTIVE_PROGRESS_PHASES } from '@store/const';
+import type { BuildGradeProgressInput, GradeProgressSummary, WeeklyProgressReport } from './types';
 
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-const ACTIVE_PROGRESS_PHASES = new Set<GameStoreState['phase']>(['playing', 'paused', 'stage-message']);
-
-export interface GradeProgressSummary {
-  effectiveGrade: Grade;
-  progressScore: number;
-  currentThreshold: number;
-  nextGrade: Grade | null;
-  nextThreshold: number | null;
-  pointsLeft: number;
-  progressRatio: number;
-}
-
-export interface WeeklyProgressReport {
-  averageAccuracy: number;
-  latestRunAt: number | null;
-  runsCompleted: number;
-  scoreEarned: number;
-}
-
-interface BuildGradeProgressInput {
-  currentScore: number;
-  grade: Grade;
-  history: GameHistoryEntry[];
-  phase: GameStoreState['phase'];
-}
-
+/**
+ * Builds a grade-progress summary that combines historical score data with the
+ * current in-progress score when the game is in an active progression phase.
+ *
+ * @param currentScore - The live score for the current run.
+ * @param grade - The player's current grade before applying historical progress.
+ * @param history - Prior runs used to calculate long-term progress.
+ * @param phase - The current gameplay phase used to determine whether the
+ * current score should contribute to progress.
+ * @returns A summary including the effective grade, thresholds, remaining points,
+ * and normalized progress toward the next grade.
+ */
 export function buildGradeProgressSummary({
   currentScore,
   grade,
@@ -62,6 +48,15 @@ export function buildGradeProgressSummary({
   };
 }
 
+/**
+ * Summarizes a player's recent weekly performance from a history list.
+ *
+ * @param history - The full game history to inspect.
+ * @param now - The reference timestamp used to determine the weekly window.
+ * Defaults to the current time.
+ * @returns A report covering total runs, average accuracy, latest run timestamp,
+ * and total score earned within the last week.
+ */
 export function buildWeeklyProgressReport(
   history: GameHistoryEntry[],
   now: number = Date.now(),

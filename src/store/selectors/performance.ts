@@ -1,32 +1,18 @@
 import type { GameHistoryEntry, MathOperation } from '@shared/types';
 
-import type { GameStoreState } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
+import { OPERATION_LABELS, GUEST_HISTORY_BUCKET, MATH_OPERATIONS } from '@store/const';
 
-const GUEST_HISTORY_BUCKET = '__guest__';
-const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
-const OPERATION_LABELS: Record<MathOperation, string> = {
-  '+': 'Addition (+)',
-  '-': 'Subtraction (-)',
-  '*': 'Multiplication (*)',
-  '/': 'Division (/)',
-};
+import type { PerformanceAggregate, PerformanceRow } from './types';
+
 const EMPTY_HISTORY: GameHistoryEntry[] = [];
 
-interface PerformanceAggregate {
-  attempts: number;
-  incorrect: number;
-  totalLatencyMs: number;
-}
-
-export interface PerformanceRow {
-  operation: MathOperation;
-  label: string;
-  accuracy: number;
-  avgSpeedSeconds: number;
-  masteryRating: string;
-  attempts: number;
-}
-
+/**
+ * Creates a zeroed aggregate bucket for each supported math operation.
+ *
+ * @returns A record keyed by operation with attempts, wrong-answer counts,
+ * and accumulated latency ready for aggregation.
+ */
 function createEmptyAggregate(): Record<MathOperation, PerformanceAggregate> {
   return {
     '+': { attempts: 0, incorrect: 0, totalLatencyMs: 0 },
@@ -36,10 +22,25 @@ function createEmptyAggregate(): Record<MathOperation, PerformanceAggregate> {
   };
 }
 
+/**
+ * Resolves the display label for a math operation used in performance summaries.
+ *
+ * @param operation - The operation being labeled.
+ * @returns A human readable label such as Addition or Multiplication.
+ */
 function getOperationLabel(operation: MathOperation): string {
   return OPERATION_LABELS[operation];
 }
 
+/**
+ * Determines a qualitative mastery band for an operation using accuracy,
+ * average response time, and total attempts.
+ *
+ * @param accuracy - Overall accuracy percentage for the operation, from 0 to 100.
+ * @param avgSpeedSeconds - Average response time in seconds.
+ * @param attempts - Total attempts recorded for the operation.
+ * @returns A label describing skill level such as Mastered or Needs Practice.
+ */
 function resolveMasteryRating(accuracy: number, avgSpeedSeconds: number, attempts: number): string {
   if (attempts === 0) {
     return 'No Data';
@@ -60,11 +61,25 @@ function resolveMasteryRating(accuracy: number, avgSpeedSeconds: number, attempt
   return 'Weak Spot';
 }
 
+/**
+ * Selects the history for the currently active profile, or the guest bucket when no
+ * profile is active.
+ *
+ * @param state - The current game store state.
+ * @returns The history entries for the active player profile, or an empty array.
+ */
 export function selectActiveProfileHistory(state: GameStoreState): GameHistoryEntry[] {
   const profileKey = state.activeUsername ?? GUEST_HISTORY_BUCKET;
   return state.gameHistoryByProfile[profileKey] ?? EMPTY_HISTORY;
 }
 
+/**
+ * Aggregates a player's operation history into rows that include accuracy,
+ * average speed, attempt counts, and a mastery classification for each operation.
+ *
+ * @param history - The full history entries to aggregate across all operations.
+ * @returns Per-operation performance rows sorted by the app's supported math order.
+ */
 export function buildPerformanceRows(history: GameHistoryEntry[]): PerformanceRow[] {
   const aggregates = createEmptyAggregate();
 

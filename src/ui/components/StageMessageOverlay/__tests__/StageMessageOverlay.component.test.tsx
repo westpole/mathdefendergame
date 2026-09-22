@@ -11,8 +11,8 @@ const uiSceneMocks = vi.hoisted(() => ({
 vi.mock('@game/scenes/UIScene', () => ({
   continueGame: uiSceneMocks.continueGame,
   startGame: vi.fn(),
-  returnToMenu: vi.fn(),
-  openMenuView: vi.fn(),
+  openMenu: vi.fn(),
+  openScreenView: vi.fn(),
   ensurePhaserGame: vi.fn(),
   destroyGame: vi.fn(),
 }));
@@ -22,7 +22,7 @@ describe('StageMessageOverlay', () => {
     uiSceneMocks.continueGame.mockReset();
     useGameStore.setState({
       phase: 'stage-message',
-      menuView: 'home',
+      screenView: 'home',
       bootReady: true,
       activeUsername: null,
       profiles: {},

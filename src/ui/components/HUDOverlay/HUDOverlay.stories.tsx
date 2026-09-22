@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useGameStore, type GameStoreState } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { minimumDesktopStoryFrame, popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';

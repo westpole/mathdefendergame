@@ -1,6 +1,6 @@
 import type { GameHistoryEntry } from '@shared/types';
 
-import { buildGradeProgressSummary, buildWeeklyProgressReport } from './progress';
+import { buildGradeProgressSummary, buildWeeklyProgressReport } from '../progress';
 
 function createHistoryEntry(
   key: string,

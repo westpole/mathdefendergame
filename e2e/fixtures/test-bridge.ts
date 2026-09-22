@@ -1,11 +1,11 @@
-import { useGameStore } from '../../src/store/useGameStore';
-import type { GameStoreState } from '../../src/store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
 import {
   endGameEarly,
   pauseGameForManualEnd,
   shouldConfirmElectronClose,
   startGame,
-} from '../../src/game/scenes/UIScene';
+} from '@game/scenes/UIScene';
 
 // Define the test bridge interface locally to avoid import issues
 interface E2ETestBridge {

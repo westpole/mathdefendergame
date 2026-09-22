@@ -10,7 +10,7 @@ import Phaser from 'phaser';
 import { Game } from '@game/main';
 import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
-import type { PauseOverlayReason } from '@store/useGameStore';
+import type { PauseOverlayReason } from '@store/types';
 import type { GameOverReason, Grade } from '@shared/types';
 import { notifyAppCloseReady } from '../../platform/adapter';
 
@@ -150,7 +150,7 @@ export class GameScene extends Phaser.Scene {
   // ── Game over (lives = 0) ─────────────────────────────────────────────────
   private handleGameOver(reason: GameOverReason): void {
     if (reason === 'lives-depleted') {
-      useGameStore.getState().returnToMenu();
+      useGameStore.getState().openMenu();
       this.scene.stop();
       return;
     }
@@ -251,7 +251,7 @@ export class GameScene extends Phaser.Scene {
       return;
     }
 
-    useGameStore.getState().openMenuView('profile');
+    useGameStore.getState().openScreenView('profile');
   }
 
   private handleResize(gameSize: Phaser.Structs.Size): void {

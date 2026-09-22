@@ -15,8 +15,8 @@ type MockState = {
     score: number;
     setGrade: ReturnType<typeof vi.fn<(grade: string) => void>>;
     startPlaying: ReturnType<typeof vi.fn<() => void>>;
-    returnToMenu: ReturnType<typeof vi.fn<() => void>>;
-    openMenuView: ReturnType<typeof vi.fn<(menuView: string) => void>>;
+    openMenu: ReturnType<typeof vi.fn<() => void>>;
+    openScreenView: ReturnType<typeof vi.fn<(screenView: string) => void>>;
   };
   continueFromOverlay: ReturnType<typeof vi.fn<() => void>>;
 };
@@ -36,8 +36,8 @@ const mockState = vi.hoisted((): MockState => ({
     score: 0,
     setGrade: vi.fn<(grade: string) => void>(),
     startPlaying: vi.fn<() => void>(),
-    returnToMenu: vi.fn<() => void>(),
-    openMenuView: vi.fn<(menuView: string) => void>(),
+    openMenu: vi.fn<() => void>(),
+    openScreenView: vi.fn<(screenView: string) => void>(),
   },
   continueFromOverlay: vi.fn<() => void>(),
 }));
@@ -92,8 +92,8 @@ describe('UIScene module', () => {
     mockState.getState.mockReset();
     mockState.store.setGrade.mockReset();
     mockState.store.startPlaying.mockReset();
-    mockState.store.returnToMenu.mockReset();
-    mockState.store.openMenuView.mockReset();
+    mockState.store.openMenu.mockReset();
+    mockState.store.openScreenView.mockReset();
     mockState.store.score = 0;
     mockState.continueFromOverlay.mockReset();
 
@@ -176,10 +176,10 @@ describe('UIScene module', () => {
     const uiScene = await loadModule();
     mockState.scenePlugin.isPaused.mockReturnValue(true);
 
-    uiScene.returnToMenu();
+    uiScene.openMenu();
 
     expect(mockState.scenePlugin.stop).toHaveBeenCalledWith('GameScene');
-    expect(mockState.store.returnToMenu).toHaveBeenCalledTimes(1);
+    expect(mockState.store.openMenu).toHaveBeenCalledTimes(1);
   });
 
   it('opens a menu view and tolerates missing GameScene access during continue', async () => {
@@ -192,9 +192,9 @@ describe('UIScene module', () => {
 
     expect(() => uiScene.continueGame()).not.toThrow();
 
-    uiScene.openMenuView('rules');
+    uiScene.openScreenView('rules');
 
-    expect(mockState.store.openMenuView).toHaveBeenCalledWith('rules');
+    expect(mockState.store.openScreenView).toHaveBeenCalledWith('rules');
     expect(mockState.scenePlugin.start).not.toHaveBeenCalled();
   });
 });

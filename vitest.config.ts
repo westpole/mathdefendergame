@@ -107,7 +107,6 @@ export default defineConfig({
         'json',             // Outputs data for CI tools (SonarQube, etc.)
         'html',             // Generates an interactive local browser report
       ],
-      include: isElectronOnlyRun ? ['electron/**'] : ['src/**', 'electron/**'],
       exclude: [
         'src/**/*.d.ts',
         '**/*.stories.{ts,tsx}',
@@ -134,13 +133,8 @@ export default defineConfig({
         test: {
           name: 'react',
           environment: 'happy-dom',
-          // deps: { inline: [/react/, /@testing-library/] },
           setupFiles: ['./vitest-react.setup.ts'],
-          include: [
-            'src/ui/**/*.{test,spec}.{ts,tsx}',
-            'src/platform/**/*.test.ts',
-            'src/store/**/*.test.ts',
-          ],
+          include: ['src/ui/**/*.{test,spec}.{ts,tsx}'],
         }
       },
       {
@@ -149,9 +143,25 @@ export default defineConfig({
           name: 'phaser',
           environment: 'jsdom', // Canvas mock required (handled in setup)
           setupFiles: ['./vitest-phaser.setup.ts'],
-          include: [
-            'src/game/**/*.test.ts',
-          ],
+          include: ['src/game/**/*.test.ts'],
+        }
+      },
+      {
+        extends: true,
+        test: {
+          name: 'platform',
+          environment: 'happy-dom',
+          include: ['src/platform/**/*.test.ts'],
+        }
+      },
+      {
+        extends: true,
+        plugins: [react()],
+        test: {
+          name: 'store',
+          environment: 'happy-dom',
+          setupFiles: ['./vitest-react.setup.ts'],
+          include: ['src/store/**/*.test.ts'],
         }
       },
       {

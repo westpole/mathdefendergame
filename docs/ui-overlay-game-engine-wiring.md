@@ -7,12 +7,12 @@ flowchart TD
     E["Electron main process<br/>electron/main.js"] -->|dispatches close query / close requested / close confirmed / close cancelled| A["React shell<br/>src/App.tsx"]
 
     A -->|mounts once and subscribes to close events| P["Phaser singleton bootstrap<br/>src/game/scenes/UIScene.ts<br/>ensurePhaserGame facade"]
-    A -->|visibility hidden while playing<br/>pause for background state| U["UIScene facade<br/>startGame / continueGame / resumePausedGame / endGameEarly / openMenuView / logOff / input helpers"]
+    A -->|visibility hidden while playing<br/>pause for background state| U["UIScene facade<br/>startGame / continueGame / resumePausedGame / endGameEarly / openScreenView / logOff / input helpers"]
     P -->|starts first| B["BootScene<br/>src/game/scenes/BootScene.ts"]
     B -->|"document.fonts.ready<br/>markBootReady()"| S["Zustand store<br/>src/store/useGameStore.ts"]
     S -->|bootReady false| L["Loading<br/>shown while boot is unresolved"]
 
-    A -->|selects by phase + menuView| O["UI overlays"]
+    A -->|selects by phase + screenView| O["UI overlays"]
     O --> I["LoginOverlay<br/>phase: login"]
     O --> M["Start overlays<br/>phase: start"]
     O --> H["HUDOverlay + mobile keypad<br/>phase: playing"]
@@ -20,13 +20,13 @@ flowchart TD
     O --> SM["StageMessageOverlay<br/>phase: stage-message"]
     O --> GO["GameOverOverlay<br/>phase: gameover"]
 
-    M --> MM["HomeOverlay<br/>menuView: home"]
-    M --> PR["ProfileOverlay<br/>menuView: profile"]
-    M --> PF["PerformanceOverlay<br/>menuView: performance"]
-    M --> RU["RulesOverlay<br/>menuView: rules"]
+    M --> MM["HomeOverlay<br/>screenView: home"]
+    M --> PR["ProfileOverlay<br/>screenView: profile"]
+    M --> PF["PerformanceOverlay<br/>screenView: performance"]
+    M --> RU["RulesOverlay<br/>screenView: rules"]
     M --> MC["MenuControls<br/>Home / Play / Profile / Performance / Rules / Log off"]
 
-    MC -->|"openMenuView(view)"| U
+    MC -->|"openScreenView(view)"| U
     MC -->|Play Game / Log off| U
     MM -->|Start Defense| U
     SM -->|Continue button or Enter| U
@@ -76,7 +76,7 @@ flowchart TD
     subgraph PhaseMap["Overlay phase map from store.phase"]
         PM1["!bootReady shows Loading<br/>initially phase: booting"]
         PM2["login to LoginOverlay"]
-        PM3["start plus menuView to home, profile, performance, rules overlays"]
+        PM3["start plus screenView to home, profile, performance, rules overlays"]
         PM4["playing to HUDOverlay"]
         PM5["paused to PauseOverlay"]
         PM6["stage-message to StageMessageOverlay"]
@@ -91,7 +91,7 @@ flowchart TD
 - Zustand is the integration boundary. React does not talk directly to the Game class; React mostly reads store state and invokes UIScene facade functions.
 - Phaser is created as a singleton in UIScene. App mounts the Phaser container, subscribes to Electron close events, and pauses active gameplay when the document becomes hidden, but scene lifecycle stays controlled from UIScene.
 - Loading is driven by `bootReady`, not just `phase`. The initial store phase is `booting`, and `BootScene` waits for `document.fonts.ready` before `markBootReady()` sends the app either to `login` or directly to `start` when a remembered profile is still valid.
-- The start menu is split across `phase` and `menuView`. `phase === 'start'` enables the menu family, `menuView` picks which start overlay is visible, and `MenuControls` owns the Home, Play Game, Profile, Performance, Rules, and Log off actions.
+- The start menu is split across `phase` and `screenView`. `phase === 'start'` enables the menu family, `screenView` picks which start overlay is visible, and `MenuControls` owns the Home, Play Game, Profile, Performance, Rules, and Log off actions.
 - HUD is not read-only. The mobile keypad in `HUDOverlay` calls UIScene input helpers, while `GameScene` still owns desktop keyboard input, touch-to-pause behavior, and Phaser render/update work.
 - GameScene is the bridge layer. It forwards gameplay callbacks from `Game` into store updates such as `syncHUD`, `showStageMessage`, `showPauseOverlay`, and `showGameOver`.
 - Stage status has two representations on purpose. The store `stage` field feeds the HUD during active play, while `stageMessage.stage` preserves the stage that was just cleared or lost for the stage-message overlay.

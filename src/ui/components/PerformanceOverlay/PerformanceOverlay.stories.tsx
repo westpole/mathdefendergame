@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 
-import { useGameStore, type GameStoreState } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
@@ -52,7 +53,7 @@ export const Default: Story = {
   args: {
     initialState: {
       ...commanderRexMock,
-      menuView: 'performance',
+      screenView: 'performance',
       phase: 'start',
     },
   },
@@ -64,7 +65,7 @@ export const MobilePerformance: Story = {
     frame: popularMobileStoryFrame,
     initialState: {
       ...commanderRexMock,
-      menuView: 'performance',
+      screenView: 'performance',
       phase: 'start',
     },
   },

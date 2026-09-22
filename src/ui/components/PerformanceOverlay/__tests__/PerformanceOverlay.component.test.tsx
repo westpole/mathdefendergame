@@ -2,7 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
-import type { GameStoreState } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
 
 import { PerformanceOverlay } from '..';
 
@@ -17,7 +17,7 @@ function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
 
 describe('PerformanceOverlay', () => {
   beforeEach(() => {
-    setMockStoreState({ menuView: 'performance' });
+    setMockStoreState({ screenView: 'performance' });
   });
 
   it('renders operator rows from completed history', () => {
@@ -38,7 +38,7 @@ describe('PerformanceOverlay', () => {
 
   it('shows an empty state when no completed history exists', () => {
     setMockStoreState({
-      menuView: 'performance',
+      screenView: 'performance',
       gameHistoryByProfile: {},
       activeUsername: 'AcePilot',
     });

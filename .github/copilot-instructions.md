@@ -5,9 +5,14 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 ## Use Local Skills For Framework Details
 
 - Use `.github/skills/phaser-best-practices/SKILL.md` for Phaser 4 scene, rendering, input, and gameplay architecture guidance.
+- Use `.github/skills/phaser-unit-tests/SKILL.md` for guidance on writing and structuring unit tests for Phaser scenes and game logic.
 - Use `.github/skills/react-frontend-zustand-expert/SKILL.md` for React 19 and Zustand patterns.
 - Use `.github/skills/storybook-zustand-expert/SKILL.md` for `*.stories.tsx` and store seeding in Storybook.
 - Use `.github/skills/electron-best-practices/SKILL.md` when changing the Electron shell.
+- Use `.github/skills/coverage-analysis/SKILL.md` for guidance on running and interpreting test coverage reports.
+- Use `.github/skills/zustand-unit-tests/SKILL.md` for guidance on writing and structuring unit tests for Zustand stores.
+- Use `.github/skills/file-organization/SKILL.md` for guidance on organizing types, constants, and utilities across the project.
+
 
 ## Current Stack
 
@@ -24,7 +29,7 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 - `src/game/scenes/GameScene.ts` owns Phaser rendering and keyboard input, and bridges gameplay events into the store.
 - `src/game/scenes/BootScene.ts` waits for fonts, then marks the UI ready.
 - `src/store/useGameStore.ts` is the single shared app store. Only the leaderboard is persisted to `localStorage`.
-- `src/App.tsx` mounts the Phaser container and React overlays, switching UI by store `phase` and `menuView`.
+- `src/App.tsx` mounts the Phaser container and React overlays, switching UI by store `phase` and `screenView`.
 - `src/phaserGame.ts` manages the singleton Phaser instance and menu/start/continue transitions.
 - `electron/main.js` owns the desktop window and app menu, dispatching `electron-menu-action` events to the renderer.
 
@@ -33,6 +38,6 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 - Phaser owns the canvas. React owns menu, HUD, stage-message, game-over, rules, and loading overlays.
 - Put gameplay rule changes in `src/game/main.ts`; keep `GameScene` focused on rendering, input, and store synchronization.
 - Treat Zustand as the integration boundary between Phaser and React. Avoid duplicate state or parallel sources of truth.
-- Overlay flow is driven by `phase` (`booting | start | playing | stage-message | gameover`) and `menuView` (`home | profile | rules`).
+- Overlay flow is driven by `phase` (`booting | start | playing | stage-message | gameover`) and `screenView` (`home | profile | rules`).
 - Stories live beside components in `src/ui/components/**`; use the Storybook skill instead of inventing a new store-mocking pattern.
 - Preserve the existing Electron security posture: `contextIsolation: true` and `nodeIntegration: false`.

@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 
 import {
-  MenuView,
+  ScreenView,
   OverlayPhase,
-  useGameStore,
   GameStoreState,
   StageMessageState,
-} from '@store/useGameStore';
+} from '@store/types';
+import { useGameStore } from '@store/useGameStore';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
@@ -17,7 +17,7 @@ import result from './__mocks__/result.json';
 
 const reusableInitialState: Partial<GameStoreState> = {
   phase: 'gameover' as OverlayPhase,
-  menuView: 'home' as MenuView,
+  screenView: 'home' as ScreenView,
   bootReady: false,
   stageMessage: {
     success: false,

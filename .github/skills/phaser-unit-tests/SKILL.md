@@ -51,5 +51,5 @@ Ensure that your unit tests provide sufficient code coverage for the Phaser 4 pr
 Generate coverage reports using Vitest's built-in coverage tools. Use the following command to run tests with coverage:
 
 ```bash
-vitest run --coverage
+npm run test:phaser -- --coverage
 ```

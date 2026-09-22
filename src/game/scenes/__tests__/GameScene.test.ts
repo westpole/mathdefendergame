@@ -199,11 +199,11 @@ function setupScene() {
   const showPauseOverlay = vi.fn();
   const showSavingBeforeClose = vi.fn();
   const persistPrematureGameEnd = vi.fn();
-  const openMenuView = vi.fn();
-  const returnToMenu = vi.fn();
+  const openScreenView = vi.fn();
+  const openMenu = vi.fn();
   const state = {
     phase: 'playing' as const,
-    menuView: 'home' as const,
+    screenView: 'home' as const,
     bootReady: true,
     grade: 'trainee' as const,
     score: 0,
@@ -220,7 +220,7 @@ function setupScene() {
     leaderboard: { trainee: [], cadet: [], commander: [], 'major-general': [] },
     markBootReady: vi.fn(),
     setGrade: vi.fn(),
-    openMenuView,
+    openScreenView,
     saveScore: vi.fn(),
     getScores: vi.fn(() => []),
     startPlaying,
@@ -232,7 +232,7 @@ function setupScene() {
     showPauseOverlay,
     showSavingBeforeClose,
     persistPrematureGameEnd,
-    returnToMenu,
+    openMenu,
   } as unknown as ReturnType<typeof useGameStore.getState>;
 
   vi.spyOn(useGameStore, 'getState').mockReturnValue(state);
@@ -295,8 +295,8 @@ function setupScene() {
       showPauseOverlay,
       showSavingBeforeClose,
       persistPrematureGameEnd,
-      openMenuView,
-      returnToMenu,
+      openScreenView,
+      openMenu,
     },
     phaser: { graphics, input, keyboard, scale, add, events, stop, shake, textObjects },
   };
@@ -407,7 +407,7 @@ describe('GameScene', () => {
     (scene as unknown as GameScenePrivate).handleKeyDown({ key: 'Escape' } as KeyboardEvent);
     expect(mockGameState.lastInstance?.pauseForManualEndPrompt).toHaveBeenCalledTimes(1);
     expect(store.showPauseOverlay).toHaveBeenCalledWith('escape');
-    expect(store.returnToMenu).not.toHaveBeenCalled();
+    expect(store.openMenu).not.toHaveBeenCalled();
     expect(phaser.stop).not.toHaveBeenCalled();
   });
 
@@ -439,7 +439,7 @@ describe('GameScene', () => {
       grade: 'commander',
       score: 222,
     }));
-    expect(store.openMenuView).toHaveBeenCalledWith('profile');
+    expect(store.openScreenView).toHaveBeenCalledWith('profile');
     expect(phaser.stop).toHaveBeenCalledTimes(1);
   });
 
@@ -514,7 +514,7 @@ describe('GameScene', () => {
     });
 
     mockGameState.lastCallbacks?.onGameOver('lives-depleted');
-    expect(store.returnToMenu).toHaveBeenCalledTimes(1);
+    expect(store.openMenu).toHaveBeenCalledTimes(1);
     expect(phaser.stop).toHaveBeenCalledTimes(1);
   });
 

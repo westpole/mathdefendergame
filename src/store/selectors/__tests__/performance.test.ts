@@ -1,8 +1,7 @@
 import type { GameHistoryEntry } from '@shared/types';
+import type { GameStoreState } from '@store/types';
 
-import type { GameStoreState } from '@store/useGameStore';
-
-import { buildPerformanceRows, selectActiveProfileHistory } from './performance';
+import { buildPerformanceRows, selectActiveProfileHistory } from '../performance';
 
 function createHistoryEntry(
   key: string,

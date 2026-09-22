@@ -5,10 +5,11 @@ import type { E2EWindow } from '../types';
 async function loginToStartMenu(page: Page) {
   const username = `Pilot${Date.now()}`;
 
-  await page.getByRole('tab', { name: 'Create profile' }).click();
+  await page.getByRole('button', { name: /create profile/i }).click();
   await page.getByLabel('Username').fill(username);
-  await page.getByLabel('Password').fill('Abc12345');
-  await page.getByRole('button', { name: 'Create profile' }).click();
+  await page.getByLabel('Password', { exact: true }).fill('Abc12345');
+  await page.getByLabel('Verify password').fill('Abc12345');
+  await page.getByRole('button', { name: /^create$/i }).click();
   await expect(page.getByTestId('main-menu')).toBeVisible();
 }
 
@@ -62,7 +63,7 @@ test.describe('Menu Navigation', () => {
     await expect(page.getByTestId('menu-options')).toHaveCount(0);
 
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-    expect(state.menuView).toBe('profile');
+    expect(state.screenView).toBe('profile');
   });
 
   test('can navigate to rules view from the React menu', async ({ page }) => {
@@ -76,7 +77,7 @@ test.describe('Menu Navigation', () => {
     await expect(page.getByTestId('menu-options')).toHaveCount(0);
 
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-    expect(state.menuView).toBe('rules');
+    expect(state.screenView).toBe('rules');
   });
 
   test('can navigate to the performance view from the React menu', async ({ page }) => {
@@ -90,6 +91,6 @@ test.describe('Menu Navigation', () => {
     await expect(page.getByTestId('menu-options')).toHaveCount(0);
 
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
-    expect(state.menuView).toBe('performance');
+    expect(state.screenView).toBe('performance');
   });
 });

@@ -2,9 +2,9 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
-import type { GameStoreState } from '@store/useGameStore';
-import { App } from '../../../App';
+import type { GameStoreState } from '@store/types';
 
+import { App } from '../../../App';
 import baseStoreState from '../__mocks__/base-store-state.json';
 
 const originalVisibilityState = document.visibilityState;
@@ -22,7 +22,7 @@ const uiSceneMocks = vi.hoisted(() => ({
   onElectronCloseCancelled: vi.fn(),
   onElectronCloseConfirmed: vi.fn(),
   onElectronCloseRequested: vi.fn(),
-  openMenuView: vi.fn(),
+  openScreenView: vi.fn(),
   pauseGameForManualEnd: vi.fn(),
   removeAnswerInputCharacter: vi.fn(),
   setAnswerInputBuffer: vi.fn(),
@@ -44,14 +44,14 @@ vi.mock('@game/scenes/UIScene', () => ({
   onElectronCloseCancelled: uiSceneMocks.onElectronCloseCancelled,
   onElectronCloseConfirmed: uiSceneMocks.onElectronCloseConfirmed,
   onElectronCloseRequested: uiSceneMocks.onElectronCloseRequested,
-  openMenuView: uiSceneMocks.openMenuView,
+  openScreenView: uiSceneMocks.openScreenView,
   pauseGameForManualEnd: uiSceneMocks.pauseGameForManualEnd,
   removeAnswerInputCharacter: uiSceneMocks.removeAnswerInputCharacter,
   setAnswerInputBuffer: uiSceneMocks.setAnswerInputBuffer,
   shouldConfirmElectronClose: uiSceneMocks.shouldConfirmElectronClose,
   startGame: uiSceneMocks.startGame,
   submitAnswerInput: uiSceneMocks.submitAnswerInput,
-  returnToMenu: vi.fn(),
+  openMenu: vi.fn(),
 }));
 
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
@@ -119,7 +119,7 @@ describe('App start menu controls', () => {
 
     fireEvent.click(screen.getByTestId('menu-option-profile'));
 
-    expect(uiSceneMocks.openMenuView).toHaveBeenCalledWith('profile');
+    expect(uiSceneMocks.openScreenView).toHaveBeenCalledWith('profile');
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
@@ -149,7 +149,7 @@ describe('App start menu controls', () => {
       setMockStoreState({
         activeUsername: 'AcePilot',
         bootReady: true,
-        menuView: 'profile',
+        screenView: 'profile',
         phase: 'start',
       });
     });
@@ -159,7 +159,7 @@ describe('App start menu controls', () => {
     fireEvent.click(screen.getByTestId('menu-toggle-button'));
     fireEvent.click(screen.getByTestId('menu-option-home'));
 
-    expect(uiSceneMocks.openMenuView).toHaveBeenCalledWith('home');
+    expect(uiSceneMocks.openScreenView).toHaveBeenCalledWith('home');
     expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
@@ -179,7 +179,7 @@ describe('App start menu controls', () => {
     fireEvent.click(screen.getByTestId('menu-option-play'));
 
     expect(uiSceneMocks.startGame).toHaveBeenCalledTimes(1);
-    expect(uiSceneMocks.openMenuView).not.toHaveBeenCalledWith('home');
+    expect(uiSceneMocks.openScreenView).not.toHaveBeenCalledWith('home');
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
@@ -199,7 +199,7 @@ describe('App start menu controls', () => {
 
     expect(uiSceneMocks.logOff).toHaveBeenCalledTimes(1);
     expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
-    expect(uiSceneMocks.openMenuView).not.toHaveBeenCalled();
+    expect(uiSceneMocks.openScreenView).not.toHaveBeenCalled();
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
@@ -208,7 +208,7 @@ describe('App start menu controls', () => {
       setMockStoreState({
         activeUsername: 'AcePilot',
         bootReady: true,
-        menuView: 'performance',
+        screenView: 'performance',
         phase: 'start',
       });
     });
@@ -224,7 +224,7 @@ describe('App start menu controls', () => {
       setMockStoreState({
         activeUsername: 'AcePilot',
         bootReady: true,
-        menuView: 'profile',
+        screenView: 'profile',
         phase: 'start',
       });
     });

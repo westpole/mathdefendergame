@@ -2,10 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
-import type { GameStoreState } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
 
 import { HomeOverlay } from '..';
-
 import baseStoreState from '../../__mocks__/base-store-state.json';
 
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
@@ -30,7 +29,7 @@ describe('HomeOverlay', () => {
       activeUsername: 'AcePilot',
       bootReady: true,
       grade: 'cadet',
-      menuView: 'home',
+      screenView: 'home',
       phase: 'start',
       gameHistoryByProfile: {
         AcePilot: [
@@ -106,7 +105,7 @@ describe('HomeOverlay', () => {
       activeUsername: 'AcePilot',
       bootReady: true,
       grade: 'cadet',
-      menuView: 'home',
+      screenView: 'home',
       phase: 'start',
       gameHistoryByProfile: {
         AcePilot: [

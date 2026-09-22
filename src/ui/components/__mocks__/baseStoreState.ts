@@ -1,4 +1,4 @@
-import type { GameStoreState } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
 
 import baseStoreStateJson from './base-store-state.json';
 
