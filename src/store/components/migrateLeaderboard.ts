@@ -3,6 +3,17 @@ import type { Grade, ScoreEntry } from '@shared/types';
 import { createEmptyLeaderboard } from '@store/const';
 import { normalizeGrade, sortAndTrimScores } from '@store/utilities';
 
+/**
+ * Normalizes the persisted per-grade leaderboard into the canonical scoreboard shape.
+ *
+ * This helper accepts the raw storage payload, converts each legacy score record to the
+ * expected ScoreEntry contract with safe defaults, sorts each grade bucket by score/date,
+ * trims each bucket to the top 10 entries, and ignores malformed buckets so corrupted
+ * localStorage data will not crash the app during startup.
+ *
+ * @param rawLeaderboard - Raw leaderboard state persisted by the game store.
+ * @returns A per-grade leaderboard map with each bucket normalized and capped to the top 10 entries.
+ */
 export function migrateLeaderboard(rawLeaderboard: unknown): Record<Grade, ScoreEntry[]> {
   const nextLeaderboard = createEmptyLeaderboard();
 

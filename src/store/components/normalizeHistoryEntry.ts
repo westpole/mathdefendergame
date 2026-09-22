@@ -4,6 +4,16 @@ import { isMathOperation, normalizeGrade } from '@store/utilities';
 
 import { normalizeOperationHistoryStats } from './normalizeOperationHistoryStats';
 
+/**
+ * Normalizes a persisted history row into the canonical GameHistoryEntry shape.
+ *
+ * This helper accepts raw local-storage data, preserves valid fields, converts legacy
+ * property names like date/grade/score into the current schema, fills missing values with
+ * safe defaults, and avoids crashing on malformed entries during startup.
+ *
+ * @param rawEntry - Raw history entry read from persisted store state.
+ * @returns A normalized game-history record that matches the current runtime contract.
+ */
 export function normalizeHistoryEntry(rawEntry: unknown): GameHistoryEntry {
   const legacyEntry = (rawEntry ?? {}) as Record<string, unknown>;
 

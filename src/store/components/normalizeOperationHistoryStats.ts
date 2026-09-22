@@ -2,6 +2,16 @@ import { MATH_OPERATIONS } from '@store/const';
 import type { MathOperation, OperationHistoryStat } from '@shared/types';
 import { createEmptyOperationHistoryStats } from '@store/utilities';
 
+/**
+ * Normalizes raw per-operation stats into the canonical record used by game history.
+ *
+ * This helper accepts persisted local-storage stats, preserves numeric values for each math
+ * operator, pads any missing or malformed bucket with zeroes, and returns the app’s default
+ * structure so startup never crashes on stale or partial data.
+ *
+ * @param rawStats - Raw operation-stat payload from persisted history.
+ * @returns A normalized record keyed by each supported math operator.
+ */
 export function normalizeOperationHistoryStats(rawStats: unknown): Record<MathOperation, OperationHistoryStat> {
   const normalizedStats = createEmptyOperationHistoryStats();
 

@@ -1,6 +1,17 @@
 import type { PlayerProfile } from '@store/types';
 import { normalizeGrade } from '@store/utilities';
 
+/**
+ * Normalizes persisted profile data from legacy storage into the current PlayerProfile contract.
+ *
+ * This migration accepts the raw local-storage profile payload, preserves valid values,
+ * falls back to safe defaults for missing or malformed fields, supports legacy grade keys such
+ * as preferredDifficulty, and ignores non-object entries so startup remains resilient after
+ * corrupted or partially migrated data.
+ *
+ * @param rawProfiles - Raw profile map read from persisted store state.
+ * @returns A normalized profile map keyed by username with safe defaults for bad data.
+ */
 export function migrateProfiles(rawProfiles: unknown): Record<string, PlayerProfile> {
   if (!rawProfiles || typeof rawProfiles !== 'object') {
     return {};
