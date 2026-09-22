@@ -133,13 +133,8 @@ export default defineConfig({
         test: {
           name: 'react',
           environment: 'happy-dom',
-          // deps: { inline: [/react/, /@testing-library/] },
           setupFiles: ['./vitest-react.setup.ts'],
-          include: [
-            'src/ui/**/*.{test,spec}.{ts,tsx}',
-            'src/platform/**/*.test.ts',
-            'src/store/**/*.test.ts',
-          ],
+          include: ['src/ui/**/*.{test,spec}.{ts,tsx}'],
         }
       },
       {
@@ -148,12 +143,25 @@ export default defineConfig({
           name: 'phaser',
           environment: 'jsdom', // Canvas mock required (handled in setup)
           setupFiles: ['./vitest-phaser.setup.ts'],
-          include: [
-            'src/game/**/*.test.ts',
-            // @note: they are included here to ensure platform and store tests are also run in the phaser project
-            'src/platform/**/*.test.ts',
-            'src/store/**/*.test.ts',
-          ],
+          include: ['src/game/**/*.test.ts'],
+        }
+      },
+      {
+        extends: true,
+        test: {
+          name: 'platform',
+          environment: 'happy-dom',
+          include: ['src/platform/**/*.test.ts'],
+        }
+      },
+      {
+        extends: true,
+        plugins: [react()],
+        test: {
+          name: 'store',
+          environment: 'happy-dom',
+          setupFiles: ['./vitest-react.setup.ts'],
+          include: ['src/store/**/*.test.ts'],
         }
       },
       {

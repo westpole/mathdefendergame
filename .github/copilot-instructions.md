@@ -5,9 +5,13 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 ## Use Local Skills For Framework Details
 
 - Use `.github/skills/phaser-best-practices/SKILL.md` for Phaser 4 scene, rendering, input, and gameplay architecture guidance.
+- Use `.github/skills/phaser-unit-tests/SKILL.md` for guidance on writing and structuring unit tests for Phaser scenes and game logic.
 - Use `.github/skills/react-frontend-zustand-expert/SKILL.md` for React 19 and Zustand patterns.
 - Use `.github/skills/storybook-zustand-expert/SKILL.md` for `*.stories.tsx` and store seeding in Storybook.
 - Use `.github/skills/electron-best-practices/SKILL.md` when changing the Electron shell.
+- Use `.github/skills/coverage-analysis/SKILL.md` for guidance on running and interpreting test coverage reports.
+- Use `.github/skills/zustand-unit-tests/SKILL.md` for guidance on writing and structuring unit tests for Zustand stores.
+
 
 ## Current Stack
 
