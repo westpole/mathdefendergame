@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
-import { useGameStore, GameStoreState } from '@store/useGameStore';
+import { useGameStore } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
 
 import { BootScene } from '../BootScene';
 

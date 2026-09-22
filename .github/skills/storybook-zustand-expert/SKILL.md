@@ -46,7 +46,10 @@ Define state overrides as typed `args` on each story, then seed them inside a pe
 ```tsx
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
-import { useGameStore, GameStoreState } from '../../../store/useGameStore';
+
+import { useGameStore } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
+
 import { HUDOverlay } from '.';
 import startGameMock from './__mocks__/start.json';
 
@@ -104,13 +107,13 @@ export const Default: Story = {
 The store exports its own types — always import them directly rather than re-declaring:
 
 ```tsx
-import {
-  useGameStore,
+import { useGameStore } from '@store/useGameStore';
+import type {
   GameStoreState,    // full state shape
   OverlayPhase,      // 'booting' | 'start' | 'playing' | 'stage-message' | 'gameover'
   ScreenView,          // 'home' | 'profile' | 'rules'
   StageMessageState,
-} from '../../../store/useGameStore';
+} from '@store/types';
 ```
 
 ## 3. Global Preview Configuration (`.storybook/preview.tsx`)
@@ -169,5 +172,5 @@ Before completing the task, verify:
 1. Does each story render correctly in isolation, without depending on another story having run first?
 2. Are all type casts limited to a single typed `StoryArgs` interface — no `as unknown as` chains?
 3. Is `@ts-ignore` absent from all story files and `preview.tsx`?
-4. Are store types (`GameStoreState`, `OverlayPhase`, etc.) imported from `useGameStore` rather than redeclared?
+4. Are store types (`GameStoreState`, `OverlayPhase`, etc.) imported from `@store/types` rather than redeclared?
 5. Run `npm run build-storybook` to confirm zero build-time errors.

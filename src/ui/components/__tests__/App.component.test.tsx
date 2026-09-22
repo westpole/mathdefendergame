@@ -2,9 +2,9 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
-import type { GameStoreState } from '@store/useGameStore';
-import { App } from '../../../App';
+import type { GameStoreState } from '@store/types';
 
+import { App } from '../../../App';
 import baseStoreState from '../__mocks__/base-store-state.json';
 
 const originalVisibilityState = document.visibilityState;

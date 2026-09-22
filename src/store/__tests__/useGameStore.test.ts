@@ -4,7 +4,7 @@
  */
 
 import { useGameStore } from '../useGameStore';
-import type { GameHistoryEntry } from '../../shared/types';
+import type { GameHistoryEntry } from '@shared/types';
 
 describe('useGameStore', () => {
   beforeEach(() => {

@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
-import type { GameStoreState } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
 
 import fullShieldsLives from '../__mocks__/full-shields-lives.json';
 

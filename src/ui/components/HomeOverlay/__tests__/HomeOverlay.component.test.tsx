@@ -2,10 +2,9 @@ import { render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
-import type { GameStoreState } from '@store/useGameStore';
+import type { GameStoreState } from '@store/types';
 
 import { HomeOverlay } from '..';
-
 import baseStoreState from '../../__mocks__/base-store-state.json';
 
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {

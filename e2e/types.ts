@@ -1,4 +1,4 @@
-import type { GameStoreState } from '../src/store/useGameStore';
+import type { GameStoreState } from '@store/types';
 
 export type E2EWindow = Window & typeof globalThis & {
   __e2e?: {
