@@ -11,6 +11,7 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 - Use `.github/skills/electron-best-practices/SKILL.md` when changing the Electron shell.
 - Use `.github/skills/coverage-analysis/SKILL.md` for guidance on running and interpreting test coverage reports.
 - Use `.github/skills/zustand-unit-tests/SKILL.md` for guidance on writing and structuring unit tests for Zustand stores.
+- Use `.github/skills/file-organization/SKILL.md` for guidance on organizing types, constants, and utilities across the project.
 
 
 ## Current Stack
