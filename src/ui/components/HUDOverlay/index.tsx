@@ -83,14 +83,6 @@ export function HUDOverlay() {
             </div>
           </div>
 
-          <button
-            aria-label="Pause"
-            className="mobile-input-panel__pause"
-            onClick={() => pauseGameForManualEnd('escape')}
-            type="button"
-          >
-            Pause
-          </button>
         </section>
 
         <section className="hud-panel hud-panel--right">
