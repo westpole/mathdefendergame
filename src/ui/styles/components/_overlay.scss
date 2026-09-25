@@ -72,6 +72,7 @@
     align-items: flex-start;
     justify-content: center;
     padding: $spacing-md;
+    padding-top: calc($spacing-md * 5);
   }
 
   .overlay-header {
