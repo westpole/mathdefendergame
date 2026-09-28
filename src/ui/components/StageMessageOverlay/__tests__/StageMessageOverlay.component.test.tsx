@@ -83,4 +83,17 @@ describe('StageMessageOverlay', () => {
 
     expect(uiSceneMocks.continueGame).toHaveBeenCalledTimes(1);
   });
+
+  it('renders streak reward message when present', () => {
+    useGameStore.setState({
+      streakRewardMessage: {
+        message: 'Congratulations! +1 life awarded for a 30 streak. Lives: 4',
+      },
+    });
+
+    render(<StageMessageOverlay />);
+
+    expect(screen.getByRole('heading', { name: 'Streak Bonus' })).toBeInTheDocument();
+    expect(screen.getByText(/\+1 life awarded for a 30 streak/i)).toBeInTheDocument();
+  });
 });

@@ -17,7 +17,6 @@ export function HUDOverlay() {
   const stage = useGameStore((state) => state.stage);
   const inputBuffer = useGameStore((state) => state.inputBuffer);
   const streak = useGameStore((state) => state.streak);
-  const streakRewardMessage = useGameStore((state) => state.streakRewardMessage);
 
   const stageShieldMax = GAME_CONFIG.stageShieldMax;
   const clampedShield = Math.max(0, Math.min(stageShieldMax, shield));
@@ -100,15 +99,6 @@ export function HUDOverlay() {
         </section>
       </div>
 
-      {/* @todo: refactor: it has to be with other messages */}
-      {streakRewardMessage && (
-        <div className="streak-reward-overlay" role="status" aria-live="polite">
-          <div className="streak-reward-overlay__panel">
-            <h2>Streak Bonus</h2>
-            <p>{streakRewardMessage.message}</p>
-          </div>
-        </div>
-      )}
     </>
   );
 }

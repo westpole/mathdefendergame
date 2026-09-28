@@ -5,6 +5,7 @@ import { useGameStore } from '@store/useGameStore';
 
 export function StageMessageOverlay() {
   const stageMessage = useGameStore((state) => state.stageMessage);
+  const streakRewardMessage = useGameStore((state) => state.streakRewardMessage);
 
   useEffect(() => {
     if (!stageMessage) {
@@ -28,9 +29,20 @@ export function StageMessageOverlay() {
     return null;
   }
 
-  const title = stageMessage.success
-    ? `Stage ${stageMessage.stage} Cleared!`
-    : 'Stage Lost';
+  const getTitle = () => {
+    if (streakRewardMessage) {
+      return 'Streak Bonus';
+    }
+
+    let title = 'Stage Lost';
+
+    if (stageMessage.success) {
+      title = `Stage ${stageMessage.stage} Cleared!`;
+    }
+
+    return title;
+  };
+
   const remainingLifeLabel = stageMessage.lives === 1 ? 'life' : 'lives';
 
   return (
@@ -41,7 +53,7 @@ export function StageMessageOverlay() {
           'accent-danger': !stageMessage.success,
         })}
       >
-        <h1>{title}</h1>
+        <h1>{getTitle()}</h1>
 
         {!stageMessage.success && stageMessage.lives > 0 && (
           <p>
@@ -57,11 +69,17 @@ export function StageMessageOverlay() {
           <p>You cleared the stage, but made {stageMessage.stageIncorrect} mistake{stageMessage.stageIncorrect > 1 ? 's' : ''}.</p>
         )}
 
-        <div className="action-row">
-          <button className="primary-button" onClick={continueGame} type="button">
-            Continue
-          </button>
-        </div>
+        {streakRewardMessage && (
+          <p>{streakRewardMessage.message}</p>
+        )}
+
+        {!streakRewardMessage && (
+          <div className="action-row">
+            <button className="primary-button" onClick={continueGame} type="button">
+              Continue
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
