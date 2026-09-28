@@ -126,6 +126,14 @@ describe('HUDOverlay Component', () => {
     expect(screen.getByText(/\+1 life awarded for a 30 streak/i)).toBeInTheDocument();
   });
 
+  it('groups mobile status panels into a summary row above the keypad', () => {
+    render(<HUDOverlay />);
+
+    expect(document.querySelector('.hud-layer__status-row')).not.toBeNull();
+    expect(document.querySelector('.hud-panel--left')).not.toBeNull();
+    expect(document.querySelector('.hud-panel--right')).not.toBeNull();
+  });
+
   it('routes mobile keypad controls through UIScene helpers', async () => {
     const user = userEvent.setup();
 

@@ -83,7 +83,7 @@
   gap: $spacing-md;
 }
 
-@include mobile {
+@container (max-width: #{$breakpoint-mobile}) {
   .stats-grid {
     gap: $spacing-xs $spacing-md;
   }

@@ -539,7 +539,7 @@
 }
 
 // Responsive
-@include mobile {
+@container (max-width: #{$breakpoint-mobile}) {
   .menu-layout,
   .gameover-layout {
     grid-template-columns: 1fr;
