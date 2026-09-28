@@ -533,14 +533,13 @@
     left: $spacing-sm;
   }
 
-  .menu-button,
   .menu-option {
     min-width: 160px;
   }
 }
 
 // Responsive
-@include mobile {
+@container (max-width: #{$breakpoint-mobile}) {
   .menu-layout,
   .gameover-layout {
     grid-template-columns: 1fr;
@@ -567,12 +566,8 @@
     align-items: stretch;
   }
 
-  .profile-stat-grid {
-    grid-template-columns: 1fr;
-  }
-
   .home-report-header {
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
     text-align: center;
   }
@@ -584,17 +579,6 @@
 
   .home-report-stat-grid {
     grid-template-columns: 1fr;
-  }
-
-  .profile-progress-labels {
-    grid-template-columns: 1fr;
-    text-align: left;
-
-    span:nth-child(2),
-    span:last-child {
-      justify-self: start;
-      text-align: left;
-    }
   }
 
   .profile-progress-bar {

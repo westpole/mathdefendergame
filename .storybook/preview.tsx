@@ -3,6 +3,10 @@ import type { Preview } from "@storybook/react-vite";
 import "../src/ui/styles/index.scss";
 
 const preview: Preview = {
+  initialGlobals: {
+    backgrounds: { value: "light" },
+  },
+
   parameters: {
     controls: {
       matchers: {

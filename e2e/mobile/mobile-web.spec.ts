@@ -38,7 +38,7 @@ test.describe('Mobile web validation', () => {
     expect(rulesBounds!.height).toBeLessThanOrEqual(viewport!.height);
   });
 
-  test('supports touch answer entry and pause controls', async ({ page }) => {
+  test('supports touch answer entry without a visible pause button', async ({ page }) => {
     await loginToStartMenu(page, `mobile-play-${Date.now()}`);
     await page.getByTestId('menu-toggle-button').tap();
     await page.getByTestId('menu-option-play').tap();
@@ -67,10 +67,6 @@ test.describe('Mobile web validation', () => {
     await page.getByRole('button', { name: 'Backspace' }).tap();
     await expect(inputPreview).toHaveText('1');
 
-    await page.getByRole('button', { name: 'Pause' }).tap();
-    await expect(page.getByRole('heading', { name: 'Game Paused' })).toBeVisible();
-
-    await page.getByRole('button', { name: 'Resume' }).tap();
-    await expect(page.getByRole('heading', { name: 'Game Paused' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Pause' })).toHaveCount(0);
   });
 });

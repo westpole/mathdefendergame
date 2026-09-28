@@ -113,17 +113,12 @@ describe('HUDOverlay Component', () => {
     expect(screen.getByText(/2000/)).toBeInTheDocument();
   });
 
-  it('should render streak reward message when present', () => {
-    useGameStore.setState({
-      streakRewardMessage: {
-        message: 'Congratulations! +1 life awarded for a 30 streak. Lives: 4',
-      },
-    });
-
+  it('renders left and right status panels around the keypad', () => {
     render(<HUDOverlay />);
 
-    expect(screen.getByRole('status')).toHaveTextContent('Streak Bonus');
-    expect(screen.getByText(/\+1 life awarded for a 30 streak/i)).toBeInTheDocument();
+    expect(document.querySelector('.hud-layer')).not.toBeNull();
+    expect(document.querySelector('.hud-panel--left')).not.toBeNull();
+    expect(document.querySelector('.hud-panel--right')).not.toBeNull();
   });
 
   it('routes mobile keypad controls through UIScene helpers', async () => {

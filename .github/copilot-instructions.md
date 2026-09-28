@@ -26,18 +26,19 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 ## Code Ownership
 
 - `src/game/main.ts` owns gameplay rules and mutable game state: score, lives, shield, stages, meteors, answer checking, stage transitions, and final accuracy.
-- `src/game/scenes/GameScene.ts` owns Phaser rendering and keyboard input, and bridges gameplay events into the store.
+- `src/game/scenes/GameScene.ts` owns Phaser rendering, keyboard input, and the bridge between gameplay events and the store.
 - `src/game/scenes/BootScene.ts` waits for fonts, then marks the UI ready.
+- `src/game/scenes/UIScene.ts` owns the singleton Phaser game instance and the menu/start/continue/pause lifecycle helpers.
 - `src/store/useGameStore.ts` is the single shared app store. Only the leaderboard is persisted to `localStorage`.
 - `src/App.tsx` mounts the Phaser container and React overlays, switching UI by store `phase` and `screenView`.
-- `src/phaserGame.ts` manages the singleton Phaser instance and menu/start/continue transitions.
-- `electron/main.js` owns the desktop window and app menu, dispatching `electron-menu-action` events to the renderer.
+- `electron/main.js` owns the desktop window and app menu, including the close-confirmation flow that dispatches events to the renderer.
 
 ## Repo-Specific Patterns
 
-- Phaser owns the canvas. React owns menu, HUD, stage-message, game-over, rules, and loading overlays.
+- Phaser owns the canvas. React owns menu, HUD, login, pause, stage-message, game-over, profile, performance, rules, and loading overlays.
 - Put gameplay rule changes in `src/game/main.ts`; keep `GameScene` focused on rendering, input, and store synchronization.
 - Treat Zustand as the integration boundary between Phaser and React. Avoid duplicate state or parallel sources of truth.
-- Overlay flow is driven by `phase` (`booting | start | playing | stage-message | gameover`) and `screenView` (`home | profile | rules`).
+- Overlay flow is driven by `phase` (`booting | login | start | playing | paused | stage-message | gameover`) and `screenView` (`home | profile | performance | rules`).
 - Stories live beside components in `src/ui/components/**`; use the Storybook skill instead of inventing a new store-mocking pattern.
 - Preserve the existing Electron security posture: `contextIsolation: true` and `nodeIntegration: false`.
+- Always add or update desktop and mobile device stories when updating or creating new UI components.

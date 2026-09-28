@@ -47,7 +47,7 @@
     color: $text-secondary;
   }
 
-  @include mobile {
+  @container (max-width: #{$breakpoint-mobile}) {
     padding: $spacing-lg;
     border-radius: $radius-lg;
   }
@@ -67,11 +67,12 @@
   margin-bottom: 2em;
 }
 
-@include mobile {
+@container (max-width: #{$breakpoint-mobile}) {
   .overlay-screen {
     align-items: flex-start;
     justify-content: center;
     padding: $spacing-md;
+    padding-top: calc($spacing-md * 5);
   }
 
   .overlay-header {
