@@ -1,7 +1,7 @@
 {
   "name": "mathdefendergame",
   "version": "1.1.0",
-  "description": "The player defends a base from falling meteors containing math expressions by typing the correct answer and pressing Enter. The game features a progression system, difficulty levels, and a persistent leaderboard.",
+  "description": "Defend your base from falling meteors by solving math problems.",
   "license": "ISC",
   "author": "Stanislav Spuzyak",
   "main": "electron/main.js",
