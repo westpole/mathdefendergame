@@ -16,11 +16,11 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 
 ## Current Stack
 
-- Phaser 4.2 for gameplay rendering.
+- Phaser 4 for gameplay rendering.
 - React 19 for DOM overlays.
 - Zustand 5 for shared UI state and persisted leaderboard data.
-- Vite + TypeScript for the renderer build.
-- Electron for the desktop wrapper.
+- Vite 8 + TypeScript for the renderer build.
+- Electron 42 for the desktop wrapper.
 - Storybook 10 and Vitest 4 for component work and testing.
 
 ## Code Ownership
@@ -37,8 +37,14 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 
 - Phaser owns the canvas. React owns menu, HUD, login, pause, stage-message, game-over, profile, performance, rules, and loading overlays.
 - Put gameplay rule changes in `src/game/main.ts`; keep `GameScene` focused on rendering, input, and store synchronization.
-- Treat Zustand as the integration boundary between Phaser and React. Avoid duplicate state or parallel sources of truth.
-- Overlay flow is driven by `phase` (`booting | login | start | playing | paused | stage-message | gameover`) and `screenView` (`home | profile | performance | rules`).
+- Treat Zustand as the integration boundary between Phaser and React. Do not duplicate gameplay state in React local state if it already exists in the game core or store.
+- Before editing, identify the owning layer; if a change crosses layers, update shared store contracts first, then adapters and consumers.
+- Overlay flow is driven by `phase` (`booting | login | start | playing | paused | stage-message | gameover`) and `screenView` (`home | profile | performance | rules`). Gameplay-driven transitions should originate from game logic/store updates; view-only transitions can originate from React UI actions.
 - Stories live beside components in `src/ui/components/**`; use the Storybook skill instead of inventing a new store-mocking pattern.
-- Preserve the existing Electron security posture: `contextIsolation: true` and `nodeIntegration: false`.
-- Always add or update desktop and mobile device stories when updating or creating new UI components.
+- Preserve the existing Electron security posture: `contextIsolation: true` and `nodeIntegration: false`, unless an explicit security-reviewed requirement says otherwise.
+- When UI behavior, states, or visuals change, add or update desktop and mobile device stories.
+
+## Utilities
+
+- run `npm run docs:sync-current-stack` to update the Current Stack section in this file.
+- revisit this instructions file after updating the Current Stack section to ensure consistency.

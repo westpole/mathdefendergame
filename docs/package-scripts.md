@@ -87,3 +87,9 @@ This document describes each script defined in `package.json` and when to use it
 | `npm run release:minor` | Bumps the minor version and then runs the release commit flow. | Use when shipping backward-compatible features. |
 | `npm run prerelease:patch` | Runs the release guard before a patch release. | Use immediately before `npm run release:patch`. |
 | `npm run release:patch` | Bumps the patch version and then runs the release commit flow. | Use when shipping backward-compatible fixes. |
+
+## Documentation Sync
+
+| Script | What it does | When to use it |
+| --- | --- | --- |
+| `npm run docs:sync-current-stack` | Rewrites the `Current Stack` section in `.github/copilot-instructions.md` from the major versions recorded in `package.json`. | Use after framework or tooling major-version changes so the instruction file stays aligned with `package.json`. |
