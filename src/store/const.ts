@@ -3,7 +3,6 @@ import type {
   DDAMathTier,
   DDAHeatState,
   Grade,
-  ScoreEntry,
   MathOperation,
 } from '@shared/types';
 
@@ -13,15 +12,6 @@ import type {
   PlayerProfile,
   GameStoreState,
 } from './types';
-
-export function createEmptyLeaderboard(): Record<Grade, ScoreEntry[]> {
-  return {
-    trainee: [],
-    cadet: [],
-    commander: [],
-    'major-general': [],
-  };
-}
 
 export const initialState = {
   phase: 'booting' as OverlayPhase,
@@ -48,7 +38,6 @@ export const initialState = {
   stageMessage: null,
   streakRewardMessage: null,
   pauseOverlay: null,
-  leaderboard: createEmptyLeaderboard(),
   gameHistoryByProfile: {},
 };
 

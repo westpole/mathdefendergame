@@ -48,12 +48,6 @@ describe('StageMessageOverlay', () => {
         lives: 8,
         stageIncorrect: 1,
       },
-      leaderboard: {
-        trainee: [],
-        cadet: [],
-        commander: [],
-        'major-general': [],
-      },
       gameHistoryByProfile: {},
     });
   });

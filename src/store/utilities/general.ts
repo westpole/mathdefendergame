@@ -2,10 +2,9 @@ import type {
   GameHistoryEntry,
   MathOperation,
   OperationHistoryStat,
-  ScoreEntry,
   Grade,
 } from '@shared/types';
-import { gradeOrder, passwordPolicy, GUEST_HISTORY_BUCKET } from '../const';
+import { passwordPolicy, GUEST_HISTORY_BUCKET } from '../const';
 import type { PlayerProfile, HistoryByProfile } from '@store/types';
 import { resolveGradeFromScore } from '@game/config';
 
@@ -43,28 +42,6 @@ export function createEmptyOperationHistoryStats(): Record<MathOperation, Operat
     '*': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
     '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
   };
-}
-
-/**
- * Sorts scores by combined value and date, then keeps only the top ten entries.
- *
- * @param scores - The leaderboard entries to rank.
- * @returns A top-ten score list sorted descending by score and recency.
- */
-export function sortAndTrimScores(scores: ScoreEntry[]): ScoreEntry[] {
-  return [...scores]
-    .sort((left, right) => right.combined - left.combined || right.date - left.date)
-    .slice(0, 10);
-}
-
-/**
- * Flattens a grade-indexed leaderboard into a single ordered list.
- *
- * @param leaderboard - Score entries grouped by grade.
- * @returns A flat list ordered by the configured grade sequence.
- */
-export function flattenLeaderboard(leaderboard: Record<Grade, ScoreEntry[]>): ScoreEntry[] {
-  return gradeOrder.flatMap((grade) => leaderboard[grade]);
 }
 
 /**

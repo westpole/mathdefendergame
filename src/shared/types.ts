@@ -24,16 +24,6 @@ export interface MathExpression {
   op: string;
 }
 
-export interface ScoreEntry {
-  key: string;
-  name: string;
-  score: number;
-  perfScore: number;
-  combined: number;
-  grade: Grade;
-  date: number;
-}
-
 export type MathOperation = '+' | '-' | '*' | '/';
 
 export interface OperationHistoryStat {

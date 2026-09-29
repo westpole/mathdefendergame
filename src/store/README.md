@@ -2,7 +2,7 @@
 
 ## Store architecture
 
-The game state is centralized in `src/store/useGameStore.ts` using Zustand. The store owns the UI flow, profile/session state, active run stats, DDA tuning, overlays, and persisted leaderboard/history data.
+The game state is centralized in `src/store/useGameStore.ts` using Zustand. The store owns the UI flow, profile/session state, active run stats, DDA tuning, overlays, and persisted history data.
 
 ### Store structure diagram
 
@@ -33,7 +33,7 @@ flowchart TD
 | `activeUsername` | `string \| null` | Logged-in profile currently active for the session. |
 | `rememberedUsername` | `string \| null` | Persisted username used to restore a session after reload. |
 | `profiles` | `Record<string, PlayerProfile>` | Registered player profiles, including password, best score, highest reached stage, and timestamps. |
-| `grade` | `Grade` | Current player grade, used for progression and leaderboard filtering. |
+| `grade` | `Grade` | Current player grade, used for progression filtering. |
 | `score` | `number` | Current in-run score. |
 | `lives` | `number` | Remaining player lives. |
 | `shield` | `number` | Shield strength for the base. |
@@ -43,7 +43,7 @@ flowchart TD
 | `correctCount` | `number` | Number of correct answers in the running session. |
 | `incorrectCount` | `number` | Number of incorrect answers in the running session. |
 | `streak` | `number` | Current answer streak. |
-| `finalPerfScore` | `number` | Performance score used at game-over and leaderboard submission. |
+| `finalPerfScore` | `number` | Performance score used at game-over submission. |
 | `ddaHeatState` | `DDAHeatState` | Dynamic difficulty state such as balanced, hot, or cooloff-related values. |
 | `ddaMathTier` | `DDAMathTier` | Current math complexity tier in the DDA system. |
 | `ddaSpeedMultiplier` | `number` | Current meteor speed multiplier derived from performance. |
@@ -51,7 +51,6 @@ flowchart TD
 | `stageMessage` | `StageMessageState \| null` | Stage transition message and summary metrics. |
 | `streakRewardMessage` | `StreakRewardMessageState \| null` | Reward text shown after successful streak milestones. |
 | `pauseOverlay` | `PauseOverlayState \| null` | Pause state triggered by escape/break or window close handling. |
-| `leaderboard` | `Record<Grade, ScoreEntry[]>` | Highest-sorted leaderboard entries by grade. |
 | `gameHistoryByProfile` | `Record<string, GameHistoryEntry[]>` | Per-profile session history used for lifetime grade and profile analytics. |
 
 ### Store actions and helper methods
@@ -76,8 +75,6 @@ flowchart TD
 | `loginProfile` | Authenticates a known player profile. |
 | `createAndLoginProfile` | Validates and creates a new player profile, then logs them in. |
 | `getActiveProfile` | Resolves the profile object for the current user. |
-| `saveScore` | Adds a leaderboard entry for a given grade. |
-| `getScores` | Reads leaderboard entries, optionally filtered by grade. |
 | `addGameHistory` | Appends a new gameplay record for the active profile or guest bucket. |
 | `getGameHistory` | Retrieves recent game history for a profile or the active player. |
 
@@ -85,12 +82,11 @@ flowchart TD
 
 The Zustand persist middleware stores only the durable data needed across sessions:
 
-- `leaderboard`
 - `profiles`
 - `gameHistoryByProfile`
 - `rememberedUsername`
 
-The live run state such as score, stage, lives, shield, input buffer, and overlay messages is intentionally not persisted. This keeps reloads predictable while preserving profile history and leaderboard continuity.
+The live run state such as score, stage, lives, shield, input buffer, and overlay messages is intentionally not persisted. This keeps reloads predictable while preserving profile history continuity.
 
 ### Additional info useful to Copilot
 
@@ -101,7 +97,6 @@ The live run state such as score, stage, lives, shield, input buffer, and overla
 - `resolveLifetimeGrade` and `resolveActiveProfile` are the go-to helpers when profile-based grade or session state needs to be derived.
 - Prefer editing the owning layer instead of scattering logic across overlay, Phaser, and React components.
 - The `gameHistoryByProfile` data is profile-scoped, with guest sessions falling back to `__guest__`.
-- `leaderboard` is grouped by grade; each entry contains name, score, perfScore, combined total, grade, and timestamp.
 
 ### Suggested Copilot prompts
 
