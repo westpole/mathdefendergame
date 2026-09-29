@@ -167,6 +167,14 @@ export default defineConfig({
       {
         extends: true,
         test: {
+          name: 'shared',
+          environment: 'happy-dom',
+          include: ['src/shared/**/*.test.ts'],
+        }
+      },
+      {
+        extends: true,
+        test: {
           name: 'electron',
           setupFiles: ['./vitest-electron.setup.ts'],
           include: ['electron/**/*.test.js'],
