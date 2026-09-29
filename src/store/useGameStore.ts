@@ -27,6 +27,11 @@ import {
 import { migrateProfiles } from './utilities/migrateProfiles';
 import { migrateGameHistoryByProfile } from './utilities/migrateGameHistoryByProfile';
 
+function createSyntheticPassword(username: string): string {
+  const entropy = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  return `simple:${username}:${entropy}`;
+}
+
 export const useGameStore = create<GameStoreState>()(
   persist(
     (set, get) => ({
@@ -255,6 +260,37 @@ export const useGameStore = create<GameStoreState>()(
 
         return { success: true };
       },
+      selectProfileByUsername: (username) => {
+        const normalizedUsername = username.trim();
+
+        if (!normalizedUsername) {
+          return {
+            success: false,
+            error: 'Username is required.',
+          };
+        }
+
+        const profile = get().profiles[normalizedUsername];
+
+        if (!profile) {
+          return {
+            success: false,
+            error: 'Username not found. Create a profile to continue.',
+          };
+        }
+
+        const resolvedGrade = resolveLifetimeGrade(normalizedUsername, get().gameHistoryByProfile);
+
+        set({
+          activeUsername: normalizedUsername,
+          rememberedUsername: null,
+          grade: resolvedGrade,
+          phase: 'start',
+          screenView: 'home',
+        });
+
+        return { success: true };
+      },
       createAndLoginProfile: (username, password, keepLoggedIn = false) => {
         const normalizedUsername = username.trim();
 
@@ -297,6 +333,47 @@ export const useGameStore = create<GameStoreState>()(
           },
           activeUsername: normalizedUsername,
           rememberedUsername: keepLoggedIn ? normalizedUsername : null,
+          phase: 'start',
+          screenView: 'home',
+        }));
+
+        return { success: true };
+      },
+      createAndLoginSimpleProfile: (username) => {
+        const normalizedUsername = username.trim();
+
+        if (!normalizedUsername) {
+          return {
+            success: false,
+            error: 'Username is required.',
+          };
+        }
+
+        if (get().profiles[normalizedUsername]) {
+          return {
+            success: false,
+            error: 'Username already exists. Pick a different username.',
+          };
+        }
+
+        const now = Date.now();
+        const profile: PlayerProfile = {
+          username: normalizedUsername,
+          password: encryptPassword(createSyntheticPassword(normalizedUsername)),
+          bestScore: 0,
+          highestStage: 1,
+          preferredGrade: get().grade,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        set((state) => ({
+          profiles: {
+            ...state.profiles,
+            [normalizedUsername]: profile,
+          },
+          activeUsername: normalizedUsername,
+          rememberedUsername: null,
           phase: 'start',
           screenView: 'home',
         }));
