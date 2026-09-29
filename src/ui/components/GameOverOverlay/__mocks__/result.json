@@ -7,16 +7,5 @@
   "stageScore": 125,
   "correctCount": 25,
   "incorrectCount": 2,
-  "finalPerfScore": 85,
-  "leaderboard": {
-    "trainee": [],
-    "cadet": [],
-    "commander": [],
-    "major-general": [
-      {
-        "name": "Super Pooper",
-        "score": 75
-      }
-    ]
-  }
+  "finalPerfScore": 85
 }

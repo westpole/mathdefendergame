@@ -50,7 +50,6 @@ const meta = {
           ...initialState,
           profiles: initialState.profiles ?? baseStoreState.profiles,
           gameHistoryByProfile: initialState.gameHistoryByProfile ?? baseStoreState.gameHistoryByProfile,
-          leaderboard: initialState.leaderboard ?? baseStoreState.leaderboard,
           stageMessage: initialState.stageMessage ?? baseStoreState.stageMessage,
         });
       }, [initialState]);

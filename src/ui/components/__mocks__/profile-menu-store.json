@@ -32,12 +32,6 @@
   "stageMessage": null,
   "streakRewardMessage": null,
   "pauseOverlay": null,
-  "leaderboard": {
-    "trainee": [],
-    "cadet": [],
-    "commander": [],
-    "major-general": []
-  },
   "gameHistoryByProfile": {
     "AcePilot": [
       {

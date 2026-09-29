@@ -14,11 +14,5 @@
   "ddaSpeedMultiplier": 1.5,
   "ddaIsCooloffActive": true,
   "stageMessage": null,
-  "streakRewardMessage": null,
-  "leaderboard": {
-    "trainee": [],
-    "cadet": [],
-    "commander": [],
-    "major-general": []
-  }
+  "streakRewardMessage": null
 }

@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-import type { ScoreEntry } from '@shared/types';
-
 import {
   initialState,
   GUEST_HISTORY_BUCKET,
@@ -16,14 +14,11 @@ import type {
 
 import {
   sortHistory,
-  sortAndTrimScores,
   validatePassword,
-  flattenLeaderboard,
   resolveActiveProfile,
   resolveLifetimeGrade,
 } from './utilities/general';
 
-import { migrateLeaderboard } from './utilities/migrateLeaderboard';
 import { migrateProfiles } from './utilities/migrateProfiles';
 import { migrateGameHistoryByProfile } from './utilities/migrateGameHistoryByProfile';
 
@@ -58,7 +53,7 @@ export const useGameStore = create<GameStoreState>()(
       setGrade: (grade) => set({ grade }),
       syncHUD: (payload) => {
         // Keep HUD updates local to UI state to avoid frequent profile/localStorage writes.
-        // Profile syncs (bestScore/highestStage) are already handled in showGameOver/saveScore.
+        // Profile syncs (bestScore/highestStage) are already handled in showGameOver.
         set(payload);
       },
       showStageMessage: (stageMessage) => set({ phase: 'stage-message', stageMessage }),
@@ -175,7 +170,6 @@ export const useGameStore = create<GameStoreState>()(
         phase: 'start',
         score: get().score,
         grade: get().grade,
-        leaderboard: get().leaderboard,
         profiles: get().profiles,
         gameHistoryByProfile: get().gameHistoryByProfile,
         activeUsername: get().activeUsername,
@@ -188,7 +182,6 @@ export const useGameStore = create<GameStoreState>()(
         screenView,
         score: get().score,
         grade: get().grade,
-        leaderboard: get().leaderboard,
         profiles: get().profiles,
         gameHistoryByProfile: get().gameHistoryByProfile,
         activeUsername: get().activeUsername,
@@ -198,7 +191,6 @@ export const useGameStore = create<GameStoreState>()(
         ...initialState,
         bootReady: true,
         phase: 'login',
-        leaderboard: get().leaderboard,
         profiles: get().profiles,
         gameHistoryByProfile: get().gameHistoryByProfile,
         activeUsername: null,
@@ -294,35 +286,6 @@ export const useGameStore = create<GameStoreState>()(
         const state = get();
         return resolveActiveProfile(state.activeUsername, state.profiles);
       },
-      saveScore: (name, score, perfScore, grade) => {
-        const entry: ScoreEntry = {
-          key: `leaderboard_${Date.now()}_${Math.floor(Math.random() * 1_000_000)}`,
-          name,
-          score,
-          perfScore,
-          combined: score + perfScore,
-          grade,
-          date: Date.now(),
-        };
-
-        set((state) => ({
-          leaderboard: {
-            ...state.leaderboard,
-            [grade]: sortAndTrimScores([...state.leaderboard[grade], entry]),
-          },
-        }));
-      },
-      getScores: (gradeFilter = null) => {
-        const { leaderboard } = get();
-
-        if (gradeFilter) {
-          return leaderboard[gradeFilter];
-        }
-
-        return flattenLeaderboard(leaderboard).sort(
-          (left, right) => right.combined - left.combined || right.date - left.date,
-        );
-      },
       addGameHistory: (entry) => {
         set((state) => {
           const profileKey = state.activeUsername ?? GUEST_HISTORY_BUCKET;
@@ -353,7 +316,6 @@ export const useGameStore = create<GameStoreState>()(
 
         return {
           ...rawState,
-          leaderboard: migrateLeaderboard(rawState.leaderboard),
           profiles: migrateProfiles(rawState.profiles),
           gameHistoryByProfile: migrateGameHistoryByProfile(rawState.gameHistoryByProfile),
           rememberedUsername:
@@ -363,7 +325,6 @@ export const useGameStore = create<GameStoreState>()(
         };
       },
       partialize: (state) => ({
-        leaderboard: state.leaderboard,
         profiles: state.profiles,
         gameHistoryByProfile: state.gameHistoryByProfile,
         rememberedUsername: state.rememberedUsername,

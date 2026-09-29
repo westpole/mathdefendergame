@@ -34,12 +34,6 @@ describe('useGameStore', () => {
       stageMessage: null,
       streakRewardMessage: null,
       pauseOverlay: null,
-      leaderboard: {
-        trainee: [],
-        cadet: [],
-        commander: [],
-        'major-general': [],
-      },
       gameHistoryByProfile: {},
     });
   });
@@ -738,72 +732,6 @@ describe('useGameStore', () => {
 
     it('should default to trainee grade', () => {
       expect(useGameStore.getState().grade).toBe('trainee');
-    });
-  });
-
-  describe('leaderboard', () => {
-    beforeEach(() => {
-      // Clear leaderboard before each test
-      useGameStore.setState({
-        leaderboard: {
-          trainee: [],
-          cadet: [],
-          commander: [],
-          'major-general': [],
-        },
-      });
-    });
-
-    it('should save score to leaderboard', () => {
-      useGameStore.getState().saveScore('Test Player', 1000, 90, 'trainee');
-
-      const scores = useGameStore.getState().getScores('trainee');
-      expect(scores.length).toBeGreaterThan(0);
-      expect(scores[0].name).toBe('Test Player');
-      expect(scores[0].score).toBe(1000);
-    });
-
-    it('should get scores for specific grade', () => {
-      useGameStore.getState().saveScore('Player 1', 500, 80, 'trainee');
-      useGameStore.getState().saveScore('Player 2', 1000, 90, 'cadet');
-
-      const traineeScores = useGameStore.getState().getScores('trainee');
-      const cadetScores = useGameStore.getState().getScores('cadet');
-      expect(traineeScores.length).toBe(1);
-      expect(cadetScores.length).toBe(1);
-    });
-
-    it('should sort leaderboard by score descending', () => {
-      useGameStore.getState().saveScore('Player 1', 500, 80, 'trainee');
-      useGameStore.getState().saveScore('Player 2', 1000, 90, 'trainee');
-      useGameStore.getState().saveScore('Player 3', 750, 85, 'trainee');
-
-      const scores = useGameStore.getState().getScores('trainee');
-      expect(scores[0].score).toBeGreaterThanOrEqual(scores[1].score);
-      expect(scores[1].score).toBeGreaterThanOrEqual(scores[2].score);
-    });
-
-    it('should return combined scores across grades in descending order', () => {
-      useGameStore.getState().saveScore('Cadet Ace', 500, 90, 'cadet');
-      useGameStore.getState().saveScore('Trainee Pro', 550, 10, 'trainee');
-      useGameStore.getState().saveScore('Commander Max', 450, 200, 'commander');
-
-      const scores = useGameStore.getState().getScores();
-      expect(scores).toHaveLength(3);
-      expect(scores[0].name).toBe('Commander Max');
-      expect(scores[1].name).toBe('Cadet Ace');
-      expect(scores[2].name).toBe('Trainee Pro');
-    });
-
-    it('should keep only the top 10 scores per grade', () => {
-      for (let i = 0; i < 12; i++) {
-        useGameStore.getState().saveScore(`Player ${i}`, i * 10, i, 'trainee');
-      }
-
-      const scores = useGameStore.getState().getScores('trainee');
-      expect(scores).toHaveLength(10);
-      expect(scores[0].name).toBe('Player 11');
-      expect(scores[9].name).toBe('Player 2');
     });
   });
 

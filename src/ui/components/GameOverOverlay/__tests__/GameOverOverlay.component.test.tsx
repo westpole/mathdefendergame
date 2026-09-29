@@ -36,12 +36,6 @@ describe('GameOverOverlay', () => {
       ddaSpeedMultiplier: 1,
       ddaIsCooloffActive: false,
       stageMessage: null,
-      leaderboard: {
-        trainee: [],
-        cadet: [],
-        commander: [],
-        'major-general': [],
-      },
       gameHistoryByProfile: {},
     });
   });

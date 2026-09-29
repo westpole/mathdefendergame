@@ -3,7 +3,6 @@ import type {
   Grade,
   DDAMathTier,
   DDAHeatState,
-  ScoreEntry,
 } from '@shared/types';
 
 export type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'paused' | 'stage-message' | 'gameover';
@@ -75,7 +74,6 @@ export interface GameStoreState {
   stageMessage: StageMessageState | null;
   streakRewardMessage: StreakRewardMessageState | null;
   pauseOverlay: PauseOverlayState | null;
-  leaderboard: Record<Grade, ScoreEntry[]>;
   gameHistoryByProfile: HistoryByProfile;
   markBootReady: () => void;
   setGrade: (grade: Grade) => void;
@@ -95,8 +93,6 @@ export interface GameStoreState {
   loginProfile: (username: string, password: string, keepLoggedIn: boolean) => LoginResult;
   createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;
   getActiveProfile: () => PlayerProfile | null;
-  saveScore: (name: string, score: number, perfScore: number, grade: Grade) => void;
-  getScores: (gradeFilter?: Grade | null) => ScoreEntry[];
   addGameHistory: (entry: GameHistoryEntry) => void;
   getGameHistory: (username?: string | null, limit?: number) => GameHistoryEntry[];
 }
