@@ -5,6 +5,7 @@
 
 import { useGameStore } from '../useGameStore';
 import type { GameHistoryEntry } from '@shared/types';
+import { isEncryptedPassword } from '../utilities/passwordEncryption';
 
 describe('useGameStore', () => {
   beforeEach(() => {
@@ -256,6 +257,31 @@ describe('useGameStore', () => {
       expect(useGameStore.getState().activeUsername).toBe('PilotOne');
       expect(useGameStore.getState().phase).toBe('start');
       expect(useGameStore.getState().profiles.PilotOne).toBeTruthy();
+      expect(isEncryptedPassword(useGameStore.getState().profiles.PilotOne.password)).toBe(true);
+    });
+
+    it('encrypts a legacy plaintext password after successful login', () => {
+      useGameStore.setState({
+        phase: 'login',
+        activeUsername: null,
+        profiles: {
+          PilotOne: {
+            username: 'PilotOne',
+            password: 'Abc12345',
+            bestScore: 0,
+            highestStage: 1,
+            preferredGrade: 'trainee',
+            createdAt: 1,
+            updatedAt: 2,
+          },
+        },
+      });
+
+      const result = useGameStore.getState().loginProfile('PilotOne', 'Abc12345', false);
+
+      expect(result.success).toBe(true);
+      expect(useGameStore.getState().profiles.PilotOne.password).not.toBe('Abc12345');
+      expect(isEncryptedPassword(useGameStore.getState().profiles.PilotOne.password)).toBe(true);
     });
 
     it('trims usernames when creating and logging into a profile', () => {

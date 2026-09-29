@@ -18,6 +18,11 @@ import {
   resolveActiveProfile,
   resolveLifetimeGrade,
 } from './utilities/general';
+import {
+  encryptPassword,
+  isEncryptedPassword,
+  verifyPassword,
+} from './utilities/passwordEncryption';
 
 import { migrateProfiles } from './utilities/migrateProfiles';
 import { migrateGameHistoryByProfile } from './utilities/migrateGameHistoryByProfile';
@@ -215,7 +220,7 @@ export const useGameStore = create<GameStoreState>()(
           };
         }
 
-        if (profile.password !== password) {
+        if (!verifyPassword(password, profile.password)) {
           return {
             success: false,
             error: 'Incorrect password. Check your credentials or create a new profile if needed.',
@@ -223,13 +228,29 @@ export const useGameStore = create<GameStoreState>()(
         }
 
         const resolvedGrade = resolveLifetimeGrade(normalizedUsername, get().gameHistoryByProfile);
+        const shouldEncryptExistingPassword = !isEncryptedPassword(profile.password);
 
-        set({
-          activeUsername: normalizedUsername,
-          rememberedUsername: keepLoggedIn ? normalizedUsername : null,
-          grade: resolvedGrade,
-          phase: 'start',
-          screenView: 'home',
+        set((state) => {
+          const nextState: Partial<GameStoreState> = {
+            activeUsername: normalizedUsername,
+            rememberedUsername: keepLoggedIn ? normalizedUsername : null,
+            grade: resolvedGrade,
+            phase: 'start',
+            screenView: 'home',
+          };
+
+          if (shouldEncryptExistingPassword) {
+            nextState.profiles = {
+              ...state.profiles,
+              [normalizedUsername]: {
+                ...profile,
+                password: encryptPassword(profile.password),
+                updatedAt: Date.now(),
+              },
+            };
+          }
+
+          return nextState;
         });
 
         return { success: true };
@@ -261,7 +282,7 @@ export const useGameStore = create<GameStoreState>()(
         const now = Date.now();
         const profile: PlayerProfile = {
           username: normalizedUsername,
-          password,
+          password: encryptPassword(password),
           bestScore: 0,
           highestStage: 1,
           preferredGrade: get().grade,
