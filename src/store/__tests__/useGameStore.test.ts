@@ -441,6 +441,7 @@ describe('useGameStore', () => {
   describe('streak reward message', () => {
     it('shows and clears the streak reward message', () => {
       useGameStore.getState().showStreakRewardMessage({ message: 'Perfect streak' });
+      expect(useGameStore.getState().phase).toBe('stage-message');
       expect(useGameStore.getState().streakRewardMessage?.message).toBe('Perfect streak');
 
       useGameStore.getState().clearStreakRewardMessage();

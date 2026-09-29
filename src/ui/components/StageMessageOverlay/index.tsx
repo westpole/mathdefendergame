@@ -25,10 +25,6 @@ export function StageMessageOverlay() {
     };
   }, [stageMessage]);
 
-  if (!stageMessage) {
-    return null;
-  }
-
   const getTitle = () => {
     if (streakRewardMessage) {
       return 'Streak Bonus';
@@ -36,36 +32,34 @@ export function StageMessageOverlay() {
 
     let title = 'Stage Lost';
 
-    if (stageMessage.success) {
+    if (stageMessage?.success) {
       title = `Stage ${stageMessage.stage} Cleared!`;
     }
 
     return title;
   };
 
-  const remainingLifeLabel = stageMessage.lives === 1 ? 'life' : 'lives';
-
   return (
     <div className="overlay-screen overlay-screen--interactive ">
       <div
         className={clsx('overlay-panel', 'modal-panel', {
-          'accent-success': stageMessage.success,
-          'accent-danger': !stageMessage.success,
+          'accent-success': stageMessage?.success,
+          'accent-danger': !stageMessage?.success,
         })}
       >
         <h1>{getTitle()}</h1>
 
-        {!stageMessage.success && stageMessage.lives > 0 && (
+        {!stageMessage?.success && (stageMessage && stageMessage.lives > 0) && (
           <p>
-            {`You lost this stage and 1 life. Remaining ${remainingLifeLabel}: ${stageMessage.lives}.`}
+            {`You lost this stage and 1 life. Remaining ${stageMessage?.lives === 1 ? 'life' : 'lives'}: ${stageMessage?.lives}.`}
           </p>
         )}
 
-        {stageMessage.success && stageMessage.stageIncorrect === 0 && (
+        {stageMessage?.success && stageMessage?.stageIncorrect === 0 && (
           <p>Perfect work. You saved your town.</p>
         )}
 
-        {stageMessage.success && stageMessage.stageIncorrect > 0 && (
+        {stageMessage?.success && stageMessage?.stageIncorrect > 0 && (
           <p>You cleared the stage, but made {stageMessage.stageIncorrect} mistake{stageMessage.stageIncorrect > 1 ? 's' : ''}.</p>
         )}
 
@@ -73,7 +67,7 @@ export function StageMessageOverlay() {
           <p>{streakRewardMessage.message}</p>
         )}
 
-        {!streakRewardMessage && (
+        {Boolean(stageMessage) && (
           <div className="action-row">
             <button className="primary-button" onClick={continueGame} type="button">
               Continue
