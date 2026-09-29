@@ -4,12 +4,46 @@ import { defineConfig } from 'vite';
 import { viteSingleFile } from 'vite-plugin-singlefile';
 import { fileURLToPath, URL } from 'node:url';
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(({ mode }) => {
+  const isE2E = mode === 'e2e';
+
+  return {
+
   plugins: [react(), ...(mode === 'e2e' ? [] : [viteSingleFile({ removeViteModuleLoader: true })])],
   base: './',
   // Required for Electron file:// protocol in production
   build: {
     outDir: 'build',
+    ...(isE2E
+      ? {
+          // Phaser 4 is intentionally shipped as a large vendor chunk.
+          chunkSizeWarningLimit: 1600,
+          rolldownOptions: {
+            output: {
+              codeSplitting: true,
+              manualChunks(id) {
+                if (!id.includes('node_modules')) {
+                  return;
+                }
+
+                if (id.includes('/phaser/')) {
+                  return 'vendor-phaser';
+                }
+
+                if (id.includes('/react/') || id.includes('/react-dom/') || id.includes('/scheduler/')) {
+                  return 'vendor-react';
+                }
+
+                if (id.includes('/zustand/')) {
+                  return 'vendor-zustand';
+                }
+
+                return 'vendor';
+              },
+            },
+          },
+        }
+      : {}),
     rollupOptions: {
       // Exclude specific files from the bundle
       external: [
@@ -37,7 +71,8 @@ export default defineConfig(({ mode }) => ({
     port: 5173,
     strictPort: true,
   },
-  define: {
-    __E2E__: mode === 'e2e',
-  },
-}));
+    define: {
+      __E2E__: mode === 'e2e',
+    },
+  };
+});
