@@ -62,7 +62,10 @@ export const useGameStore = create<GameStoreState>()(
         set(payload);
       },
       showStageMessage: (stageMessage) => set({ phase: 'stage-message', stageMessage }),
-      showStreakRewardMessage: (streakRewardMessage) => set({ streakRewardMessage }),
+      showStreakRewardMessage: (streakRewardMessage) => set({
+        phase: 'stage-message',
+        streakRewardMessage,
+      }),
       clearStreakRewardMessage: () => set({ streakRewardMessage: null }),
       showPauseOverlay: (reason) => set({
         phase: 'paused',
