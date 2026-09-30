@@ -1,4 +1,34 @@
 
+## [1.2.0](https://github.com/westpole/mathdefendergame/compare/v1.1.0...v1.2.0) (2026-09-30)
+
+### Features
+
+* [#50](https://github.com/westpole/mathdefendergame/issues/50) add CODEOWNERS file to define repository ownership ([3b3ea09](https://github.com/westpole/mathdefendergame/commit/3b3ea0991ce0a58eeb7f800c5d0c919d878b5ed1))
+* [#50](https://github.com/westpole/mathdefendergame/issues/50) add GitHub Actions workflow to verify code quality and run tests on pull requests ([c3b1d03](https://github.com/westpole/mathdefendergame/commit/c3b1d035e379c19781d47a36dd6da077c8416190))
+* [#51](https://github.com/westpole/mathdefendergame/issues/51) add comprehensive tests for game input controls and store selectors ([39b5459](https://github.com/westpole/mathdefendergame/commit/39b5459866f10530123a4a511d3d30b1df09ce64))
+* [#51](https://github.com/westpole/mathdefendergame/issues/51) add coverage analysis skill documentation for Vitest ([2c8e88c](https://github.com/westpole/mathdefendergame/commit/2c8e88ca52a57fc7dfff40b3dad112ddf5853161))
+* [#51](https://github.com/westpole/mathdefendergame/issues/51) add package scripts documentation for development, testing, and build processes ([c5a79ef](https://github.com/westpole/mathdefendergame/commit/c5a79ef5610fc8ecf523833bb0575ca2ebad945e))
+* [#51](https://github.com/westpole/mathdefendergame/issues/51) add pause button to HUDOverlay with styling for mobile input panel ([01c5d9e](https://github.com/westpole/mathdefendergame/commit/01c5d9eced5681f0ad866b227111124f163e5407))
+* [#51](https://github.com/westpole/mathdefendergame/issues/51) add Snyk policy file to manage code exclusions for tests and mocks ([338f3eb](https://github.com/westpole/mathdefendergame/commit/338f3ebbbee461ddab33e05e780f58e21e52de29))
+* [#51](https://github.com/westpole/mathdefendergame/issues/51) add unit tests for game configuration functions ([e8dc941](https://github.com/westpole/mathdefendergame/commit/e8dc9411d1a56174817b84ba9b9b37cf214a125a))
+* [#51](https://github.com/westpole/mathdefendergame/issues/51) update CI workflows to improve test execution and browser setup ([e9f9cf9](https://github.com/westpole/mathdefendergame/commit/e9f9cf994b520e5788513054e790298f427cd9d6))
+* [#51](https://github.com/westpole/mathdefendergame/issues/51) update quality gate and test authoring agents with enhanced validation rules and coverage guidelines ([d7fdfba](https://github.com/westpole/mathdefendergame/commit/d7fdfba370430a435f3eaa8fef1f3cda4a4bbe62))
+* [#61](https://github.com/westpole/mathdefendergame/issues/61) sync Current Stack section in instructions and add documentation sync script ([57f485f](https://github.com/westpole/mathdefendergame/commit/57f485faf22bab5209781001d45a2683e9319084))
+* [#67](https://github.com/westpole/mathdefendergame/issues/67) add feature flag manager and integrate feature flags into game logic ([fa6d063](https://github.com/westpole/mathdefendergame/commit/fa6d063e9d0c76f28cadaea5b1a3b1c6e56931af))
+* [#67](https://github.com/westpole/mathdefendergame/issues/67) add mock feature flags implementation and corresponding tests ([479a21a](https://github.com/westpole/mathdefendergame/commit/479a21a8c73a4b63e13057459ed795e3d7f94af7))
+* [#67](https://github.com/westpole/mathdefendergame/issues/67) implement feature flag overrides for login screen testing in E2E tests ([004b011](https://github.com/westpole/mathdefendergame/commit/004b011538c21f1a198f1833dce982ac258238d6))
+* [#67](https://github.com/westpole/mathdefendergame/issues/67) implement password encryption and verification for user profiles ([31f4ec2](https://github.com/westpole/mathdefendergame/commit/31f4ec2809089431a0e1bd7cb0930813ad933c1d))
+* [#67](https://github.com/westpole/mathdefendergame/issues/67) implement simple login feature with profile selection ([69b5c11](https://github.com/westpole/mathdefendergame/commit/69b5c114a7b1c75886e73a816f610000403b63c7))
+
+### Bug Fixes
+
+* [#45](https://github.com/westpole/mathdefendergame/issues/45) add missing file extention ([d7959a7](https://github.com/westpole/mathdefendergame/commit/d7959a7f6804843a5b098bb4c8ebdc69c96984ac))
+* [#48](https://github.com/westpole/mathdefendergame/issues/48) update GitHub Actions workflow to include type checking and tests for Phaser and React ([9809de2](https://github.com/westpole/mathdefendergame/commit/9809de2f5364da9044403e91d87c2c753ab07fdf))
+* [#50](https://github.com/westpole/mathdefendergame/issues/50) update Node.js version to 24 in GitHub Actions workflow ([dc3c69f](https://github.com/westpole/mathdefendergame/commit/dc3c69fc3372d27a86917a24fc9c548e496a3f3e))
+* [#55](https://github.com/westpole/mathdefendergame/issues/55) correct imports for store types and failing tests ([705f8a2](https://github.com/westpole/mathdefendergame/commit/705f8a22262791c47d883e503951d3990a6ff28f))
+* [#65](https://github.com/westpole/mathdefendergame/issues/65) ensure streak reward message is visible and correctly handled in state ([9165843](https://github.com/westpole/mathdefendergame/commit/9165843fd886d995628dec86b1e3a396361272fa))
+* [#65](https://github.com/westpole/mathdefendergame/issues/65) update game description for clarity and conciseness ([ff94d10](https://github.com/westpole/mathdefendergame/commit/ff94d1054b0a34c76e5a8f86e7f2d93933949b43))
+
 ## [1.1.0](https://github.com/westpole/mathdefendergame/compare/v1.0.1...v1.1.0) (2026-09-17)
 
 ### Features
