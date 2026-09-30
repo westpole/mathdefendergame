@@ -9,8 +9,21 @@ export type FeatureFlags = Record<string, boolean>;
 
 /**
  * Runtime feature flag registry loaded from the JSON config.
+ * E2E tests can pre-set overrides via localStorage before the app initializes.
  */
-const featureFlags: FeatureFlags = rawFeatureFlags as FeatureFlags;
+const getInitialFlags = (): FeatureFlags => {
+  const stored = typeof window !== 'undefined' ? localStorage.getItem('__e2eFeatureFlags') : null;
+  if (stored) {
+    try {
+      return { ...rawFeatureFlags, ...JSON.parse(stored) };
+    } catch {
+      return rawFeatureFlags as FeatureFlags;
+    }
+  }
+  return rawFeatureFlags as FeatureFlags;
+};
+
+const featureFlags: FeatureFlags = getInitialFlags();
 
 /**
  * Returns a shallow copy of the current feature flag set.
