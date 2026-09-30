@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Math Defender Feature Flags</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="hero">
+        <p class="kicker">Math Defender Tooling</p>
+        <h1>Feature Flag Manager</h1>
+        <p class="subtitle">
+          Manage runtime flags in a separate page, then generate and replace
+          the shared JSON used by the game.
+        </p>
+      </header>
+
+      <section class="panel controls" aria-label="Feature flag actions">
+        <div class="action-row">
+          <button id="add-flag" type="button" class="btn btn-ghost">Add new flag</button>
+          <button id="generate-list" type="button" class="btn btn-solid">Generate list</button>
+        </div>
+        <p id="status-message" class="status-message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="panel" aria-label="Feature flag list">
+        <div class="table-head">
+          <h2>Flags</h2>
+          <p class="hint">Name must be lowercase and contain no spaces.</p>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="flags-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" aria-label="Generated output preview">
+        <div class="table-head">
+          <h2>Generated JSON Preview</h2>
+          <p class="hint">Export shape: { &lt;name&gt;: boolean }</p>
+        </div>
+        <pre id="json-preview" class="json-preview">{}</pre>
+      </section>
+    </main>
+
+    <template id="flag-row-template">
+      <tr>
+        <td>
+          <label class="sr-only">Feature flag name</label>
+          <input data-field="name" type="text" placeholder="example_flag" maxlength="64" autocomplete="off" />
+        </td>
+        <td>
+          <label class="sr-only">Feature flag description</label>
+          <input data-field="description" type="text" placeholder="What this flag controls" maxlength="160" autocomplete="off" />
+        </td>
+        <td>
+          <label class="sr-only">Feature flag status</label>
+          <select data-field="status">
+            <option value="1">enabled (1)</option>
+            <option value="0">disabled (0)</option>
+          </select>
+        </td>
+        <td>
+          <button data-action="remove" type="button" class="btn btn-danger">Remove</button>
+        </td>
+      </tr>
+    </template>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

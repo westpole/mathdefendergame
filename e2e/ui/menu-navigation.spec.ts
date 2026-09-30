@@ -14,8 +14,17 @@ async function loginToStartMenu(page: Page) {
 }
 
 test.describe('Menu Navigation', () => {
-  test('should show login screen on launch', async ({ page }) => {
+  test.beforeEach(async ({ page }) => {
+    // Override simple_login to false to test LoginOverlay component
+    await page.addInitScript(() => {
+      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: false }));
+    });
+    await page.reload();
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
+    await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().bootReady === true, { timeout: 5000 });
+  });
+
+  test('should show login screen on launch', async ({ page }) => {
 
     const loginScreen = page.locator('[data-testid="login-screen"]');
     await expect(loginScreen).toBeVisible();

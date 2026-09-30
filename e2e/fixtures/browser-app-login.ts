@@ -10,8 +10,8 @@ export const test = base.extend<Fixtures>({
   page: async ({ page }, use) => {
     await page.addInitScript(() => {
       window.localStorage.clear();
-      // Set default feature flags before app initializes
-      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: true }));
+      // Set feature flags for LoginOverlay testing
+      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: false }));
     });
 
     await page.goto('/');

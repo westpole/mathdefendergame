@@ -99,6 +99,20 @@ describe('App start menu controls', () => {
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
+  it('renders profile selector during login phase when simple login is enabled', () => {
+    act(() => {
+      setMockStoreState({
+        bootReady: true,
+        phase: 'login',
+      });
+    });
+
+    render(<App />);
+
+    expect(screen.getByTestId('profile-selector-screen')).toBeVisible();
+    expect(screen.queryByTestId('login-screen')).not.toBeInTheDocument();
+  });
+
   it('opens the React menu and routes menu selections through UIScene', () => {
     act(() => {
       setMockStoreState({

@@ -1,16 +1,16 @@
 import type { Page } from '@playwright/test';
 
-import { test, expect } from '../fixtures/browser-app';
+import { test, expect } from '../fixtures/browser-app-login';
 
 import type { E2EWindow } from '../types';
 
 async function loginToStartMenu(page: Page, username: string) {
   await expect(page.getByTestId('login-screen')).toBeVisible();
-  await page.getByRole('button', { name: 'Create Profile' }).tap();
+  await page.getByRole('button', { name: 'Create Profile' }).click();
   await page.getByLabel('Username').fill(username);
-  await page.locator('#login-password').fill('Abc12345');
+  await page.getByLabel('Password', { exact: true }).fill('Abc12345');
   await page.getByLabel('Verify password').fill('Abc12345');
-  await page.getByRole('button', { name: 'Create' }).tap();
+  await page.getByRole('button', { name: 'Create' }).click();
   await expect(page.getByTestId('main-menu')).toBeVisible();
 }
 
@@ -38,7 +38,7 @@ test.describe('Mobile web validation', () => {
     expect(rulesBounds!.height).toBeLessThanOrEqual(viewport!.height);
   });
 
-  test('supports touch answer entry without a visible pause button', async ({ page }) => {
+  test('supports pausing game by touching the game canvas', async ({ page }) => {
     await loginToStartMenu(page, `mobile-play-${Date.now()}`);
     await page.getByTestId('menu-toggle-button').tap();
     await page.getByTestId('menu-option-play').tap();
@@ -67,6 +67,15 @@ test.describe('Mobile web validation', () => {
     await page.getByRole('button', { name: 'Backspace' }).tap();
     await expect(inputPreview).toHaveText('1');
 
-    await expect(page.getByRole('button', { name: 'Pause' })).toHaveCount(0);
+    const canvasBounds = await page.locator('#game-container canvas').boundingBox();
+
+    expect(canvasBounds).not.toBeNull();
+    await page.touchscreen.tap(canvasBounds!.x + canvasBounds!.width / 2, canvasBounds!.y + 20);
+
+    const pausedState = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
+
+    expect(pausedState.phase).toBe('paused');
+    expect(pausedState.pauseOverlay?.reason).toBe('escape');
+    await expect(page.getByRole('heading', { name: 'Game Paused' })).toBeVisible();
   });
 });

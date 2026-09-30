@@ -9,6 +9,7 @@
     "dev:web": "vite",
     "dev:web:mobile": "vite --host 0.0.0.0 --port 5173",
     "dev:electron": "concurrently -k \"npm:dev:web\" \"wait-on http://localhost:5173 && electron . --renderer-url=http://localhost:5173\"",
+    "flags:manager": "node scripts/feature-flags/server.mjs",
     "start:electron": "electron .",
     "start:electron:debug": "electron . --inspect",
     "test:ui": "vitest --ui --config vitest.config.ts",

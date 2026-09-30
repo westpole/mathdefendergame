@@ -18,9 +18,19 @@ import {
   resolveActiveProfile,
   resolveLifetimeGrade,
 } from './utilities/general';
+import {
+  encryptPassword,
+  isEncryptedPassword,
+  verifyPassword,
+} from './utilities/passwordEncryption';
 
 import { migrateProfiles } from './utilities/migrateProfiles';
 import { migrateGameHistoryByProfile } from './utilities/migrateGameHistoryByProfile';
+
+function createSyntheticPassword(username: string): string {
+  const entropy = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  return `simple:${username}:${entropy}`;
+}
 
 export const useGameStore = create<GameStoreState>()(
   persist(
@@ -215,7 +225,7 @@ export const useGameStore = create<GameStoreState>()(
           };
         }
 
-        if (profile.password !== password) {
+        if (!verifyPassword(password, profile.password)) {
           return {
             success: false,
             error: 'Incorrect password. Check your credentials or create a new profile if needed.',
@@ -223,10 +233,57 @@ export const useGameStore = create<GameStoreState>()(
         }
 
         const resolvedGrade = resolveLifetimeGrade(normalizedUsername, get().gameHistoryByProfile);
+        const shouldEncryptExistingPassword = !isEncryptedPassword(profile.password);
+
+        set((state) => {
+          const nextState: Partial<GameStoreState> = {
+            activeUsername: normalizedUsername,
+            rememberedUsername: keepLoggedIn ? normalizedUsername : null,
+            grade: resolvedGrade,
+            phase: 'start',
+            screenView: 'home',
+          };
+
+          if (shouldEncryptExistingPassword) {
+            nextState.profiles = {
+              ...state.profiles,
+              [normalizedUsername]: {
+                ...profile,
+                password: encryptPassword(profile.password),
+                updatedAt: Date.now(),
+              },
+            };
+          }
+
+          return nextState;
+        });
+
+        return { success: true };
+      },
+      selectProfileByUsername: (username) => {
+        const normalizedUsername = username.trim();
+
+        if (!normalizedUsername) {
+          return {
+            success: false,
+            error: 'Username is required.',
+          };
+        }
+
+        const profile = get().profiles[normalizedUsername];
+
+        if (!profile) {
+          return {
+            success: false,
+            error: 'Username not found. Create a profile to continue.',
+          };
+        }
+
+        const resolvedGrade = resolveLifetimeGrade(normalizedUsername, get().gameHistoryByProfile);
 
         set({
           activeUsername: normalizedUsername,
-          rememberedUsername: keepLoggedIn ? normalizedUsername : null,
+          rememberedUsername: null,
           grade: resolvedGrade,
           phase: 'start',
           screenView: 'home',
@@ -261,7 +318,7 @@ export const useGameStore = create<GameStoreState>()(
         const now = Date.now();
         const profile: PlayerProfile = {
           username: normalizedUsername,
-          password,
+          password: encryptPassword(password),
           bestScore: 0,
           highestStage: 1,
           preferredGrade: get().grade,
@@ -276,6 +333,47 @@ export const useGameStore = create<GameStoreState>()(
           },
           activeUsername: normalizedUsername,
           rememberedUsername: keepLoggedIn ? normalizedUsername : null,
+          phase: 'start',
+          screenView: 'home',
+        }));
+
+        return { success: true };
+      },
+      createAndLoginSimpleProfile: (username) => {
+        const normalizedUsername = username.trim();
+
+        if (!normalizedUsername) {
+          return {
+            success: false,
+            error: 'Username is required.',
+          };
+        }
+
+        if (get().profiles[normalizedUsername]) {
+          return {
+            success: false,
+            error: 'Username already exists. Pick a different username.',
+          };
+        }
+
+        const now = Date.now();
+        const profile: PlayerProfile = {
+          username: normalizedUsername,
+          password: encryptPassword(createSyntheticPassword(normalizedUsername)),
+          bestScore: 0,
+          highestStage: 1,
+          preferredGrade: get().grade,
+          createdAt: now,
+          updatedAt: now,
+        };
+
+        set((state) => ({
+          profiles: {
+            ...state.profiles,
+            [normalizedUsername]: profile,
+          },
+          activeUsername: normalizedUsername,
+          rememberedUsername: null,
           phase: 'start',
           screenView: 'home',
         }));

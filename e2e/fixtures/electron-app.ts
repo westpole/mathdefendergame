@@ -19,6 +19,12 @@ export const test = base.extend<Fixtures>({
   },
   page: async ({ electronApp }, use) => {
     const page = await electronApp.firstWindow();
+
+    // Set feature flags via localStorage BEFORE app loads
+    await page.addInitScript(() => {
+      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: true }));
+    });
+
     await page.waitForLoadState('domcontentloaded');
     await use(page);
 

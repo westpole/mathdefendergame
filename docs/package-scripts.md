@@ -9,6 +9,7 @@ This document describes each script defined in `package.json` and when to use it
 | `npm run dev:web` | Starts the Vite development server for the web renderer. | Use during normal browser-based development of the game UI and renderer code. |
 | `npm run dev:web:mobile` | Starts the Vite development server on `0.0.0.0:5173` so other devices on the network can reach it. | Use when testing on a phone, tablet, or another machine on the same network. |
 | `npm run dev:electron` | Runs the Vite dev server and then launches Electron once the renderer is available. | Use when developing the desktop shell and the renderer together. |
+| `npm run flags:manager` | Starts the standalone feature-flag management page server on `http://localhost:4783`. | Use when authoring flags and replacing `src/shared/feature-flags.json` outside the game UI. |
 | `npm run start:electron` | Launches Electron against the built app entry configured by the project. | Use for a quick local smoke check of the desktop app without the dev server workflow. |
 | `npm run start:electron:debug` | Launches Electron with the Node inspector enabled. | Use when debugging Electron main-process behavior with DevTools or an attached debugger. |
 

@@ -10,6 +10,7 @@ The player defends a base from falling meteors containing math expressions by ty
   - [Using the `release-game` agent](/docs/release-game-agent.md)
   - [Tips and Tricks](/docs/tips-and-tricks.md)
   - [Game Overview on engine and wiring](/docs/ui-overlay-game-engine-wiring.md)
+  - [Feature Flags](/scripts/feature-flags/README.md)
 * Useful resources:
   - [Game preview](https://westpole.github.io/mathdefendergame/)
 
