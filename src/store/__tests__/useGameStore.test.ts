@@ -351,6 +351,17 @@ describe('useGameStore', () => {
       expect(useGameStore.getState().rememberedUsername).toBeNull();
     });
 
+    it('remembers selected profile in simple login mode when remember me is enabled', () => {
+      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+      useGameStore.setState({ phase: 'login', activeUsername: null, rememberedUsername: null });
+
+      const result = useGameStore.getState().selectProfileByUsername('PilotOne', true);
+
+      expect(result.success).toBe(true);
+      expect(useGameStore.getState().activeUsername).toBe('PilotOne');
+      expect(useGameStore.getState().rememberedUsername).toBe('PilotOne');
+    });
+
     it('returns an error when selecting a missing profile by username', () => {
       const result = useGameStore.getState().selectProfileByUsername('UnknownPilot');
 

@@ -7,6 +7,7 @@ type SelectorMode = 'select' | 'create';
 
 export function ProfileSelector() {
   const profiles = useGameStore((state) => state.profiles);
+  const rememberedUsername = useGameStore((state) => state.rememberedUsername);
   const selectProfileByUsername = useGameStore((state) => state.selectProfileByUsername);
   const triggerId = 'profile-selector-username';
   const labelId = useId();
@@ -14,13 +15,19 @@ export function ProfileSelector() {
   const listboxRef = useRef<HTMLUListElement | null>(null);
   const [selectorMode, setSelectorMode] = useState<SelectorMode>('select');
   const [selectedUsername, setSelectedUsername] = useState('');
+  const [rememberMe, setRememberMe] = useState(Boolean(rememberedUsername));
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeOptionIndex, setActiveOptionIndex] = useState(0);
 
   const profileUsernames = useMemo(() => Object.keys(profiles).sort((left, right) => left.localeCompare(right)), [profiles]);
   const selectedUsernameIsValid = profileUsernames.includes(selectedUsername);
-  const currentSelectedUsername = selectedUsernameIsValid ? selectedUsername : '';
+  const rememberedUsernameIsValid = Boolean(rememberedUsername && profileUsernames.includes(rememberedUsername));
+  const currentSelectedUsername = selectedUsernameIsValid
+    ? selectedUsername
+    : rememberedUsernameIsValid
+      ? rememberedUsername ?? ''
+      : '';
 
   useEffect(() => {
     if (!isDropdownOpen) {
@@ -147,7 +154,7 @@ export function ProfileSelector() {
       return;
     }
 
-    const result = selectProfileByUsername(currentSelectedUsername);
+    const result = selectProfileByUsername(currentSelectedUsername, rememberMe);
 
     if (!result.success) {
       setErrorMessage(result.error ?? 'Unable to load profile.');
@@ -262,6 +269,17 @@ export function ProfileSelector() {
                 {errorMessage}
               </div>
             )}
+
+            <label className="checkbox-row" htmlFor="remember-profile-login">
+              <input
+                checked={rememberMe}
+                id="remember-profile-login"
+                onChange={(event) => setRememberMe(event.target.checked)}
+                type="checkbox"
+                disabled={!selectedUsernameIsValid}
+              />
+              Remember me
+            </label>
 
             <div className="login-actions">
               <button className="primary-button" disabled={profileUsernames.length === 0} type="submit">

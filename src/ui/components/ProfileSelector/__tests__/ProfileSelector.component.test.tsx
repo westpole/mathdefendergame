@@ -38,15 +38,29 @@ describe('ProfileSelector', () => {
   it('shows profile list and logs in selected profile', () => {
     render(<ProfileSelector />);
 
-    fireEvent.change(screen.getByLabelText(/username/i), {
-      target: { value: 'AcePilot' },
-    });
+    fireEvent.click(screen.getByRole('button', { name: /select profile/i }));
+    fireEvent.click(screen.getByRole('option', { name: 'AcePilot' }));
     fireEvent.click(screen.getByRole('button', { name: /^login$/i }));
 
     const state = useGameStore.getState();
     expect(state.phase).toBe('start');
     expect(state.screenView).toBe('home');
     expect(state.activeUsername).toBe('AcePilot');
+    expect(state.rememberedUsername).toBeNull();
+  });
+
+  it('remembers selected profile when remember me is enabled', () => {
+    render(<ProfileSelector />);
+
+    fireEvent.click(screen.getByRole('button', { name: /select profile/i }));
+    fireEvent.click(screen.getByRole('option', { name: 'AcePilot' }));
+    fireEvent.click(screen.getByLabelText(/remember me/i));
+    fireEvent.click(screen.getByRole('button', { name: /^login$/i }));
+
+    const state = useGameStore.getState();
+    expect(state.phase).toBe('start');
+    expect(state.activeUsername).toBe('AcePilot');
+    expect(state.rememberedUsername).toBe('AcePilot');
   });
 
   it('shows create profile form when create profile action is selected', () => {

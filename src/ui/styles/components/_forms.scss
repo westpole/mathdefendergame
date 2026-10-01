@@ -114,9 +114,20 @@
   align-items: center;
   gap: 0.5em;
   color: $text-primary;
-  font-size: $font-size-body-sm;
+  font-size: $font-size-body;
   margin-top: 0.25em;
+  margin-left: 1em;
   flex-wrap: wrap;
+  line-height: calc($font-size-body * 3);
+  color: #aaa;
+}
+
+#remember-profile-login {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: $color-primary-yellow;
+  cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .login-actions {
