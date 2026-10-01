@@ -260,7 +260,7 @@ export const useGameStore = create<GameStoreState>()(
 
         return { success: true };
       },
-      selectProfileByUsername: (username) => {
+      selectProfileByUsername: (username, rememberProfile = false) => {
         const normalizedUsername = username.trim();
 
         if (!normalizedUsername) {
@@ -283,7 +283,7 @@ export const useGameStore = create<GameStoreState>()(
 
         set({
           activeUsername: normalizedUsername,
-          rememberedUsername: null,
+          rememberedUsername: rememberProfile ? normalizedUsername : null,
           grade: resolvedGrade,
           phase: 'start',
           screenView: 'home',

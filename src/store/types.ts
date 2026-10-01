@@ -91,7 +91,7 @@ export interface GameStoreState {
   openScreenView: (screenView: ScreenView) => void;
   logOff: () => void;
   loginProfile: (username: string, password: string, keepLoggedIn: boolean) => LoginResult;
-  selectProfileByUsername: (username: string) => LoginResult;
+  selectProfileByUsername: (username: string, rememberProfile?: boolean) => LoginResult;
   createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;
   createAndLoginSimpleProfile: (username: string) => LoginResult;
   getActiveProfile: () => PlayerProfile | null;

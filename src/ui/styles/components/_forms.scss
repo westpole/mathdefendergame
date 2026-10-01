@@ -42,6 +42,63 @@
   gap: $spacing-sm;
 }
 
+.custom-select {
+  position: relative;
+}
+
+.custom-select__trigger {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.custom-select__placeholder {
+  color: $text-muted;
+}
+
+.custom-select__arrow {
+  color: $color-primary-yellow;
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  line-height: 1;
+  margin-left: $spacing-sm;
+}
+
+.custom-select__options {
+  background: $bg-dark-panel;
+  border: 1px solid $border-dark;
+  border-radius: $radius-md;
+  list-style: none;
+  margin: 6px 0 0;
+  max-height: 170px;
+  overflow-y: auto;
+  padding: 6px;
+  position: absolute;
+  width: 100%;
+  z-index: $z-menu-overlay;
+
+  li {
+    border-radius: $radius-sm;
+    cursor: pointer;
+    padding: 8px 10px;
+
+    &:hover,
+    &.is-active {
+      background: rgba(255, 224, 102, 0.24);
+    }
+
+    &[aria-selected='true'] {
+      font-weight: 700;
+    }
+  }
+}
+
+.custom-select__options[hidden] {
+  display: none;
+}
+
 .form-error-block {
   padding: 10px 12px;
   border-radius: $radius-md;
@@ -57,9 +114,20 @@
   align-items: center;
   gap: 0.5em;
   color: $text-primary;
-  font-size: $font-size-body-sm;
+  font-size: $font-size-body;
   margin-top: 0.25em;
+  margin-left: 1em;
   flex-wrap: wrap;
+  line-height: calc($font-size-body * 3);
+  color: #aaa;
+}
+
+#remember-profile-login {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: $color-primary-yellow;
+  cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .login-actions {
