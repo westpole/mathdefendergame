@@ -43,6 +43,7 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 - Stories live beside components in `src/ui/components/**`; use the Storybook skill instead of inventing a new store-mocking pattern.
 - Preserve the existing Electron security posture: `contextIsolation: true` and `nodeIntegration: false`, unless an explicit security-reviewed requirement says otherwise.
 - When UI behavior, states, or visuals change, add or update desktop and mobile device stories.
+- Make sure new and modified components, hooks, and utilities are properly documented and tested.
 
 ## Utilities
 

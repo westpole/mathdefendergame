@@ -140,3 +140,13 @@ Before completing any task, verify the code against these constraints:
 8. Are all styles in SCSS module files following BEM methodology, with no inline `style` props?
 9. Are dynamic class names composed using `clsx` instead of template literals?
 10. Run `npm run lint` to ensure zero compilation or type-checking errors.
+
+## 10. Delivery
+
+- **Code Review**: Ensure all changes have been reviewed and approved by at least one other developer.
+- **Documentation**: Update any relevant documentation to reflect the new or changed functionality.
+- **JSDoc**: Ensure all new or modified functions include complete JSDoc comments for better maintainability and Copilot assistance.
+- **Mocks**: Ensure all necessary mocks are updated or created for unit and integration tests to reflect the new or changed functionality.
+- **Testing**: Run all unit, integration, and end-to-end tests to confirm that new changes do not break existing functionality.
+- **Linting and Formatting**: Run `npm run lint` to maintain code quality and consistency.
+- **Storybook**: Update or add relevant stories in Storybook to reflect the new or changed components.
