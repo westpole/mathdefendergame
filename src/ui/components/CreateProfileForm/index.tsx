@@ -7,6 +7,19 @@ interface CreateProfileFormProps {
   onCancel?: () => void;
 }
 
+/**
+ * Renders the create-account form used during login flow startup.
+ *
+ * In full mode, the user must provide a username, password, and password confirmation;
+ * in simple mode, only a username is required and a lightweight profile is created.
+ * Successful submissions call the matching store action to create and immediately log in
+ * the profile. Validation errors are surfaced inline in the form.
+ *
+ * @param props - The form configuration and optional cancel callback.
+ * @param props.simpleMode - When true, skip password fields and use the simplified profile flow.
+ * @param props.onCancel - Optional callback invoked when the user cancels the form.
+ * @returns The profile creation form UI.
+ */
 export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormProps) {
   const createAndLoginProfile = useGameStore((state) => state.createAndLoginProfile);
   const createAndLoginSimpleProfile = useGameStore((state) => state.createAndLoginSimpleProfile);
