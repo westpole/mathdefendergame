@@ -5,6 +5,12 @@ import { CreateProfileForm } from '@ui/components/CreateProfileForm';
 
 type AuthMode = 'login' | 'create';
 
+/**
+ * Renders the player access screen for logging in or creating a profile.
+ *
+ * The form switches between login and creation modes, validates credentials via
+ * the game store, and shows any authentication errors returned by the store.
+ */
 export function LoginOverlay() {
   const loginProfile = useGameStore((state) => state.loginProfile);
   const [activeMode, setActiveMode] = useState<AuthMode>('login');
