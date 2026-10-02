@@ -3,34 +3,17 @@ import { useState } from 'react';
 import { selectActiveProfileHistory } from '@store/selectors/performance';
 import { buildGradeProgressSummary, buildWeeklyProgressReport } from '@store/selectors/progress';
 import { useGameStore } from '@store/useGameStore';
-import type { Grade } from '@shared/types';
-
 import { ProfileIcon } from '@ui/components/ProfileIcon';
+
+import { formatShortDate, formatScore, formatAccuracy, toGradeTitle } from './utilities';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-function toGradeTitle(grade: Grade): string {
-  return grade
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
-
-function formatScore(value: number): string {
-  return value.toLocaleString();
-}
-
-function formatAccuracy(value: number): string {
-  return `${Math.round(value)}%`;
-}
-
-function formatShortDate(value: number): string {
-  return new Intl.DateTimeFormat(undefined, {
-    month: 'short',
-    day: 'numeric',
-  }).format(value);
-}
-
+/**
+ * Renders the home dashboard with the active profile, weekly summary, and grade progress.
+ *
+ * @returns The interactive home overlay showing historical progress and status for the current player.
+ */
 export function HomeOverlay() {
   const activeUsername = useGameStore((state) => state.activeUsername);
   const grade = useGameStore((state) => state.grade);
