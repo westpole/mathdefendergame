@@ -2,38 +2,17 @@ import { useState } from 'react';
 
 import menuCloseIcon from '@assets/menu-close.svg';
 import menuIcon from '@assets/menu.svg';
-import { logOff, openScreenView, startGame } from '@game/scenes/UIScene';
-import { useGameStore } from '@store/useGameStore';
 
-const menuItems = [
-  { id: 'home', label: 'Home', type: 'view', view: 'home' },
-  { id: 'play', label: 'Play Game', type: 'start' },
-  { id: 'profile', label: 'Profile', type: 'view', view: 'profile' },
-  { id: 'performance', label: 'Performance', type: 'view', view: 'performance' },
-  { id: 'rules', label: 'Rules', type: 'view', view: 'rules' },
-  { id: 'logoff', label: 'Log off', type: 'logoff' },
-] as const;
+import { MenuList } from './MenuList';
 
+/**
+ * Displays the game menu toggle and opens the navigation menu overlay.
+ *
+ * The component tracks the menu's open state and renders the list of available
+ * actions when the user expands the menu.
+ */
 export function MenuControls() {
-  const activeView = useGameStore((state) => state.screenView);
   const [isOpen, setIsOpen] = useState(false);
-
-  const handleMenuSelect = (item: (typeof menuItems)[number]) => {
-    if (item.type === 'start') {
-      startGame();
-      setIsOpen(false);
-      return;
-    }
-
-    if (item.type === 'logoff') {
-      logOff();
-      setIsOpen(false);
-      return;
-    }
-
-    openScreenView(item.view);
-    setIsOpen(false);
-  };
 
   return (
     <div className="menu-shell" data-testid="menu-shell">
@@ -64,25 +43,7 @@ export function MenuControls() {
       )}
 
       {isOpen && (
-        <div className="menu-overlay" data-testid="menu-overlay">
-          <div className="menu-panel" data-testid="menu-options" id="menu-options" role="menu">
-            <div className="menu-options">
-              {menuItems.map((item) => (
-                <button
-                  key={item.id}
-                  aria-current={item.type === 'view' && activeView === item.view ? 'page' : undefined}
-                  className="secondary-button menu-option"
-                  data-testid={`menu-option-${item.id}`}
-                  onClick={() => handleMenuSelect(item)}
-                  role="menuitem"
-                  type="button"
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        <MenuList setIsOpen={setIsOpen} />
       )}
     </div>
   );
