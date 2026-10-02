@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { SubmitEvent, useEffect, useRef, useState } from 'react';
 
 import { useGameStore } from '@store/useGameStore';
 
@@ -20,7 +20,7 @@ export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormPro
     usernameInputRef.current?.focus();
   }, []);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!simpleMode) {

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useRef, useState } from 'react';
+import { SubmitEvent, useEffect, useRef, useState } from 'react';
 
 import { useGameStore } from '@store/useGameStore';
 import { CreateProfileForm } from '@ui/components/CreateProfileForm';
@@ -23,7 +23,7 @@ export function LoginOverlay() {
     setErrorMessage(null);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const result = loginProfile(username, password, keepLoggedIn);

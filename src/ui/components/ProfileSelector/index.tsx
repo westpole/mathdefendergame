@@ -1,4 +1,4 @@
-import { FormEvent, KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { SubmitEvent, KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { useGameStore } from '@store/useGameStore';
 import { CreateProfileForm } from '@ui/components/CreateProfileForm';
@@ -146,7 +146,7 @@ export function ProfileSelector() {
     }
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!currentSelectedUsername.trim()) {
