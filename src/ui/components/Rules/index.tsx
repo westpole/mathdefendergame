@@ -7,6 +7,9 @@ const rules = [
   'Clear 28 stages to win.',
 ];
 
+/**
+ * Rules overlay component displaying the game rules.
+ */
 export function RulesOverlay() {
   return (
     <div className="overlay-screen overlay-screen--interactive" data-testid="rules-overlay">
