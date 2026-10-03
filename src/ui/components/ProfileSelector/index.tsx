@@ -5,6 +5,9 @@ import { CreateProfileForm } from '@ui/components/CreateProfileForm';
 
 type SelectorMode = 'select' | 'create';
 
+/**
+ * Profile selector component allowing users to select or create profiles.
+ */
 export function ProfileSelector() {
   const profiles = useGameStore((state) => state.profiles);
   const rememberedUsername = useGameStore((state) => state.rememberedUsername);
