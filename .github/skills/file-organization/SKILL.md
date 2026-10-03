@@ -53,7 +53,7 @@ Framework scope:
 
 ## 4. JSDoc Requirements for Copilot
 
-Add JSDoc to every function (including exported and internal helpers) so Copilot has clear intent and contract metadata.
+Add JSDoc to every function (including exported and internal helpers) so Copilot has clear intent and contract metadata. Place block comments immediately above the function definition.
 
 Minimum required tags:
 - Summary line describing behavior and intent.

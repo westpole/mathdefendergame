@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
 import type { Grade } from '@shared/types';
-
+import { toGradeTitle, formatScore, formatApm } from './utilities';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
 
 const gradeOrder: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
@@ -14,24 +14,9 @@ const EMPTY_HISTORY: Array<{
   averageAnswerTimeMs: number;
 }> = [];
 
-function toGradeTitle(grade: Grade): string {
-  return grade
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
-
-function formatScore(value: number): string {
-  return value.toLocaleString();
-}
-
-function formatApm(value: number): string {
-  return value.toLocaleString(undefined, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
-}
-
+/**
+ * Profile overlay component displaying user statistics and progress.
+ */
 export function ProfileOverlay() {
   const activeUsername = useGameStore((state) => state.activeUsername);
   const phase = useGameStore((state) => state.phase);
@@ -86,13 +71,6 @@ export function ProfileOverlay() {
   const progressRatio = nextThreshold !== null && nextThreshold > currentThreshold
     ? Math.min(Math.max((progressScore - currentThreshold) / (nextThreshold - currentThreshold), 0), 1)
     : 0;
-  const progressTone = grade === 'trainee'
-    ? 'trainee'
-    : grade === 'cadet'
-      ? 'cadet'
-      : grade === 'commander'
-        ? 'commander'
-        : 'major-general';
 
   return (
     <div className="overlay-screen overlay-screen--interactive" data-testid="profile-overlay">
@@ -145,11 +123,11 @@ export function ProfileOverlay() {
 
                 <div className="profile-progress-bar">
                   <div
-                    className={`profile-progress-fill profile-progress-fill--${progressTone}`}
+                    className={`profile-progress-fill profile-progress-fill--${grade ?? 'trainee'}`}
                     style={{ width: `${progressRatio * 100}%` }}
                   />
                   <div
-                    className={`profile-progress-marker profile-progress-marker--${progressTone}`}
+                    className={`profile-progress-marker profile-progress-marker--${grade ?? 'trainee'}`}
                     style={{ left: `${progressRatio * 100}%` }}
                   />
                 </div>

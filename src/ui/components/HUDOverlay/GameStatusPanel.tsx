@@ -12,6 +12,10 @@ interface GameStatusPanelProps {
   items: ReadonlyArray<GameStatusPanelItem>;
 }
 
+/**
+ * Displays a compact group of status tiles for the active game session.
+ * @param items - The status metrics to render in the panel.
+ */
 export const GameStatusPanel = ({ items }: GameStatusPanelProps) => {
   return (
     <div className="status-panel">

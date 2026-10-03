@@ -6,6 +6,12 @@ interface ProfileIconProps {
   size?: number;
 }
 
+/**
+ * Renders a profile icon with a background and avatar image.
+ *
+ * @param param0 The props object containing the label and optional size.
+ * @returns A JSX element representing the profile icon.
+ */
 export function ProfileIcon({ label, size = 96 }: ProfileIconProps) {
   return (
     <div

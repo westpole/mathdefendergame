@@ -1,6 +1,14 @@
 import { startGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
+/**
+ * Renders the post-run summary shown when the player loses all lives.
+ *
+ * The overlay reads the latest score, correctness counts, and final accuracy from the
+ * shared game store and offers a single action to start a fresh run.
+ *
+ * @returns The final game-over overlay with stats and the restart action.
+ */
 export function GameOverOverlay() {
   const score = useGameStore((state) => state.score);
   const correctCount = useGameStore((state) => state.correctCount);

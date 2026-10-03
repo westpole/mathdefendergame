@@ -24,6 +24,13 @@ const variantClassNames: Record<StatusItemVariant, string> = {
   streak: 'status-item--streak',
 };
 
+/**
+ * Renders a single HUD statistic with a label, value, and optional state styling.
+ * @param label - Human-readable name for the statistic.
+ * @param tone - Optional color emphasis to signal health or urgency.
+ * @param value - The metric value to display.
+ * @param variant - Visual treatment used for the status tile.
+ */
 export const StatusItem = ({ label, tone, value, variant }: StatusItemProps) => {
   return (
     <div

@@ -1,10 +1,13 @@
-import { FormEvent, KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { SubmitEvent, KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { useGameStore } from '@store/useGameStore';
 import { CreateProfileForm } from '@ui/components/CreateProfileForm';
 
 type SelectorMode = 'select' | 'create';
 
+/**
+ * Profile selector component allowing users to select or create profiles.
+ */
 export function ProfileSelector() {
   const profiles = useGameStore((state) => state.profiles);
   const rememberedUsername = useGameStore((state) => state.rememberedUsername);
@@ -146,7 +149,7 @@ export function ProfileSelector() {
     }
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!currentSelectedUsername.trim()) {

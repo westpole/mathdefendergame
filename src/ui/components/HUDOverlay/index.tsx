@@ -1,15 +1,14 @@
-import {
-  appendAnswerInputCharacter,
-  removeAnswerInputCharacter,
-  submitAnswerInput,
-} from '@game/scenes/UIScene';
 import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
 
 import { GameStatusPanel, type GameStatusPanelItem } from './GameStatusPanel';
+import { InputPanel } from './InputPanel';
 
-const mobileKeypadValues = ['7', '8', '9', 'Enter', '4', '5', '6', 'Delete', '1', '2', '3', '0'];
-
+/**
+ * Renders the in-game HUD overlay for the current match state.
+ * It reads live values from the shared game store and composes the score,
+ * stage, resource, and mobile answer input panels.
+ */
 export function HUDOverlay() {
   const score = useGameStore((state) => state.score);
   const lives = useGameStore((state) => state.lives);
@@ -39,28 +38,6 @@ export function HUDOverlay() {
     { id: 'streak', label: 'Streak', value: streak, variant: 'streak' },
   ];
 
-  const EnterButton = () => (
-    <button
-      aria-label="Submit answer"
-      className="mobile-input-panel__key mobile-input-panel__key--primary"
-      onClick={submitAnswerInput}
-      type="button"
-    >
-      Enter
-    </button>
-  );
-
-  const DeleteButton = () => (
-    <button
-      aria-label="Backspace"
-      className="mobile-input-panel__key mobile-input-panel__key--secondary"
-      onClick={removeAnswerInputCharacter}
-      type="button"
-    >
-      Del
-    </button>
-  );
-
   return (
     <>
       <div className="hud-layer">
@@ -71,27 +48,7 @@ export function HUDOverlay() {
         <section className="hud-panel hud-panel--center">
           <div className="input-preview">{inputBuffer}</div>
 
-          <div className="mobile-input-panel" data-testid="mobile-input-panel">
-            <div className="mobile-input-panel__keypad" aria-label="Answer keypad" role="group">
-              {mobileKeypadValues.map((keyValue) => {
-                if (keyValue === 'Enter') return <EnterButton key="Enter" />;
-                if (keyValue === 'Delete') return <DeleteButton key="Delete" />;
-
-                return (
-                  <button
-                    aria-label={keyValue === '-' ? 'Negative sign' : `Digit ${keyValue}`}
-                    className="mobile-input-panel__key"
-                    key={keyValue}
-                    onClick={() => appendAnswerInputCharacter(keyValue)}
-                    type="button"
-                  >
-                    {keyValue}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
+          <InputPanel />
         </section>
 
         <section className="hud-panel hud-panel--right">

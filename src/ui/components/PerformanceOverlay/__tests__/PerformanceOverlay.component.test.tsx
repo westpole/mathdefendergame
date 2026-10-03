@@ -33,7 +33,20 @@ describe('PerformanceOverlay', () => {
     expect(within(additionRow as HTMLTableRowElement).getByText('1.0s')).toBeInTheDocument();
     expect(within(additionRow as HTMLTableRowElement).getByText('Proficient')).toBeInTheDocument();
     expect(within(subtractionRow as HTMLTableRowElement).getByText('71%')).toBeInTheDocument();
+    expect(within(subtractionRow as HTMLTableRowElement).getByText('1.0s')).toBeInTheDocument();
     expect(within(subtractionRow as HTMLTableRowElement).getByText('Needs Practice')).toBeInTheDocument();
+  });
+
+  it('uses the guest label when there is no active profile', () => {
+    setMockStoreState({
+      activeUsername: null,
+    });
+
+    render(<PerformanceOverlay />);
+
+    expect(
+      screen.getByText(/Performance by operator for Ghost based on completed runs\./i),
+    ).toBeInTheDocument();
   });
 
   it('shows an empty state when no completed history exists', () => {
