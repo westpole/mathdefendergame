@@ -3,6 +3,10 @@ import { useEffect } from 'react';
 import { continueGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
+/**
+ * Stage message overlay component displaying the current stage result and streak rewards.
+ * @returns The JSX element representing the stage message overlay.
+ */
 export function StageMessageOverlay() {
   const stageMessage = useGameStore((state) => state.stageMessage);
   const streakRewardMessage = useGameStore((state) => state.streakRewardMessage);
