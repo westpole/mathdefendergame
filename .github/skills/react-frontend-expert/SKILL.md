@@ -1,17 +1,20 @@
 ---
-name: react-frontend-zustand-expert
-description: Guidelines for building, refactoring, and optimizing client-side-only React applications (Vite/CRA) using Zustand for state management.
+name: react-frontend-expert
+description: Guidelines for building, refactoring, and optimizing game UI overlays (Vite/CRA) using Zustand for state management.
 ---
 
-# React Front-End Expert Skill (Zustand Edition)
+# React Front-End Expert Skill
 
-Use this skill when developing client-side-only React applications utilizing Zustand. Do NOT apply these rules to server-side rendering (SSR) frameworks.
+Use this skill when developing game UI overlays utilizing Zustand as the state management solution.
 
 ## 1. Core Component Architecture
 
-- **Functional Components**: Write all components as functional components using explicit `const Component = () => {}` syntax.
-- **Strict Typing**: Use TypeScript `interface` for props. Avoid `React.FC` to keep generic parameters clean.
-- **File Structure**: Enforce one component per file. Group features and global state logically.
+- **Functional Components**: Write all components as functional components using explicit `function MyComponent() {}` syntax.
+- **File Structure**: Enforce one component per file. Group features and global state logically. Use skills from `.github/skills/file-organization/SKILL.md` for best practices.
+- **Strict Typing**: Always define explicit TypeScript `interface` or `type` for component props and state. Avoid using `any` and prefer precise types to ensure type safety and maintainability. Save types and interfaces in a separate file `types.ts`.
+- **Constants**: Define all constant values (e.g., action types, default settings) in a separate `constants.ts` file to maintain consistency and avoid magic numbers or strings throughout the codebase.
+- **Tests**: Write unit tests for all components and store logic. Use `Jest` and `React Testing Library` to ensure components render correctly and state updates behave as expected. Save test files alongside the component or in a dedicated `__tests__` folder.
+- **Storybook**: Ensure all new or updated components have corresponding stories in Storybook for visual testing and documentation. Use skills from `.github/skills/storybook-expert/SKILL.md` for best practices.
 
 ## 2. Zustand State Management Standards
 
@@ -140,13 +143,9 @@ Before completing any task, verify the code against these constraints:
 8. Are all styles in SCSS module files following BEM methodology, with no inline `style` props?
 9. Are dynamic class names composed using `clsx` instead of template literals?
 10. Run `npm run lint` to ensure zero compilation or type-checking errors.
+11. Did you update or add relevant documentation to reflect the new or changed functionality? JSDoc comments should be included for all new or modified functions.
+12. Did you ensure all new types and constants are added to their respective `types.ts` and `constants.ts` files?
+13. Did all new or updated lines have corresponding unit or integration tests to ensure proper coverage? Run `npm run test:react` to verify.
+14. Make sure that test coverage is sufficient and meets the repository's thresholds. Use skills from `.github/skills/coverage-analysis/SKILL.md` for best practices.
+15. Did you verify that all new or updated components are correctly documented in Storybook? Run `npm run test:storybook` to check.
 
-## 10. Delivery
-
-- **Code Review**: Ensure all changes have been reviewed and approved by at least one other developer.
-- **Documentation**: Update any relevant documentation to reflect the new or changed functionality.
-- **JSDoc**: Ensure all new or modified functions include complete JSDoc comments for better maintainability and Copilot assistance.
-- **Mocks**: Ensure all necessary mocks are updated or created for unit and integration tests to reflect the new or changed functionality.
-- **Testing**: Run all unit, integration, and end-to-end tests to confirm that new changes do not break existing functionality.
-- **Linting and Formatting**: Run `npm run lint` to maintain code quality and consistency.
-- **Storybook**: Update or add relevant stories in Storybook to reflect the new or changed components.

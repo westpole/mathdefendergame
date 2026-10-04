@@ -1,11 +1,11 @@
 ---
-name: storybook-zustand-expert
+name: storybook-expert
 description: Guidelines for authoring Storybook (CSF 3) component stories while seamlessly mocking and seeding Zustand global application state.
 ---
 
-# Storybook & Zustand Component Expert Skill
+# Storybook Expert Skill
 
-Use this skill when creating or refactoring Storybook files (`*.stories.tsx`) for components that consume global Zustand state, ensuring isolated, predictable UI renders without real side effects.
+Use this skill when creating or refactoring Storybook files (`*.stories.tsx`) for React components. It focuses on managing global Zustand state, ensuring isolated, predictable UI renders without real side effects.
 
 ## 1. Story Format & Meta Configuration
 
@@ -141,8 +141,6 @@ const preview: Preview = {
 
 export default preview;
 ```
-
-> **Fix `@ts-ignore`:** The current `preview.tsx` uses `// @ts-ignore` to silence the CSS import. Remove it by ensuring `src/vite-env.d.ts` contains `/// <reference types=vite/client />` — this gives TypeScript the CSS module type declarations it needs.
 
 ## 4. Security & Type-Safety Rules
 

@@ -1,6 +1,6 @@
 ---
 name: coverage-analysis
-description: "Instructions for running Vitest coverage, reading coverage-final.json, and targeting uncovered lines and branches to meet repo thresholds."
+description: Instructions for running Vitest coverage, reading coverage-final.json, and targeting uncovered lines and branches to meet repo thresholds.
 ---
 
 # Skill: Vitest Coverage Analysis & Gap Resolution
