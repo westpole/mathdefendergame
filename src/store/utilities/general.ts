@@ -4,7 +4,7 @@ import type {
   OperationHistoryStat,
   Grade,
 } from '@shared/types';
-import { passwordPolicy, GUEST_HISTORY_BUCKET } from '../const';
+import { passwordPolicy, GUEST_HISTORY_BUCKET } from '../constants';
 import type { PlayerProfile, HistoryByProfile } from '@store/types';
 import { resolveGradeFromScore } from '@game/config';
 

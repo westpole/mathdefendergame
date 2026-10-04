@@ -5,7 +5,7 @@ import {
   initialState,
   GUEST_HISTORY_BUCKET,
   leaderboardStorageKey,
-} from './const';
+} from './constants';
 
 import type {
   PlayerProfile,

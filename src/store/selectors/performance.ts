@@ -1,7 +1,7 @@
 import type { GameHistoryEntry, MathOperation } from '@shared/types';
 
 import type { GameStoreState } from '@store/types';
-import { OPERATION_LABELS, GUEST_HISTORY_BUCKET, MATH_OPERATIONS } from '@store/const';
+import { OPERATION_LABELS, GUEST_HISTORY_BUCKET, MATH_OPERATIONS } from '@store/constants';
 
 import type { PerformanceAggregate, PerformanceRow } from './types';
 
