@@ -164,11 +164,14 @@ export default preview;
 
 Store story fixtures in a `__mocks__/` folder alongside the component. Name files after the scenario they represent (e.g., `child.json`, `adult.json`, `inProgress.json`). Mock files should contain only the `Partial<GameStoreState>` fields relevant to that story — the decorator's reset logic fills in defaults for the rest.
 
-## 8. Verification Checklist
+### 8. Feature Flag & Variant Requirements
+
+- **simple_login**: Indicates that the simple login feature flag must be enabled for this story to be relevant. This flag should be set to `true` by default. It should be specified in a test scenario when it should be disabled.
+
+## 9. Verification Checklist
 
 Before completing the task, verify:
 1. Does each story render correctly in isolation, without depending on another story having run first?
 2. Are all type casts limited to a single typed `StoryArgs` interface — no `as unknown as` chains?
 3. Is `@ts-ignore` absent from all story files and `preview.tsx`?
 4. Are store types (`GameStoreState`, `OverlayPhase`, etc.) imported from `@store/types` rather than redeclared?
-5. Run `npm run build-storybook` to confirm zero build-time errors.

@@ -40,7 +40,6 @@ This document describes each script defined in `package.json` and when to use it
 | `npm run build:e2e` | Builds the web app in E2E mode and then creates an unpacked Electron application directory. | Use when Playwright or manual checks need an Electron build artifact without creating an installer. |
 | `npm run build:web` | Runs the full Vitest suite, runs TypeScript type checking, and then builds the web app with Vite. | Use before production web builds or before packaging when you want the standard gate to run first. |
 | `npm run build:win` | Removes `dist`, runs the validated web build, and then packages the Windows Electron app with `electron-builder`. | Use when producing a Windows installer or distributable package. This script assumes a shell that supports `rm -Rf`. |
-| `npm run build-storybook` | Builds the static Storybook site. | Use when publishing, reviewing, or validating the production Storybook output. |
 
 ## Linting And Static Analysis
 
