@@ -26,13 +26,11 @@ import { MenuControls } from '@ui/components/MenuControls';
 import { ProfileSelector } from '@ui/components/ProfileSelector';
 import { isFeatureEnabled } from '@shared/featureFlags';
 
-const SIMPLE_LOGIN_FLAG = 'simple_login';
-
 export function App() {
   const phase = useGameStore((state) => state.phase);
   const bootReady = useGameStore((state) => state.bootReady);
   const screenView = useGameStore((state) => state.screenView);
-  const isSimpleLoginEnabled = isFeatureEnabled(SIMPLE_LOGIN_FLAG);
+  const isSimpleLoginEnabled = isFeatureEnabled('simple_login');
   const isStartPhase = bootReady && phase === 'start';
   const handleVisibilityChange = useEffectEvent(() => {
     if (document.visibilityState !== 'hidden' || phase !== 'playing') {

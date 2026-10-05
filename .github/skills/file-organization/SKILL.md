@@ -26,14 +26,14 @@ Decision rule:
 
 ## 2. Constants and Static Values
 
-- Keep constants and static values in `consts.ts` at the same folder level as the requesting file.
-- If a constant is reusable across layers, place it in `src/shared/consts.ts`.
+Keep constants and static values in `constants.ts` at the same folder level as the requesting file.
+If a constant is reusable across layers, place it in `src/shared/constants.ts`.
 - Keep runtime literals out of store/action files when they can be named and centralized.
 - Group related constants and export them as named exports.
 
 Decision rule:
-- Feature-only constant -> local `consts.ts`.
-- Cross-layer reusable constant -> `src/shared/consts.ts`.
+Feature-only constant -> local `constants.ts`.
+Cross-layer reusable constant -> `src/shared/constants.ts`.
 
 ## 3. Utility Function Placement
 
@@ -85,9 +85,9 @@ export function doThing(input: string): string {
 
 ## 5. Naming and Import Rules
 
-- Prefer explicit names: `consts.ts`, `types.ts`, `utilities.ts`, and `utilities/<name>.ts`.
+Prefer explicit names: `constants.ts`, `types.ts`, `utilities.ts`, and `utilities/<name>.ts`.
 - Keep imports type-only where applicable: `import type { X } from './types';`.
-- Avoid cyclic dependencies between `types.ts`, `consts.ts`, and utility files.
+Avoid cyclic dependencies between `types.ts`, `constants.ts`, and utility files.
 - Keep feature entry files focused on orchestration, not helper implementation details.
 
 Layer-specific note:
@@ -99,8 +99,8 @@ Layer-specific note:
 
 Before finishing any project change:
 1. Did all local interfaces/types move into sibling `types.ts`?
-2. Did all static values move into sibling `consts.ts`?
-3. Did reusable cross-layer types/constants move into `src/shared/types.ts` and `src/shared/consts.ts`?
+2. Did all static values move into sibling `constants.ts`?
+3. Did reusable cross-layer types/constants move into `src/shared/types.ts` and `src/shared/constants.ts`?
 4. Are general reusable helpers in sibling `utilities.ts`?
 5. Are one-off helpers split into one-function files inside `utilities/`?
 6. Does every function include complete JSDoc for Copilot?
@@ -110,17 +110,17 @@ Before finishing any project change:
 
 - React:
   - Place component/hook-specific types in sibling `types.ts`.
-  - Place UI constants in sibling `consts.ts`.
+  - Place UI constants in sibling `constants.ts`.
   - Place UI helpers in sibling `utilities.ts` or `utilities/<name>.ts`.
 - Zustand:
   - Place store-only interfaces/actions in sibling `types.ts`.
-  - Place store constants (keys, limits, defaults) in sibling `consts.ts`.
+  - Place store constants (keys, limits, defaults) in sibling `constants.ts`.
   - Place selectors/normalizers/sorting/validation helpers in utilities files.
 - Phaser:
   - Place scene/gameplay module types in sibling `types.ts`.
-  - Place gameplay tuning constants in sibling `consts.ts`.
+  - Place gameplay tuning constants in sibling `constants.ts`.
   - Place math/spawn/format helpers in utilities files.
 
 ## 8. Migration Notes (Existing Repos)
 
-When a repository currently uses different names (for example `const.ts`), keep behavior unchanged during migration and perform a focused rename in a separate change to avoid regressions.
+When a repository currently uses different names (for example `const.ts`), keep behavior unchanged during migration and perform a focused rename to `constants.ts` in a separate change to avoid regressions.

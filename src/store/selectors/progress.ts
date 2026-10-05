@@ -1,6 +1,6 @@
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
 import type { GameHistoryEntry } from '@shared/types';
-import { WEEK_MS, ACTIVE_PROGRESS_PHASES } from '@store/const';
+import { WEEK_MS, ACTIVE_PROGRESS_PHASES } from '@store/constants';
 import type { BuildGradeProgressInput, GradeProgressSummary, WeeklyProgressReport } from './types';
 
 /**
