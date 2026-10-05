@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type ComponentProps } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { initialState } from '@store/constants';
@@ -10,11 +10,10 @@ import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks
 
 import { CreateProfileForm } from '.';
 
-interface StoryArgs {
+type CreateProfileFormStoryArgs = ComponentProps<typeof CreateProfileForm> & {
   initialState: Partial<GameStoreState>;
   frame?: StoryFrame;
-  simpleMode: boolean;
-}
+};
 
 const meta = {
   title: 'Screens/CreateProfileForm',
@@ -25,10 +24,14 @@ const meta = {
   },
   args: {
     simpleMode: false,
+    initialState: {
+      profiles: {},
+      gameHistoryByProfile: {},
+    },
   },
   decorators: [
     (Story, context) => {
-      const { initialState: customState, frame } = context.args as StoryArgs;
+      const { initialState: customState, frame } = context.args as CreateProfileFormStoryArgs;
 
       useEffect(() => {
         useGameStore.setState({
@@ -55,7 +58,7 @@ const meta = {
       );
     },
   ],
-} satisfies Meta<typeof CreateProfileForm>;
+} satisfies Meta<CreateProfileFormStoryArgs>;
 
 export default meta;
 
