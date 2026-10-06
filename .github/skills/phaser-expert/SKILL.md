@@ -1,5 +1,5 @@
 ---
-name: phaser-best-practices
+name: phaser-expert
 description: Builds and refactors Phaser 4 browser games. Use for creating a new Phaser 4 project, adding scenes, entities, physics, UI, tilemaps, animations, input, audio, camera, or for fixing Phaser-specific bugs and performance problems.
 ---
 

@@ -38,18 +38,12 @@ If no file specified, then generate tests for files that include "Phaser" in the
 - Keep tests small and focused on a single aspect of the functionality.
 - Use setup and teardown methods to prepare the test environment and clean up afterward.
 
-## Restrictions and limitations
+## Verification
 
-Do not write integration tests, end-to-end tests, or any other type of tests that are not unit tests. Focus solely on unit testing for Phaser 4 projects using Vitest.
+To verify the effectiveness of your Phaser 4 unit tests:
 
-Do not install new NPM packages. Ask if you need to use any additional packages or libraries for testing purposes.
-
-## Code coverage
-
-Ensure that your unit tests provide sufficient code coverage for the Phaser 4 project. Aim for high coverage, but prioritize meaningful tests that validate the functionality of the code rather than achieving a specific percentage.
-
-Generate coverage reports using Vitest's built-in coverage tools. Use the following command to run tests with coverage:
-
-```bash
-npm run test:phaser -- --coverage
-```
+- Ensure all tests pass successfully.
+- Check code coverage reports to confirm that critical paths are tested.
+- Review test cases to ensure they cover edge cases and potential failure scenarios. Add happy and failure path tests as needed.
+- Run `npm run test:phaser` to execute the Phaser 4 unit tests and verify their effectiveness.
+- Run `npm run test:all:coverage` to validate that test coverage did not decrease.

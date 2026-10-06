@@ -4,7 +4,7 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 
 ## Use Local Skills For Framework Details
 
-- Use `.github/skills/phaser-best-practices/SKILL.md` for Phaser 4 scene, rendering, input, and gameplay architecture guidance.
+- Use `.github/skills/phaser-expert/SKILL.md` for Phaser 4 scene, rendering, input, and gameplay architecture guidance.
 - Use `.github/skills/phaser-unit-tests/SKILL.md` for guidance on writing and structuring unit tests for Phaser scenes and game logic.
 - Use `.github/skills/react-frontend-expert/SKILL.md` for guidance on  generating game UI layouts.
 - Use `.github/skills/storybook-expert/SKILL.md` for `*.stories.tsx` and store seeding in Storybook.
