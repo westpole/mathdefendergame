@@ -12,6 +12,7 @@ This skill focuses on writing and maintaining unit tests for React components us
 - **Unit Testing**: Testing individual components or functions in isolation.
 - **Jest**: A JavaScript testing framework commonly used for React applications.
 - **React Testing Library**: A library for testing React components by simulating user interactions and verifying component behavior.
+- **Feature Flags**: Conditional logic in components that enables or disables features based on specific flags, often used for gradual rollouts or A/B testing. See src/shared/README.md for implementation guidelines.
 
 ## Best Practices
 
