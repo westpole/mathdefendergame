@@ -136,4 +136,39 @@ describe('HomeOverlay', () => {
     expect(screen.getByText(/no completed runs in the last 7 days/i)).toBeInTheDocument();
     expect(screen.getByText('226 pts to next grade')).toBeInTheDocument();
   });
+
+  it('renders the career-complete panel when the player has maxed out their grade', () => {
+    setMockStoreState({
+      activeUsername: 'AcePilot',
+      bootReady: true,
+      grade: 'major-general',
+      screenView: 'home',
+      phase: 'start',
+      gameHistoryByProfile: {
+        AcePilot: [
+          {
+            key: 'recent',
+            playedAt: Date.parse('2026-08-30T12:00:00.000Z'),
+            correctAnswers: 20,
+            incorrectAnswers: 2,
+            averageAnswerTimeMs: 900,
+            mostProblematicOperation: '+',
+            operationStats: {
+              '+': { attempts: 10, incorrect: 0, avgTimeMs: 900 },
+              '-': { attempts: 6, incorrect: 1, avgTimeMs: 1000 },
+              '*': { attempts: 6, incorrect: 1, avgTimeMs: 980 },
+              '/': { attempts: 6, incorrect: 0, avgTimeMs: 950 },
+            },
+            gradeAtFinish: 'major-general',
+            finalScore: 2200,
+            finalPerfScore: 95,
+          },
+        ],
+      },
+    });
+
+    render(<HomeOverlay />);
+
+    expect(screen.getByText(/lifetime points secured/i)).toBeInTheDocument();
+  });
 });

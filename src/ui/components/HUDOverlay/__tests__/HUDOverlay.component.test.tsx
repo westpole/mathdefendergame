@@ -96,6 +96,15 @@ describe('HUDOverlay Component', () => {
     expect(livesSquare).toHaveClass('status-item--danger');
   });
 
+  it('should render good and warning tones for healthy shield and life totals', () => {
+    useGameStore.setState({ shield: 3, lives: 3 });
+
+    render(<HUDOverlay />);
+
+    expect(document.querySelector('.status-item--shield')).toHaveClass('status-item--warn');
+    expect(document.querySelector('.status-item--lives')).toHaveClass('status-item--good');
+  });
+
   it('should render numeric status squares for shield, lives, streak, score and stage', () => {
     render(<HUDOverlay />);
 

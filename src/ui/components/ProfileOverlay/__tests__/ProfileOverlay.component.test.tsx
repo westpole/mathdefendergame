@@ -42,4 +42,23 @@ describe('ProfileOverlay', () => {
     expect(screen.getByText('86%')).toBeInTheDocument();
     expect(screen.getByText('381 pts to next grade')).toBeInTheDocument();
   });
+
+  it('renders the max-rank completion panel when the player has reached major-general', () => {
+    setMockStoreState({
+      activeUsername: 'AcePilot',
+      phase: 'start',
+      grade: 'major-general',
+      gameHistoryByProfile: {
+        AcePilot: [],
+      },
+      score: 0,
+      correctCount: 0,
+      incorrectCount: 0,
+    });
+
+    render(<ProfileOverlay />);
+
+    expect(document.querySelector('.profile-major-general-box--major-general')).toBeInTheDocument();
+    expect(screen.getByText('AcePilot')).toBeInTheDocument();
+  });
 });
