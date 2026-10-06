@@ -1,6 +1,17 @@
-import { DDAController, HeatState, MathTier } from '../DDAController';
+import { DDAController, HeatState, MathTier, type MetricSample } from '../DDAController';
 
 describe('DDAController', () => {
+  const getInternalDDA = (dda: DDAController) => dda as unknown as {
+    calculatePerformanceRating: (samples: MetricSample[]) => number;
+    updateHeatState: (rating: number) => void;
+    currentHeatState: HeatState;
+    fallSpeedMultiplier: number;
+    adjustVelocityAndDensity: (rating: number) => void;
+    highPerformanceWindowsCount: number;
+    currentMathTier: MathTier;
+    adjustMathComplexity: (rating: number) => void;
+    cooloffRemainingMeteors: number;
+  };
   it('reaches overdrive on sustained high performance', () => {
     const dda = new DDAController({ windowSize: 5 });
 
@@ -75,39 +86,42 @@ describe('DDAController', () => {
 
   it('covers the empty-sample, heat-state transitions, and clamp reset branches', () => {
     const dda = new DDAController({ windowSize: 5 });
+    const internalDda = getInternalDDA(dda);
 
-    expect((dda as any).calculatePerformanceRating([])).toBe(0.5);
-    (dda as any).updateHeatState(0.35);
-    expect((dda as any).currentHeatState).toBe(HeatState.STRUGGLING);
-    (dda as any).updateHeatState(0.5);
-    expect((dda as any).currentHeatState).toBe(HeatState.BALANCED);
-    (dda as any).updateHeatState(0.8);
-    expect((dda as any).currentHeatState).toBe(HeatState.FLOW);
+    expect(internalDda.calculatePerformanceRating([])).toBe(0.5);
+    internalDda.updateHeatState(0.35);
+    expect(internalDda.currentHeatState).toBe(HeatState.STRUGGLING);
+    internalDda.updateHeatState(0.5);
+    expect(internalDda.currentHeatState).toBe(HeatState.BALANCED);
+    internalDda.updateHeatState(0.8);
+    expect(internalDda.currentHeatState).toBe(HeatState.FLOW);
 
-    (dda as any).fallSpeedMultiplier = 2.5;
-    (dda as any).adjustVelocityAndDensity(0.95);
-    expect((dda as any).fallSpeedMultiplier).toBe(2.2);
+    internalDda.fallSpeedMultiplier = 2.5;
+    internalDda.adjustVelocityAndDensity(0.95);
+    expect(internalDda.fallSpeedMultiplier).toBe(2.2);
 
-    (dda as any).fallSpeedMultiplier = 0.1;
-    (dda as any).adjustVelocityAndDensity(0.05);
-    expect((dda as any).fallSpeedMultiplier).toBe(0.5);
+    internalDda.fallSpeedMultiplier = 0.1;
+    internalDda.adjustVelocityAndDensity(0.05);
+    expect(internalDda.fallSpeedMultiplier).toBe(0.5);
 
-    (dda as any).highPerformanceWindowsCount = 1;
-    (dda as any).currentMathTier = MathTier.TIER_2_ADVANCED_ADD_MULT;
-    (dda as any).adjustMathComplexity(0.5);
-    expect((dda as any).highPerformanceWindowsCount).toBe(0);
+    internalDda.highPerformanceWindowsCount = 1;
+    internalDda.currentMathTier = MathTier.TIER_2_ADVANCED_ADD_MULT;
+    internalDda.adjustMathComplexity(0.5);
+    expect(internalDda.highPerformanceWindowsCount).toBe(0);
   });
 
   it('applies panic slowdown and heat-state multipliers for critical and overdrive states', () => {
     const critical = new DDAController({ windowSize: 5 });
-    (critical as any).currentHeatState = HeatState.CRITICAL;
-    (critical as any).fallSpeedMultiplier = 1;
+    const criticalInternal = getInternalDDA(critical);
+    criticalInternal.currentHeatState = HeatState.CRITICAL;
+    criticalInternal.fallSpeedMultiplier = 1;
 
     expect(critical.getMeteorTickSpeed(0.9)).toBeCloseTo(42, 5);
 
     const overdrive = new DDAController({ windowSize: 5 });
-    (overdrive as any).currentHeatState = HeatState.OVERDRIVE;
-    (overdrive as any).fallSpeedMultiplier = 1;
+    const overdriveInternal = getInternalDDA(overdrive);
+    overdriveInternal.currentHeatState = HeatState.OVERDRIVE;
+    overdriveInternal.fallSpeedMultiplier = 1;
 
     expect(overdrive.getMeteorTickSpeed(0.1)).toBeCloseTo(135, 5);
   });
@@ -123,8 +137,9 @@ describe('DDAController', () => {
 
     for (const [heatState, expectedMax] of cases) {
       const dda = new DDAController({ windowSize: 5 });
-      (dda as any).currentHeatState = heatState;
-      (dda as any).cooloffRemainingMeteors = 2;
+      const internalDda = getInternalDDA(dda);
+      internalDda.currentHeatState = heatState;
+      internalDda.cooloffRemainingMeteors = 2;
 
       expect(dda.getDifficultyState().maxActiveMeteors).toBe(expectedMax);
       expect(dda.getDifficultyState().mathTier).toBe(MathTier.TIER_1_BASIC_ADD_SUB);
@@ -133,15 +148,17 @@ describe('DDAController', () => {
 
   it('drops tier on severe struggles and promotes after sustained high performance', () => {
     const struggling = new DDAController({ windowSize: 5, startingMathTier: MathTier.TIER_3_DIV_MIXED_DOUBLE });
-    (struggling as any).adjustMathComplexity(0.2);
-    expect((struggling as any).currentMathTier).toBe(MathTier.TIER_2_ADVANCED_ADD_MULT);
+    const strugglingInternal = getInternalDDA(struggling);
+    strugglingInternal.adjustMathComplexity(0.2);
+    expect(strugglingInternal.currentMathTier).toBe(MathTier.TIER_2_ADVANCED_ADD_MULT);
 
     const rising = new DDAController({ windowSize: 5, startingMathTier: MathTier.TIER_2_ADVANCED_ADD_MULT });
-    (rising as any).highPerformanceWindowsCount = 1;
-    (rising as any).adjustMathComplexity(0.8);
-    expect((rising as any).currentMathTier).toBe(MathTier.TIER_3_DIV_MIXED_DOUBLE);
+    const risingInternal = getInternalDDA(rising);
+    risingInternal.highPerformanceWindowsCount = 1;
+    risingInternal.adjustMathComplexity(0.8);
+    expect(risingInternal.currentMathTier).toBe(MathTier.TIER_3_DIV_MIXED_DOUBLE);
 
-    (rising as any).adjustMathComplexity(0.8);
-    expect((rising as any).currentMathTier).toBe(MathTier.TIER_3_DIV_MIXED_DOUBLE);
+    risingInternal.adjustMathComplexity(0.8);
+    expect(risingInternal.currentMathTier).toBe(MathTier.TIER_3_DIV_MIXED_DOUBLE);
   });
 });
