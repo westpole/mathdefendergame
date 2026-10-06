@@ -1,20 +1,46 @@
-const path = require('path');
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import * as electron from 'electron';
+import type { MenuItemConstructorOptions } from 'electron';
 
-function getRuntimeContext(options = {}) {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+type ElectronRuntimeOptions = {
+  electron?: typeof import('electron');
+  argv?: string[];
+  platform?: NodeJS.Platform;
+  rendererUrl?: string | null;
+  rendererBuildDir?: string | null;
+};
+
+type RendererEntry =
+  | {
+      type: 'url';
+      target: string;
+    }
+  | {
+      type: 'file';
+      target: string;
+    };
+
+type CloseDecision = 'ready' | 'cancelled';
+
+function getRuntimeContext(options: ElectronRuntimeOptions = {}) {
   return {
-    electron: options.electron ?? require('electron'),
+    electron: options.electron ?? electron,
     argv: options.argv ?? process.argv,
     platform: options.platform ?? process.platform,
   };
 }
 
-function getArgValue(argv, prefix) {
+function getArgValue(argv: string[], prefix: string): string | null {
   return argv.find((arg) => arg.startsWith(prefix))?.slice(prefix.length) ?? null;
 }
 
-function resolveRendererEntry(options = {}) {
-  const { electron, argv } = getRuntimeContext(options);
-  const { app } = electron;
+function resolveRendererEntry(options: ElectronRuntimeOptions = {}): RendererEntry {
+  const { electron: runtimeElectron, argv } = getRuntimeContext(options);
+  const { app } = runtimeElectron;
   const explicitRendererUrl = options.rendererUrl ?? getArgValue(argv, '--renderer-url=');
   const explicitRendererBuildDir = options.rendererBuildDir ?? getArgValue(argv, '--renderer-build-dir=');
 
@@ -25,18 +51,20 @@ function resolveRendererEntry(options = {}) {
     };
   }
 
+  const buildDirectory = explicitRendererBuildDir ?? 'build';
+
   return {
     type: 'file',
-    target: path.join(__dirname, `../${explicitRendererBuildDir ?? 'build'}/index.html`),
+    target: path.resolve(__dirname, '..', buildDirectory, 'index.html'),
   };
 }
 
-function buildMenu(options = {}) {
-  const { electron, argv } = getRuntimeContext(options);
-  const { app, Menu } = electron;
+function buildMenu(options: ElectronRuntimeOptions = {}) {
+  const { electron: runtimeElectron, argv } = getRuntimeContext(options);
+  const { app, Menu } = runtimeElectron;
   const isDev = !app.isPackaged && resolveRendererEntry(options).type === 'url';
   const isDebug = argv.includes('--inspect');
-  const template = [];
+  const template: MenuItemConstructorOptions[] = [];
 
   if (isDev || isDebug) {
     template.push({
@@ -53,34 +81,48 @@ function buildMenu(options = {}) {
   return Menu.buildFromTemplate(template);
 }
 
-function createWindow(options = {}) {
-  const { electron, argv } = getRuntimeContext(options);
-  const { app, BrowserWindow, Menu } = electron;
+function createWindow(options: ElectronRuntimeOptions = {}) {
+  const { electron: runtimeElectron, argv } = getRuntimeContext(options);
+  const { app, BrowserWindow, Menu } = runtimeElectron;
   const rendererEntry = resolveRendererEntry(options);
   const isDev = !app.isPackaged && rendererEntry.type === 'url';
   const isDebug = argv.includes('--inspect');
+  const webPreferences = {
+    contextIsolation: true,
+    nodeIntegration: false,
+    sandbox: true,
+    webSecurity: true,
+    allowRunningInsecureContent: false,
+    enableRemoteModule: false,
+    webviewTag: false,
+    devTools: !app.isPackaged,
+  } as electron.BrowserWindowConstructorOptions['webPreferences'] & {
+    enableRemoteModule?: boolean;
+  };
+
   const win = new BrowserWindow({
     width: 900,
     height: 900,
     minWidth: 700,
     minHeight: 700,
-    webPreferences: {
-      nodeIntegration: false,
-      contextIsolation: true,
-    },
-    title: 'Math Defender',
+    show: false,
     backgroundColor: '#1e2326',
+    title: 'Math Defender',
+    webPreferences,
   });
 
   Menu.setApplicationMenu(buildMenu(options));
 
+  win.once('ready-to-show', () => {
+    win.show();
+  });
+
   if (isDev) {
-    win.loadURL(rendererEntry.target);
+    void win.loadURL(rendererEntry.target);
   } else {
-    win.loadFile(rendererEntry.target);
+    void win.loadFile(rendererEntry.target);
   }
 
-  // Open DevTools in debug mode (localhost only, not in packaged app)
   if (isDebug && !app.isPackaged) {
     win.webContents.openDevTools();
   }
@@ -88,7 +130,7 @@ function createWindow(options = {}) {
   let allowWindowClose = false;
   let closeFlowInProgress = false;
 
-  const notifyRenderer = (eventName) => {
+  const notifyRenderer = (eventName: string): void => {
     if (win.isDestroyed()) {
       return;
     }
@@ -97,14 +139,19 @@ function createWindow(options = {}) {
       `window.dispatchEvent(new CustomEvent('${eventName}'));`,
     );
 
-    if (dispatchResult && typeof dispatchResult.catch === 'function') {
+    if (
+      dispatchResult &&
+      typeof dispatchResult === 'object' &&
+      'catch' in dispatchResult &&
+      typeof dispatchResult.catch === 'function'
+    ) {
       dispatchResult.catch(() => {
         // Ignore renderer dispatch failures during shutdown.
       });
     }
   };
 
-  const shouldConfirmClose = async () => {
+  const shouldConfirmClose = async (): Promise<boolean> => {
     if (win.isDestroyed()) {
       return false;
     }
@@ -129,7 +176,7 @@ function createWindow(options = {}) {
     }
   };
 
-  const waitForRendererCloseDecision = async () => {
+  const waitForRendererCloseDecision = async (): Promise<CloseDecision> => {
     if (win.isDestroyed()) {
       return 'cancelled';
     }
@@ -156,7 +203,7 @@ function createWindow(options = {}) {
     }
   };
 
-  const handleCloseIntent = async () => {
+  const handleCloseIntent = async (): Promise<void> => {
     if (closeFlowInProgress || allowWindowClose) {
       return;
     }
@@ -201,30 +248,48 @@ function createWindow(options = {}) {
   return win;
 }
 
-function initializeApp(options = {}) {
-  const { electron, platform } = getRuntimeContext(options);
-  const { app, BrowserWindow } = electron;
+function initializeApp(options: ElectronRuntimeOptions = {}) {
+  const { electron: runtimeElectron, platform } = getRuntimeContext(options);
+  const { app, BrowserWindow } = runtimeElectron;
+  const isPlaywrightRun = process.env.PLAYWRIGHT_ELECTRON_RUN === '1';
+
+  if (!isPlaywrightRun && !app.requestSingleInstanceLock()) {
+    app.quit();
+    return;
+  }
+
   app.whenReady().then(() => {
     createWindow(options);
   });
 
+  app.on('second-instance', () => {
+    const existingWindows = BrowserWindow.getAllWindows();
+    const [mainWindow] = existingWindows;
+
+    if (mainWindow) {
+      if (mainWindow.isMinimized()) {
+        mainWindow.restore();
+      }
+
+      mainWindow.focus();
+    }
+  });
+
   app.on('window-all-closed', () => {
-    if (platform !== 'darwin') app.quit();
+    if (platform !== 'darwin') {
+      app.quit();
+    }
   });
 
   app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow(options);
+    if (BrowserWindow.getAllWindows().length === 0) {
+      createWindow(options);
+    }
   });
 }
 
-/* c8 ignore next 3 */
-if (process.type === 'browser') {
+if (process.type === 'browser' || process.env.PLAYWRIGHT_ELECTRON_RUN === '1') {
   initializeApp();
 }
 
-module.exports = {
-  buildMenu,
-  createWindow,
-  resolveRendererEntry,
-  initializeApp,
-};
+export { buildMenu, createWindow, resolveRendererEntry, initializeApp };

@@ -1,5 +1,6 @@
 import { test as base, _electron as electron, ElectronApplication, Page } from '@playwright/test';
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'url';
 
 import type { E2EWindow } from '../types';
 
@@ -10,9 +11,10 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
   electronApp: async ({}, use) => {
+    const appRoot = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
     const app = await electron.launch({
-      args: [path.join(__dirname, '../../electron/main.js')],
-      env: { ...process.env, E2E: 'true' }, // flag your app is under test
+      args: [appRoot],
+      env: { ...process.env, E2E: 'true', PLAYWRIGHT_ELECTRON_RUN: '1' }, // flags app is under Playwright E2E test
     });
     await use(app);
     await app.close();

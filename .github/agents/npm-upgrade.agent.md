@@ -65,7 +65,7 @@ When assigned an upgrade task (e.g., from a Snyk alert, `npm audit` finding, dep
     - Grep for dynamic imports or requires: `require('<package-name>')`
   2. Cross-reference changed exported signatures against the package's changelog.
   3. Refactor call sites to match updated interfaces, parameters, or export structures.
-  4. Keep ownership boundaries intact: gameplay rules stay in `src/game/main.ts`, Phaser scene behavior stays in `src/game/scenes/**`, React/Zustand overlay work stays in `src/App.tsx`, `src/store/useGameStore.ts`, and `src/ui/components/**`, and Electron shell changes stay in `electron/main.js`.
+  4. Keep ownership boundaries intact: gameplay rules stay in `src/game/main.ts`, Phaser scene behavior stays in `src/game/scenes/**`, React/Zustand overlay work stays in `src/App.tsx`, `src/store/useGameStore.ts`, and `src/ui/components/**`, and Electron shell changes stay in `electron/main.ts`.
 
 ### Step 4: Local Verification Loop
 Execute the following commands in sequence. If any step fails, analyze the error log, apply fixes, and restart from sub-step 4.1:

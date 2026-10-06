@@ -126,6 +126,26 @@ describe('Game', () => {
       expect(mockCallbacks.onHUDUpdate).not.toHaveBeenCalled();
     });
 
+    it('ignores append and remove actions while not playing', () => {
+      game.state = 'message';
+      game.inputBuffer = '12';
+
+      game.appendInputCharacter('3');
+      game.removeLastInputCharacter();
+
+      expect(game.inputBuffer).toBe('12');
+      expect(mockCallbacks.onHUDUpdate).not.toHaveBeenCalled();
+    });
+
+    it('ignores resumeAfterStreakReward while the game is not paused', () => {
+      game.state = 'playing';
+
+      game.resumeAfterStreakReward();
+
+      expect(game.state).toBe('playing');
+      expect(mockCallbacks.onHUDUpdate).not.toHaveBeenCalled();
+    });
+
     it('appends sanitized characters while enforcing the max answer length', () => {
       game.inputBuffer = '-123';
 
@@ -216,6 +236,38 @@ describe('Game', () => {
       game.setGrade('major-general');
 
       expect(game.grade).toBe('major-general');
+    });
+  });
+
+  describe('streak reward and finish states', () => {
+    it('pauses the game when a streak reward triggers stage completion', () => {
+      const target = GAME_CONFIG.grades[game.grade].stageClearCorrectAnswers - 1;
+      game.stageCorrect = target;
+      game.streak = 29;
+      game.state = 'playing';
+
+      game.spawnMeteor();
+      const meteor = game.meteors[0];
+      game.inputBuffer = meteor.answer.toString();
+
+      game.checkAnswer();
+
+      expect(game.state).toBe('paused');
+      expect(mockCallbacks.onStreakReward).toHaveBeenCalledWith(game.lives);
+
+      game.resumeAfterStreakReward();
+      expect(game.state).toBe('message');
+    });
+
+    it('records a victory when gameOver is invoked in win mode', () => {
+      game.correctCount = 8;
+      game.incorrectCount = 2;
+      game.score = 250;
+
+      game.gameOver(true);
+
+      expect(game.state).toBe('gameover');
+      expect(mockCallbacks.onGameOver).toHaveBeenCalledWith('victory');
     });
   });
 

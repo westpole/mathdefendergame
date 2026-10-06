@@ -123,7 +123,7 @@ test('menu matches snapshot', async ({ page }) => {
 
 - Playwright starts from the **built** E2E renderer bundle automatically via `vite preview`
 - Browser-shell tests use the preview server at `http://127.0.0.1:4173`
-- Electron tests load the same built renderer from disk through `electron/main.js`
+- Electron tests load the same built renderer from disk through `electron/main.ts`
 - Visual tests have stricter pixel diff thresholds (1%)
 - Use fixed RNG seeds for reproducible game state tests
 - Playwright doesn't parallelize Electron windows as well as browser contexts

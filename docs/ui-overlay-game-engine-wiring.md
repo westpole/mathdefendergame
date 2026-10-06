@@ -4,7 +4,7 @@ This diagram shows how the React overlays, Zustand store, Phaser scenes, core ga
 
 ```mermaid
 flowchart TD
-    E["Electron main process<br/>electron/main.js"] -->|dispatches close query / close requested / close confirmed / close cancelled| A["React shell<br/>src/App.tsx"]
+    E["Electron main process<br/>electron/main.ts"] -->|dispatches close query / close requested / close confirmed / close cancelled| A["React shell<br/>src/App.tsx"]
 
     A -->|mounts once and subscribes to close events| P["Phaser singleton bootstrap<br/>src/game/scenes/UIScene.ts<br/>ensurePhaserGame facade"]
     A -->|visibility hidden while playing<br/>pause for background state| U["UIScene facade<br/>startGame / continueGame / resumePausedGame / endGameEarly / openScreenView / logOff / input helpers"]

@@ -78,6 +78,74 @@ describe('StageMessageOverlay', () => {
     expect(uiSceneMocks.continueGame).toHaveBeenCalledTimes(1);
   });
 
+  it('renders a perfect clear message when the stage is won without mistakes', () => {
+    useGameStore.setState({
+      stageMessage: {
+        success: true,
+        stage: 4,
+        score: 900,
+        lives: 8,
+        stageIncorrect: 0,
+      },
+    });
+
+    render(<StageMessageOverlay />);
+
+    expect(screen.getByRole('heading', { name: 'Stage 4 Cleared!' })).toBeInTheDocument();
+    expect(screen.getByText(/perfect work\. you saved your town\./i)).toBeInTheDocument();
+  });
+
+  it('renders the lost-stage messaging when the player still has lives remaining', () => {
+    useGameStore.setState({
+      stageMessage: {
+        success: false,
+        stage: 4,
+        score: 900,
+        lives: 2,
+        stageIncorrect: 1,
+      },
+    });
+
+    render(<StageMessageOverlay />);
+
+    expect(screen.getByRole('heading', { name: 'Stage Lost' })).toBeInTheDocument();
+    expect(screen.getByText(/you lost this stage and 1 life\. remaining lives: 2\./i)).toBeInTheDocument();
+  });
+
+  it('handles the last-life wording when the player is down to one life', () => {
+    useGameStore.setState({
+      stageMessage: {
+        success: false,
+        stage: 4,
+        score: 900,
+        lives: 1,
+        stageIncorrect: 3,
+      },
+    });
+
+    render(<StageMessageOverlay />);
+
+    expect(screen.getByRole('heading', { name: 'Stage Lost' })).toBeInTheDocument();
+    expect(screen.getByText(/remaining life:/i)).toBeInTheDocument();
+  });
+
+  it('renders the multi-mistake success copy when the player clears with errors', () => {
+    useGameStore.setState({
+      stageMessage: {
+        success: true,
+        stage: 5,
+        score: 920,
+        lives: 4,
+        stageIncorrect: 2,
+      },
+    });
+
+    render(<StageMessageOverlay />);
+
+    expect(screen.getByRole('heading', { name: 'Stage 5 Cleared!' })).toBeInTheDocument();
+    expect(screen.getByText(/made 2 mistakes/i)).toBeInTheDocument();
+  });
+
   it('renders streak reward message when present', () => {
     useGameStore.setState({
       streakRewardMessage: {

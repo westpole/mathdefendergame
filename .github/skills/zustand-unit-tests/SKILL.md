@@ -41,6 +41,7 @@ If no file is specified, default to store modules and migration helpers located 
 - Verify state shape and ordering, not implementation details.
 - Keep tests small and focused on a single aspect of the functionality.
 - Use setup and teardown methods to prepare the test environment and clean up afterward.
+- Never add `any` types; always strive for precise type definitions to maintain type safety and clarity in your tests.
 
 ## Restrictions and limitations
 
