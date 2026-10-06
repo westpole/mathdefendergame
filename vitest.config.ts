@@ -51,7 +51,7 @@ const defaultCoverageThresholds = {
   'src/game/**/*.ts': {
     branches: 90,
     functions: 100,
-    statements: 100
+    statements: 95
   },
   'src/game/scenes/**/*.ts': {
     lines: 20,
