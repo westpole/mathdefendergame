@@ -24,6 +24,7 @@ This skill focuses on writing and maintaining unit tests for React components us
 - Aim for high test coverage to ensure most of the code is tested.
 - Review and update tests regularly to keep them relevant as the code evolves.
 - Continuously integrate tests into the development workflow to catch issues early and maintain code quality.
+- Never add `any` types; always strive for precise type definitions to maintain type safety and clarity in your tests.
 
 ## Verification
 

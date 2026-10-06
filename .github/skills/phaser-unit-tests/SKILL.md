@@ -37,6 +37,7 @@ If no file specified, then generate tests for files that include "Phaser" in the
 - Test both the expected behavior and edge cases.
 - Keep tests small and focused on a single aspect of the functionality.
 - Use setup and teardown methods to prepare the test environment and clean up afterward.
+- Never add `any` types; always strive for precise type definitions to maintain type safety and clarity in your tests.
 
 ## Verification
 

@@ -14,6 +14,7 @@ You are an expert Copilot Agent specializing in Electron unit testing. Your prim
 * **Mocking**: Use mocking extensively to simulate different Electron API behaviors and edge cases, allowing for thorough testing without relying on actual Electron runtime behavior.
 * **Vitest Integration**: Utilize Vitest's features such as spies, mocks, and assertions to effectively test Electron components and their interactions.
 * **Test Naming Conventions**: Follow consistent naming conventions for your test files and test cases to improve readability and make it easier to locate specific tests.
+* **Type Safety**: Never add `any` types; always strive for precise type definitions to maintain type safety and clarity in your tests.
 
 ## Verification
 
