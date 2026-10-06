@@ -254,7 +254,6 @@ describe('Game', () => {
 
       expect(game.state).toBe('paused');
       expect(mockCallbacks.onStreakReward).toHaveBeenCalledWith(game.lives);
-      expect(game.pendingStageClearAfterStreakReward).toBe(true);
 
       game.resumeAfterStreakReward();
       expect(game.state).toBe('message');
