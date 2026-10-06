@@ -259,5 +259,104 @@ describe('Electron Main Process', () => {
 
       expect(BrowserWindow).not.toHaveBeenCalled();
     });
+
+    it('should abort close confirmation when the window is already destroyed', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      win.isDestroyed.mockReturnValue(true);
+      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+
+      expect(closeHandler).toBeTypeOf('function');
+
+      const event = { preventDefault: vi.fn() };
+      closeHandler(event);
+      await flushCloseFlow();
+
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+      expect(win.webContents.executeJavaScript).not.toHaveBeenCalled();
+      expect(win.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('should ignore non-promise dispatch results during renderer shutdown notifications', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      win.webContents.executeJavaScript
+        .mockResolvedValueOnce(true)
+        .mockReturnValueOnce({})
+        .mockResolvedValueOnce('ready');
+
+      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const event = { preventDefault: vi.fn() };
+
+      closeHandler(event);
+      await flushCloseFlow();
+
+      expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
+        expect.stringContaining('electron-close-query'),
+      );
+      expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
+        expect.stringContaining('math-defender-close-ready'),
+      );
+      expect(win.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('should ignore duplicate close events while a close flow is already in progress', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      win.webContents.executeJavaScript
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce('ready');
+
+      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const firstEvent = { preventDefault: vi.fn() };
+      const secondEvent = { preventDefault: vi.fn() };
+
+      closeHandler(firstEvent);
+      closeHandler(secondEvent);
+      await flushCloseFlow();
+
+      expect(firstEvent.preventDefault).toHaveBeenCalledTimes(1);
+      expect(secondEvent.preventDefault).toHaveBeenCalledTimes(1);
+      expect(win.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('should skip the final close when the renderer confirms the window is already destroyed', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      win.isDestroyed
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true);
+      win.webContents.executeJavaScript
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce('ready');
+
+      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const event = { preventDefault: vi.fn() };
+
+      closeHandler(event);
+      await flushCloseFlow();
+
+      expect(win.close).not.toHaveBeenCalled();
+    });
+
+    it('should ignore close events after a close has already been allowed', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      win.webContents.executeJavaScript
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce('ready');
+
+      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const firstEvent = { preventDefault: vi.fn() };
+      const secondEvent = { preventDefault: vi.fn() };
+
+      closeHandler(firstEvent);
+      await flushCloseFlow();
+      closeHandler(secondEvent);
+
+      expect(firstEvent.preventDefault).toHaveBeenCalledTimes(1);
+      expect(secondEvent.preventDefault).not.toHaveBeenCalled();
+      expect(win.close).toHaveBeenCalledTimes(1);
+    });
   });
 });
