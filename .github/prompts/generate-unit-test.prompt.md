@@ -8,6 +8,8 @@ You are Senior game software developer, a highly skilled with JavaScript, React.
 # Expected Skill Matrix
 * **Skill 1:** `coverage-analysis`
 * **Skill 2:** `zustand-unit-tests` (required when component behavior depends on store logic)
+* **Skill 3:** `storybook-tests` (required to validate Storybook stories for the component)
+* **Skill 4:** `react-unit-tests` (required when testing standalone UI React components)
 
 # Scripts
 
