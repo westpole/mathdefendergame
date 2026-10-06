@@ -2,7 +2,7 @@
  * Unit tests for mathGen utility
  * Tests the math expression generation logic
  */
-import { generateMath, getOperationForStage } from '../mathGen';
+import { generateMath, getOperationForStage, getOperationsForTier } from '../mathGen';
 import { MathTier } from '../DDAController';
 
 function evaluateExpression(text: string): number {
@@ -138,6 +138,27 @@ describe('MathGen', () => {
       expect(evaluateExpression(result.text)).toBe(result.answer);
     });
 
+    it('should expose the full tier operation matrix and the fallback tier mapping', () => {
+      expect(getOperationsForTier(MathTier.TIER_4_ORDER_OF_OPERATIONS)).toEqual(['+', '-', '*', '/']);
+      expect(getOperationsForTier(0 as MathTier)).toEqual(['+', '-']);
+    });
+
+    it('should generate precedence expressions with multiplication before addition', () => {
+      const randomSpy = vi.spyOn(Math, 'random')
+        .mockReturnValueOnce(0)
+        .mockReturnValueOnce(0)
+        .mockReturnValueOnce(0)
+        .mockReturnValueOnce(0)
+        .mockReturnValueOnce(0);
+
+      const result = generateMath(25, MathTier.TIER_4_ORDER_OF_OPERATIONS);
+
+      expect(result.text).toBe('10 + 2 * 2');
+      expect(result.answer).toBe(14);
+      expect(result.op).toBe('*');
+      randomSpy.mockRestore();
+    });
+
     it('should fallback to valid stage operation when tier 4 is requested early', () => {
       const result = generateMath(1, MathTier.TIER_4_ORDER_OF_OPERATIONS);
       expect(result.op).toBe('+');
@@ -166,6 +187,18 @@ describe('MathGen', () => {
     it('should return all operations for advanced stages', () => {
       const ops = getOperationForStage(25);
       expect(ops).toEqual(['+', '-', '*', '/']);
+    });
+
+    it('should cover the remaining stage operation ranges and fallback selections', () => {
+      expect(getOperationForStage(5)).toEqual(['-']);
+      expect(getOperationForStage(9)).toEqual(['+', '-']);
+      expect(getOperationForStage(13)).toEqual(['*']);
+      expect(getOperationForStage(17)).toEqual(['/']);
+      expect(getOperationForStage(22)).toEqual(['*', '/']);
+
+      const fallback = generateMath(1, MathTier.TIER_4_ORDER_OF_OPERATIONS);
+      expect(['+', '-', '*', '/']).toContain(fallback.op);
+      expect(evaluateExpression(fallback.text)).toBe(fallback.answer);
     });
   });
 });

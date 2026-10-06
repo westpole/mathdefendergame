@@ -29,7 +29,7 @@ function getCommonOperations(stageOps: string[], tierOps: string[]): string[] {
   return stageOps.filter((op) => tierOps.includes(op));
 }
 
-function getOperationsForTier(mathTier: MathTier): string[] {
+export function getOperationsForTier(mathTier: MathTier): string[] {
   switch (mathTier) {
     case MathTier.TIER_1_BASIC_ADD_SUB:
       return ['+', '-'];
@@ -68,10 +68,6 @@ function generateTwoTermExpression(op: string, mathTier: MathTier): MathExpressi
       b = randomInt(2, 12);
       res = randomInt(1, Math.max(1, Math.floor(maxOperand / b)));
       a = res * b;
-      if (a === 0) {
-        a = b;
-        res = 1;
-      }
       break;
   }
 

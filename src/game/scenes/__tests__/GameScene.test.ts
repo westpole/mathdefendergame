@@ -3,6 +3,7 @@ import Phaser from 'phaser';
 import type { GameCallbacks } from '@game/main';
 import { useGameStore } from '@store/useGameStore';
 
+import * as adapter from '../../../platform/adapter';
 import { GameScene } from '../GameScene';
 
 type GameScenePrivate = {
@@ -360,6 +361,103 @@ describe('GameScene', () => {
     (scene as unknown as GameScenePrivate).handleResize({ width: 390, height: 844 });
 
     expect(mockGameState.lastInstance?.setCanvasSize).toHaveBeenCalledWith(390, 844);
+  });
+
+  it('routes overlay and game-over transitions through the matching store calls', () => {
+    const { scene, store } = setupScene();
+
+    scene.init({ grade: 'trainee' });
+    mockGameState.lastInstance!.state = 'playing';
+    scene.continueFromOverlay();
+    expect(store.startPlaying).toHaveBeenCalledTimes(2);
+
+    (scene as unknown as { handleGameOver: (reason: 'victory' | 'lives-depleted') => void }).handleGameOver('lives-depleted');
+    expect(store.openMenu).toHaveBeenCalledTimes(1);
+
+    (scene as unknown as { handleGameOver: (reason: 'victory' | 'lives-depleted') => void }).handleGameOver('victory');
+    expect(store.showGameOver).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips update work outside active play and clears existing streak reward timers', () => {
+    const { scene, store } = setupScene();
+
+    scene.init({ grade: 'trainee' });
+    mockGameState.lastInstance!.state = 'paused';
+    (scene as unknown as { update: (time: number, delta: number) => void }).update(0, 16);
+    expect(mockGameState.lastInstance?.update).not.toHaveBeenCalled();
+
+    const previousTimer = setTimeout(() => undefined, 5000);
+    (scene as unknown as { streakRewardTimer: ReturnType<typeof setTimeout> | null }).streakRewardTimer = previousTimer;
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+
+    (scene as unknown as { handleStreakReward: (lives: number) => void }).handleStreakReward(3);
+    expect(clearTimeoutSpy).toHaveBeenCalledWith(previousTimer);
+    expect(vi.getTimerCount()).toBe(1);
+
+    vi.runAllTimers();
+    expect(store.clearStreakRewardMessage).toHaveBeenCalledTimes(1);
+    expect(mockGameState.lastInstance?.resumeAfterStreakReward).toHaveBeenCalledTimes(1);
+  });
+
+  it('ignores manual pause requests outside active states and clears stale reward timers', () => {
+    const { scene, store } = setupScene();
+
+    scene.init({ grade: 'trainee' });
+    mockGameState.lastInstance!.state = 'message';
+    scene.pauseForManualEndPrompt('escape');
+    expect(store.showPauseOverlay).not.toHaveBeenCalled();
+
+    const staleTimer = setTimeout(() => undefined, 2000);
+    (scene as unknown as { streakRewardTimer: ReturnType<typeof setTimeout> | null }).streakRewardTimer = staleTimer;
+
+    (scene as unknown as { clearStreakRewardTimer: () => void }).clearStreakRewardTimer();
+    expect((scene as unknown as { streakRewardTimer: ReturnType<typeof setTimeout> | null }).streakRewardTimer).toBeNull();
+  });
+
+  it('forwards answer input actions and pause state changes to the active gameplay logic', () => {
+    const { scene, store } = setupScene();
+
+    scene.init({ grade: 'trainee' });
+    mockGameState.lastInstance!.state = 'playing';
+
+    scene.setAnswerInputBuffer('42');
+    scene.appendAnswerInputCharacter('7');
+    scene.removeAnswerInputCharacter();
+    scene.submitAnswerInput();
+
+    expect(mockGameState.lastInstance?.setInputBuffer).toHaveBeenCalledWith('42');
+    expect(mockGameState.lastInstance?.appendInputCharacter).toHaveBeenCalledWith('7');
+    expect(mockGameState.lastInstance?.removeLastInputCharacter).toHaveBeenCalledTimes(1);
+    expect(mockGameState.lastInstance?.submitInputBuffer).toHaveBeenCalledTimes(1);
+
+    scene.pauseForManualEndPrompt('escape');
+    expect(store.showPauseOverlay).toHaveBeenCalledWith('escape');
+
+    mockGameState.lastInstance!.state = 'paused';
+    scene.resumeFromManualPausePrompt();
+    expect(store.startPlaying).toHaveBeenCalled();
+  });
+
+  it('saves and exits cleanly when ending the current run from the overlay flow', () => {
+    const { scene, store, phaser } = setupScene();
+    const notifyAppCloseReadySpy = vi.spyOn(adapter, 'notifyAppCloseReady').mockImplementation(() => {});
+
+    scene.init({ grade: 'major-general' });
+    mockGameState.lastInstance!.state = 'paused';
+    mockGameState.lastInstance!.score = 120;
+
+    scene.endGameEarly({ closeApp: true });
+
+    expect(store.showSavingBeforeClose).toHaveBeenCalledTimes(1);
+    expect(store.persistPrematureGameEnd).toHaveBeenCalledWith(expect.objectContaining({
+      grade: 'major-general',
+      score: 120,
+    }));
+    expect(phaser.stop).toHaveBeenCalledTimes(1);
+    expect(notifyAppCloseReadySpy).toHaveBeenCalledTimes(1);
+
+    scene.endGameEarly();
+    expect(store.openScreenView).toHaveBeenCalledWith('profile');
   });
 
   it('updates the HUD input buffer on backspace and keeps answer input sanitized', () => {
