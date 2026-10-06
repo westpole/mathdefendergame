@@ -5,24 +5,36 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { BrowserWindow, app, Menu, dialog, ipcMain } from 'electron';
-import * as mainProcess from '../main.js';
+import * as electronModule from 'electron';
+import * as mainProcess from '../main';
 
 // Mock electron modules are set up in vitest-electron.setup.ts
+const mockedBrowserWindow = vi.mocked(BrowserWindow);
 
-function createRuntimeOptions({ argv = ['node', 'electron'], isPackaged = false, platform = 'win32' } = {}) {
+type RuntimeOptionsInput = {
+  argv?: string[];
+  isPackaged?: boolean;
+  platform?: NodeJS.Platform;
+};
+
+function setPackagedState(isPackaged: boolean) {
+  Object.defineProperty(app, 'isPackaged', {
+    configurable: true,
+    writable: true,
+    value: isPackaged,
+  });
+}
+
+function createRuntimeOptions(
+  { argv = ['node', 'electron'], isPackaged = false, platform = 'win32' }: RuntimeOptionsInput = {},
+) {
   vi.clearAllMocks();
-  app.isPackaged = isPackaged;
+  setPackagedState(isPackaged);
 
   return {
     argv,
     platform,
-    electron: {
-      app,
-      BrowserWindow,
-      Menu,
-      dialog,
-      ipcMain,
-    },
+    electron: electronModule,
   };
 }
 
@@ -36,14 +48,16 @@ async function flushCloseFlow() {
 describe('Electron Main Process', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    app.isPackaged = false;
+    setPackagedState(false);
   });
 
   describe('Application lifecycle', () => {
     it('should initialize app listeners', () => {
       mainProcess.initializeApp(createRuntimeOptions());
 
+      expect(app.requestSingleInstanceLock).toHaveBeenCalled();
       expect(app.whenReady).toHaveBeenCalled();
+      expect(app.on).toHaveBeenCalledWith('second-instance', expect.any(Function));
       expect(app.on).toHaveBeenCalledWith('window-all-closed', expect.any(Function));
       expect(app.on).toHaveBeenCalledWith('activate', expect.any(Function));
     });
@@ -140,28 +154,43 @@ describe('Electron Main Process', () => {
         height: 900,
         minWidth: 700,
         minHeight: 700,
-        webPreferences: {
-          nodeIntegration: false,
-          contextIsolation: true,
-        },
-        title: 'Math Defender',
+        show: false,
         backgroundColor: '#1e2326',
+        title: 'Math Defender',
+        webPreferences: {
+          contextIsolation: true,
+          nodeIntegration: false,
+          sandbox: true,
+          webSecurity: true,
+          allowRunningInsecureContent: false,
+          enableRemoteModule: false,
+          webviewTag: false,
+          devTools: true,
+        },
       });
     });
 
     it('should prevent close, delegate confirmation to the renderer, and close when ready', async () => {
-      BrowserWindow.mockClear();
+      mockedBrowserWindow.mockClear();
 
       const win = mainProcess.createWindow(createRuntimeOptions());
-      win.webContents.executeJavaScript
+      const executeJavaScriptMock = vi.mocked(win.webContents.executeJavaScript);
+      executeJavaScriptMock
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce('ready');
-      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+
+      const onCalls = vi.mocked(win.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const closeHandler = onCalls.find(([eventName]) => eventName === 'close')?.[1];
 
       expect(closeHandler).toBeTypeOf('function');
 
       const event = { preventDefault: vi.fn() };
+
+      if (!closeHandler) {
+        throw new Error('Expected BrowserWindow "close" handler to be registered, but none was found.');
+      }
+
       closeHandler(event);
       await flushCloseFlow();
 
@@ -178,12 +207,20 @@ describe('Electron Main Process', () => {
 
     it('should close immediately without confirmation when no game is running', async () => {
       const win = mainProcess.createWindow(createRuntimeOptions());
-      win.webContents.executeJavaScript.mockResolvedValueOnce(false);
-      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const executeJavaScriptMock = vi.mocked(win.webContents.executeJavaScript);
+
+      executeJavaScriptMock.mockResolvedValueOnce(false);
+      const onCalls = vi.mocked(win.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const closeHandler = onCalls.find(([eventName]) => eventName === 'close')?.[1];
 
       expect(closeHandler).toBeTypeOf('function');
 
       const event = { preventDefault: vi.fn() };
+
+      if (!closeHandler) {
+        throw new Error('Expected BrowserWindow "close" handler to be registered, but none was found.');
+      }
+
       closeHandler(event);
       await flushCloseFlow();
 
@@ -193,18 +230,25 @@ describe('Electron Main Process', () => {
     });
 
     it('should keep the window open when the renderer cancels the close flow', async () => {
-      BrowserWindow.mockClear();
+      mockedBrowserWindow.mockClear();
 
       const win = mainProcess.createWindow(createRuntimeOptions());
-      win.webContents.executeJavaScript
+      const executeJavaScriptMock = vi.mocked(win.webContents.executeJavaScript);
+      executeJavaScriptMock
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce('cancelled');
-      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const onCalls = vi.mocked(win.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const closeHandler = onCalls.find(([eventName]) => eventName === 'close')?.[1];
 
       expect(closeHandler).toBeTypeOf('function');
 
       const event = { preventDefault: vi.fn() };
+
+      if (!closeHandler) {
+        throw new Error('Expected BrowserWindow "close" handler to be registered, but none was found.');
+      }
+
       closeHandler(event);
       await flushCloseFlow();
 
@@ -218,19 +262,29 @@ describe('Electron Main Process', () => {
     it('should create a window when the app activates with no open windows', () => {
       mainProcess.initializeApp(createRuntimeOptions());
 
-      const activateHandler = app.on.mock.calls.find(([eventName]) => eventName === 'activate')?.[1];
+      const mockedAppOnCalls = vi.mocked(app.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const activateHandler = mockedAppOnCalls.find(([eventName]) => eventName === 'activate')?.[1];
       expect(activateHandler).toBeTypeOf('function');
+
+      if (!activateHandler) {
+        throw new Error('Expected app "activate" handler to be registered, but none was found.');
+      }
 
       activateHandler();
 
-      expect(BrowserWindow).toHaveBeenCalled();
+      expect(mockedBrowserWindow).toHaveBeenCalled();
     });
 
     it('should quit when all windows are closed on non-macOS platforms', () => {
       mainProcess.initializeApp(createRuntimeOptions({ platform: 'win32' }));
 
-      const closeHandler = app.on.mock.calls.find(([eventName]) => eventName === 'window-all-closed')?.[1];
+      const mockedAppOnCalls = vi.mocked(app.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const closeHandler = mockedAppOnCalls.find(([eventName]) => eventName === 'window-all-closed')?.[1];
       expect(closeHandler).toBeTypeOf('function');
+
+      if (!closeHandler) {
+        throw new Error('Expected app "window-all-closed" handler to be registered, but none was found.');
+      }
 
       closeHandler();
 
@@ -240,8 +294,13 @@ describe('Electron Main Process', () => {
     it('should not quit when all windows are closed on macOS', () => {
       mainProcess.initializeApp(createRuntimeOptions({ platform: 'darwin' }));
 
-      const closeHandler = app.on.mock.calls.find(([eventName]) => eventName === 'window-all-closed')?.[1];
+      const mockedAppOnCalls = vi.mocked(app.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const closeHandler = mockedAppOnCalls.find(([eventName]) => eventName === 'window-all-closed')?.[1];
       expect(closeHandler).toBeTypeOf('function');
+
+      if (!closeHandler) {
+        throw new Error('Expected app "window-all-closed" handler to be registered, but none was found.');
+      }
 
       closeHandler();
 
@@ -249,21 +308,52 @@ describe('Electron Main Process', () => {
     });
 
     it('should not create a window when one already exists on activate', () => {
-      BrowserWindow.getAllWindows.mockReturnValueOnce([{}]);
+      mockedBrowserWindow.getAllWindows.mockReturnValueOnce([{} as unknown as BrowserWindow]);
       mainProcess.initializeApp(createRuntimeOptions());
 
-      const activateHandler = app.on.mock.calls.find(([eventName]) => eventName === 'activate')?.[1];
+      const mockedAppOnCalls = vi.mocked(app.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const activateHandler = mockedAppOnCalls.find(([eventName]) => eventName === 'activate')?.[1];
       expect(activateHandler).toBeTypeOf('function');
+
+      if (!activateHandler) {
+        throw new Error('Expected app "activate" handler to be registered, but none was found.');
+      }
 
       activateHandler();
 
-      expect(BrowserWindow).not.toHaveBeenCalled();
+      expect(mockedBrowserWindow).not.toHaveBeenCalled();
+    });
+
+    it('should focus the existing window when a second instance is requested', () => {
+      const existingWindow = {
+        isMinimized: vi.fn().mockReturnValue(false),
+        focus: vi.fn(),
+      } as unknown as BrowserWindow;
+      mockedBrowserWindow.getAllWindows.mockReturnValueOnce([existingWindow]);
+
+      mainProcess.initializeApp(createRuntimeOptions());
+
+      const mockedAppOnCalls = vi.mocked(app.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const secondInstanceHandler = mockedAppOnCalls.find(([eventName]) => eventName === 'second-instance')?.[1];
+      expect(secondInstanceHandler).toBeTypeOf('function');
+
+      if (!secondInstanceHandler) {
+        throw new Error('Expected app "second-instance" handler to be registered, but none was found.');
+      }
+      secondInstanceHandler();
+
+      expect(existingWindow.focus).toHaveBeenCalled();
     });
 
     it('should abort close confirmation when the window is already destroyed', async () => {
       const win = mainProcess.createWindow(createRuntimeOptions());
-      win.isDestroyed.mockReturnValue(true);
-      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const windowOnCalls = vi.mocked(win.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      vi.mocked(win.isDestroyed).mockReturnValue(true);
+      const closeHandler = windowOnCalls.find(([eventName]) => eventName === 'close')?.[1];
+
+      if (!closeHandler) {
+        throw new Error('Expected BrowserWindow "close" handler to be registered, but none was found.');
+      }
 
       expect(closeHandler).toBeTypeOf('function');
 
@@ -272,27 +362,32 @@ describe('Electron Main Process', () => {
       await flushCloseFlow();
 
       expect(event.preventDefault).toHaveBeenCalledTimes(1);
-      expect(win.webContents.executeJavaScript).not.toHaveBeenCalled();
+      expect(vi.mocked(win.webContents.executeJavaScript)).not.toHaveBeenCalled();
       expect(win.close).toHaveBeenCalledTimes(1);
     });
 
     it('should ignore non-promise dispatch results during renderer shutdown notifications', async () => {
       const win = mainProcess.createWindow(createRuntimeOptions());
-      win.webContents.executeJavaScript
+      vi.mocked(win.webContents.executeJavaScript)
         .mockResolvedValueOnce(true)
-        .mockReturnValueOnce({})
+        .mockReturnValueOnce({} as unknown as Promise<unknown>)
         .mockResolvedValueOnce('ready');
 
-      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const windowOnCalls = vi.mocked(win.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const closeHandler = windowOnCalls.find(([eventName]) => eventName === 'close')?.[1];
       const event = { preventDefault: vi.fn() };
+
+      if (!closeHandler) {
+        throw new Error('Expected BrowserWindow "close" handler to be registered, but none was found.');
+      }
 
       closeHandler(event);
       await flushCloseFlow();
 
-      expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
+      expect(vi.mocked(win.webContents.executeJavaScript)).toHaveBeenCalledWith(
         expect.stringContaining('electron-close-query'),
       );
-      expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
+      expect(vi.mocked(win.webContents.executeJavaScript)).toHaveBeenCalledWith(
         expect.stringContaining('math-defender-close-ready'),
       );
       expect(win.close).toHaveBeenCalledTimes(1);
@@ -300,14 +395,19 @@ describe('Electron Main Process', () => {
 
     it('should ignore duplicate close events while a close flow is already in progress', async () => {
       const win = mainProcess.createWindow(createRuntimeOptions());
-      win.webContents.executeJavaScript
+      vi.mocked(win.webContents.executeJavaScript)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce('ready');
 
-      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const windowOnCalls = vi.mocked(win.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const closeHandler = windowOnCalls.find(([eventName]) => eventName === 'close')?.[1];
       const firstEvent = { preventDefault: vi.fn() };
       const secondEvent = { preventDefault: vi.fn() };
+
+      if (!closeHandler) {
+        throw new Error('Expected BrowserWindow "close" handler to be registered, but none was found.');
+      }
 
       closeHandler(firstEvent);
       closeHandler(secondEvent);
@@ -320,18 +420,23 @@ describe('Electron Main Process', () => {
 
     it('should skip the final close when the renderer confirms the window is already destroyed', async () => {
       const win = mainProcess.createWindow(createRuntimeOptions());
-      win.isDestroyed
+      vi.mocked(win.isDestroyed)
         .mockReturnValueOnce(false)
         .mockReturnValueOnce(false)
         .mockReturnValueOnce(false)
         .mockReturnValueOnce(true);
-      win.webContents.executeJavaScript
+      vi.mocked(win.webContents.executeJavaScript)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce('ready');
 
-      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const windowOnCalls = vi.mocked(win.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const closeHandler = windowOnCalls.find(([eventName]) => eventName === 'close')?.[1];
       const event = { preventDefault: vi.fn() };
+
+      if (!closeHandler) {
+        throw new Error('Expected BrowserWindow "close" handler to be registered, but none was found.');
+      }
 
       closeHandler(event);
       await flushCloseFlow();
@@ -341,14 +446,19 @@ describe('Electron Main Process', () => {
 
     it('should ignore close events after a close has already been allowed', async () => {
       const win = mainProcess.createWindow(createRuntimeOptions());
-      win.webContents.executeJavaScript
+      vi.mocked(win.webContents.executeJavaScript)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce(true)
         .mockResolvedValueOnce('ready');
 
-      const closeHandler = win.on.mock.calls.find(([eventName]) => eventName === 'close')?.[1];
+      const windowOnCalls = vi.mocked(win.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
+      const closeHandler = windowOnCalls.find(([eventName]) => eventName === 'close')?.[1];
       const firstEvent = { preventDefault: vi.fn() };
       const secondEvent = { preventDefault: vi.fn() };
+
+      if (!closeHandler) {
+        throw new Error('Expected BrowserWindow "close" handler to be registered, but none was found.');
+      }
 
       closeHandler(firstEvent);
       await flushCloseFlow();

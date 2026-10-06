@@ -10,6 +10,7 @@ vi.mock('electron', () => {
       getAppPath: vi.fn().mockReturnValue('/mocked/app/path'),
       isPackaged: false,
       whenReady: vi.fn(() => Promise.resolve()),
+      requestSingleInstanceLock: vi.fn().mockReturnValue(true),
       on: vi.fn(),
       quit: vi.fn(),
     },
@@ -29,18 +30,22 @@ vi.mock('electron', () => {
     BrowserWindow: Object.assign(
       vi.fn().mockImplementation(function mockBrowserWindow() {
         return {
-        loadURL: vi.fn(),
-        loadFile: vi.fn(),
-        on: vi.fn(),
-        show: vi.fn(),
-        close: vi.fn(),
-        isDestroyed: vi.fn().mockReturnValue(false),
-        webContents: {
-          openDevTools: vi.fn(),
-          send: vi.fn(),
-          executeJavaScript: vi.fn().mockResolvedValue(true),
-        },
-      };
+          loadURL: vi.fn(),
+          loadFile: vi.fn(),
+          on: vi.fn(),
+          once: vi.fn(),
+          show: vi.fn(),
+          close: vi.fn(),
+          focus: vi.fn(),
+          isMinimized: vi.fn().mockReturnValue(false),
+          restore: vi.fn(),
+          isDestroyed: vi.fn().mockReturnValue(false),
+          webContents: {
+            openDevTools: vi.fn(),
+            send: vi.fn(),
+            executeJavaScript: vi.fn().mockResolvedValue(true),
+          },
+        };
       }),
       {
         getAllWindows: vi.fn().mockReturnValue([]),

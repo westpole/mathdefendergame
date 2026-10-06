@@ -4,7 +4,7 @@
   "description": "Defend your base from falling meteors by solving math problems.",
   "license": "ISC",
   "author": "Stanislav Spuzyak",
-  "main": "electron/main.js",
+  "main": "electron/main.ts",
   "type": "module",
   "scripts": {
     "dev:web": "vite",

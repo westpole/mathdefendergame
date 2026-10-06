@@ -31,7 +31,7 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 - `src/game/scenes/UIScene.ts` owns the singleton Phaser game instance and the menu/start/continue/pause lifecycle helpers.
 - `src/store/useGameStore.ts` is the single shared app store. Only the leaderboard is persisted to `localStorage`.
 - `src/App.tsx` mounts the Phaser container and React overlays, switching UI by store `phase` and `screenView`.
-- `electron/main.js` owns the desktop window and app menu, including the close-confirmation flow that dispatches events to the renderer.
+- `electron/main.ts` owns the desktop window and app menu, including the close-confirmation flow that dispatches events to the renderer.
 
 ## Repo-Specific Patterns
 

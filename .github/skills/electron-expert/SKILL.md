@@ -58,78 +58,75 @@ You must strictly enforce the following security and architectural rules in ever
 ### Step-by-Step Execution Plan
 When asked to scaffold or modify a wrapper application, you must output your response in this structural order:
 1. **Target Evaluation**: Confirm the target web application URL and identify any required cross-origin permissions.
-2. **Main Process Configuration**: Output a secure, production-ready `main.js` using the standard code template.
-3. **Preload Layer Definition**: Output a minimized, secure `preload.js`.
+2. **Main Process Configuration**: Output a secure, production-ready TypeScript ESM `main.ts` using the project’s module-based Electron template.
+3. **Preload Layer Definition**: Output a minimized, secure `preload.ts` (or compiled JS if the build pipeline requires it) using `contextBridge`.
 4. **Security Checklist**: Review your own output against the "Hardened Security Settings" rules and explicitly state that it passes.
 
 ### Reference Code Implementations
 
-#### Secure Main Process Template (`main.js`)
-```javascript
-const { app, BrowserWindow, shell, ipcMain, session } = require('electron');
-const path = require('path');
+This project is configured as an ESM TypeScript app (`"type": "module"` and a TypeScript Electron entrypoint), so examples must use `import` syntax, `import.meta.url`, and `URL`-based origin validation rather than CommonJS `require()` patterns.
 
-// Use origin (scheme + host + port) for all URL comparisons — never use startsWith on a full URL.
-const ALLOWED_ORIGIN = 'https://example.com'; // Replace with your app's origin
+#### Secure Main Process Template (`main.ts`)
+```ts
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { app, BrowserWindow, ipcMain, session, shell } from 'electron';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const ALLOWED_ORIGIN = 'https://example.com';
 const isMac = process.platform === 'darwin';
 
-// Prevent second instances; quit immediately if another is already running.
-if (!app.requestSingleInstanceLock()) {
-  app.quit();
-}
-
-let mainWindow;
-
-function isAllowedOrigin(url) {
+const isAllowedOrigin = (url: string): boolean => {
   try {
     return new URL(url).origin === ALLOWED_ORIGIN;
   } catch {
     return false;
   }
-}
+};
 
-function safeOpenExternal(url) {
-  // Only open http/https URLs externally — block file:// and custom protocols.
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
-      shell.openExternal(url);
-    }
-  } catch {
-    // Ignore malformed URLs
-  }
-}
-
-function isSafeAppEntry(url) {
+const isSafeAppEntry = (url: string): boolean => {
   try {
     const parsed = new URL(url);
     return parsed.protocol === 'https:' || parsed.protocol === 'http:';
   } catch {
     return false;
   }
-}
+};
 
-function applyContentSecurityPolicy(targetSession) {
+const safeOpenExternal = (url: string): void => {
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
+      void shell.openExternal(url);
+    }
+  } catch {
+    // Ignore malformed or dangerous URLs.
+  }
+};
+
+const applyContentSecurityPolicy = (targetSession = session.defaultSession): void => {
   targetSession.webRequest.onHeadersReceived((details, callback) => {
     callback({
       responseHeaders: {
         ...details.responseHeaders,
         'Content-Security-Policy': [
-          "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'",
+          "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://example.com",
         ],
       },
     });
   });
-}
+};
 
-function createWindow() {
-  mainWindow = new BrowserWindow({
+function createWindow(): void {
+  const mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     show: false,
+    title: 'My App',
     webPreferences: {
-      // Use path.resolve to prevent path traversal issues with the preload path.
-      preload: path.resolve(__dirname, 'preload.js'),
+      preload: path.resolve(__dirname, 'preload.ts'),
       contextIsolation: true,
       nodeIntegration: false,
       sandbox: true,
@@ -137,23 +134,20 @@ function createWindow() {
       allowRunningInsecureContent: false,
       enableRemoteModule: false,
       webviewTag: false,
-      // Disable devTools in packaged (production) builds.
       devTools: !app.isPackaged,
     },
   });
 
-  applyContentSecurityPolicy(session.defaultSession);
+  applyContentSecurityPolicy();
 
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
   });
 
-  // Prevent guest content from enabling a <webview> with its own preload or Node settings.
   mainWindow.webContents.on('will-attach-webview', (event) => {
     event.preventDefault();
   });
 
-  // Block unauthorized in-page navigation (e.g., history.pushState to external origin).
   mainWindow.webContents.on('will-navigate', (event, url) => {
     if (!isAllowedOrigin(url)) {
       event.preventDefault();
@@ -161,21 +155,18 @@ function createWindow() {
     }
   });
 
-  // Also block server-side redirects that bypass will-navigate.
-  mainWindow.webContents.on('did-start-navigation', (event, url, isInPlace, isMainFrame) => {
+  mainWindow.webContents.on('did-start-navigation', (event, url, _isInPlace, isMainFrame) => {
     if (isMainFrame && !isAllowedOrigin(url)) {
       event.preventDefault();
       safeOpenExternal(url);
     }
   });
 
-  // Intercept and redirect new window / _blank creation.
-  // IMPORTANT: Use origin comparison, not startsWith — startsWith('https://example.com')
-  // would incorrectly match 'https://example.com.evil.com'.
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (isAllowedOrigin(url)) {
       return { action: 'allow' };
     }
+
     safeOpenExternal(url);
     return { action: 'deny' };
   });
@@ -184,31 +175,28 @@ function createWindow() {
     throw new Error('Refusing to load a non-http(s) application origin');
   }
 
-  mainWindow.loadURL(ALLOWED_ORIGIN);
+  void mainWindow.loadURL(ALLOWED_ORIGIN);
 }
 
-// Global security lockdown for any dynamically created web contents.
-app.on('web-contents-created', (event, contents) => {
-  contents.on('will-attach-webview', (attachEvent) => {
-    attachEvent.preventDefault();
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+}
+
+app.on('web-contents-created', (_event, contents) => {
+  contents.on('will-attach-webview', (event) => {
+    event.preventDefault();
   });
 
-  contents.session.setPermissionRequestHandler((webContents, permission, callback) => {
-    return callback(false);
-  });
-
-  contents.session.setPermissionCheckHandler(() => {
-    return false;
-  });
+  contents.session.setPermissionRequestHandler((_webContents, _permission, callback) => callback(false));
+  contents.session.setPermissionCheckHandler(() => false);
 
   if (typeof contents.session.setDevicePermissionHandler === 'function') {
-    contents.session.setDevicePermissionHandler(() => {
-      return false;
-    });
+    contents.session.setDevicePermissionHandler(() => false);
   }
 });
 
 app.on('second-instance', () => {
+  const [mainWindow] = BrowserWindow.getAllWindows();
   if (!mainWindow) {
     return;
   }
@@ -220,20 +208,15 @@ app.on('second-instance', () => {
   mainWindow.focus();
 });
 
-// --- IPC handlers (main process side) ---
-// Always validate channel arguments before acting.
-ipcMain.handle('get-version', () => {
-  return app.getVersion();
-});
+ipcMain.handle('get-version', () => app.getVersion());
 
-app.whenReady().then(createWindow);
+app.whenReady().then(() => {
+  createWindow();
+});
 
 app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
-  } else if (mainWindow) {
-    mainWindow.show();
-    mainWindow.focus();
   }
 });
 
@@ -244,19 +227,31 @@ app.on('window-all-closed', () => {
 });
 ```
 
-#### Preload Script Template (`preload.js`)
-```javascript
-const { contextBridge, ipcRenderer } = require('electron');
+If your build emits the preload script to a plain `.js` file instead of running TypeScript directly, keep the same logic and change the path extension accordingly. The important point is to keep the runtime in ESM/TypeScript semantics and avoid CommonJS patterns in the wrapper.
+
+#### Preload Script Template (`preload.ts`)
+```ts
+import { contextBridge, ipcRenderer } from 'electron';
+
+type ElectronAppApi = {
+  getAppVersion: () => Promise<string>;
+  onNetworkStatusChange: (callback: (status: string) => void) => () => void;
+};
+
+declare global {
+  interface Window {
+    ElectronApp: ElectronAppApi;
+  }
+}
 
 contextBridge.exposeInMainWorld('ElectronApp', {
   getAppVersion: () => ipcRenderer.invoke('get-version'),
-
-  // Return an unsubscribe function so callers (e.g. React useEffect) can clean up the
-  // listener on unmount. Omitting cleanup causes listener accumulation across re-renders.
-  onNetworkStatusChange: (callback) => {
-    const handler = (_, status) => callback(status);
+  onNetworkStatusChange: (callback: (status: string) => void) => {
+    const handler = (_event: unknown, status: string) => callback(status);
     ipcRenderer.on('network-status', handler);
     return () => ipcRenderer.removeListener('network-status', handler);
   },
 });
 ```
+
+Keep preload APIs minimal, explicitly typed, and return cleanup functions for any renderer subscriptions. This prevents listener leaks and keeps the bridge aligned with the project’s TypeScript + ESM architecture.

@@ -61,7 +61,7 @@ const defaultCoverageThresholds = {
   },
 
   // Target: Electron main process (Critical for app stability, high coverage required)
-  'electron/**/*.js': {
+  'electron/**/*.ts': {
     lines: 90,
     branches: 90,
     functions: 90,
@@ -177,7 +177,7 @@ export default defineConfig({
         test: {
           name: 'electron',
           setupFiles: ['./vitest-electron.setup.ts'],
-          include: ['electron/**/*.test.js'],
+          include: ['electron/**/*.test.ts'],
           environment: 'node', // Electron main/preload tests run in Node.js
         },
       },
