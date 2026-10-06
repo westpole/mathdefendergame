@@ -1,5 +1,5 @@
 ---
-name: electron-best-practices
+name: electron-expert
 description: Builds and refactors Electron applications. Use for creating a new Electron project, adding windows, menus, IPC, native integrations, or for fixing Electron-specific bugs and performance problems.
 ---
 
