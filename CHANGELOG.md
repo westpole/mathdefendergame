@@ -1,4 +1,39 @@
 
+## [1.3.0](https://github.com/westpole/mathdefendergame/compare/v1.2.0...v1.3.0) (2026-10-07)
+
+### Features
+
+* [#62](https://github.com/westpole/mathdefendergame/issues/62) add constants file and update imports across the store modules ([af0918e](https://github.com/westpole/mathdefendergame/commit/af0918e685d52a520242468f2a732adc526a2cd9))
+* [#62](https://github.com/westpole/mathdefendergame/issues/62) add CreateProfileForm stories for desktop and mobile variations ([b74b9cf](https://github.com/westpole/mathdefendergame/commit/b74b9cfca6382435210d4b47c52246e464c50845))
+* [#62](https://github.com/westpole/mathdefendergame/issues/62) add generate-storybook prompt and update storybook skill guidelines ([cba101b](https://github.com/westpole/mathdefendergame/commit/cba101be414661ed905dad0b307119a7218e6f7d))
+* [#62](https://github.com/westpole/mathdefendergame/issues/62) add missing skills documentation for React frontend and Storybook ([d5e52fa](https://github.com/westpole/mathdefendergame/commit/d5e52fa0d8a058ef451a66edb41556f9b89f3aa6))
+* [#62](https://github.com/westpole/mathdefendergame/issues/62) add missing stories and unit test generation prompts for React components ([6ecccb1](https://github.com/westpole/mathdefendergame/commit/6ecccb15d54e2d9b9af0c7fa2f400552e25fca0b))
+* [#62](https://github.com/westpole/mathdefendergame/issues/62) add unit tests for CreateProfileForm component ([5281d87](https://github.com/westpole/mathdefendergame/commit/5281d872b78387a3e4c4ee41c28a47ea9de8d539))
+* [#62](https://github.com/westpole/mathdefendergame/issues/62) update CreateProfileForm stories with type definitions and initial state ([ea725d9](https://github.com/westpole/mathdefendergame/commit/ea725d9977d64fe417def57d5d08c5987b4d154e))
+* [#75](https://github.com/westpole/mathdefendergame/issues/75) enhance ProfileSelector with custom dropdown functionality and styles ([19a1277](https://github.com/westpole/mathdefendergame/commit/19a1277936ce7b30930b176336acf77835c605c5))
+* [#75](https://github.com/westpole/mathdefendergame/issues/75) implement "Remember Me" functionality in ProfileSelector and update related tests ([e16757c](https://github.com/westpole/mathdefendergame/commit/e16757cfd246b982a6c8d5f8f0e97d04a3f0692c))
+* [#76](https://github.com/westpole/mathdefendergame/issues/76) add Windows build step to release agent and remove obsolete Windows packaging agent ([12b7f87](https://github.com/westpole/mathdefendergame/commit/12b7f87ddf8ee946222f881722a828af0b564fce))
+* [#76](https://github.com/westpole/mathdefendergame/issues/76) enhance release process with HTML report generation and update .gitignore ([16ce348](https://github.com/westpole/mathdefendergame/commit/16ce3480fd4ae5170a6539e001a3ab753265781c))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) add internal DDAController type casting for improved test coverage and clarity ([b35c972](https://github.com/westpole/mathdefendergame/commit/b35c97231e61101cb8d0a036c5e5681d9946a94e))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) add SKILL.md for electron-expert and electron-unit-tests; define roles, guidelines, and verification processes ([c246563](https://github.com/westpole/mathdefendergame/commit/c246563bf18c93064648f3140ec1e6562fcca425))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) add type safety guideline to SKILL.md for unit testing skills ([0350c99](https://github.com/westpole/mathdefendergame/commit/0350c996ff435efc2c9e5377bf513b009cfa8f9f))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) add unit tests for game logic, DDAController, and mathGen utility; enhance test coverage and functionality ([eeaaf13](https://github.com/westpole/mathdefendergame/commit/eeaaf1368ab99e1863ca7c2ddeb18d5d8bf474d3))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) add unit tests for HUDOverlay, HomeOverlay, PauseOverlay, ProfileOverlay, ProfileSelector, and StageMessageOverlay components ([57a5ca3](https://github.com/westpole/mathdefendergame/commit/57a5ca30fa6172cf8f55ed41da1f51292372b8d0))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) add unit tests for window close behavior in Electron main process; enhance reliability and coverage ([7a69d07](https://github.com/westpole/mathdefendergame/commit/7a69d07763d18e67d3bc7757c1bf596d98b1b5d7))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) update Phaser unit testing documentation and add phaser-expert skill guide ([673838d](https://github.com/westpole/mathdefendergame/commit/673838da586252bbafaf9471347eadad20761241))
+* [#80](https://github.com/westpole/mathdefendergame/issues/80) add e2e-test-expert skill documentation and generate-e2e-test prompt ([7350cb5](https://github.com/westpole/mathdefendergame/commit/7350cb572e60a072726897469384e6a1c90b604b))
+* [#83](https://github.com/westpole/mathdefendergame/issues/83) add feature flags explanation to React unit tests documentation ([bf1ec1f](https://github.com/westpole/mathdefendergame/commit/bf1ec1f8512faec37c280c01a983aa1cf96918a8))
+* [#83](https://github.com/westpole/mathdefendergame/issues/83) add react-unit-tests skill documentation for unit testing React components ([08b41cc](https://github.com/westpole/mathdefendergame/commit/08b41ccbd4129243e50e959e6e1360c41596f7bc))
+* [#83](https://github.com/westpole/mathdefendergame/issues/83) add README documentation for feature flags in shared utilities ([f0180f4](https://github.com/westpole/mathdefendergame/commit/f0180f404f5e5f4a4c531268ed269e841152a01a))
+
+### Bug Fixes
+
+* [#62](https://github.com/westpole/mathdefendergame/issues/62) correct skill formatting and typo in generate-storybook prompt ([1af3d02](https://github.com/westpole/mathdefendergame/commit/1af3d0276ef34c548dc712b91360ef1d22d5aef7))
+* [#62](https://github.com/westpole/mathdefendergame/issues/62) update visual snapshot for main menu in Electron on Win32 ([0f5b3ae](https://github.com/westpole/mathdefendergame/commit/0f5b3ae2b52a9a9fc20729a091c956f4a02d6deb))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) add missing "type" field in package.json for module support ([03c4e77](https://github.com/westpole/mathdefendergame/commit/03c4e77c39e98d4a5bb4bd09bf52ffafd73aa16f))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) remove unnecessary assertion for pendingStageClearAfterStreakReward in resumeAfterStreakReward test ([3c73aa2](https://github.com/westpole/mathdefendergame/commit/3c73aa2f975446ac8e1c17033431e2ee5287547f))
+* [#79](https://github.com/westpole/mathdefendergame/issues/79) update coverage threshold for statements for Phaser game engine ([388c203](https://github.com/westpole/mathdefendergame/commit/388c20372688ee47e89f80c4a543ac617ee7d9a3))
+
 ## [1.2.0](https://github.com/westpole/mathdefendergame/compare/v1.1.0...v1.2.0) (2026-09-30)
 
 ### Features
