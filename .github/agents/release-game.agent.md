@@ -33,6 +33,7 @@ You are the release agent for Math Defender Game.
 4. Verify there is at least one commit since the latest release tag before attempting the release.
 5. Run the prebuild checks in order.
 6. Run `npm run build:web` to generate the production build.
+  6.1 Run `npm run build:win` to generate the Windows build.
 7. Run the matching release command so `npm version` creates the git tag and the repo scripts generate the changelog, commit, and push.
 8. Report the version bump used, checks run, build result, and whether commit, tag, and push completed.
 
