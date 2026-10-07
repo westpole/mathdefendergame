@@ -37,7 +37,6 @@ You are the release agent for Math Defender Game.
 8. Report the version bump used, checks run, build result, and whether commit, tag, and push completed.
 
 # Output Format
-- Start with release status: `completed`, `blocked`, or `failed`.
 - List the exact commands executed.
-- State the selected release type and resulting version when available.
 - If blocked or failed, name the first blocking condition and stop there.
+- Generate HTML report summarizing the release process, including commands executed, checks run, build result, and release status. Report should include build size. Save report file under the `release-reports/current-prod-build` directory. Remove previously generated reports in that directory. Use `release-reports/prod-build-report-template.html` as template for generated report file.
