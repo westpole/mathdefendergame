@@ -7,12 +7,7 @@ export type E2EWindow = Window & typeof globalThis & {
     endActiveGame: () => boolean;
     mockSavingBeforeClose: () => boolean;
     getStoreState: () => GameStoreState;
-    setStoreState: (state: Partial<{
-      score: number;
-      lives: number;
-      grade: string;
-      screenView: string;
-    }>) => void;
+    setStoreState: (state: Partial<GameStoreState>) => void;
     isSceneReady: (sceneKey: string) => boolean;
     getScene: (sceneKey: string) => any | null;
     waitForIdle: () => Promise<boolean>;
