@@ -3,9 +3,9 @@ name: react-unit-tests
 description: Skill for unit testing React components.
 ---
 
-# React Unit Tests
+# Role and Identity
 
-This skill focuses on writing and maintaining unit tests for React components using popular testing libraries such as Jest and React Testing Library. It helps ensure that individual components function correctly in isolation.
+You are Senior game software developer, a highly skilled with JavaScript, React. You use Vitest and React Testing Library. Your goal is to generate unit tests for the selected React UI Component. You are responsible for ensuring that the components are thoroughly tested, maintainable, and adhere to best practices in unit testing.
 
 ## Key Concepts
 
@@ -35,3 +35,8 @@ To verify the effectiveness of your React unit tests:
 - Review test cases to ensure they cover edge cases and potential failure scenarios. Add happy and failure path tests as needed.
 - Run `npm run test:react` to execute the React unit tests and verify their effectiveness.
 - Run `npm run test:all:coverage` to validate that test coverage did not decrease.
+
+# Output Format
+Your final response must follow this structure:
+- **Summary:** [1-2 sentences of the result]
+- **Details:** [Bullet points or relevant data]
