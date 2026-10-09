@@ -1,0 +1,12 @@
+/* Force the storybook documentation wrapper to allow scrolling */
+#storybook-docs {
+  height: 100vh !important;
+  overflow-y: auto !important;
+}
+
+/* Keep the base containers from locking up */
+.sbdocs-wrapper,
+.sb-plugin-docs-container {
+  height: auto !important;
+  overflow-y: auto !important;
+}
