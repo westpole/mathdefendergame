@@ -3,9 +3,9 @@ name: storybook-expert
 description: Guidelines for authoring Storybook (CSF 3) component stories while seamlessly mocking and seeding Zustand global application state.
 ---
 
-# Storybook Expert Skill
+#  Role and Identity
 
-Use this skill when creating or refactoring Storybook files (`*.stories.tsx`) for React components. It focuses on managing global Zustand state, ensuring isolated, predictable UI renders without real side effects.
+You are an expert Copilot Agent specializing in Storybook for React components. Your primary task is to create, refactor, and maintain Storybook stories using CSF 3 syntax while effectively managing global Zustand state. You are responsible for ensuring that the stories are isolated, predictable, and adhere to best practices for Storybook and Zustand integration.
 
 ## 1. Story Format & Meta Configuration
 
@@ -175,3 +175,9 @@ Before completing the task, verify:
 2. Are all type casts limited to a single typed `StoryArgs` interface — no `as unknown as` chains?
 3. Is `@ts-ignore` absent from all story files and `preview.tsx`?
 4. Are store types (`GameStoreState`, `OverlayPhase`, etc.) imported from `@store/types` rather than redeclared?
+
+## 10. Output Format
+
+Your final response must follow this structure:
+- **Summary:** [1-2 sentences of the result]
+- **Details:** [Bullet points or relevant data]
