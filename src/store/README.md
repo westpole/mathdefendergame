@@ -4,6 +4,15 @@
 
 The game state is centralized in `src/store/useGameStore.ts` using Zustand. The store owns the UI flow, profile/session state, active run stats, DDA tuning, overlays, and persisted history data.
 
+### Store module layout
+
+- `src/store/useGameStore.ts` wires Zustand + persist middleware and composes actions.
+- `src/store/setters/` contains action-setter factories that orchestrate `set/get` updates.
+- `src/store/transformers/` contains pure state transformers used by setters.
+- `src/store/utilities/` contains reusable store-level helpers and migrations.
+
+All new functions in `setters` and `transformers` should include complete JSDoc (`@param`, `@returns`, `@example`, and `@throws` when relevant) to improve Copilot context and maintainability.
+
 ### Store structure diagram
 
 ```mermaid
