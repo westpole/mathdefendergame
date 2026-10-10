@@ -1,7 +1,6 @@
 ---
 name: Code Reviewer
 description: Specialized agent for reviewing code against project guidelines
-model: Claude Haiku 4.5 (copilot)
 tools: [read, search, gitkraken/git_log_or_diff]
 target: vscode
 ---
