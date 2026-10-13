@@ -35,6 +35,6 @@
     "global.d.ts"
   ],
   "exclude": [
-    "scripts"
+    "tools"
   ]
 }

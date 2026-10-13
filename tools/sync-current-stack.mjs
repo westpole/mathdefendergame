@@ -83,7 +83,7 @@ if (updatedInstructionsText === instructionsText) {
 }
 
 if (checkOnly) {
-  process.stdout.write('Current Stack is out of date. Run `node scripts/sync-current-stack.mjs` to update it.\n');
+  process.stdout.write('Current Stack is out of date. Run `node tools/sync-current-stack.mjs` to update it.\n');
   process.exit(1);
 }
 
