@@ -1,4 +1,21 @@
 
+## [1.4.0](https://github.com/westpole/mathdefendergame/compare/v1.3.0...v1.4.0) (2026-10-13)
+
+### Features
+
+* [#70](https://github.com/westpole/mathdefendergame/issues/70) add storybook.css to improve documentation scrolling behavior ([22961b0](https://github.com/westpole/mathdefendergame/commit/22961b0d7ef45bf55e076b254a0cfe3fc2681176))
+* [#84](https://github.com/westpole/mathdefendergame/issues/84) extract setters and data transformers into separate files to reduce prompt context size ([07e2041](https://github.com/westpole/mathdefendergame/commit/07e2041c8dcaba8316650556e6c38c13c5167f41))
+* [#90](https://github.com/westpole/mathdefendergame/issues/90) remove generate-storybook prompt as it is deprecated ([8364e15](https://github.com/westpole/mathdefendergame/commit/8364e1599a6b2a4fdf5d352d91edffecc8f6765d))
+* [#90](https://github.com/westpole/mathdefendergame/issues/90) retire e2e-test prompt as deprecated ([9cbc6f7](https://github.com/westpole/mathdefendergame/commit/9cbc6f7a3ba441832cf9229d49dcb7c5f9bb2730))
+* [#90](https://github.com/westpole/mathdefendergame/issues/90) retire unit test prompt as deprecated ([b212c36](https://github.com/westpole/mathdefendergame/commit/b212c363eb30f536ac4ee3e871f891a89204f03b))
+* [#91](https://github.com/westpole/mathdefendergame/issues/91) update E2E types and enhance visual regression tests with detailed performance metrics ([a83f964](https://github.com/westpole/mathdefendergame/commit/a83f96421da7b4079dd230d341b2251c33168c09))
+* [#91](https://github.com/westpole/mathdefendergame/issues/91) update visual regression tests to include profile and performance screens, and remove deprecated snapshots ([d7e64cb](https://github.com/westpole/mathdefendergame/commit/d7e64cbeef900aea99799ddd9a1a3a325bb86586))
+* [#92](https://github.com/westpole/mathdefendergame/issues/92) update release agent documentation to clarify git worktree checks and add release platforms section ([526937c](https://github.com/westpole/mathdefendergame/commit/526937cf69b3c6057f05ded8ca4633559e7774e1))
+
+### Bug Fixes
+
+* [#99](https://github.com/westpole/mathdefendergame/issues/99) update reports directory structure for unit test outputs ([17ba8d9](https://github.com/westpole/mathdefendergame/commit/17ba8d97b38ffaa7d9cd0733446561c1601cc795))
+
 ## [1.3.0](https://github.com/westpole/mathdefendergame/compare/v1.2.0...v1.3.0) (2026-10-07)
 
 ### Features
