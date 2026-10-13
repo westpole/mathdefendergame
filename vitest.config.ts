@@ -93,7 +93,7 @@ export default defineConfig({
       'html',
     ],
     outputFile: {
-      html: './reports/index.html',
+      html: './reports/unit-tests/index.html',
     },
 
     // 1. GLOBAL COVERAGE MANAGEMENT
@@ -101,7 +101,7 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       enabled: false,
-      reportsDirectory: './reports/coverage',
+      reportsDirectory: './reports/unit-tests/coverage',
       reporter: [
         'text',             // Prints a compact table directly to the console
         'json',             // Outputs data for CI tools (SonarQube, etc.)
