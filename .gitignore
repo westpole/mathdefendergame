@@ -5,7 +5,3 @@ reports
 *storybook.log
 storybook-static
 test-results
-
-release-reports/*
-!release-reports/README.md
-!release-reports/*-template.html
