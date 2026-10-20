@@ -8,7 +8,10 @@ import {
 import type { GameStoreState } from './types';
 
 import { createGameStoreSetters } from './setters/createGameStoreSetters';
-import { migrateProfiles } from './utilities/migrateProfiles';
+import {
+  migrateLegacyProfiles,
+  migrateProfiles,
+} from './utilities/migrateProfiles';
 import { migrateGameHistoryByProfile } from './utilities/migrateGameHistoryByProfile';
 
 export const useGameStore = create<GameStoreState>()(
@@ -19,14 +22,17 @@ export const useGameStore = create<GameStoreState>()(
     }),
     {
       name: leaderboardStorageKey,
-      version: 3,
+      version: 4,
       storage: createJSONStorage(() => localStorage),
-      migrate: (persistedState) => {
+      migrate: (persistedState, persistedVersion) => {
         const rawState = (persistedState ?? {}) as Record<string, unknown>;
+        const profiles =
+          persistedVersion < 4
+            ? migrateLegacyProfiles(rawState.profiles).profiles
+            : migrateProfiles(rawState.profiles);
 
         return {
-          ...rawState,
-          profiles: migrateProfiles(rawState.profiles),
+          profiles,
           gameHistoryByProfile: migrateGameHistoryByProfile(rawState.gameHistoryByProfile),
           rememberedUsername:
             typeof rawState.rememberedUsername === 'string' || rawState.rememberedUsername === null
