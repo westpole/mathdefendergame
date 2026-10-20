@@ -97,6 +97,8 @@ The Zustand persist middleware stores only the durable data needed across sessio
 
 The live run state such as score, stage, lives, shield, input buffer, and overlay messages is intentionally not persisted. This keeps reloads predictable while preserving profile history continuity.
 
+Profile persistence uses a versioned migration step. Starting with persist version `4`, older profile payloads are migrated once from legacy keys (for example `preferredDifficulty`) into the canonical `PlayerProfile` shape, malformed profile entries are dropped, and only the canonical keys are written back.
+
 ### Additional info useful to Copilot
 
 - Keep gameplay logic in `src/game/main.ts` and Phaser rendering in `src/game/scenes/GameScene.ts`; avoid duplicating run-state behavior in the store.
