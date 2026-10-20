@@ -88,7 +88,10 @@ export function migrateLegacyProfiles(rawProfiles: unknown): LegacyProfileMigrat
     }
 
     const profileRecord = profile as Record<string, unknown>;
-    const hasLegacyGradeField = Object.hasOwn(profileRecord, 'preferredDifficulty');
+    const hasLegacyGradeField = Object.prototype.hasOwnProperty.call(
+      profileRecord,
+      'preferredDifficulty',
+    );
 
     if (hasLegacyGradeField) {
       removedLegacyFields += 1;
