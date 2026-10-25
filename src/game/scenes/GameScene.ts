@@ -27,7 +27,9 @@ export class GameScene extends Phaser.Scene {
   private readonly handleKeyDown = (e: KeyboardEvent): void => {
     const isEscapeKey = e.key === 'Escape' || e.key === 'Esc' || e.code === 'Escape';
     if (isEscapeKey) {
-      e.preventDefault();
+      if (typeof e.preventDefault === 'function') {
+        e.preventDefault();
+      }
       this.pauseForManualEndPrompt('escape');
       return;
     }
@@ -63,7 +65,9 @@ export class GameScene extends Phaser.Scene {
       onGameOver: (reason) => this.handleGameOver(reason),
       onShake: () => this.cameras.main.shake(500, 0.01),
     });
-    this.gameLogic.setRunConfig(data?.mode ?? 'regular', data?.practiceOperation ?? '+');
+    if (typeof this.gameLogic.setRunConfig === 'function') {
+      this.gameLogic.setRunConfig(data?.mode ?? 'regular', data?.practiceOperation ?? '+');
+    }
     this.gameLogic.reset(data?.score ?? 0, {
       mode: data?.mode ?? 'regular',
       practiceOperation: data?.practiceOperation ?? '+',
