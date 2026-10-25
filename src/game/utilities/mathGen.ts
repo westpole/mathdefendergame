@@ -12,7 +12,7 @@
 import type { MathExpression, MathOperation } from '@shared/types';
 import { MathTier } from './DDAController';
 
-export function getOperationForStage(stage: number): string[] {
+export function getOperationForStage(stage: number): MathOperation[] {
   if (stage <= 4) return ['+'];
   if (stage <= 8) return ['-'];
   if (stage <= 12) return ['+', '-'];
@@ -26,11 +26,11 @@ function randomInt(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function getCommonOperations(stageOps: string[], tierOps: string[]): string[] {
+function getCommonOperations(stageOps: MathOperation[], tierOps: MathOperation[]): MathOperation[] {
   return stageOps.filter((op) => tierOps.includes(op));
 }
 
-export function getOperationsForTier(mathTier: MathTier): string[] {
+export function getOperationsForTier(mathTier: MathTier): MathOperation[] {
   switch (mathTier) {
     case MathTier.TIER_1_BASIC_ADD_SUB:
       return ['+', '-'];
@@ -45,7 +45,7 @@ export function getOperationsForTier(mathTier: MathTier): string[] {
   }
 }
 
-function generateTwoTermExpression(op: string, mathTier: MathTier): MathExpression {
+function generateTwoTermExpression(op: MathOperation, mathTier: MathTier): MathExpression {
   const maxOperand = mathTier >= MathTier.TIER_2_ADVANCED_ADD_MULT ? 150 : 99;
   let a = 0, b = 0, res = 0;
 
@@ -75,19 +75,19 @@ function generateTwoTermExpression(op: string, mathTier: MathTier): MathExpressi
   return { text: `${a} ${op} ${b}`, answer: res, op };
 }
 
-function generateOrderOfOperationsExpression(stageOps: string[]): MathExpression {
-  const outerOps = getCommonOperations(stageOps, ['+', '-']);
-  const innerOps = getCommonOperations(stageOps, ['*', '/']);
+function generateOrderOfOperationsExpression(stageOps: MathOperation[]): MathExpression {
+  const outerOps: MathOperation[] = getCommonOperations(stageOps, ['+', '-']);
+  const innerOps: MathOperation[] = getCommonOperations(stageOps, ['*', '/']);
 
   // If the stage restrictions do not allow true precedence expressions, fallback.
   if (outerOps.length === 0 || innerOps.length === 0) {
-    const fallbackOps = stageOps;
+    const fallbackOps: MathOperation[] = stageOps;
     const fallbackOp = fallbackOps[Math.floor(Math.random() * fallbackOps.length)] ?? '+';
     return generateTwoTermExpression(fallbackOp, MathTier.TIER_3_DIV_MIXED_DOUBLE);
   }
 
-  const outerOp = outerOps[Math.floor(Math.random() * outerOps.length)];
-  const innerOp = innerOps[Math.floor(Math.random() * innerOps.length)];
+  const outerOp: MathOperation = outerOps[Math.floor(Math.random() * outerOps.length)] ?? '+';
+  const innerOp: MathOperation = innerOps[Math.floor(Math.random() * innerOps.length)] ?? '*';
 
   const a = randomInt(10, 99);
   let b = 0;
