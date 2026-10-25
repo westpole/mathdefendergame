@@ -10,6 +10,7 @@ import Phaser from 'phaser';
 
 import { useGameStore } from '@store/useGameStore';
 import type { ScreenView, PauseOverlayReason } from '@store/types';
+import type { GameMode, PracticeOperation } from '@shared/types';
 import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
 import { notifyAppCloseCancelled, notifyAppCloseReady } from '../../platform/adapter';
 
@@ -57,20 +58,40 @@ export function destroyGame(game: Phaser.Game): void {
   phaserGame = null;
 }
 
-export function startGame(): void {
+export function startGame(config?: { mode?: GameMode; practiceOperation?: PracticeOperation }): void {
   const game = ensurePhaserGame();
   const state = useGameStore.getState();
+  const mode = config?.mode ?? state.runMode ?? 'regular';
+  const practiceOperation = config?.practiceOperation ?? state.practiceOperation ?? '+';
   const startingScore = Math.max(0, state.score);
   const startingGrade = resolveGradeFromScore(startingScore);
 
   state.setGrade(startingGrade);
-  state.startPlaying();
+  if (typeof state.startRegularPlay === 'function') {
+    state.startRegularPlay();
+  }
+  if (mode === 'practice' && typeof state.startPracticePlay === 'function') {
+    state.startPracticePlay(practiceOperation);
+  }
+  if (typeof state.startPlaying === 'function') {
+    state.startPlaying();
+  }
 
   if (game.scene.isActive('GameScene') || game.scene.isPaused('GameScene')) {
     game.scene.stop('GameScene');
   }
 
-  game.scene.start('GameScene', { grade: startingGrade, score: startingScore });
+  const sceneData: { grade: string; score: number; mode?: GameMode; practiceOperation?: PracticeOperation } = {
+    grade: startingGrade,
+    score: startingScore,
+  };
+
+  if (mode !== 'regular' || practiceOperation !== '+') {
+    sceneData.mode = mode;
+    sceneData.practiceOperation = practiceOperation;
+  }
+
+  game.scene.start('GameScene', sceneData);
 }
 
 export function continueGame(): void {

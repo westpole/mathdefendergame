@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
@@ -24,151 +24,60 @@ describe('HomeOverlay', () => {
     vi.useRealTimers();
   });
 
-  it('renders the weekly report and all-time grade progress', () => {
+  it('renders the home launch tiles and default practice operation selector', () => {
     setMockStoreState({
       activeUsername: 'AcePilot',
       bootReady: true,
       grade: 'cadet',
-      screenView: 'home',
       phase: 'start',
-      gameHistoryByProfile: {
-        AcePilot: [
-          {
-            key: 'recent-1',
-            playedAt: Date.parse('2026-08-30T12:00:00.000Z'),
-            correctAnswers: 12,
-            incorrectAnswers: 3,
-            averageAnswerTimeMs: 1000,
-            mostProblematicOperation: '-',
-            operationStats: {
-              '+': { attempts: 4, incorrect: 0, avgTimeMs: 900 },
-              '-': { attempts: 4, incorrect: 2, avgTimeMs: 1100 },
-              '*': { attempts: 4, incorrect: 1, avgTimeMs: 1050 },
-              '/': { attempts: 3, incorrect: 0, avgTimeMs: 950 },
-            },
-            gradeAtFinish: 'cadet',
-            finalScore: 150,
-            finalPerfScore: 80,
-          },
-          {
-            key: 'recent-2',
-            playedAt: Date.parse('2026-08-26T12:00:00.000Z'),
-            correctAnswers: 18,
-            incorrectAnswers: 2,
-            averageAnswerTimeMs: 950,
-            mostProblematicOperation: '+',
-            operationStats: {
-              '+': { attempts: 5, incorrect: 0, avgTimeMs: 850 },
-              '-': { attempts: 5, incorrect: 1, avgTimeMs: 980 },
-              '*': { attempts: 5, incorrect: 1, avgTimeMs: 970 },
-              '/': { attempts: 5, incorrect: 0, avgTimeMs: 1000 },
-            },
-            gradeAtFinish: 'cadet',
-            finalScore: 120,
-            finalPerfScore: 90,
-          },
-          {
-            key: 'older',
-            playedAt: Date.parse('2026-08-10T12:00:00.000Z'),
-            correctAnswers: 20,
-            incorrectAnswers: 10,
-            averageAnswerTimeMs: 1500,
-            mostProblematicOperation: '*',
-            operationStats: {
-              '+': { attempts: 10, incorrect: 2, avgTimeMs: 1300 },
-              '-': { attempts: 8, incorrect: 4, avgTimeMs: 1400 },
-              '*': { attempts: 7, incorrect: 3, avgTimeMs: 1700 },
-              '/': { attempts: 5, incorrect: 1, avgTimeMs: 1600 },
-            },
-            gradeAtFinish: 'cadet',
-            finalScore: 95,
-            finalPerfScore: 66,
-          },
-        ],
-      },
+      practiceOperation: '+',
     });
 
     render(<HomeOverlay />);
 
-    expect(screen.getByTestId('home-weekly-report')).toBeVisible();
-    expect(screen.queryByTestId('start-defense-button')).not.toBeInTheDocument();
-    expect(screen.getByText('Weekly Progress Report')).toBeInTheDocument();
-    expect(screen.getByText('Commander on duty')).toBeInTheDocument();
-    expect(screen.getByText('2')).toBeInTheDocument();
-    expect(screen.getByText('270')).toBeInTheDocument();
-    expect(screen.getByText('86%')).toBeInTheDocument();
-    expect(screen.getByText('386 pts to next grade')).toBeInTheDocument();
+    expect(screen.getByTestId('main-menu')).toBeVisible();
+    expect(screen.getByTestId('home-mode-select')).toBeVisible();
+    expect(screen.getByTestId('home-practice-controls')).toBeVisible();
+    expect(screen.getByTestId('home-regular-play-tile')).toBeVisible();
+    expect(screen.getByTestId('home-practice-tile')).toBeVisible();
+    expect(screen.queryByText(/Mission Control/i)).not.toBeInTheDocument();
+    expect(screen.getByTestId('practice-operation-+')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('practice-operation-*')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('home-practice-start-button')).toBeVisible();
   });
 
-  it('shows an empty weekly state when no recent runs are available', () => {
+  it('allows the practice operation to be switched before starting the drill', () => {
     setMockStoreState({
       activeUsername: 'AcePilot',
       bootReady: true,
       grade: 'cadet',
-      screenView: 'home',
       phase: 'start',
-      gameHistoryByProfile: {
-        AcePilot: [
-          {
-            key: 'older',
-            playedAt: Date.parse('2026-08-01T12:00:00.000Z'),
-            correctAnswers: 10,
-            incorrectAnswers: 2,
-            averageAnswerTimeMs: 1200,
-            mostProblematicOperation: '+',
-            operationStats: {
-              '+': { attempts: 3, incorrect: 1, avgTimeMs: 1000 },
-              '-': { attempts: 3, incorrect: 0, avgTimeMs: 1200 },
-              '*': { attempts: 3, incorrect: 1, avgTimeMs: 1300 },
-              '/': { attempts: 3, incorrect: 0, avgTimeMs: 1250 },
-            },
-            gradeAtFinish: 'cadet',
-            finalScore: 125,
-            finalPerfScore: 83,
-          },
-        ],
-      },
+      practiceOperation: '+',
     });
 
     render(<HomeOverlay />);
 
-    expect(screen.getByTestId('home-weekly-empty-state')).toBeVisible();
-    expect(screen.getByText(/no completed runs in the last 7 days/i)).toBeInTheDocument();
-    expect(screen.getByText('226 pts to next grade')).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId('practice-operation-*'));
+
+    expect(screen.getByTestId('practice-operation-*')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByTestId('practice-operation-+')).toHaveAttribute('aria-pressed', 'false');
+    expect(useGameStore.getState().practiceOperation).toBe('*');
   });
 
-  it('renders the career-complete panel when the player has maxed out their grade', () => {
+  it('keeps the home screen available without weekly report content', () => {
     setMockStoreState({
       activeUsername: 'AcePilot',
       bootReady: true,
       grade: 'major-general',
-      screenView: 'home',
       phase: 'start',
-      gameHistoryByProfile: {
-        AcePilot: [
-          {
-            key: 'recent',
-            playedAt: Date.parse('2026-08-30T12:00:00.000Z'),
-            correctAnswers: 20,
-            incorrectAnswers: 2,
-            averageAnswerTimeMs: 900,
-            mostProblematicOperation: '+',
-            operationStats: {
-              '+': { attempts: 10, incorrect: 0, avgTimeMs: 900 },
-              '-': { attempts: 6, incorrect: 1, avgTimeMs: 1000 },
-              '*': { attempts: 6, incorrect: 1, avgTimeMs: 980 },
-              '/': { attempts: 6, incorrect: 0, avgTimeMs: 950 },
-            },
-            gradeAtFinish: 'major-general',
-            finalScore: 2200,
-            finalPerfScore: 95,
-          },
-        ],
-      },
     });
 
     render(<HomeOverlay />);
 
-    expect(screen.getByText(/lifetime points secured/i)).toBeInTheDocument();
+    expect(screen.queryByTestId('home-weekly-report')).not.toBeInTheDocument();
+    expect(screen.getByTestId('home-regular-play-button')).toBeVisible();
+    expect(screen.getByTestId('home-practice-start-button')).toBeVisible();
+    expect(screen.queryByText(/Mission Control/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Major General/i)).not.toBeInTheDocument();
   });
 });

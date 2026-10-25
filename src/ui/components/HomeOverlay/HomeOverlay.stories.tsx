@@ -7,11 +7,7 @@ import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
-import emptyWeekMock from './__mocks__/empty-week.json';
-import weeklyProgressMock from './__mocks__/weekly-progress.json';
 import { HomeOverlay } from '.';
-
-const STORY_NOW = Date.UTC(2026, 7, 31, 12, 0, 0);
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
@@ -30,19 +26,12 @@ const meta = {
       const { initialState, frame } = context.args as StoryArgs;
 
       useEffect(() => {
-        const originalDateNow = Date.now;
-
-        Date.now = () => STORY_NOW;
         useGameStore.setState({
           ...baseStoreState,
           ...initialState,
           profiles: initialState.profiles ?? baseStoreState.profiles,
           gameHistoryByProfile: initialState.gameHistoryByProfile ?? baseStoreState.gameHistoryByProfile,
         });
-
-        return () => {
-          Date.now = originalDateNow;
-        };
       }, [initialState]);
 
       return (
@@ -59,23 +48,38 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
-  name: 'Weekly progress available',
+  name: 'Default home launch',
   args: {
-    initialState: weeklyProgressMock,
+    initialState: {
+      activeUsername: 'AcePilot',
+      grade: 'cadet',
+      phase: 'start',
+      practiceOperation: '+',
+    },
   },
 };
 
-export const EmptyWeek: Story = {
-  name: 'No weekly activity',
+export const PracticeOperationSelected: Story = {
+  name: 'Practice mode operation selected',
   args: {
-    initialState: emptyWeekMock,
+    initialState: {
+      activeUsername: 'AcePilot',
+      grade: 'commander',
+      phase: 'start',
+      practiceOperation: '*',
+    },
   },
 };
 
-export const MobileWeeklyProgress: Story = {
-  name: 'Mobile weekly progress',
+export const MobileLayout: Story = {
+  name: 'Mobile home layout',
   args: {
     frame: popularMobileStoryFrame,
-    initialState: weeklyProgressMock,
+    initialState: {
+      activeUsername: 'AcePilot',
+      grade: 'cadet',
+      phase: 'start',
+      practiceOperation: '/',
+    },
   },
 };

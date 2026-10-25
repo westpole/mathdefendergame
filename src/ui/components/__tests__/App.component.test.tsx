@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
@@ -113,7 +113,7 @@ describe('App start menu controls', () => {
     expect(screen.queryByTestId('login-screen')).not.toBeInTheDocument();
   });
 
-  it('opens the React menu and routes menu selections through UIScene', () => {
+  it('opens the React menu and routes menu selections through UIScene', async () => {
     act(() => {
       setMockStoreState({
         activeUsername: 'AcePilot',
@@ -133,7 +133,9 @@ describe('App start menu controls', () => {
 
     fireEvent.click(screen.getByTestId('menu-option-profile'));
 
-    expect(uiSceneMocks.openScreenView).toHaveBeenCalledWith('profile');
+    await waitFor(() => {
+      expect(uiSceneMocks.openScreenView).toHaveBeenCalledWith('profile');
+    });
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
@@ -158,7 +160,7 @@ describe('App start menu controls', () => {
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
-  it('routes the Home menu option back to the Home overlay', () => {
+  it('routes the Home menu option back to the Home overlay', async () => {
     act(() => {
       setMockStoreState({
         activeUsername: 'AcePilot',
@@ -173,12 +175,14 @@ describe('App start menu controls', () => {
     fireEvent.click(screen.getByTestId('menu-toggle-button'));
     fireEvent.click(screen.getByTestId('menu-option-home'));
 
-    expect(uiSceneMocks.openScreenView).toHaveBeenCalledWith('home');
+    await waitFor(() => {
+      expect(uiSceneMocks.openScreenView).toHaveBeenCalledWith('home');
+    });
     expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
-  it('starts the game from the start menu play action', () => {
+  it('starts the game from the start menu play action', async () => {
     act(() => {
       setMockStoreState({
         activeUsername: 'AcePilot',
@@ -192,12 +196,14 @@ describe('App start menu controls', () => {
     fireEvent.click(screen.getByTestId('menu-toggle-button'));
     fireEvent.click(screen.getByTestId('menu-option-play'));
 
-    expect(uiSceneMocks.startGame).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(uiSceneMocks.startGame).toHaveBeenCalledTimes(1);
+    });
     expect(uiSceneMocks.openScreenView).not.toHaveBeenCalledWith('home');
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
-  it('routes the Log off menu option through UIScene', () => {
+  it('routes the Log off menu option through UIScene', async () => {
     act(() => {
       setMockStoreState({
         activeUsername: 'AcePilot',
@@ -211,7 +217,9 @@ describe('App start menu controls', () => {
     fireEvent.click(screen.getByTestId('menu-toggle-button'));
     fireEvent.click(screen.getByTestId('menu-option-logoff'));
 
-    expect(uiSceneMocks.logOff).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(uiSceneMocks.logOff).toHaveBeenCalledTimes(1);
+    });
     expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
     expect(uiSceneMocks.openScreenView).not.toHaveBeenCalled();
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();

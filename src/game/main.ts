@@ -8,6 +8,7 @@
 import { useGameStore } from '@store/useGameStore';
 import type {
   GameHistoryEntry,
+  GameMode,
   GameOverReason,
   GameState,
   Grade,
@@ -15,6 +16,7 @@ import type {
   Meteor,
   OperationHistoryStat,
   Particle,
+  PracticeOperation,
 } from '@shared/types';
 import { isFeatureEnabled } from '@shared/featureFlags';
 
@@ -107,6 +109,8 @@ export class Game {
   score: number = 0;
   stage: number = 1;
   stageScore: number = 0;
+  mode: GameMode = 'regular';
+  practiceOperation: PracticeOperation = '+';
 
   grade: Grade = 'trainee';
   canvasWidth: number = GAME_CONFIG.CANVAS_WIDTH;
@@ -154,9 +158,11 @@ export class Game {
     this.applyGradeBaseline(grade);
   }
 
-  reset(startingScore = 0): void {
+  reset(startingScore = 0, config?: { mode?: GameMode; practiceOperation?: PracticeOperation }): void {
     const storeState = useGameStore.getState();
 
+    this.mode = config?.mode ?? this.mode ?? 'regular';
+    this.practiceOperation = config?.practiceOperation ?? this.practiceOperation ?? '+';
     this.lives = GAME_CONFIG.initialLives;
     this.shield = GAME_CONFIG.stageShieldMax;
     this.score = Math.max(0, startingScore);
@@ -197,9 +203,18 @@ export class Game {
     this.canvasHeight = height;
   }
 
+  setRunConfig(mode: GameMode, practiceOperation: PracticeOperation = '+'): void {
+    this.mode = mode;
+    this.practiceOperation = practiceOperation;
+  }
+
   spawnMeteor(): void {
     const difficultyState = this.dda.getDifficultyState();
-    const expr = generateMath(this.stage, difficultyState.mathTier);
+    const expr = generateMath(
+      this.stage,
+      difficultyState.mathTier,
+      this.mode === 'practice' ? this.practiceOperation : undefined,
+    );
     const horizontalPadding = getMeteorSpawnPadding(this.canvasWidth);
     const playableWidth = Math.max(1, this.canvasWidth - horizontalPadding * 2);
 
@@ -299,7 +314,7 @@ export class Game {
 
       let streakRewardTriggered = false;
 
-      if (isFeatureEnabled(STREAK_REWARD_FLAG) && this.streak >= 30) {
+      if (this.mode !== 'practice' && isFeatureEnabled(STREAK_REWARD_FLAG) && this.streak >= 30) {
         this.lives += 1;
         this.streak = 0;
         streakRewardTriggered = true;
@@ -360,6 +375,32 @@ export class Game {
     this.cb.onHUDUpdate();
     this.syncStore();
 
+    if (this.mode === 'practice') {
+      if (this.lives <= 0) {
+        this.lives = GAME_CONFIG.initialLives;
+        this.shield = GAME_CONFIG.stageShieldMax;
+        this.stage = 1;
+        this.stageScore = 0;
+        this.stageIncorrect = 0;
+        this.stageCorrect = 0;
+        this.streak = 0;
+        this.meteors = [];
+        this.particles = [];
+        this.inputBuffer = '';
+        this.dda = new DDAController(getDDAConfigForGrade(this.grade));
+        this.scoreAtStageStart = this.score;
+        this.livesAtStageStart = this.lives;
+        this.captureStageCheckpoint();
+        this.state = 'playing';
+        this.cb.onHUDUpdate();
+        this.syncStore();
+        return;
+      }
+
+      this.finishStage(false);
+      return;
+    }
+
     if (this.lives <= 0) {
       this.pendingGameOver = true;
       this.pendingGameOverReason = 'lives-depleted';
@@ -390,6 +431,10 @@ export class Game {
       this.scoreAtStageStart = this.score;
       this.livesAtStageStart = this.lives;
       this.captureStageCheckpoint();
+
+      if (this.mode === 'practice') {
+        return;
+      }
 
       if (this.stage > 28) {
         // Pre-calculate final score; let continueFromMessage handle the transition
@@ -660,9 +705,9 @@ export class Game {
       gradeAtFinish: this.grade,
       finalScore: this.score,
       finalPerfScore: this.finalPerfScore,
+      mode: this.mode,
     };
   }
-
   private captureStageCheckpoint(): void {
     this.correctCountAtStageStart = this.correctCount;
     this.incorrectCountAtStageStart = this.incorrectCount;

@@ -1,9 +1,12 @@
+export type GameMode = 'regular' | 'practice';
+export type PracticeOperation = '+' | '-' | '*' | '/';
+
 export interface Meteor {
   x: number;
   y: number;
   text: string;
   answer: number;
-  op: string;
+  op: MathOperation;
   speed: number;
   id: number;
   spawnTimeMs: number;
@@ -21,10 +24,10 @@ export interface Particle {
 export interface MathExpression {
   text: string;
   answer: number;
-  op: string;
+  op: MathOperation;
 }
 
-export type MathOperation = '+' | '-' | '*' | '/';
+export type MathOperation = PracticeOperation;
 
 export interface OperationHistoryStat {
   attempts: number;
@@ -43,6 +46,7 @@ export interface GameHistoryEntry {
   gradeAtFinish: Grade;
   finalScore: number;
   finalPerfScore: number;
+  mode?: GameMode;
 }
 
 export type Grade = 'trainee' | 'cadet' | 'commander' | 'major-general';

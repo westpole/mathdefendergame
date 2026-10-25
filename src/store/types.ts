@@ -3,10 +3,12 @@ import type {
   Grade,
   DDAMathTier,
   DDAHeatState,
+  GameMode,
+  PracticeOperation,
 } from '@shared/types';
 
 export type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'paused' | 'stage-message' | 'gameover';
-export type ScreenView = 'home' | 'profile' | 'performance' | 'rules';
+export type ScreenView = 'home' | 'profile' | 'performance' | 'rules' | 'weekly-report';
 export type HistoryByProfile = Record<string, GameHistoryEntry[]>;
 export type PauseOverlayReason = 'escape' | 'window-close' | 'background';
 
@@ -52,6 +54,8 @@ export interface PrematureGameEndPayload {
 export interface GameStoreState {
   phase: OverlayPhase;
   screenView: ScreenView;
+  runMode: GameMode;
+  practiceOperation: PracticeOperation;
   bootReady: boolean;
   activeUsername: string | null;
   rememberedUsername: string | null;
@@ -77,6 +81,9 @@ export interface GameStoreState {
   gameHistoryByProfile: HistoryByProfile;
   markBootReady: () => void;
   setGrade: (grade: Grade) => void;
+  selectPracticeOperation: (operation: PracticeOperation) => void;
+  startRegularPlay: () => void;
+  startPracticePlay: (operation?: PracticeOperation) => void;
   syncHUD: (payload: Partial<Pick<GameStoreState, 'grade' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'inputBuffer' | 'correctCount' | 'incorrectCount' | 'streak' | 'finalPerfScore' | 'ddaHeatState' | 'ddaMathTier' | 'ddaSpeedMultiplier' | 'ddaIsCooloffActive'>>) => void;
   showStageMessage: (payload: StageMessageState) => void;
   showStreakRewardMessage: (payload: StreakRewardMessageState) => void;
