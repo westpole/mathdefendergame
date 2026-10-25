@@ -16,6 +16,8 @@ import type {
 export const initialState = {
   phase: 'booting' as OverlayPhase,
   screenView: 'home' as ScreenView,
+  runMode: 'regular' as const,
+  practiceOperation: '+' as const,
   bootReady: false,
   activeUsername: null as string | null,
   rememberedUsername: null as string | null,

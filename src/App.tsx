@@ -24,6 +24,7 @@ import { GameBgLayout } from '@ui/components/GameBgLayout';
 import { LoginOverlay } from '@ui/components/LoginOverlay';
 import { MenuControls } from '@ui/components/MenuControls';
 import { ProfileSelector } from '@ui/components/ProfileSelector';
+import { WeeklyReportOverlay } from '@ui/components/WeeklyReportOverlay';
 import { isFeatureEnabled } from '@shared/featureFlags';
 
 export function App() {
@@ -74,6 +75,7 @@ export function App() {
         {isStartPhase && screenView === 'profile' && <ProfileOverlay />}
         {isStartPhase && screenView === 'performance' && <PerformanceOverlay />}
         {isStartPhase && screenView === 'rules' && <RulesOverlay />}
+        {isStartPhase && screenView === 'weekly-report' && <WeeklyReportOverlay />}
         {isStartPhase && <MenuControls />}
         {bootReady && phase === 'playing' && <HUDOverlay />}
         {bootReady && phase === 'paused' && <PauseOverlay />}

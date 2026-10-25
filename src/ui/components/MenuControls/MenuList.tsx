@@ -1,9 +1,10 @@
 import { useGameStore } from '@store/useGameStore';
-import { logOff, openScreenView, startGame } from '@game/scenes/UIScene';
 
 const menuItems = [
   { id: 'home', label: 'Home', type: 'view', view: 'home' },
-  { id: 'play', label: 'Play Game', type: 'start' },
+  { id: 'play', label: 'Regular Play', type: 'start', mode: 'regular' },
+  { id: 'practice', label: 'Practice Mode', type: 'start', mode: 'practice' },
+  { id: 'weekly-report', label: 'Weekly Report', type: 'view', view: 'weekly-report' },
   { id: 'profile', label: 'Profile', type: 'view', view: 'profile' },
   { id: 'performance', label: 'Performance', type: 'view', view: 'performance' },
   { id: 'rules', label: 'Rules', type: 'view', view: 'rules' },
@@ -24,21 +25,27 @@ interface MenuListProps {
  */
 export function MenuList({ setIsOpen }: MenuListProps) {
   const activeView = useGameStore((state) => state.screenView);
+  const practiceOperation = useGameStore((state) => state.practiceOperation);
 
   const handleMenuSelect = (item: (typeof menuItems)[number]) => {
     if (item.type === 'start') {
-      startGame();
+      void import('@game/scenes/UIScene').then(({ startGame }) => {
+        startGame({
+          mode: item.mode ?? 'regular',
+          practiceOperation: item.mode === 'practice' ? practiceOperation : undefined,
+        });
+      });
       setIsOpen(false);
       return;
     }
 
     if (item.type === 'logoff') {
-      logOff();
+      void import('@game/scenes/UIScene').then(({ logOff }) => logOff());
       setIsOpen(false);
       return;
     }
 
-    openScreenView(item.view);
+    void import('@game/scenes/UIScene').then(({ openScreenView }) => openScreenView(item.view));
     setIsOpen(false);
   };
 

@@ -64,6 +64,9 @@ export function createGameStoreSetters(
 ): Pick<GameStoreState,
   | 'markBootReady'
   | 'setGrade'
+  | 'selectPracticeOperation'
+  | 'startRegularPlay'
+  | 'startPracticePlay'
   | 'syncHUD'
   | 'showStageMessage'
   | 'showStreakRewardMessage'
@@ -86,6 +89,9 @@ export function createGameStoreSetters(
   | 'getGameHistory'
 > {
   return {
+    selectPracticeOperation: (operation) => set({ practiceOperation: operation }),
+    startRegularPlay: () => set({ runMode: 'regular' }),
+    startPracticePlay: (operation = get().practiceOperation) => set({ runMode: 'practice', practiceOperation: operation }),
     markBootReady: () => {
       const rememberedUsername = get().rememberedUsername;
 

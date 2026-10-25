@@ -1,118 +1,90 @@
 import { useState } from 'react';
 
-import { selectActiveProfileHistory } from '@store/selectors/performance';
-import { buildGradeProgressSummary, buildWeeklyProgressReport } from '@store/selectors/progress';
 import { useGameStore } from '@store/useGameStore';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
 
-import { formatShortDate, formatScore, formatAccuracy, toGradeTitle } from './utilities';
+import { toGradeTitle } from './utilities';
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+const PRACTICE_OPERATIONS = ['+', '-', '*', '/'] as const;
 
 /**
- * Renders the home dashboard with the active profile, weekly summary, and grade progress.
- *
- * @returns The interactive home overlay showing historical progress and status for the current player.
+ * Renders the home dashboard with quick-mode launch tiles for regular play and practice mode.
  */
 export function HomeOverlay() {
   const activeUsername = useGameStore((state) => state.activeUsername);
   const grade = useGameStore((state) => state.grade);
-  const phase = useGameStore((state) => state.phase);
-  const score = useGameStore((state) => state.score);
-  const history = useGameStore(selectActiveProfileHistory);
+  const practiceOperation = useGameStore((state) => state.practiceOperation);
+  const selectPracticeOperation = useGameStore((state) => state.selectPracticeOperation);
+
   const [now] = useState(() => Date.now());
-  const weeklyReport = buildWeeklyProgressReport(history, now);
-  const progress = buildGradeProgressSummary({
-    currentScore: score,
-    grade,
-    history,
-    phase,
-  });
-  const displayGrade = progress.effectiveGrade;
-  const weekWindowLabel = `${formatShortDate(now - (6 * DAY_MS))} - ${formatShortDate(now)}`;
-  const hasWeeklyProgress = weeklyReport.runsCompleted > 0;
+
+  const handleStartRegularPlay = () => {
+    void import('@game/scenes/UIScene').then(({ startGame }) => startGame({ mode: 'regular' }));
+  };
+
+  const handleStartPracticeMode = () => {
+    void import('@game/scenes/UIScene').then(({ startGame }) => {
+      startGame({ mode: 'practice', practiceOperation });
+    });
+  };
 
   return (
     <div className="overlay-screen overlay-screen--interactive" data-testid="main-menu">
-      <div className="overlay-panel home-report-panel" data-testid="home-weekly-report">
+      <div className="overlay-panel home-report-panel" data-testid="home-mode-select">
         <div className="home-report-header">
           <ProfileIcon label={`${toGradeTitle(grade)} icon`} size={120} />
 
           <div className="home-report-copy">
-            <p className="home-report-eyebrow">Weekly Progress Report</p>
+            <p className="home-report-eyebrow">Mission Control</p>
             <h1>{activeUsername ?? 'Ghost'}</h1>
-            <h4 className="menu-subtitle">{toGradeTitle(displayGrade)} on duty</h4>
-            <p className="home-report-window">{weekWindowLabel}</p>
+            <h4 className="menu-subtitle">{toGradeTitle(grade)} on duty</h4>
+            <p className="home-report-window">{new Date(now).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</p>
           </div>
         </div>
 
-        {hasWeeklyProgress ? (
-          <div className="home-report-stat-grid" aria-label="Weekly summary">
-            <div className="home-report-stat-card">
-              <span className="home-report-stat-label">Runs Completed</span>
-              <strong>{weeklyReport.runsCompleted}</strong>
-            </div>
-            <div className="home-report-stat-card">
-              <span className="home-report-stat-label">Score Earned</span>
-              <strong>{formatScore(weeklyReport.scoreEarned)}</strong>
-            </div>
-            <div className="home-report-stat-card">
-              <span className="home-report-stat-label">Avg Accuracy</span>
-              <strong>{formatAccuracy(weeklyReport.averageAccuracy)}</strong>
-            </div>
-          </div>
-        ) : (
-          <div className="home-report-empty-state" data-testid="home-weekly-empty-state" role="status">
-            No completed runs in the last 7 days. Use Menu and choose Play Game to start a fresh report.
-          </div>
-        )}
+        <div className="home-quick-actions" data-testid="home-practice-controls">
+          <article className="home-mode-tile" data-testid="home-regular-play-tile">
+            <h2>Regular Play</h2>
+            <p>Campaign defense runs with the normal stage flow.</p>
+            <button
+              type="button"
+              data-testid="home-regular-play-button"
+              className="secondary-button"
+              onClick={handleStartRegularPlay}
+            >
+              Start Regular Play
+            </button>
+          </article>
 
-        <section className="home-report-progress-section" aria-label="Grade progress">
-          <div className="home-report-progress-header">
-            <div>
-              <h2>Grade Progress</h2>
-              <p className="home-report-progress-note">
-                Weekly recap, lifetime promotion track.
-              </p>
+          <article className="home-mode-tile" data-testid="home-practice-tile">
+            <h2>Practice Mode</h2>
+            <p>Train one operation at a time without a campaign cap.</p>
+
+            <div className="practice-operation-picker" aria-label="Practice operation selector">
+              {PRACTICE_OPERATIONS.map((operation) => (
+                <button
+                  key={operation}
+                  type="button"
+                  className={operation === practiceOperation ? 'practice-operation-button practice-operation-button--active' : 'practice-operation-button'}
+                  data-testid={`practice-operation-${operation}`}
+                  onClick={() => selectPracticeOperation(operation)}
+                  aria-pressed={operation === practiceOperation}
+                >
+                  {operation}
+                </button>
+              ))}
             </div>
-            <strong className="home-report-progress-score">{formatScore(progress.progressScore)} pts</strong>
-          </div>
 
-          {progress.nextGrade ? (
-            <>
-              <div className="profile-progress-labels home-report-progress-labels">
-                <span>{formatScore(progress.currentThreshold)}</span>
-                <span>Next {toGradeTitle(progress.nextGrade)}</span>
-                <span>{formatScore(progress.nextThreshold ?? progress.currentThreshold)}</span>
-              </div>
-
-              <div className="profile-progress-bar home-report-progress-bar">
-                <div
-                  className={`profile-progress-fill home-report-progress-fill home-report-progress-fill--${displayGrade}`}
-                  style={{ width: `${progress.progressRatio * 100}%` }}
-                />
-                <div
-                  className={`profile-progress-marker home-report-progress-marker home-report-progress-marker--${displayGrade}`}
-                  style={{ left: `${progress.progressRatio * 100}%` }}
-                />
-              </div>
-
-              <div className="profile-points-remaining home-report-points-remaining">
-                {formatScore(progress.pointsLeft)} pts to next grade
-              </div>
-            </>
-          ) : (
-            <div className="profile-major-general-box home-report-major-general-box">
-              {formatScore(progress.progressScore)} lifetime points secured
-            </div>
-          )}
-
-          {weeklyReport.latestRunAt ? (
-            <p className="home-report-latest-run">
-              Last recorded defense: {formatShortDate(weeklyReport.latestRunAt)}
-            </p>
-          ) : null}
-        </section>
+            <button
+              type="button"
+              data-testid="home-practice-start-button"
+              className="secondary-button"
+              onClick={handleStartPracticeMode}
+            >
+              Start Practice Mode
+            </button>
+          </article>
+        </div>
       </div>
     </div>
   );

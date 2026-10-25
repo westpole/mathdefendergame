@@ -4,6 +4,7 @@
  */
 import { generateMath, getOperationForStage, getOperationsForTier } from '../mathGen';
 import { MathTier } from '../DDAController';
+import type { MathOperation } from '@shared/types';
 
 function evaluateExpression(text: string): number {
   const tokens = text.trim().split(' ');
@@ -162,6 +163,30 @@ describe('MathGen', () => {
     it('should fallback to valid stage operation when tier 4 is requested early', () => {
       const result = generateMath(1, MathTier.TIER_4_ORDER_OF_OPERATIONS);
       expect(result.op).toBe('+');
+      expect(evaluateExpression(result.text)).toBe(result.answer);
+    });
+
+    it.each([
+      ['+', '+'],
+      ['-', '-'],
+      ['*', '*'],
+      ['/', '/'],
+    ] as const)('locks to forced %s operation regardless of stage unlocks', (forcedOperation, expectedOp) => {
+      const result = generateMath(1, MathTier.TIER_1_BASIC_ADD_SUB, forcedOperation);
+
+      expect(result.op).toBe(expectedOp);
+      expect(result.text.split(' ')).toContain(expectedOp);
+      expect(evaluateExpression(result.text)).toBe(result.answer);
+    });
+
+    it('locks to forced operation even when tier 4 is active', () => {
+      const forcedOperation: MathOperation = '*';
+      const result = generateMath(25, MathTier.TIER_4_ORDER_OF_OPERATIONS, forcedOperation);
+      const tokens = result.text.split(' ');
+
+      expect(result.op).toBe(forcedOperation);
+      expect(tokens).toHaveLength(3);
+      expect(tokens[1]).toBe(forcedOperation);
       expect(evaluateExpression(result.text)).toBe(result.answer);
     });
   });

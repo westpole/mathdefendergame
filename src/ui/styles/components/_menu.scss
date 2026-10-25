@@ -141,6 +141,64 @@
   border-radius: 50%;
 }
 
+.home-quick-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: $spacing-md;
+}
+
+.home-mode-tile {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-lg;
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-lg;
+  background: rgba(15, 23, 42, 0.28);
+
+  h2 {
+    margin: 0;
+    color: $text-primary;
+    font-size: 1.1rem;
+  }
+
+  p {
+    margin: 0;
+    color: $text-secondary;
+    line-height: 1.5;
+  }
+}
+
+.practice-operation-picker {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.practice-operation-button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid $border-panel-light;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.25);
+  color: $text-primary;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+    transform: translateY(-1px);
+  }
+}
+
+.practice-operation-button--active {
+  border-color: $color-primary-yellow;
+  background: rgba(250, 204, 21, 0.18);
+  box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.28);
+}
+
 .home-report-panel {
   width: min(100%, 760px);
   display: flex;

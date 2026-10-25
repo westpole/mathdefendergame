@@ -11,7 +11,7 @@ import { Game } from '@game/main';
 import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
 import type { PauseOverlayReason } from '@store/types';
-import type { GameOverReason, Grade } from '@shared/types';
+import type { GameMode, GameOverReason, Grade, PracticeOperation } from '@shared/types';
 import { notifyAppCloseReady } from '../../platform/adapter';
 
 function colorToInt(hex: string): number {
@@ -25,7 +25,9 @@ export class GameScene extends Phaser.Scene {
   private particleGraphics!: Phaser.GameObjects.Graphics;
   private streakRewardTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly handleKeyDown = (e: KeyboardEvent): void => {
-    if (e.key === 'Escape') {
+    const isEscapeKey = e.key === 'Escape' || e.key === 'Esc' || e.code === 'Escape';
+    if (isEscapeKey) {
+      e.preventDefault();
       this.pauseForManualEndPrompt('escape');
       return;
     }
@@ -53,7 +55,7 @@ export class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
-  init(data?: { grade?: Grade; score?: number }): void {
+  init(data?: { grade?: Grade; score?: number; mode?: GameMode; practiceOperation?: PracticeOperation }): void {
     this.gameLogic = new Game({
       onHUDUpdate: () => this.updateHUD(),
       onFinishStage: (success) => this.handleFinishStage(success),
@@ -61,7 +63,11 @@ export class GameScene extends Phaser.Scene {
       onGameOver: (reason) => this.handleGameOver(reason),
       onShake: () => this.cameras.main.shake(500, 0.01),
     });
-    this.gameLogic.reset(data?.score ?? 0);
+    this.gameLogic.setRunConfig(data?.mode ?? 'regular', data?.practiceOperation ?? '+');
+    this.gameLogic.reset(data?.score ?? 0, {
+      mode: data?.mode ?? 'regular',
+      practiceOperation: data?.practiceOperation ?? '+',
+    });
     this.gameLogic.setGrade(data?.grade ?? 'trainee');
     this.gameLogic.state = 'playing';
     this.gameLogic.lastSpawn = Date.now();

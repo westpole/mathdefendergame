@@ -6,9 +6,10 @@
  *
  * The `generateMath` function returns a `MathExpression` object containing the expression text, the correct answer, and the operation used.
  * The operations are determined by the current stage, with specific operations unlocked at certain stages.
+ * When `forcedOperation` is provided (practice mode), the generated expression is locked to that operation.
  */
 
-import type { MathExpression } from '@shared/types';
+import type { MathExpression, MathOperation } from '@shared/types';
 import { MathTier } from './DDAController';
 
 export function getOperationForStage(stage: number): string[] {
@@ -111,7 +112,15 @@ function generateOrderOfOperationsExpression(stageOps: string[]): MathExpression
   };
 }
 
-export function generateMath(stage: number, mathTier: MathTier = MathTier.TIER_1_BASIC_ADD_SUB): MathExpression {
+export function generateMath(
+  stage: number,
+  mathTier: MathTier = MathTier.TIER_1_BASIC_ADD_SUB,
+  forcedOperation?: MathOperation,
+): MathExpression {
+  if (forcedOperation) {
+    return generateTwoTermExpression(forcedOperation, mathTier);
+  }
+
   const stageOps = getOperationForStage(stage);
 
   if (mathTier === MathTier.TIER_4_ORDER_OF_OPERATIONS) {
@@ -120,8 +129,8 @@ export function generateMath(stage: number, mathTier: MathTier = MathTier.TIER_1
 
   const tierOps = getOperationsForTier(mathTier);
   const commonOps = getCommonOperations(stageOps, tierOps);
-  const ops = commonOps.length > 0 ? commonOps : stageOps;
-  const op = ops[Math.floor(Math.random() * ops.length)] ?? '+';
+  const allowedOps = commonOps.length > 0 ? commonOps : stageOps;
+  const op = allowedOps[Math.floor(Math.random() * allowedOps.length)] ?? '+';
 
   return generateTwoTermExpression(op, mathTier);
 }
