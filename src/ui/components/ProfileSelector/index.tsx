@@ -24,7 +24,7 @@ export function ProfileSelector() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeOptionIndex, setActiveOptionIndex] = useState(0);
-  const [language, setLanguage] = useState(i18n.resolvedLanguage ?? 'en');
+  const language = i18n.resolvedLanguage ?? 'en';
 
   const profileUsernames = useMemo(() => Object.keys(profiles).sort((left, right) => left.localeCompare(right)), [profiles]);
   const selectedUsernameIsValid = profileUsernames.includes(selectedUsername);
@@ -34,10 +34,6 @@ export function ProfileSelector() {
     : rememberedUsernameIsValid
       ? rememberedUsername ?? ''
       : '';
-
-  useEffect(() => {
-    setLanguage(i18n.resolvedLanguage ?? 'en');
-  }, [i18n, i18n.resolvedLanguage]);
 
   useEffect(() => {
     if (!isDropdownOpen) {
@@ -272,7 +268,6 @@ export function ProfileSelector() {
               className="text-input"
               value={language}
               onChange={(event) => {
-                setLanguage(event.target.value);
                 void i18n.changeLanguage(event.target.value);
               }}
             >
