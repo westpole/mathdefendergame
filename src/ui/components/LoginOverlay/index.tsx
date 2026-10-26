@@ -1,4 +1,5 @@
 import { SubmitEvent, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useGameStore } from '@store/useGameStore';
 import { CreateProfileForm } from '@ui/components/CreateProfileForm';
@@ -12,6 +13,7 @@ type AuthMode = 'login' | 'create';
  * the game store, and shows any authentication errors returned by the store.
  */
 export function LoginOverlay() {
+  const { t } = useTranslation();
   const loginProfile = useGameStore((state) => state.loginProfile);
   const [activeMode, setActiveMode] = useState<AuthMode>('login');
   const [username, setUsername] = useState('');
@@ -35,7 +37,7 @@ export function LoginOverlay() {
     const result = loginProfile(username, password, keepLoggedIn);
 
     if (!result.success) {
-      setErrorMessage(result.error ?? 'Authentication failed.');
+      setErrorMessage(result.error ?? t('auth.authenticationFailed'));
       return;
     }
 
@@ -45,34 +47,32 @@ export function LoginOverlay() {
   return (
     <div className="overlay-screen overlay-screen--interactive" data-testid="login-screen">
       <div className="overlay-panel login-panel">
-        <h1>PLAYER ACCESS</h1>
+        <h1>{t('ui.playerAccessTitle')}</h1>
         <p className="menu-subtitle login-subtitle">
-          {activeMode === 'login'
-            ? 'Login with your existing profile.'
-            : 'Create your profile to continue.'}
+          {activeMode === 'login' ? t('ui.playerAccessLoginHint') : t('ui.playerAccessCreateHint')}
         </p>
 
         {activeMode === 'login' ? (
           <form className="login-form" onSubmit={handleSubmit}>
-            <label className="field-label" htmlFor="login-username">Username</label>
+            <label className="field-label" htmlFor="login-username">{t('ui.username')}</label>
             <input
               id="login-username"
               className="text-input"
               autoFocus
               maxLength={20}
               onChange={(event) => setUsername(event.target.value)}
-              placeholder="Your username"
+              placeholder={t('ui.yourUsername')}
               ref={usernameInputRef}
               value={username}
             />
 
-            <label className="field-label" htmlFor="login-password">Password</label>
+            <label className="field-label" htmlFor="login-password">{t('ui.password')}</label>
             <input
               id="login-password"
               className="text-input"
               maxLength={8}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Your password"
+              placeholder={t('ui.yourPassword')}
               type="password"
               value={password}
             />
@@ -84,7 +84,7 @@ export function LoginOverlay() {
                 onChange={(event) => setKeepLoggedIn(event.target.checked)}
                 type="checkbox"
               />
-              Keep me logged in
+              {t('ui.keepLoggedIn')}
             </label>
 
             {errorMessage && (
@@ -95,10 +95,10 @@ export function LoginOverlay() {
 
             <div className="login-actions">
               <button className="primary-button" type="submit">
-                Login
+                {t('ui.login')}
               </button>
               <button className="secondary-button" onClick={() => switchMode('create')} type="button">
-                Create Profile
+                {t('ui.createProfile')}
               </button>
             </div>
           </form>

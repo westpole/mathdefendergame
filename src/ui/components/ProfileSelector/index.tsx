@@ -1,4 +1,5 @@
 import { SubmitEvent, KeyboardEvent, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useGameStore } from '@store/useGameStore';
 import { CreateProfileForm } from '@ui/components/CreateProfileForm';
@@ -9,6 +10,7 @@ type SelectorMode = 'select' | 'create';
  * Profile selector component allowing users to select or create profiles.
  */
 export function ProfileSelector() {
+  const { t, i18n } = useTranslation();
   const profiles = useGameStore((state) => state.profiles);
   const rememberedUsername = useGameStore((state) => state.rememberedUsername);
   const selectProfileByUsername = useGameStore((state) => state.selectProfileByUsername);
@@ -22,6 +24,7 @@ export function ProfileSelector() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeOptionIndex, setActiveOptionIndex] = useState(0);
+  const language = i18n.resolvedLanguage ?? 'en';
 
   const profileUsernames = useMemo(() => Object.keys(profiles).sort((left, right) => left.localeCompare(right)), [profiles]);
   const selectedUsernameIsValid = profileUsernames.includes(selectedUsername);
@@ -153,14 +156,14 @@ export function ProfileSelector() {
     event.preventDefault();
 
     if (!currentSelectedUsername.trim()) {
-      setErrorMessage('Choose a profile to continue.');
+      setErrorMessage(t('auth.chooseProfile'));
       return;
     }
 
     const result = selectProfileByUsername(currentSelectedUsername, rememberMe);
 
     if (!result.success) {
-      setErrorMessage(result.error ?? 'Unable to load profile.');
+      setErrorMessage(result.error ?? t('errors.profileUnavailable'));
       return;
     }
 
@@ -170,16 +173,14 @@ export function ProfileSelector() {
   return (
     <div className="overlay-screen overlay-screen--interactive" data-testid="profile-selector-screen">
       <div className="overlay-panel login-panel">
-        <h1>PROFILE SELECT</h1>
+        <h1>{t('ui.profileSelectTitle')}</h1>
         <p className="menu-subtitle login-subtitle">
-          {selectorMode === 'select'
-            ? 'Choose your username to continue.'
-            : 'Create your profile to continue.'}
+          {selectorMode === 'select' ? t('ui.selectYourUsername') : t('ui.createProfilePrompt')}
         </p>
 
         {selectorMode === 'select' ? (
           <form className="login-form" onSubmit={handleSubmit}>
-            <label className="field-label" id={labelId}>Username</label>
+            <label className="field-label" id={labelId}>{t('ui.username')}</label>
             <div className="custom-select">
               <button
                 id={triggerId}
@@ -200,7 +201,7 @@ export function ProfileSelector() {
                 type="button"
               >
                 <span className={!currentSelectedUsername ? 'custom-select__placeholder' : undefined} id={`${triggerId}-value`}>
-                  {currentSelectedUsername || 'Select profile'}
+                  {currentSelectedUsername || t('ui.profileSelectPlaceholder')}
                 </span>
                 <span aria-hidden="true" className="custom-select__arrow">▼</span>
               </button>
@@ -261,9 +262,22 @@ export function ProfileSelector() {
               </ul>
             </div>
 
+            <label className="field-label" htmlFor="profile-language-select">{t('ui.profileSelectionLabel')}</label>
+            <select
+              id="profile-language-select"
+              className="text-input"
+              value={language}
+              onChange={(event) => {
+                void i18n.changeLanguage(event.target.value);
+              }}
+            >
+              <option value="en">English</option>
+              <option value="uk">Українська</option>
+            </select>
+
             {profileUsernames.length === 0 && (
               <div className="form-error-block" role="status">
-                No profiles found. Create one to begin.
+                {t('ui.noProfilesFound')}
               </div>
             )}
 
@@ -281,12 +295,12 @@ export function ProfileSelector() {
                 type="checkbox"
                 disabled={!selectedUsernameIsValid}
               />
-              Remember me
+              {t('ui.rememberMe')}
             </label>
 
             <div className="login-actions">
               <button className="primary-button" disabled={profileUsernames.length === 0} type="submit">
-                Login
+                {t('ui.login')}
               </button>
               <button
                 className="secondary-button"
@@ -296,7 +310,7 @@ export function ProfileSelector() {
                 }}
                 type="button"
               >
-                Create Profile
+                {t('ui.createProfile')}
               </button>
             </div>
           </form>

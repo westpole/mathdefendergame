@@ -15,9 +15,10 @@ async function loginToStartMenu(page: Page) {
 
 test.describe('Menu Navigation', () => {
   test.beforeEach(async ({ page }) => {
-    // Override simple_login to false to test LoginOverlay component
+    // Override simple_login to false to test LoginOverlay component and reset language
     await page.addInitScript(() => {
       localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: false }));
+      localStorage.setItem('math-defender-language', 'en');
     });
     await page.reload();
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
@@ -25,8 +26,8 @@ test.describe('Menu Navigation', () => {
   });
 
   test('should show login screen on launch', async ({ page }) => {
-
     const loginScreen = page.locator('[data-testid="login-screen"]');
+
     await expect(loginScreen).toBeVisible();
     await expect(page.getByTestId('menu-toggle-button')).toHaveCount(0);
   });

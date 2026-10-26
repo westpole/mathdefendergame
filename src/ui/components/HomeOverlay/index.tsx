@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+
 import { useGameStore } from '@store/useGameStore';
 
 const PRACTICE_OPERATIONS = ['+', '-', '*', '/'] as const;
@@ -6,6 +8,7 @@ const PRACTICE_OPERATIONS = ['+', '-', '*', '/'] as const;
  * Renders the home dashboard with quick-mode launch tiles for regular play and practice mode.
  */
 export function HomeOverlay() {
+  const { t } = useTranslation();
   const practiceOperation = useGameStore((state) => state.practiceOperation);
   const selectPracticeOperation = useGameStore((state) => state.selectPracticeOperation);
 
@@ -24,23 +27,23 @@ export function HomeOverlay() {
       <div className="overlay-panel home-report-panel" data-testid="home-mode-select">
         <div className="home-quick-actions" data-testid="home-practice-controls">
           <article className="home-mode-tile" data-testid="home-regular-play-tile">
-            <h2>Regular Play</h2>
-            <p>Campaign defense runs with the normal stage flow.</p>
+            <h2>{t('ui.regularPlay')}</h2>
+            <p>{t('ui.campaignDescription')}</p>
             <button
               type="button"
               data-testid="home-regular-play-button"
               className="secondary-button"
               onClick={handleStartRegularPlay}
             >
-              Start Regular Play
+              {t('ui.startRegularPlay')}
             </button>
           </article>
 
           <article className="home-mode-tile" data-testid="home-practice-tile">
-            <h2>Practice Mode</h2>
-            <p>Train one operation at a time without a campaign cap.</p>
+            <h2>{t('ui.practiceMode')}</h2>
+            <p>{t('ui.practiceDescription')}</p>
 
-            <div className="practice-operation-picker" aria-label="Practice operation selector">
+            <div className="practice-operation-picker" aria-label={t('ui.practiceOperationSelector')}>
               {PRACTICE_OPERATIONS.map((operation) => (
                 <button
                   key={operation}
@@ -61,7 +64,7 @@ export function HomeOverlay() {
               className="secondary-button"
               onClick={handleStartPracticeMode}
             >
-              Start Practice Mode
+              {t('ui.startPracticeMode')}
             </button>
           </article>
         </div>

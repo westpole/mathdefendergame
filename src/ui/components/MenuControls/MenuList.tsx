@@ -1,15 +1,6 @@
-import { useGameStore } from '@store/useGameStore';
+import { useTranslation } from 'react-i18next';
 
-const menuItems = [
-  { id: 'home', label: 'Home', type: 'view', view: 'home' },
-  { id: 'play', label: 'Regular Play', type: 'start', mode: 'regular' },
-  { id: 'practice', label: 'Practice Mode', type: 'start', mode: 'practice' },
-  { id: 'weekly-report', label: 'Weekly Report', type: 'view', view: 'weekly-report' },
-  { id: 'profile', label: 'Profile', type: 'view', view: 'profile' },
-  { id: 'performance', label: 'Performance', type: 'view', view: 'performance' },
-  { id: 'rules', label: 'Rules', type: 'view', view: 'rules' },
-  { id: 'logoff', label: 'Log off', type: 'logoff' },
-] as const;
+import { useGameStore } from '@store/useGameStore';
 
 /**
  * Props for the menu list overlay.
@@ -24,8 +15,20 @@ interface MenuListProps {
  * @param props - Controls the menu visibility after a user makes a selection.
  */
 export function MenuList({ setIsOpen }: MenuListProps) {
+  const { t, i18n } = useTranslation();
   const activeView = useGameStore((state) => state.screenView);
   const practiceOperation = useGameStore((state) => state.practiceOperation);
+
+  const menuItems = [
+    { id: 'home', label: t('ui.home'), type: 'view', view: 'home' },
+    { id: 'play', label: t('ui.regularPlay'), type: 'start', mode: 'regular' },
+    { id: 'practice', label: t('ui.practiceMode'), type: 'start', mode: 'practice' },
+    { id: 'weekly-report', label: t('ui.weeklyReport'), type: 'view', view: 'weekly-report' },
+    { id: 'profile', label: t('ui.profile'), type: 'view', view: 'profile' },
+    { id: 'performance', label: t('ui.performance'), type: 'view', view: 'performance' },
+    { id: 'rules', label: t('ui.rules'), type: 'view', view: 'rules' },
+    { id: 'logoff', label: t('ui.logOff'), type: 'logoff' },
+  ] as const;
 
   const handleMenuSelect = (item: (typeof menuItems)[number]) => {
     if (item.type === 'start') {
@@ -52,6 +55,23 @@ export function MenuList({ setIsOpen }: MenuListProps) {
   return (
     <div className="menu-overlay" data-testid="menu-overlay">
       <div className="menu-panel" data-testid="menu-options" id="menu-options" role="menu">
+        <div className="menu-language-picker">
+          <label className="field-label" htmlFor="menu-language-select">
+            {t('ui.language')}
+          </label>
+          <select
+            id="menu-language-select"
+            aria-label={t('ui.selectLanguage')}
+            className="text-input"
+            value={i18n.resolvedLanguage ?? 'en'}
+            onChange={(event) => {
+              void i18n.changeLanguage(event.target.value);
+            }}
+          >
+            <option value="en">English</option>
+            <option value="uk">Українська</option>
+          </select>
+        </div>
         <div className="menu-options">
           {menuItems.map((item) => (
             <button
