@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
@@ -18,6 +19,7 @@ const EMPTY_HISTORY: Array<{
  * Profile overlay component displaying user statistics and progress.
  */
 export function ProfileOverlay() {
+  const { t } = useTranslation();
   const activeUsername = useGameStore((state) => state.activeUsername);
   const phase = useGameStore((state) => state.phase);
   const grade = useGameStore((state) => state.grade);
@@ -71,37 +73,39 @@ export function ProfileOverlay() {
   const progressRatio = nextThreshold !== null && nextThreshold > currentThreshold
     ? Math.min(Math.max((progressScore - currentThreshold) / (nextThreshold - currentThreshold), 0), 1)
     : 0;
+  const currentGradeLabel = t(`grades.${grade}`, { defaultValue: toGradeTitle(grade) });
+  const nextGradeLabel = nextGrade ? t(`grades.${nextGrade}`, { defaultValue: toGradeTitle(nextGrade) }) : null;
 
   return (
     <div className="overlay-screen overlay-screen--interactive" data-testid="profile-overlay">
       <section className="overlay-panel menu-page-panel profile-panel">
           <div className="overlay-header">
-            <h1>PROFILE</h1>
+            <h1>{t('ui.profileTitle')}</h1>
           </div>
 
           <div className="profile-header">
-            <ProfileIcon label={`${toGradeTitle(grade)} icon`} size={120} />
+            <ProfileIcon label={t('ui.gradeIconLabel', { grade: currentGradeLabel })} size={120} />
 
             <div className="profile-stat-list">
               <div className="profile-identity-row">
-                <strong className="profile-identity-label">{activeUsername ?? 'Ghost'}</strong>
+                <strong className="profile-identity-label">{activeUsername ?? t('ui.guestUsername')}</strong>
               </div>
 
               <div className="profile-stat-grid">
                 <div className="profile-stat">
-                  <span className="profile-stat-label">Avg. APM</span>
+                  <span className="profile-stat-label">{t('ui.avgApm')}</span>
                   <strong>{formatApm(stats.averageAnswersPerMinute)}</strong>
                 </div>
                 <div className="profile-stat">
-                  <span className="profile-stat-label">Games</span>
+                  <span className="profile-stat-label">{t('ui.games')}</span>
                   <strong>{stats.gameCount}</strong>
                 </div>
                 <div className="profile-stat">
-                  <span className="profile-stat-label">Avg Accuracy</span>
+                  <span className="profile-stat-label">{t('ui.avgAccuracy')}</span>
                   <strong>{`${Math.round(stats.averageAccuracy)}%`}</strong>
                 </div>
                 <div className="profile-stat">
-                  <span className="profile-stat-label">Active Streak</span>
+                  <span className="profile-stat-label">{t('ui.activeStreak')}</span>
                   <strong>{stats.activeStreak}</strong>
                 </div>
               </div>
@@ -117,7 +121,7 @@ export function ProfileOverlay() {
               <>
                 <div className="profile-progress-labels">
                   <span>{formatScore(currentThreshold)}</span>
-                  <span>{nextGrade ? `Next ${toGradeTitle(nextGrade)}` : 'Top grade'}</span>
+                  <span>{nextGradeLabel ? t('ui.nextGradeLabel', { grade: nextGradeLabel }) : t('ui.topGrade')}</span>
                   <span>{formatScore(nextThreshold ?? currentThreshold)}</span>
                 </div>
 
@@ -133,7 +137,7 @@ export function ProfileOverlay() {
                 </div>
 
                 <div className="profile-points-remaining">
-                  {formatScore(pointsLeft)} pts to next grade
+                  {t('ui.pointsToNextGrade', { count: formatScore(pointsLeft) })}
                 </div>
               </>
             )}

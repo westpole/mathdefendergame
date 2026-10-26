@@ -1,5 +1,6 @@
 import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
+import { useTranslation } from 'react-i18next';
 
 import { GameStatusPanel, type GameStatusPanelItem } from './GameStatusPanel';
 import { InputPanel } from './InputPanel';
@@ -10,6 +11,7 @@ import { InputPanel } from './InputPanel';
  * stage, resource, and mobile answer input panels.
  */
 export function HUDOverlay() {
+  const { t } = useTranslation();
   const score = useGameStore((state) => state.score);
   const lives = useGameStore((state) => state.lives);
   const shield = useGameStore((state) => state.shield);
@@ -23,19 +25,19 @@ export function HUDOverlay() {
   const livesTone = lives > 2 ? 'good' : lives > 1 ? 'warn' : 'danger';
 
   const leftStatusItems: ReadonlyArray<GameStatusPanelItem> = [
-    { id: 'score', label: 'Score', value: score, variant: 'score' },
-    { id: 'stage', label: 'Stage', value: stage, variant: 'stage' },
+    { id: 'score', label: t('hud.score'), value: score, variant: 'score' },
+    { id: 'stage', label: t('hud.stage'), value: stage, variant: 'stage' },
   ];
   const rightStatusItems: ReadonlyArray<GameStatusPanelItem> = [
     {
       id: 'shield',
-      label: 'Base Shield',
+      label: t('hud.baseShield'),
       tone: shieldsTone,
       value: clampedShield,
       variant: 'shield',
     },
-    { id: 'lives', label: 'Lives', tone: livesTone, value: lives, variant: 'lives' },
-    { id: 'streak', label: 'Streak', value: streak, variant: 'streak' },
+    { id: 'lives', label: t('hud.lives'), tone: livesTone, value: lives, variant: 'lives' },
+    { id: 'streak', label: t('hud.streak'), value: streak, variant: 'streak' },
   ];
 
   return (

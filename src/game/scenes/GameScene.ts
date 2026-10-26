@@ -9,6 +9,7 @@ import Phaser from 'phaser';
 
 import { Game } from '@game/main';
 import { GAME_CONFIG } from '@game/config';
+import { tPhaser } from '@game/i18n/phaserI18n';
 import { useGameStore } from '@store/useGameStore';
 import type { PauseOverlayReason } from '@store/types';
 import type { GameMode, GameOverReason, Grade, PracticeOperation } from '@shared/types';
@@ -181,7 +182,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     useGameStore.getState().showStreakRewardMessage({
-      message: `Congratulations! +1 life awarded for a 30 streak. Lives: ${lives}`,
+      message: tPhaser('game.streakRewardDetail', { lives }),
     });
 
     this.streakRewardTimer = setTimeout(() => {
