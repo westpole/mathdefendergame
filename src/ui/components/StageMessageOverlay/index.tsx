@@ -1,5 +1,6 @@
 import { clsx } from 'clsx';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { continueGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
@@ -8,6 +9,7 @@ import { useGameStore } from '@store/useGameStore';
  * @returns The JSX element representing the stage message overlay.
  */
 export function StageMessageOverlay() {
+  const { t } = useTranslation();
   const stageMessage = useGameStore((state) => state.stageMessage);
   const streakRewardMessage = useGameStore((state) => state.streakRewardMessage);
 
@@ -31,16 +33,14 @@ export function StageMessageOverlay() {
 
   const getTitle = () => {
     if (streakRewardMessage) {
-      return 'Streak Bonus';
+      return t('game.streakBonus');
     }
-
-    let title = 'Stage Lost';
 
     if (stageMessage?.success) {
-      title = `Stage ${stageMessage.stage} Cleared!`;
+      return t('game.stageCleared', { stage: stageMessage.stage });
     }
 
-    return title;
+    return t('game.stageLost');
   };
 
   return (
@@ -55,26 +55,26 @@ export function StageMessageOverlay() {
 
         {!stageMessage?.success && (stageMessage && stageMessage.lives > 0) && (
           <p>
-            {`You lost this stage and 1 life. Remaining ${stageMessage?.lives === 1 ? 'life' : 'lives'}: ${stageMessage?.lives}.`}
+            {t('game.lostLifeSummary', {
+              count: stageMessage.lives,
+            })}
           </p>
         )}
 
         {stageMessage?.success && stageMessage?.stageIncorrect === 0 && (
-          <p>Perfect work. You saved your town.</p>
+          <p>{t('game.perfectClear')}</p>
         )}
 
         {stageMessage?.success && stageMessage?.stageIncorrect > 0 && (
-          <p>You cleared the stage, but made {stageMessage.stageIncorrect} mistake{stageMessage.stageIncorrect > 1 ? 's' : ''}.</p>
+          <p>{t('game.mistakeSummary', { count: stageMessage.stageIncorrect })}</p>
         )}
 
-        {streakRewardMessage && (
-          <p>{streakRewardMessage.message}</p>
-        )}
+        {streakRewardMessage && <p>{streakRewardMessage.message}</p>}
 
         {Boolean(stageMessage) && (
           <div className="action-row">
             <button className="primary-button" onClick={continueGame} type="button">
-              Continue
+              {t('ui.continue')}
             </button>
           </div>
         )}

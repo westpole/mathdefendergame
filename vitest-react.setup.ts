@@ -1,5 +1,9 @@
 import { vi } from 'vitest';
-import '@testing-library/jest-dom/vitest'; // Included from your previous question!
+import '@testing-library/jest-dom/vitest';
+
+import i18n from './src/i18n/config';
+
+void i18n.changeLanguage('en');
 
 // Mock the secure bridge API exposure (e.g., window.electron API layer)
 Object.defineProperty(window, 'electron', {

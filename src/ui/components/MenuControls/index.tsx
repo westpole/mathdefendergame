@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import menuCloseIcon from '@assets/menu-close.svg';
 import menuIcon from '@assets/menu.svg';
@@ -13,6 +14,7 @@ import { MenuList } from './MenuList';
  */
 export function MenuControls() {
   const [isOpen, setIsOpen] = useState(false);
+  const { t } = useTranslation();
 
   return (
     <div className="menu-shell" data-testid="menu-shell">
@@ -21,7 +23,7 @@ export function MenuControls() {
           aria-controls="menu-options"
           aria-expanded={isOpen}
           aria-haspopup="menu"
-          aria-label="Open menu"
+          aria-label={t('ui.menuOpen')}
           className="secondary-button menu-button"
           data-testid="menu-toggle-button"
           onClick={() => setIsOpen((current) => !current)}
@@ -31,8 +33,8 @@ export function MenuControls() {
         </button>
       )}
       {isOpen && (
-          <button
-          aria-label="Close menu"
+        <button
+          aria-label={t('ui.menuClose')}
           className="secondary-button menu-close-button"
           data-testid="menu-close-button"
           onClick={() => setIsOpen(false)}
@@ -42,9 +44,7 @@ export function MenuControls() {
         </button>
       )}
 
-      {isOpen && (
-        <MenuList setIsOpen={setIsOpen} />
-      )}
+      {isOpen && <MenuList setIsOpen={setIsOpen} />}
     </div>
   );
 }

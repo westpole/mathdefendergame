@@ -1,4 +1,5 @@
 import { SubmitEvent, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useGameStore } from '@store/useGameStore';
 
@@ -21,6 +22,7 @@ interface CreateProfileFormProps {
  * @returns The profile creation form UI.
  */
 export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormProps) {
+  const { t } = useTranslation();
   const createAndLoginProfile = useGameStore((state) => state.createAndLoginProfile);
   const createAndLoginSimpleProfile = useGameStore((state) => state.createAndLoginSimpleProfile);
   const [username, setUsername] = useState('');
@@ -38,12 +40,12 @@ export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormPro
 
     if (!simpleMode) {
       if (!verifyPassword.trim()) {
-        setErrorMessage('Please verify your password.');
+        setErrorMessage(t('auth.pleaseVerifyPassword'));
         return;
       }
 
       if (password !== verifyPassword) {
-        setErrorMessage('Password and verify password must match.');
+        setErrorMessage(t('auth.passwordMismatch'));
         return;
       }
     }
@@ -53,7 +55,7 @@ export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormPro
       : createAndLoginProfile(username, password, false);
 
     if (!result.success) {
-      setErrorMessage(result.error ?? 'Profile creation failed.');
+      setErrorMessage(result.error ?? t('auth.profileCreationFailed'));
       return;
     }
 
@@ -62,38 +64,38 @@ export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormPro
 
   return (
     <form className="login-form" onSubmit={handleSubmit}>
-      <label className="field-label" htmlFor="create-profile-username">Username</label>
+      <label className="field-label" htmlFor="create-profile-username">{t('ui.username')}</label>
       <input
         id="create-profile-username"
         className="text-input"
         autoFocus
         maxLength={20}
         onChange={(event) => setUsername(event.target.value)}
-        placeholder="Unique username"
+        placeholder={t('ui.uniqueUsername')}
         ref={usernameInputRef}
         value={username}
       />
 
       {!simpleMode && (
         <>
-          <label className="field-label" htmlFor="create-profile-password">Password</label>
+          <label className="field-label" htmlFor="create-profile-password">{t('ui.password')}</label>
           <input
             id="create-profile-password"
             className="text-input"
             maxLength={8}
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="8 chars: Aa1xxxxx"
+            placeholder={t('ui.passwordHint')}
             type="password"
             value={password}
           />
 
-          <label className="field-label" htmlFor="create-profile-verify-password">Verify password</label>
+          <label className="field-label" htmlFor="create-profile-verify-password">{t('ui.verifyPassword')}</label>
           <input
             id="create-profile-verify-password"
             className="text-input"
             maxLength={8}
             onChange={(event) => setVerifyPassword(event.target.value)}
-            placeholder="Re-enter your password"
+            placeholder={t('ui.reenterPassword')}
             type="password"
             value={verifyPassword}
           />
@@ -108,11 +110,11 @@ export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormPro
 
       <div className="login-actions">
         <button className="primary-button" type="submit">
-          Create
+          {t('ui.create')}
         </button>
         {onCancel && (
           <button className="secondary-button" onClick={onCancel} type="button">
-            Cancel
+            {t('ui.cancel')}
           </button>
         )}
       </div>
