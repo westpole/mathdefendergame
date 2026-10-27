@@ -23,7 +23,7 @@ Do not use this skill for unrelated feature development or debugging work.
 
 ## Required assets
 
-- Guard script: `.github/skills/release-workflow/assets/scripts/release-guard.mjs`
+- Guard script: `.github/skills/release-workflow/scripts/release-guard.mjs`
 - Report template: `.github/skills/release-workflow/assets/templates/prod-build-report-template.html`
 
 ## Workflow
