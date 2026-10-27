@@ -49,7 +49,7 @@
     "build:win": "rm -Rf ./dist/ && npm run build:web && electron-builder",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "release:guard": "node tools/release-guard.mjs",
+    "release:guard": "node .github/skills/release-workflow/assets/scripts/release-guard.mjs",
     "docs:sync-current-stack": "node tools/sync-current-stack.mjs",
     "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 0",
     "git:commit": "git add . && git commit -m \"build: bump up to a new version\"",
