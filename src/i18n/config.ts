@@ -34,6 +34,10 @@ i18n
   });
 
 const syncDocumentLanguage = () => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
   const language = i18n.resolvedLanguage ?? 'en';
   const root = document.documentElement;
 
@@ -41,7 +45,9 @@ const syncDocumentLanguage = () => {
   root.dir = i18n.dir(language);
 };
 
-syncDocumentLanguage();
-i18n.on('languageChanged', syncDocumentLanguage);
+if (typeof document !== 'undefined') {
+  syncDocumentLanguage();
+  i18n.on('languageChanged', syncDocumentLanguage);
+}
 
 export default i18n;
