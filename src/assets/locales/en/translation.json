@@ -42,7 +42,43 @@
     "uniqueUsername": "Unique username",
     "passwordHint": "8 chars: Aa1xxxxx",
     "reenterPassword": "Re-enter your password",
-    "profileSelectionLabel": "Select language"
+    "profileSelectionLabel": "Select language",
+    "profileTitle": "PROFILE",
+    "guestUsername": "Ghost",
+    "gradeIconLabel": "{{grade}} icon",
+    "avgApm": "Avg. APM",
+    "games": "Games",
+    "avgAccuracy": "Avg Accuracy",
+    "activeStreak": "Active Streak",
+    "nextGradeLabel": "Next {{grade}}",
+    "topGrade": "Top grade",
+    "pointsToNextGrade": "{{count}} pts to next grade",
+    "weeklyProgressReportTitle": "Weekly Progress Report",
+    "gradeOnDuty": "{{grade}} on duty",
+    "weeklySummaryAriaLabel": "Weekly summary",
+    "runsCompleted": "Runs Completed",
+    "scoreEarned": "Score Earned",
+    "noCompletedRunsLast7Days": "No completed runs in the last 7 days. Use Menu and choose Play Game to start a fresh report.",
+    "gradeProgressAriaLabel": "Grade progress",
+    "gradeProgressTitle": "Grade Progress",
+    "weeklyRecapLifetimePromotion": "Weekly recap, lifetime promotion track.",
+    "pointsShortLabel": "{{count}} pts",
+    "lifetimePointsSecured": "{{count}} lifetime points secured",
+    "lastRecordedDefense": "Last recorded defense: {{date}}",
+    "rulesTitle": "RULES",
+    "performanceTitle": "PERFORMANCE",
+    "performanceByOperatorForUser": "Performance by operator for {{username}} based on completed runs.",
+    "operationType": "Operation Type",
+    "accuracyPercent": "Accuracy (%)",
+    "avgSpeedSeconds": "Avg Speed (sec)",
+    "masteryRating": "Mastery Rating",
+    "completeRunForPerformanceInsights": "Complete a run to unlock operator performance insights.",
+    "rulesTypeAnswerPressEnter": "Type the answer and press Enter.",
+    "rulesPressEscapeMenu": "Press Escape to return to the menu.",
+    "rulesBeginWithLives": "You begin with 3 lives.",
+    "rulesBaseShieldPoints": "The base shield has 5 shield points before a life is lost.",
+    "rulesReachStreakReward": "Reach 30 correct answers in a row to earn 1 extra life.",
+    "rulesClearStagesToWin": "Clear 28 stages to win."
   },
   "auth": {
     "chooseProfile": "Choose a profile to continue.",
@@ -53,6 +89,7 @@
   },
   "game": {
     "streakBonus": "Streak Bonus",
+    "streakRewardDetail": "Congratulations! +1 life awarded for a 30 streak. Lives: {{lives}}",
     "stageLost": "Stage Lost",
     "stageCleared": "Stage {{stage}} Cleared!",
     "perfectClear": "Perfect work. You saved your town.",
@@ -61,6 +98,47 @@
     "lostLifeSummary_one": "You lost this stage and 1 life. Remaining life: {{count}}.",
     "lostLifeSummary_other": "You lost this stage and 1 life. Remaining lives: {{count}}.",
     "continue": "Continue"
+  },
+  "hud": {
+    "score": "Score",
+    "stage": "Stage",
+    "baseShield": "Base Shield",
+    "lives": "Lives",
+    "streak": "Streak"
+  },
+  "pause": {
+    "savingProgressTitle": "Saving progress",
+    "savingProgressDescription": "Saving data before closing...",
+    "confirmExitTitle": "Confirm Exit",
+    "gamePausedTitle": "Game Paused",
+    "confirmEndGameQuestion": "Are you sure you want to end this game?",
+    "backgroundPauseDescription": "Game paused because this tab moved to the background. Resume when you are ready or end this game.",
+    "defaultPauseDescription": "Game paused. You can resume any time or end this game.",
+    "keepPlaying": "Keep playing",
+    "resume": "Resume",
+    "endGameAndClose": "End game and close",
+    "endGame": "End game"
+  },
+  "grades": {
+    "trainee": "Trainee",
+    "cadet": "Cadet",
+    "commander": "Commander",
+    "major-general": "Major General"
+  },
+  "performance": {
+    "operation": {
+      "addition": "Addition (+)",
+      "subtraction": "Subtraction (-)",
+      "multiplication": "Multiplication (*)",
+      "division": "Division (/)"
+    },
+    "mastery": {
+      "noData": "No Data",
+      "mastered": "Mastered",
+      "proficient": "Proficient",
+      "needsPractice": "Needs Practice",
+      "weakSpot": "Weak Spot"
+    }
   },
   "errors": {
     "profileUnavailable": "Profile is unavailable."

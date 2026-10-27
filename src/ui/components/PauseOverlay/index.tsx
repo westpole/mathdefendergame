@@ -1,5 +1,6 @@
 import { cancelElectronClose, endGameEarly, resumePausedGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Renders the game pause/exit confirmation overlay.
@@ -11,6 +12,7 @@ import { useGameStore } from '@store/useGameStore';
  * @returns The pause UI when a pause state exists, otherwise null.
  */
 export function PauseOverlay() {
+  const { t } = useTranslation();
   const pauseOverlay = useGameStore((state) => state.pauseOverlay);
 
   // The store is the source of truth for transient overlay state and may clear
@@ -26,8 +28,8 @@ export function PauseOverlay() {
     return (
       <div className="overlay-screen overlay-screen--interactive">
         <div className="overlay-panel modal-panel accent-success">
-          <h1>Saving progress</h1>
-          <p>Saving data before closing...</p>
+          <h1>{t('pause.savingProgressTitle')}</h1>
+          <p>{t('pause.savingProgressDescription')}</p>
         </div>
       </div>
     );
@@ -38,12 +40,12 @@ export function PauseOverlay() {
   // simply pausing the current session.
   const isWindowClosePrompt = pauseOverlay.reason === 'window-close';
   const isBackgroundPause = pauseOverlay.reason === 'background';
-  const title = isWindowClosePrompt ? 'Confirm Exit' : 'Game Paused';
+  const title = isWindowClosePrompt ? t('pause.confirmExitTitle') : t('pause.gamePausedTitle');
   const message = isWindowClosePrompt
-    ? 'Are you sure you want to end this game?'
+    ? t('pause.confirmEndGameQuestion')
     : isBackgroundPause
-      ? 'Game paused because this tab moved to the background. Resume when you are ready or end this game.'
-      : 'Game paused. You can resume any time or end this game.';
+      ? t('pause.backgroundPauseDescription')
+      : t('pause.defaultPauseDescription');
 
   // The primary action depends on the pause source: the confirmation flow must
   // dismiss the close prompt without resuming gameplay, while regular pauses can
@@ -62,7 +64,7 @@ export function PauseOverlay() {
             onClick={handleResume}
             type="button"
           >
-            {isWindowClosePrompt ? 'Keep playing' : 'Resume'}
+            {isWindowClosePrompt ? t('pause.keepPlaying') : t('pause.resume')}
           </button>
           <button
             className="primary-button"
@@ -72,7 +74,7 @@ export function PauseOverlay() {
             onClick={() => endGameEarly({ closeApp: isWindowClosePrompt })}
             type="button"
           >
-            {isWindowClosePrompt ? 'End game and close' : 'End game'}
+            {isWindowClosePrompt ? t('pause.endGameAndClose') : t('pause.endGame')}
           </button>
         </div>
       </div>

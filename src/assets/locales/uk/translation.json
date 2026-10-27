@@ -42,7 +42,43 @@
     "uniqueUsername": "Унікальне ім'я",
     "passwordHint": "8 символів: Aa1xxxxx",
     "reenterPassword": "Повторіть пароль",
-    "profileSelectionLabel": "Вибір мови"
+    "profileSelectionLabel": "Вибір мови",
+    "profileTitle": "ПРОФІЛЬ",
+    "guestUsername": "Привид",
+    "gradeIconLabel": "Іконка звання {{grade}}",
+    "avgApm": "Сер. APM",
+    "games": "Ігор",
+    "avgAccuracy": "Сер. точність",
+    "activeStreak": "Поточна серія",
+    "nextGradeLabel": "Далі {{grade}}",
+    "topGrade": "Найвище звання",
+    "pointsToNextGrade": "{{count}} очк. до наступного звання",
+    "weeklyProgressReportTitle": "Щотижневий звіт прогресу",
+    "gradeOnDuty": "{{grade}} на службі",
+    "weeklySummaryAriaLabel": "Підсумок тижня",
+    "runsCompleted": "Завершено забігів",
+    "scoreEarned": "Набрано очок",
+    "noCompletedRunsLast7Days": "За останні 7 днів завершених забігів не було. Відкрийте меню і виберіть «Почати гру», щоб сформувати новий звіт.",
+    "gradeProgressAriaLabel": "Прогрес звання",
+    "gradeProgressTitle": "Прогрес звання",
+    "weeklyRecapLifetimePromotion": "Підсумок тижня, шлях до підвищення за весь час.",
+    "pointsShortLabel": "{{count}} очк.",
+    "lifetimePointsSecured": "{{count}} очок за весь час",
+    "lastRecordedDefense": "Остання зафіксована оборона: {{date}}",
+    "rulesTitle": "ПРАВИЛА",
+    "performanceTitle": "РЕЗУЛЬТАТИ",
+    "performanceByOperatorForUser": "Показники за операціями для {{username}} на основі завершених забігів.",
+    "operationType": "Тип операції",
+    "accuracyPercent": "Точність (%)",
+    "avgSpeedSeconds": "Сер. швидкість (с)",
+    "masteryRating": "Рівень володіння",
+    "completeRunForPerformanceInsights": "Завершіть забіг, щоб відкрити аналітику за операціями.",
+    "rulesTypeAnswerPressEnter": "Введіть відповідь і натисніть Enter.",
+    "rulesPressEscapeMenu": "Натисніть Escape, щоб повернутися в меню.",
+    "rulesBeginWithLives": "Ви починаєте з 3 життів.",
+    "rulesBaseShieldPoints": "Щит бази має 5 очок захисту до втрати життя.",
+    "rulesReachStreakReward": "Отримайте 30 правильних відповідей поспіль, щоб заробити 1 додаткове життя.",
+    "rulesClearStagesToWin": "Пройдіть 28 етапів, щоб перемогти."
   },
   "auth": {
     "chooseProfile": "Виберіть профіль, щоб продовжити.",
@@ -53,6 +89,7 @@
   },
   "game": {
     "streakBonus": "Бонус серії",
+    "streakRewardDetail": "Вітаємо! +1 життя за серію з 30. Життів: {{lives}}",
     "stageLost": "Рівень програно",
     "stageCleared": "Рівень {{stage}} пройдено!",
     "perfectClear": "Ідеальна робота. Ви врятували своє місто.",
@@ -61,6 +98,47 @@
     "lostLifeSummary_one": "Ви програли цей рівень і втратили 1 життя. Залишилося життя: {{count}}.",
     "lostLifeSummary_other": "Ви програли цей рівень і втратили 1 життя. Залишилося життів: {{count}}.",
     "continue": "Продовжити"
+  },
+  "hud": {
+    "score": "Рахунок",
+    "stage": "Етап",
+    "baseShield": "Щит бази",
+    "lives": "Життя",
+    "streak": "Серія"
+  },
+  "pause": {
+    "savingProgressTitle": "Збереження прогресу",
+    "savingProgressDescription": "Зберігаємо дані перед закриттям...",
+    "confirmExitTitle": "Підтвердьте вихід",
+    "gamePausedTitle": "Гру призупинено",
+    "confirmEndGameQuestion": "Ви впевнені, що хочете завершити цю гру?",
+    "backgroundPauseDescription": "Гру призупинено, бо вкладка перейшла у фоновий режим. Відновіть, коли будете готові, або завершіть цю гру.",
+    "defaultPauseDescription": "Гру призупинено. Ви можете відновити її будь-коли або завершити цю гру.",
+    "keepPlaying": "Продовжити гру",
+    "resume": "Відновити",
+    "endGameAndClose": "Завершити гру і закрити",
+    "endGame": "Завершити гру"
+  },
+  "grades": {
+    "trainee": "Новобранець",
+    "cadet": "Кадет",
+    "commander": "Командир",
+    "major-general": "Генерал-майор"
+  },
+  "performance": {
+    "operation": {
+      "addition": "Додавання (+)",
+      "subtraction": "Віднімання (-)",
+      "multiplication": "Множення (*)",
+      "division": "Ділення (/)"
+    },
+    "mastery": {
+      "noData": "Немає даних",
+      "mastered": "Майстерно",
+      "proficient": "Впевнено",
+      "needsPractice": "Потребує практики",
+      "weakSpot": "Слабке місце"
+    }
   },
   "errors": {
     "profileUnavailable": "Профіль недоступний."

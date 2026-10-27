@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 
 import type { GameCallbacks } from '@game/main';
+import { tPhaser } from '@game/i18n/phaserI18n';
 import { useGameStore } from '@store/useGameStore';
 
 import * as adapter from '../../../platform/adapter';
@@ -622,7 +623,7 @@ describe('GameScene', () => {
     mockGameState.lastCallbacks?.onStreakReward(6);
 
     expect(store.showStreakRewardMessage).toHaveBeenCalledWith({
-      message: 'Congratulations! +1 life awarded for a 30 streak. Lives: 6',
+      message: tPhaser('game.streakRewardDetail', { lives: 6 }),
     });
 
     vi.advanceTimersByTime(3000);

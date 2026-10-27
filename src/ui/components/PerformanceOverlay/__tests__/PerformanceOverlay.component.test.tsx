@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/types';
+import i18n from '../../../../i18n/config';
 
 import { PerformanceOverlay } from '..';
 
@@ -16,7 +17,8 @@ function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
 }
 
 describe('PerformanceOverlay', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    await i18n.changeLanguage('en');
     setMockStoreState({ screenView: 'performance' });
   });
 
@@ -47,6 +49,18 @@ describe('PerformanceOverlay', () => {
     expect(
       screen.getByText(/Performance by operator for Ghost based on completed runs\./i),
     ).toBeInTheDocument();
+  });
+
+  it('renders translated performance labels in Ukrainian', async () => {
+    await i18n.changeLanguage('uk');
+    setMockStoreState({ screenView: 'performance' });
+
+    render(<PerformanceOverlay />);
+
+    expect(screen.getByRole('heading', { name: /результати/i })).toBeInTheDocument();
+    expect(screen.getByText(/показники за операціями для/i)).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /тип операції/i })).toBeInTheDocument();
+    expect(screen.getByRole('rowheader', { name: 'Додавання (+)' })).toBeInTheDocument();
   });
 
   it('shows an empty state when no completed history exists', () => {
