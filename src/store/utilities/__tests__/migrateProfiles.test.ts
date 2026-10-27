@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  migrateLegacyProfiles,
-  migrateProfiles,
-} from '../migrateProfiles';
+import { migrateProfiles } from '../migrateProfiles';
 
 describe('migrateProfiles', () => {
   it('normalizes persisted profile data into the canonical PlayerProfile shape', () => {
@@ -109,50 +106,5 @@ describe('migrateProfiles', () => {
     });
 
     expect(migrated.alpha?.preferredGrade).toBe('trainee');
-  });
-});
-
-describe('migrateLegacyProfiles', () => {
-  it('migrates legacy preferredDifficulty and reports migration details', () => {
-    const { profiles, report } = migrateLegacyProfiles({
-      alpha: {
-        preferredDifficulty: 'major-general',
-        bestScore: 400,
-      },
-      beta: null,
-    });
-
-    expect(profiles.alpha).toEqual({
-      username: 'alpha',
-      password: '',
-      bestScore: 400,
-      highestStage: 1,
-      preferredGrade: 'major-general',
-      createdAt: expect.any(Number),
-      updatedAt: expect.any(Number),
-    });
-
-    expect(report).toEqual({
-      status: 'success',
-      details: 'Migrated 1 profile(s). Dropped 1 invalid profile(s). Removed 1 legacy field(s).',
-      migratedProfiles: 1,
-      droppedProfiles: 1,
-      removedLegacyFields: 1,
-    });
-  });
-
-  it('returns a failed report when legacy payload is malformed', () => {
-    const result = migrateLegacyProfiles('invalid');
-
-    expect(result).toEqual({
-      profiles: {},
-      report: {
-        status: 'failed',
-        details: 'Legacy payload invalid. Reset profiles to empty map.',
-        migratedProfiles: 0,
-        droppedProfiles: 0,
-        removedLegacyFields: 0,
-      },
-    });
   });
 });
