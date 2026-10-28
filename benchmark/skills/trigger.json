@@ -1,0 +1,27 @@
+[
+  {
+    "id": "phaser-trigger-1",
+    "expectedSkill": "phaser-expert",
+    "prompt": "Add a new enemy wave system to the Phaser scene with increasing speed, keyboard input, and stable stage transitions."
+  },
+  {
+    "id": "react-trigger-1",
+    "expectedSkill": "react-frontend-expert",
+    "prompt": "Build a pause menu overlay with resume, restart, and quit actions using the React HUD and overlay flow."
+  },
+  {
+    "id": "storybook-trigger-1",
+    "expectedSkill": "storybook-expert",
+    "prompt": "Write Storybook stories for the menu, game-over state, and startup overlay so the UI states can be previewed quickly."
+  },
+  {
+    "id": "electron-trigger-1",
+    "expectedSkill": "electron-expert",
+    "prompt": "Update the Electron desktop window behavior so the close confirmation flow appears before the app exits during gameplay."
+  },
+  {
+    "id": "release-trigger-1",
+    "expectedSkill": "release-workflow",
+    "prompt": "Prepare the next production release with the right version bump, changelog, build checks, and release validation steps."
+  }
+]

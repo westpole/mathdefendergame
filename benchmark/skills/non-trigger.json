@@ -1,0 +1,27 @@
+[
+  {
+    "id": "non-trigger-1",
+    "expectedSkill": null,
+    "prompt": "Explain what a JavaScript Promise is in simple language."
+  },
+  {
+    "id": "non-trigger-2",
+    "expectedSkill": null,
+    "prompt": "Rewrite the README to make it easier for contributors to understand the project."
+  },
+  {
+    "id": "non-trigger-3",
+    "expectedSkill": null,
+    "prompt": "Help me debug a JSON parse error in a backend API script unrelated to the game."
+  },
+  {
+    "id": "non-trigger-4",
+    "expectedSkill": null,
+    "prompt": "Create a small landing page for a hobby blog with an attractive navigation section."
+  },
+  {
+    "id": "non-trigger-5",
+    "expectedSkill": null,
+    "prompt": "Write a short haiku about afternoon rain."
+  }
+]

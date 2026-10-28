@@ -1,0 +1,35 @@
+name: Skill validation
+
+on:
+  pull_request:
+    paths:
+      - '.github/skills/**'
+      - 'benchmark/skills/**'
+      - 'scripts/skill-smoke.mjs'
+      - 'scripts/skill-benchmark.mjs'
+      - 'package.json'
+  workflow_dispatch:
+
+jobs:
+  skill-validation:
+    name: Validate skill metadata and trigger heuristics
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run skill smoke test
+        run: npm run skill:smoke
+
+      - name: Run skill benchmark
+        run: npm run skill:bench:ci
