@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+CHANGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR)
+if [ -z "$CHANGED_FILES" ]; then
+  exit 0
+fi
+
+if printf '%s\n' "$CHANGED_FILES" | grep -Eq '(^|/)(SKILL\.md$|\.github/skills/|benchmark/skills/)'; then
+  echo "Running skill smoke checks..."
+  node scripts/skill-smoke.mjs
+fi

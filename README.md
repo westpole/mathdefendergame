@@ -17,3 +17,20 @@ The player defends a base from falling meteors containing math expressions by ty
 ## Agents
 
 `.github\agents` contains project's agents that were designed to help in development of each game components.
+
+## Skill validation
+
+This repo includes a lightweight validation workflow for custom skills.
+
+- `npm run skill:smoke` validates modified skill metadata, required frontmatter, and referenced assets.
+- `npm run skill:bench` runs the curated trigger/non-trigger benchmark suite under `benchmark/skills`.
+- The Git hook in `.githooks/pre-commit` runs the smoke test automatically when a skill file changes.
+
+To enable the repo hook locally:
+
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit
+```
+
+On Windows, use Git Bash or a shell that honors executable bits for the hook script.

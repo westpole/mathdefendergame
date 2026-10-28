@@ -75,7 +75,7 @@ This document describes each script defined in `package.json` and when to use it
 
 | Script | What it does | When to use it |
 | --- | --- | --- |
-| `npm run release:guard` | Runs the project release guard checks from `tools/release-guard.mjs`. | Use before versioning or pushing a release to ensure release prerequisites are satisfied. |
+| `npm run release:guard` | Runs the project release guard checks from `.github/skills/release-workflow/assets/scripts/release-guard.mjs`. | Use before versioning or pushing a release to ensure release prerequisites are satisfied. |
 | `npm run changelog` | Regenerates `CHANGELOG.md` from conventional commits. | Use when preparing release notes from commit history. |
 | `npm run git:commit` | Stages all changes and creates a release-style commit. | Use only inside the existing release workflow when all pending changes are intended for that commit. |
 | `npm run git:push` | Pushes `master` and all tags to `origin`. | Use only when the local release commit and tags are ready to publish. |

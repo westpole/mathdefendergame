@@ -1,0 +1,22 @@
+[
+  {
+    "id": "ambiguous-1",
+    "expectedSkill": "phaser-expert",
+    "prompt": "The game freezes when the player presses keys during stage transitions. It feels like an input or timing issue in the scene."
+  },
+  {
+    "id": "ambiguous-2",
+    "expectedSkill": "react-frontend-expert",
+    "prompt": "The menu looks wrong after a recent change. Can you inspect the app and fix the visible UI issue without touching gameplay logic?"
+  },
+  {
+    "id": "ambiguous-3",
+    "expectedSkill": "storybook-expert",
+    "prompt": "I need a quick preview of the main game screens and overlays to validate the states before release."
+  },
+  {
+    "id": "ambiguous-4",
+    "expectedSkill": "electron-expert",
+    "prompt": "The desktop app closes unexpectedly when the user exits from the menu, even though the game is still running."
+  }
+]

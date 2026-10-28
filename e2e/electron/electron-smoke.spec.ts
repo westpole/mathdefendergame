@@ -37,15 +37,15 @@ test.describe('Electron wrapper smoke', () => {
       activeWindow.close();
     });
 
-    await expect(page.getByRole('heading', { name: 'Confirm Exit' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /confirm exit/i })).toBeVisible();
 
     const pausedState = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
 
     expect(pausedState.phase).toBe('paused');
     expect(pausedState.pauseOverlay?.reason).toBe('window-close');
 
-    await page.getByRole('button', { name: 'Keep playing' }).click();
-    await expect(page.getByRole('heading', { name: 'Confirm Exit' })).toHaveCount(0);
+    await page.getByRole('button', { name: /keep playing/i }).click();
+    await expect(page.getByRole('heading', { name: /confirm exit/i })).toHaveCount(0);
 
     const resumedState = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
 
