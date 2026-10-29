@@ -1,0 +1,77 @@
+{
+  "reportTitle": "Math Defender Game Production Build Report",
+  "reportDate": "2026-10-28T21:00:00.000Z",
+  "branchName": "master",
+  "releaseType": "patch",
+  "status": {
+    "level": "success",
+    "text": "success"
+  },
+  "previousVersion": "1.4.0",
+  "nextVersion": "1.4.1",
+  "primaryBuildSize": "12.34 MB",
+  "primaryBuildPath": "build",
+  "summary": {
+    "primaryBuildSummary": "Web build completed successfully.",
+    "releaseWorkflow": "release:patch",
+    "gitState": "clean",
+    "checksOverview": "lint/typecheck/test:all passed",
+    "buildResult": "build:web and build:win passed",
+    "releaseResult": "commit, tag, and push completed"
+  },
+  "additionalBuilds": [
+    {
+      "build": "Windows installer",
+      "path": "dist",
+      "type": "nsis",
+      "size": "45.67 MB"
+    },
+    {
+      "build": "Windows portable",
+      "path": "dist/win-unpacked",
+      "type": "portable",
+      "size": "120.00 MB"
+    }
+  ],
+  "commands": [
+    {
+      "command": "npm run lint",
+      "result": "passed"
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "passed"
+    }
+  ],
+  "checks": [
+    {
+      "check": "Lint",
+      "command": "npm run lint",
+      "result": "passed",
+      "notes": "-"
+    },
+    {
+      "check": "Typecheck",
+      "command": "npm run typecheck",
+      "result": "passed",
+      "notes": "-"
+    }
+  ],
+  "buildDetails": {
+    "buildCommand": "npm run build:web",
+    "buildDirectory": "build",
+    "primaryOutputSize": "12.34 MB",
+    "generatedFiles": [
+      "index.html",
+      "assets/index.js"
+    ],
+    "buildNotes": "-"
+  },
+  "releaseStatus": {
+    "tagCreated": "yes",
+    "changelogGenerated": "yes",
+    "commitCreated": "yes",
+    "pushCompleted": "yes",
+    "finalNotes": "Release complete."
+  }
+}

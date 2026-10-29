@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{REPORT_TITLE}}</title>
+    <title>Math Defender Game Production Build Report</title>
     <style>
       :root {
         --bg: #111827;
@@ -178,38 +178,41 @@
     <div class="container">
       <header class="header">
         <span class="eyebrow">Release Report</span>
-        <h1>{{REPORT_TITLE}}</h1>
-        <p class="subhead">Generated: {{REPORT_DATE}} &middot; Branch: {{BRANCH_NAME}} &middot; Release Type: {{RELEASE_TYPE}}</p>
+        <h1 id="report-title">Math Defender Game Production Build Report</h1>
+        <p class="subhead">
+          Generated: <span id="report-date">-</span> &middot; Branch: <span id="branch-name">-</span> &middot; Release Type:
+          <span id="release-type">-</span>
+        </p>
       </header>
 
       <section class="grid">
         <div class="card">
           <span class="label">Status</span>
-          <div class="status-pill {{STATUS_CLASS}}">{{STATUS_TEXT}}</div>
+          <div id="status-pill" class="status-pill status-warning">Unknown</div>
         </div>
         <div class="card">
           <span class="label">Version</span>
-          <div class="value mono">{{PREVIOUS_VERSION}} &rarr; {{NEXT_VERSION}}</div>
+          <div class="value mono"><span id="previous-version">-</span> &rarr; <span id="next-version">-</span></div>
         </div>
         <div class="card">
           <span class="label">Primary app build size</span>
-          <div class="value mono">{{PRIMARY_BUILD_SIZE}}</div>
+          <div id="primary-build-size" class="value mono">-</div>
         </div>
         <div class="card">
           <span class="label">Primary app path</span>
-          <div class="value mono">{{PRIMARY_BUILD_PATH}}</div>
+          <div id="primary-build-path" class="value mono">-</div>
         </div>
       </section>
 
       <section class="panel">
         <h2>Summary</h2>
         <ul>
-          <li><strong>Primary application:</strong> {{PRIMARY_BUILD_SUMMARY}}</li>
-          <li><strong>Release workflow:</strong> {{RELEASE_WORKFLOW}}</li>
-          <li><strong>Git state:</strong> {{GIT_STATE}}</li>
-          <li><strong>Pre-release checks:</strong> {{CHECKS_OVERVIEW}}</li>
-          <li><strong>Build result:</strong> {{BUILD_RESULT}}</li>
-          <li><strong>Release result:</strong> {{RELEASE_RESULT}}</li>
+          <li><strong>Primary application:</strong> <span id="primary-build-summary">-</span></li>
+          <li><strong>Release workflow:</strong> <span id="release-workflow">-</span></li>
+          <li><strong>Git state:</strong> <span id="git-state">-</span></li>
+          <li><strong>Pre-release checks:</strong> <span id="checks-overview">-</span></li>
+          <li><strong>Build result:</strong> <span id="build-result">-</span></li>
+          <li><strong>Release result:</strong> <span id="release-result">-</span></li>
         </ul>
       </section>
 
@@ -224,9 +227,7 @@
               <th>Size</th>
             </tr>
           </thead>
-          <tbody>
-            {{ADDITIONAL_BUILD_ROWS}}
-          </tbody>
+          <tbody id="additional-build-rows"></tbody>
         </table>
       </section>
 
@@ -240,9 +241,7 @@
               <th>Result</th>
             </tr>
           </thead>
-          <tbody>
-            {{COMMAND_ROWS}}
-          </tbody>
+          <tbody id="command-rows"></tbody>
         </table>
       </section>
 
@@ -257,35 +256,220 @@
               <th>Notes</th>
             </tr>
           </thead>
-          <tbody>
-            {{CHECK_ROWS}}
-          </tbody>
+          <tbody id="check-rows"></tbody>
         </table>
       </section>
 
       <section class="panel">
         <h2>Build Details</h2>
         <ul>
-          <li><strong>Primary build command:</strong> <span class="mono">{{BUILD_COMMAND}}</span></li>
-          <li><strong>Primary build directory:</strong> <span class="mono">{{BUILD_DIRECTORY}}</span></li>
-          <li><strong>Primary output size:</strong> <span class="mono">{{PRIMARY_BUILD_SIZE}}</span></li>
-          <li><strong>Generated files:</strong> {{GENERATED_FILES}}</li>
-          <li><strong>Build notes:</strong> {{BUILD_NOTES}}</li>
+          <li><strong>Primary build command:</strong> <span id="build-command" class="mono">-</span></li>
+          <li><strong>Primary build directory:</strong> <span id="build-directory" class="mono">-</span></li>
+          <li><strong>Primary output size:</strong> <span id="build-primary-output-size" class="mono">-</span></li>
+          <li><strong>Generated files:</strong> <span id="generated-files">-</span></li>
+          <li><strong>Build notes:</strong> <span id="build-notes">-</span></li>
         </ul>
       </section>
 
       <section class="panel">
         <h2>Release Status</h2>
         <ul>
-          <li><strong>Tag created:</strong> {{TAG_CREATED}}</li>
-          <li><strong>Changelog generated:</strong> {{CHANGELOG_GENERATED}}</li>
-          <li><strong>Commit created:</strong> {{COMMIT_CREATED}}</li>
-          <li><strong>Push completed:</strong> {{PUSH_COMPLETED}}</li>
-          <li><strong>Final notes:</strong> {{FINAL_NOTES}}</li>
+          <li><strong>Tag created:</strong> <span id="tag-created">-</span></li>
+          <li><strong>Changelog generated:</strong> <span id="changelog-generated">-</span></li>
+          <li><strong>Commit created:</strong> <span id="commit-created">-</span></li>
+          <li><strong>Push completed:</strong> <span id="push-completed">-</span></li>
+          <li><strong>Final notes:</strong> <span id="final-notes">-</span></li>
         </ul>
       </section>
 
       <div class="footer">Math Defender Game release report template</div>
     </div>
+    <!-- REPORT_DATA_INJECTION -->
+    <script>
+      const STATUS_CLASS_BY_LEVEL = {
+        success: 'status-success',
+        warning: 'status-warning',
+        danger: 'status-danger',
+      };
+
+      function setTextContent(elementId, value) {
+        const element = document.getElementById(elementId);
+        if (!element) {
+          return;
+        }
+        element.textContent = typeof value === 'string' && value.trim().length > 0 ? value : '-';
+      }
+
+      function createTableCell(text) {
+        const cell = document.createElement('td');
+        cell.textContent = typeof text === 'string' && text.trim().length > 0 ? text : '-';
+        return cell;
+      }
+
+      function renderAdditionalBuildRows(rows) {
+        const tbody = document.getElementById('additional-build-rows');
+        if (!tbody) {
+          return;
+        }
+
+        tbody.innerHTML = '';
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+          const tr = document.createElement('tr');
+          const td = createTableCell('No additional builds.');
+          td.colSpan = 4;
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          return;
+        }
+
+        for (const row of rows) {
+          const tr = document.createElement('tr');
+          tr.appendChild(createTableCell(row.build));
+          tr.appendChild(createTableCell(row.path));
+          tr.appendChild(createTableCell(row.type));
+          tr.appendChild(createTableCell(row.size));
+          tbody.appendChild(tr);
+        }
+      }
+
+      function renderCommandRows(rows) {
+        const tbody = document.getElementById('command-rows');
+        if (!tbody) {
+          return;
+        }
+
+        tbody.innerHTML = '';
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+          const tr = document.createElement('tr');
+          const td = createTableCell('No commands captured.');
+          td.colSpan = 3;
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          return;
+        }
+
+        rows.forEach((row, index) => {
+          const tr = document.createElement('tr');
+          tr.appendChild(createTableCell(String(index + 1)));
+          tr.appendChild(createTableCell(row.command));
+          tr.appendChild(createTableCell(row.result));
+          tbody.appendChild(tr);
+        });
+      }
+
+      function renderCheckRows(rows) {
+        const tbody = document.getElementById('check-rows');
+        if (!tbody) {
+          return;
+        }
+
+        tbody.innerHTML = '';
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+          const tr = document.createElement('tr');
+          const td = createTableCell('No checks captured.');
+          td.colSpan = 4;
+          tr.appendChild(td);
+          tbody.appendChild(tr);
+          return;
+        }
+
+        for (const row of rows) {
+          const tr = document.createElement('tr');
+          tr.appendChild(createTableCell(row.check));
+          tr.appendChild(createTableCell(row.command));
+          tr.appendChild(createTableCell(row.result));
+          tr.appendChild(createTableCell(row.notes));
+          tbody.appendChild(tr);
+        }
+      }
+
+      function applyStatus(status) {
+        const statusPill = document.getElementById('status-pill');
+        if (!statusPill) {
+          return;
+        }
+
+        statusPill.classList.remove('status-success', 'status-warning', 'status-danger');
+
+        const level = status && typeof status.level === 'string' ? status.level : 'warning';
+        const statusClass = STATUS_CLASS_BY_LEVEL[level] || STATUS_CLASS_BY_LEVEL.warning;
+        statusPill.classList.add(statusClass);
+        statusPill.textContent =
+          status && typeof status.text === 'string' && status.text.trim().length > 0 ? status.text : 'Unknown';
+      }
+
+      function initializeReport(data) {
+        const reportTitle =
+          data && typeof data.reportTitle === 'string' && data.reportTitle.trim().length > 0
+            ? data.reportTitle
+            : 'Math Defender Game Production Build Report';
+
+        document.title = reportTitle;
+        setTextContent('report-title', reportTitle);
+        setTextContent('report-date', data.reportDate);
+        setTextContent('branch-name', data.branchName);
+        setTextContent('release-type', data.releaseType);
+
+        applyStatus(data.status);
+
+        setTextContent('previous-version', data.previousVersion);
+        setTextContent('next-version', data.nextVersion);
+        setTextContent('primary-build-size', data.primaryBuildSize);
+        setTextContent('primary-build-path', data.primaryBuildPath);
+
+        setTextContent('primary-build-summary', data.summary && data.summary.primaryBuildSummary);
+        setTextContent('release-workflow', data.summary && data.summary.releaseWorkflow);
+        setTextContent('git-state', data.summary && data.summary.gitState);
+        setTextContent('checks-overview', data.summary && data.summary.checksOverview);
+        setTextContent('build-result', data.summary && data.summary.buildResult);
+        setTextContent('release-result', data.summary && data.summary.releaseResult);
+
+        renderAdditionalBuildRows(data.additionalBuilds);
+        renderCommandRows(data.commands);
+        renderCheckRows(data.checks);
+
+        setTextContent('build-command', data.buildDetails && data.buildDetails.buildCommand);
+        setTextContent('build-directory', data.buildDetails && data.buildDetails.buildDirectory);
+        setTextContent('build-primary-output-size', data.buildDetails && data.buildDetails.primaryOutputSize);
+
+        if (data.buildDetails && Array.isArray(data.buildDetails.generatedFiles) && data.buildDetails.generatedFiles.length > 0) {
+          setTextContent('generated-files', data.buildDetails.generatedFiles.join(', '));
+        } else {
+          setTextContent('generated-files', data.buildDetails && data.buildDetails.generatedFiles);
+        }
+
+        setTextContent('build-notes', data.buildDetails && data.buildDetails.buildNotes);
+
+        setTextContent('tag-created', data.releaseStatus && data.releaseStatus.tagCreated);
+        setTextContent('changelog-generated', data.releaseStatus && data.releaseStatus.changelogGenerated);
+        setTextContent('commit-created', data.releaseStatus && data.releaseStatus.commitCreated);
+        setTextContent('push-completed', data.releaseStatus && data.releaseStatus.pushCompleted);
+        setTextContent('final-notes', data.releaseStatus && data.releaseStatus.finalNotes);
+      }
+
+      function main() {
+        const dataScript = document.getElementById('report-data');
+        if (!dataScript) {
+          setTextContent('final-notes', 'Report data was not injected into this template.');
+          return;
+        }
+
+        let reportData = {};
+
+        try {
+          reportData = JSON.parse(dataScript.textContent || '{}');
+        } catch {
+          setTextContent('final-notes', 'Unable to parse embedded report JSON data.');
+          return;
+        }
+
+        initializeReport(reportData);
+      }
+
+      main();
+    </script>
   </body>
 </html>

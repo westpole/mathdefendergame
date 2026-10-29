@@ -25,6 +25,8 @@ Do not use this skill for unrelated feature development or debugging work.
 
 - Guard script: `.github/skills/release-workflow/scripts/release-guard.mjs`
 - Report template: `.github/skills/release-workflow/assets/templates/prod-build-report-template.html`
+- Report JSON data template: `.github/skills/release-workflow/assets/templates/prod-build-report-data-template.json`
+- Report build script: `.github/skills/release-workflow/scripts/build-prod-report.mjs`
 
 ## Workflow
 
@@ -62,7 +64,9 @@ Do not use this skill for unrelated feature development or debugging work.
 
 7. **Generate release report**
    - Remove old files in `reports/current-prod-build`.
-   - Generate a new HTML report from the template asset.
+   - Write report data to `reports/current-prod-build/prod-build-report.json`.
+   - Generate `reports/current-prod-build/index.html` from the template asset and JSON data:
+     - `node .github/skills/release-workflow/scripts/build-prod-report.mjs`
    - Report must include:
      - commands executed
      - checks and outcomes

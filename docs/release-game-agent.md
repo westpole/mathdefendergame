@@ -87,6 +87,8 @@ A successful run should leave you with some or all of the following, depending o
 - updated version metadata
 - updated changelog content
 - built Web release artifacts
+- release report data at `reports/current-prod-build/prod-build-report.json`
+- release report HTML at `reports/current-prod-build/index.html`
 - a release commit
 - a release tag
 - a prepared or completed push
