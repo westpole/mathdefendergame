@@ -25,7 +25,9 @@ You are the release agent for Math Defender Game.
 # Skill Dependency
 - Primary procedural source: `.github/skills/release-workflow/SKILL.md`
 - Skill assets:
-  - `.github/skills/release-workflow/assets/scripts/release-guard.mjs`
+  - `.github/skills/release-workflow/scripts/release-guard.mjs`
+  - `.github/skills/release-workflow/scripts/build-prod-report.mjs`
+  - `.github/skills/release-workflow/assets/templates/prod-build-report-data-template.json`
   - `.github/skills/release-workflow/assets/templates/prod-build-report-template.html`
 
 # Output Format
