@@ -423,6 +423,85 @@
   left: 0;
 }
 
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.settings-avatar-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  &__title {
+    margin: 0;
+    color: $text-primary;
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+}
+
+.settings-avatar-grid {
+  display: grid;
+  gap: $spacing-sm;
+  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+}
+
+.settings-avatar-option {
+  position: relative;
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-md;
+  background: rgba(15, 23, 42, 0.28);
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+
+  img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  &:hover {
+    border-color: rgba(255, 224, 102, 0.72);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 224, 102, 0.9);
+    outline-offset: 2px;
+  }
+}
+
+.settings-avatar-option--selected {
+  border-color: rgba(255, 224, 102, 0.9);
+  box-shadow: 0 0 0 2px rgba(255, 224, 102, 0.18);
+}
+
+.settings-avatar-option__checkmark {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid rgba(255, 224, 102, 0.9);
+  color: $color-primary-yellow;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.settings-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .profile-stat-list {
   flex: 1;
   min-width: 0;

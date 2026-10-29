@@ -20,6 +20,7 @@ import { Loading } from '@ui/components/Loading';
 import { PerformanceOverlay } from '@ui/components/PerformanceOverlay';
 import { ProfileOverlay } from '@ui/components/ProfileOverlay';
 import { RulesOverlay } from '@ui/components/Rules';
+import { SettingsOverlay } from '@ui/components/SettingsOverlay';
 import { GameBgLayout } from '@ui/components/GameBgLayout';
 import { LoginOverlay } from '@ui/components/LoginOverlay';
 import { MenuControls } from '@ui/components/MenuControls';
@@ -73,6 +74,7 @@ export function App() {
         {bootReady && phase === 'login' && (isSimpleLoginEnabled ? <ProfileSelector /> : <LoginOverlay />)}
         {isStartPhase && screenView === 'home' && <HomeOverlay />}
         {isStartPhase && screenView === 'profile' && <ProfileOverlay />}
+        {isStartPhase && screenView === 'settings' && <SettingsOverlay />}
         {isStartPhase && screenView === 'performance' && <PerformanceOverlay />}
         {isStartPhase && screenView === 'rules' && <RulesOverlay />}
         {isStartPhase && screenView === 'weekly-report' && <WeeklyReportOverlay />}

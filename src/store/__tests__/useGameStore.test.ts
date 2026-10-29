@@ -6,6 +6,7 @@
 import { useGameStore } from '../useGameStore';
 import type { GameHistoryEntry } from '@shared/types';
 import { isEncryptedPassword } from '../utilities/passwordEncryption';
+import { DEFAULT_AVATAR_ID } from '@shared/avatarCatalog';
 
 describe('useGameStore', () => {
   beforeEach(() => {
@@ -196,6 +197,11 @@ describe('useGameStore', () => {
       expect(useGameStore.getState().screenView).toBe('performance');
     });
 
+    it('should switch to settings view', () => {
+      useGameStore.getState().openScreenView('settings');
+      expect(useGameStore.getState().screenView).toBe('settings');
+    });
+
     it('should return to home menu', () => {
       useGameStore.getState().openScreenView('rules');
       useGameStore.getState().openScreenView('home');
@@ -378,6 +384,7 @@ describe('useGameStore', () => {
       expect(useGameStore.getState().screenView).toBe('home');
       expect(useGameStore.getState().rememberedUsername).toBeNull();
       expect(isEncryptedPassword(useGameStore.getState().profiles.PilotOne.password)).toBe(true);
+      expect(useGameStore.getState().profiles.PilotOne.avatarId).toBe(DEFAULT_AVATAR_ID);
     });
 
     it('logs off by clearing active and remembered login credentials', () => {
@@ -402,6 +409,25 @@ describe('useGameStore', () => {
 
     it('returns null when no profile is active', () => {
       expect(useGameStore.getState().getActiveProfile()).toBeNull();
+    });
+
+    it('updates the active profile avatar', () => {
+      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+
+      const result = useGameStore.getState().updateActiveProfileAvatar('avatar-4');
+
+      expect(result.success).toBe(true);
+      expect(useGameStore.getState().profiles.PilotOne.avatarId).toBe('avatar-4');
+    });
+
+    it('rejects invalid avatar updates', () => {
+      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+
+      const result = useGameStore.getState().updateActiveProfileAvatar('avatar-99');
+
+      expect(result.success).toBe(false);
+      expect(result.error).toMatch(/invalid avatar/i);
+      expect(useGameStore.getState().profiles.PilotOne.avatarId).toBe(DEFAULT_AVATAR_ID);
     });
 
     it('derives the login grade from cumulative game history', () => {

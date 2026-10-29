@@ -21,6 +21,7 @@ const EMPTY_HISTORY: Array<{
 export function ProfileOverlay() {
   const { t } = useTranslation();
   const activeUsername = useGameStore((state) => state.activeUsername);
+  const activeProfile = useGameStore((state) => (state.activeUsername ? state.profiles[state.activeUsername] ?? null : null));
   const phase = useGameStore((state) => state.phase);
   const grade = useGameStore((state) => state.grade);
   const currentScore = useGameStore((state) => state.score);
@@ -84,7 +85,7 @@ export function ProfileOverlay() {
           </div>
 
           <div className="profile-header">
-            <ProfileIcon label={t('ui.gradeIconLabel', { grade: currentGradeLabel })} size={120} />
+            <ProfileIcon avatarId={activeProfile?.avatarId} label={t('ui.gradeIconLabel', { grade: currentGradeLabel })} size={120} />
 
             <div className="profile-stat-list">
               <div className="profile-identity-row">
