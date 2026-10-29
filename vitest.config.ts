@@ -19,6 +19,9 @@ const aliases = {
 const isElectronOnlyRun = process.argv.some((arg, index, argv) => {
   return arg === '--project=electron' || (arg === '--project' && argv[index + 1] === 'electron');
 });
+const shouldPrintStdout = ['1', 'true', 'yes', 'on'].includes(
+  (process.env.VITEST_PRINT_STDOUT || '').toLowerCase(),
+);
 
 const defaultCoverageThresholds = {
   // Global fallback thresholds if files don't match specific globs below
@@ -87,6 +90,11 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    onConsoleLog(_log, type) {
+      if (type === 'stdout' && !shouldPrintStdout) {
+        return false;
+      }
+    },
 
     reporters: [
       'default',
