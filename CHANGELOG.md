@@ -1,4 +1,24 @@
 
+## [1.5.0](https://github.com/westpole/mathdefendergame/compare/v1.4.0...v1.5.0) (2026-10-30)
+
+### Features
+
+* [#105](https://github.com/westpole/mathdefendergame/issues/105) add localization support for UI components and implement language selection in game overlays ([3f91b78](https://github.com/westpole/mathdefendergame/commit/3f91b781b1105fa3488ef532b191adfb8251543c))
+* [#105](https://github.com/westpole/mathdefendergame/issues/105) extend language package to the Phaser scope and add localization support in Storybook ([f460ffc](https://github.com/westpole/mathdefendergame/commit/f460ffc9327c782c2432256cef773b533e4465dd))
+* [#112](https://github.com/westpole/mathdefendergame/issues/112) enhance release workflow with report generation and templates ([7f4add6](https://github.com/westpole/mathdefendergame/commit/7f4add66fc9b800e585ece135cb808606c8476cb))
+* [#19](https://github.com/westpole/mathdefendergame/issues/19) Implement practice mode with operation selection and update game state management ([98b7c8c](https://github.com/westpole/mathdefendergame/commit/98b7c8c84b94acef629a05b85300120bf62f3897))
+* [#30](https://github.com/westpole/mathdefendergame/issues/30) add option to enable stdout output for Vitest test scripts ([50e1e5b](https://github.com/westpole/mathdefendergame/commit/50e1e5b6e1b1387c4275ba8f4ca4a16e6f0eaf46))
+* [#30](https://github.com/westpole/mathdefendergame/issues/30) add save animation to settings save button and corresponding styles ([fad739a](https://github.com/westpole/mathdefendergame/commit/fad739adcda110224bc4813acddce61890aba71c))
+* [#30](https://github.com/westpole/mathdefendergame/issues/30) add settings overlay for avatar selection and profile customization ([59ccdfd](https://github.com/westpole/mathdefendergame/commit/59ccdfd168d3ee0339d728e828c881fb239e6093))
+* [#30](https://github.com/westpole/mathdefendergame/issues/30) reduce icon size and remove unused profile SVG ([bd4926d](https://github.com/westpole/mathdefendergame/commit/bd4926d867ad9679a566382eaaf4648786dafc0e))
+* [#6](https://github.com/westpole/mathdefendergame/issues/6) include language selector in ProfileSelector component and update login test for language reset ([0668cb3](https://github.com/westpole/mathdefendergame/commit/0668cb3231d8fc5fcc2bf432886b1de69c250d9d))
+* [#6](https://github.com/westpole/mathdefendergame/issues/6) integrate i18next for localization support ([19f88c4](https://github.com/westpole/mathdefendergame/commit/19f88c45728884609d3474766b1da2ea5babbeb3))
+
+### Bug Fixes
+
+* [#107](https://github.com/westpole/mathdefendergame/issues/107) ensure document checks before syncing language in i18n configuration ([e412fe6](https://github.com/westpole/mathdefendergame/commit/e412fe687ba5a731efce8df905fb02cdcbc49033))
+* [#116](https://github.com/westpole/mathdefendergame/issues/116) update release workflow to automate version bump determination ([25d2872](https://github.com/westpole/mathdefendergame/commit/25d287264f9e8ebfcde08e51395843398b62a788))
+
 ## [1.4.0](https://github.com/westpole/mathdefendergame/compare/v1.3.0...v1.4.0) (2026-10-13)
 
 ### Features
