@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
@@ -22,10 +22,32 @@ export function SettingsOverlay() {
   const persistedAvatarId = resolveAvatarId(activeProfile?.avatarId);
   const [pendingAvatarId, setPendingAvatarId] = useState<AvatarId | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isSaveAnimating, setIsSaveAnimating] = useState(false);
+  const saveAnimationTimeoutRef = useRef<number | null>(null);
   const draftAvatarId = pendingAvatarId ?? persistedAvatarId;
   const hasUnsavedChanges = pendingAvatarId !== null && pendingAvatarId !== persistedAvatarId;
 
   const avatarOptions = avatarIds.map((avatarId) => ({ avatarId, src: avatarImageById[avatarId] }));
+
+  useEffect(() => {
+    return () => {
+      if (saveAnimationTimeoutRef.current !== null) {
+        window.clearTimeout(saveAnimationTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const triggerSaveAnimation = () => {
+    if (saveAnimationTimeoutRef.current !== null) {
+      window.clearTimeout(saveAnimationTimeoutRef.current);
+    }
+
+    setIsSaveAnimating(true);
+    saveAnimationTimeoutRef.current = window.setTimeout(() => {
+      setIsSaveAnimating(false);
+      saveAnimationTimeoutRef.current = null;
+    }, 220);
+  };
 
   const handleSave = () => {
     const result = updateActiveProfileAvatar(draftAvatarId);
@@ -37,6 +59,7 @@ export function SettingsOverlay() {
 
     setPendingAvatarId(null);
     setErrorMessage(null);
+    triggerSaveAnimation();
   };
 
   return (
@@ -82,7 +105,7 @@ export function SettingsOverlay() {
 
         <div className="settings-actions">
           <button
-            className="primary-button"
+            className={clsx('primary-button', 'settings-save-button', isSaveAnimating && 'settings-save-button--animating')}
             data-testid="settings-save-avatar-button"
             disabled={!hasUnsavedChanges}
             onClick={handleSave}

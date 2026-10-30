@@ -502,6 +502,39 @@
   justify-content: flex-end;
 }
 
+.settings-save-button {
+  transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+
+  &:hover {
+    filter: brightness(1.06);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+.settings-save-button--animating {
+  animation: settings-save-button-pop 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes settings-save-button-pop {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(255, 224, 102, 0);
+  }
+
+  35% {
+    transform: scale(0.97);
+    box-shadow: 0 0 0 10px rgba(255, 224, 102, 0.18);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(255, 224, 102, 0);
+  }
+}
+
 .profile-stat-list {
   flex: 1;
   min-width: 0;
