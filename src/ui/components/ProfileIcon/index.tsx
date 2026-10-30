@@ -1,4 +1,3 @@
-import profileIconBackground from '@assets/profile.svg';
 import { resolveAvatarSrc } from '@shared/avatarCatalog';
 
 interface ProfileIconProps {
@@ -24,8 +23,14 @@ export function ProfileIcon({ label, size = 96, avatarId = null }: ProfileIconPr
         height: `${size}px`,
       }}
     >
-      <img src={profileIconBackground} alt={label}/>
-      <img src={resolveAvatarSrc(avatarId)} alt={label}/>
+      <img
+        src={resolveAvatarSrc(avatarId)}
+        alt={label}
+        style={{
+          display: 'block',
+          borderRadius: '50%',
+        }}
+      />
     </div>
   );
 }
