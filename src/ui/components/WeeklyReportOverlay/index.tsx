@@ -16,6 +16,7 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 export function WeeklyReportOverlay() {
   const { t } = useTranslation();
   const activeUsername = useGameStore((state) => state.activeUsername);
+  const activeProfile = useGameStore((state) => (state.activeUsername ? state.profiles[state.activeUsername] ?? null : null));
   const grade = useGameStore((state) => state.grade);
   const phase = useGameStore((state) => state.phase);
   const score = useGameStore((state) => state.score);
@@ -41,7 +42,7 @@ export function WeeklyReportOverlay() {
     <div className="overlay-screen overlay-screen--interactive" data-testid="weekly-report-overlay">
       <div className="overlay-panel home-report-panel" data-testid="home-weekly-report">
         <div className="home-report-header">
-          <ProfileIcon label={t('ui.gradeIconLabel', { grade: iconGradeLabel })} size={120} />
+          <ProfileIcon avatarId={activeProfile?.avatarId} label={t('ui.gradeIconLabel', { grade: iconGradeLabel })} size={120} />
 
           <div className="home-report-copy">
             <p className="home-report-eyebrow">{t('ui.weeklyProgressReportTitle')}</p>

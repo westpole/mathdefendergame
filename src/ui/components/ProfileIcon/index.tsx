@@ -1,9 +1,9 @@
-import profileIconBackground from '@assets/profile.svg';
-import avatarIcon from '@assets/avatar.svg';
+import { resolveAvatarSrc } from '@shared/avatarCatalog';
 
 interface ProfileIconProps {
   label: string;
   size?: number;
+  avatarId?: string | null;
 }
 
 /**
@@ -12,7 +12,7 @@ interface ProfileIconProps {
  * @param param0 The props object containing the label and optional size.
  * @returns A JSX element representing the profile icon.
  */
-export function ProfileIcon({ label, size = 96 }: ProfileIconProps) {
+export function ProfileIcon({ label, size = 96, avatarId = null }: ProfileIconProps) {
   return (
     <div
       aria-label={label}
@@ -23,8 +23,14 @@ export function ProfileIcon({ label, size = 96 }: ProfileIconProps) {
         height: `${size}px`,
       }}
     >
-      <img src={profileIconBackground} alt={label}/>
-      <img src={avatarIcon} alt={label}/>
+      <img
+        src={resolveAvatarSrc(avatarId)}
+        alt={label}
+        style={{
+          display: 'block',
+          borderRadius: '50%',
+        }}
+      />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { encryptPassword } from '../utilities/passwordEncryption';
+import { DEFAULT_AVATAR_ID } from '@shared/avatarCatalog';
 import type {
   GameStoreState,
   LoginResult,
@@ -53,6 +54,7 @@ export function buildNewProfile(
   return {
     username,
     password: encryptPassword(password),
+    avatarId: DEFAULT_AVATAR_ID,
     bestScore: 0,
     highestStage: 1,
     preferredGrade,
@@ -60,4 +62,3 @@ export function buildNewProfile(
     updatedAt: now,
   };
 }
-

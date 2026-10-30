@@ -25,6 +25,7 @@ export function MenuList({ setIsOpen }: MenuListProps) {
     { id: 'practice', label: t('ui.practiceMode'), type: 'start', mode: 'practice' },
     { id: 'weekly-report', label: t('ui.weeklyReport'), type: 'view', view: 'weekly-report' },
     { id: 'profile', label: t('ui.profile'), type: 'view', view: 'profile' },
+    { id: 'settings', label: t('ui.settings'), type: 'view', view: 'settings' },
     { id: 'performance', label: t('ui.performance'), type: 'view', view: 'performance' },
     { id: 'rules', label: t('ui.rules'), type: 'view', view: 'rules' },
     { id: 'logoff', label: t('ui.logOff'), type: 'logoff' },

@@ -37,11 +37,11 @@ flowchart TD
 | Key | Type | Description |
 | --- | --- | --- |
 | `phase` | `OverlayPhase` | Current overlay lifecycle: booting, login, start, playing, paused, stage-message, gameover. |
-| `screenView` | `ScreenView` | Active React screen: home, profile, performance, or rules. |
+| `screenView` | `ScreenView` | Active React screen: home, profile, settings, performance, rules, or weekly-report. |
 | `bootReady` | `boolean` | Set once the boot sequence finishes and the app can render the main menu flow. |
 | `activeUsername` | `string \| null` | Logged-in profile currently active for the session. |
 | `rememberedUsername` | `string \| null` | Persisted username used to restore a session after reload. |
-| `profiles` | `Record<string, PlayerProfile>` | Registered player profiles, including password, best score, highest reached stage, and timestamps. |
+| `profiles` | `Record<string, PlayerProfile>` | Registered player profiles, including password, avatar, best score, highest reached stage, and timestamps. |
 | `grade` | `Grade` | Current player grade, used for progression filtering. |
 | `score` | `number` | Current in-run score. |
 | `lives` | `number` | Remaining player lives. |
@@ -83,6 +83,7 @@ flowchart TD
 | `logOff` | Logs the current user out and returns to login. |
 | `loginProfile` | Authenticates a known player profile. |
 | `createAndLoginProfile` | Validates and creates a new player profile, then logs them in. |
+| `updateActiveProfileAvatar` | Updates the active profile avatar selection from the supported avatar catalog. |
 | `getActiveProfile` | Resolves the profile object for the current user. |
 | `addGameHistory` | Appends a new gameplay record for the active profile or guest bucket. |
 | `getGameHistory` | Retrieves recent game history for a profile or the active player. |

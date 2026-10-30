@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { DEFAULT_AVATAR_ID } from '@shared/avatarCatalog';
 
 import { migrateProfiles } from '../migrateProfiles';
 
@@ -8,6 +9,7 @@ describe('migrateProfiles', () => {
       alice: {
         username: 'alice',
         password: 'StrongPass1!',
+        avatarId: DEFAULT_AVATAR_ID,
         bestScore: 900,
         highestStage: 12,
         preferredGrade: 'commander',
@@ -33,6 +35,7 @@ describe('migrateProfiles', () => {
     expect(migrated.alice).toEqual({
       username: 'alice',
       password: 'StrongPass1!',
+      avatarId: DEFAULT_AVATAR_ID,
       bestScore: 900,
       highestStage: 12,
       preferredGrade: 'commander',
@@ -43,6 +46,7 @@ describe('migrateProfiles', () => {
     expect(migrated.bob).toEqual({
       username: 'bob',
       password: '',
+      avatarId: DEFAULT_AVATAR_ID,
       bestScore: 250,
       highestStage: 6,
       preferredGrade: 'major-general',
@@ -53,6 +57,7 @@ describe('migrateProfiles', () => {
     expect(migrated.carol).toEqual({
       username: 'carol',
       password: 'weak',
+      avatarId: DEFAULT_AVATAR_ID,
       bestScore: 30,
       highestStage: 3,
       preferredGrade: 'trainee',
@@ -80,6 +85,7 @@ describe('migrateProfiles', () => {
       dave: {
         username: 'dave',
         password: '',
+        avatarId: DEFAULT_AVATAR_ID,
         bestScore: 0,
         highestStage: 4,
         preferredGrade: 'cadet',
@@ -89,6 +95,7 @@ describe('migrateProfiles', () => {
       erin: {
         username: 'erin',
         password: '',
+        avatarId: DEFAULT_AVATAR_ID,
         bestScore: 0,
         highestStage: 1,
         preferredGrade: 'trainee',

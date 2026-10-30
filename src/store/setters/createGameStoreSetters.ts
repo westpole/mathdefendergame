@@ -35,6 +35,7 @@ import type {
   GameStoreGetState,
   GameStoreSetState,
 } from './types';
+import { isAvatarId } from '@shared/avatarCatalog';
 
 /**
  * Builds a synthetic password seed for simple profile mode and guest-like account flows.
@@ -84,6 +85,7 @@ export function createGameStoreSetters(
   | 'selectProfileByUsername'
   | 'createAndLoginProfile'
   | 'createAndLoginSimpleProfile'
+  | 'updateActiveProfileAvatar'
   | 'getActiveProfile'
   | 'addGameHistory'
   | 'getGameHistory'
@@ -354,6 +356,37 @@ export function createGameStoreSetters(
         phase: 'start',
         screenView: 'home',
       }));
+
+      return { success: true };
+    },
+    updateActiveProfileAvatar: (avatarId): LoginResult => {
+      if (!isAvatarId(avatarId)) {
+        return {
+          success: false,
+          error: 'Invalid avatar selection.',
+        };
+      }
+
+      const state = get();
+      const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
+
+      if (!activeProfile) {
+        return {
+          success: false,
+          error: 'Active profile is unavailable.',
+        };
+      }
+
+      set({
+        profiles: {
+          ...state.profiles,
+          [activeProfile.username]: {
+            ...activeProfile,
+            avatarId,
+            updatedAt: Date.now(),
+          },
+        },
+      });
 
       return { success: true };
     },

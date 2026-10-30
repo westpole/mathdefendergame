@@ -31,6 +31,8 @@ This document describes each script defined in `package.json` and when to use it
 | `npm run test:e2e:ui` | Opens the Playwright UI runner. | Use when debugging end-to-end tests interactively. |
 | `npm run test:e2e:update-snapshots` | Re-records snapshots for the Electron visual test project. | Use only when visual changes are intentional and the new snapshots should become the baseline. |
 
+Vitest suppresses `stdout` output by default. To enable it for a run, set `VITEST_PRINT_STDOUT=1` before invoking a test script (PowerShell example: `$env:VITEST_PRINT_STDOUT='1'; npm run test:all`).
+
 ## Build And Preview
 
 | Script | What it does | When to use it |

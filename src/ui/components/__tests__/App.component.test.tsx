@@ -257,6 +257,22 @@ describe('App start menu controls', () => {
     expect(screen.getByText(/profile/i)).toBeInTheDocument();
   });
 
+  it('renders the settings page when the menu view is set to settings', () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        screenView: 'settings',
+        phase: 'start',
+      });
+    });
+
+    render(<App />);
+
+    expect(screen.getByTestId('settings-overlay')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'SETTINGS' })).toBeInTheDocument();
+  });
+
   it('forwards Electron close events to UIScene and destroys the Phaser game on unmount', () => {
     setMockStoreState({ bootReady: true, phase: 'login' });
 

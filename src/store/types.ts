@@ -6,15 +6,17 @@ import type {
   GameMode,
   PracticeOperation,
 } from '@shared/types';
+import type { AvatarId } from '@shared/avatarCatalog';
 
 export type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'paused' | 'stage-message' | 'gameover';
-export type ScreenView = 'home' | 'profile' | 'performance' | 'rules' | 'weekly-report';
+export type ScreenView = 'home' | 'profile' | 'performance' | 'rules' | 'weekly-report' | 'settings';
 export type HistoryByProfile = Record<string, GameHistoryEntry[]>;
 export type PauseOverlayReason = 'escape' | 'window-close' | 'background';
 
 export interface PlayerProfile {
   username: string;
   password: string;
+  avatarId?: AvatarId;
   bestScore: number;
   highestStage: number;
   preferredGrade: Grade;
@@ -101,6 +103,7 @@ export interface GameStoreState {
   selectProfileByUsername: (username: string, rememberProfile?: boolean) => LoginResult;
   createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;
   createAndLoginSimpleProfile: (username: string) => LoginResult;
+  updateActiveProfileAvatar: (avatarId: string) => LoginResult;
   getActiveProfile: () => PlayerProfile | null;
   addGameHistory: (entry: GameHistoryEntry) => void;
   getGameHistory: (username?: string | null, limit?: number) => GameHistoryEntry[];
