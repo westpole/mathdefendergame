@@ -18,7 +18,8 @@ Do not use this skill for unrelated feature development or debugging work.
 
 ## Inputs
 
-- Release type: `patch`, `minor`, or `major`
+- Release type is derived automatically by running `npm run which:version`.
+- Never ask the user to type a version number; use the recommended bump from `npm run which:version` (`patch`, `minor`, or `major`).
 - Optional release notes or constraints from the user
 
 ## Required assets
@@ -30,9 +31,10 @@ Do not use this skill for unrelated feature development or debugging work.
 
 ## Workflow
 
-1. **Confirm release type**
-   - Require one of: `patch`, `minor`, `major`.
-   - If missing or invalid, stop and ask for correction.
+1. **Determine release bump**
+   - Run `npm run which:version`.
+   - Use the recommended bump from that command (`patch`, `minor`, or `major`).
+   - Do not ask the user to type a version number or pick a bump manually.
 
 2. **Verify git state**
    - `git branch --show-current` must be `master`.
@@ -42,7 +44,7 @@ Do not use this skill for unrelated feature development or debugging work.
    - Stop at the first failing condition.
 
 3. **Check release eligibility**
-   - Run `npm run which:version` and report recommendation.
+   - Use the recommended bump from step 1.
    - Ensure at least one releasable commit exists since the latest release tag.
    - Use `npm run release:guard` to enforce release checks.
 
