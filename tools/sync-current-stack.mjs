@@ -8,7 +8,10 @@ const scriptPath = fileURLToPath(import.meta.url);
 const scriptDir = path.dirname(scriptPath);
 const repoRoot = path.resolve(scriptDir, '..');
 const packageJsonPath = path.join(repoRoot, 'package.json');
-const instructionsPath = path.join(repoRoot, '.github', 'copilot-instructions.md');
+const instructionsPaths = [
+  path.join(repoRoot, '.github', 'copilot-instructions.md'),
+  path.join(repoRoot, 'CLAUDE.md'),
+];
 
 const args = new Set(process.argv.slice(2));
 const checkOnly = args.has('--check');
@@ -61,31 +64,43 @@ function formatStack(packageJson) {
   ].join('\n');
 }
 
-function syncCurrentStack(instructionsText, stackText) {
-  const pattern = /## Current Stack\n\n([\s\S]*?)\n## Code Ownership/;
-  const replacement = `## Current Stack\n\n${stackText}\n\n## Code Ownership`;
+function syncCurrentStack(instructionsText, stackText, relativePath) {
+  // Files may be checked out with CRLF (core.autocrlf), so match either line ending and preserve it.
+  const eol = instructionsText.includes('\r\n') ? '\r\n' : '\n';
+  const pattern = /## Current Stack\r?\n\r?\n([\s\S]*?)\r?\n## Code Ownership/;
+  const replacement = ['## Current Stack', '', stackText.split('\n').join(eol), '', '## Code Ownership'].join(eol);
 
   if (!pattern.test(instructionsText)) {
-    throw new Error('Unable to find the Current Stack section in .github/copilot-instructions.md');
+    throw new Error(`Unable to find the Current Stack section in ${relativePath}`);
   }
 
   return instructionsText.replace(pattern, replacement);
 }
 
 const packageJson = readJson(packageJsonPath);
-const instructionsText = readFileSync(instructionsPath, 'utf8');
 const stackText = formatStack(packageJson);
-const updatedInstructionsText = syncCurrentStack(instructionsText, stackText);
+let isOutdated = false;
 
-if (updatedInstructionsText === instructionsText) {
-  process.stdout.write('Current Stack is already synchronized.\n');
-  process.exit(0);
+for (const instructionsPath of instructionsPaths) {
+  const relativePath = path.relative(repoRoot, instructionsPath);
+  const instructionsText = readFileSync(instructionsPath, 'utf8');
+  const updatedInstructionsText = syncCurrentStack(instructionsText, stackText, relativePath);
+
+  if (updatedInstructionsText === instructionsText) {
+    process.stdout.write(`Current Stack is already synchronized in ${relativePath}.\n`);
+    continue;
+  }
+
+  if (checkOnly) {
+    process.stdout.write(`Current Stack is out of date in ${relativePath}. Run \`node tools/sync-current-stack.mjs\` to update it.\n`);
+    isOutdated = true;
+    continue;
+  }
+
+  writeFileSync(instructionsPath, updatedInstructionsText);
+  process.stdout.write(`Updated ${relativePath} Current Stack section.\n`);
 }
 
-if (checkOnly) {
-  process.stdout.write('Current Stack is out of date. Run `node tools/sync-current-stack.mjs` to update it.\n');
+if (isOutdated) {
   process.exit(1);
 }
-
-writeFileSync(instructionsPath, updatedInstructionsText);
-process.stdout.write('Updated .github/copilot-instructions.md Current Stack section.\n');

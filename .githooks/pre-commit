@@ -6,7 +6,7 @@ if [ -z "$CHANGED_FILES" ]; then
   exit 0
 fi
 
-if printf '%s\n' "$CHANGED_FILES" | grep -Eq '(^|/)(SKILL\.md$|\.github/skills/|benchmark/skills/)'; then
+if printf '%s\n' "$CHANGED_FILES" | grep -Eq '(^|/)(SKILL\.md$|\.github/skills/|\.claude/skills/|benchmark/skills/)'; then
   echo "Running skill smoke checks..."
   node scripts/skill-smoke.mjs
 fi
