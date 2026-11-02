@@ -84,10 +84,26 @@ test.describe('Menu Navigation', () => {
     await page.getByTestId('menu-option-rules').click();
 
     await expect(page.getByTestId('rules-overlay')).toBeVisible();
+    await expect(page.getByTestId('rules-overlay')).toHaveAttribute('data-device', 'desktop');
+    await expect(page.getByText(/press esc to pause/i)).toBeVisible();
     await expect(page.getByTestId('menu-options')).toHaveCount(0);
 
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
     expect(state.screenView).toBe('rules');
+  });
+
+  test('opens rules from the home hint and remembers its dismissal', async ({ page }) => {
+    await loginToStartMenu(page);
+
+    await page.getByTestId('home-rules-hint-link').click();
+    await expect(page.getByTestId('rules-overlay')).toBeVisible();
+
+    await page.getByTestId('menu-toggle-button').click();
+    await page.getByTestId('menu-option-home').click();
+    // The hint unmounts as soon as it is dismissed, so click instead of check (which re-reads the state).
+    await page.getByTestId('home-rules-hint-dismiss').click();
+
+    await expect(page.getByTestId('home-rules-hint')).toHaveCount(0);
   });
 
   test('can navigate to the performance view from the React menu', async ({ page }) => {

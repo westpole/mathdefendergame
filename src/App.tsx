@@ -9,7 +9,7 @@ import {
   onElectronCloseRequested,
   pauseGameForManualEnd,
 } from '@game/scenes/UIScene';
-import { subscribeToAppCloseEvents } from './platform/adapter';
+import { subscribeToAppCloseEvents, subscribeToMobileDeviceChanges } from './platform/adapter';
 import { useGameStore } from '@store/useGameStore';
 import { GameOverOverlay } from '@ui/components/GameOverOverlay';
 import { HUDOverlay } from '@ui/components/HUDOverlay';
@@ -32,6 +32,7 @@ export function App() {
   const phase = useGameStore((state) => state.phase);
   const bootReady = useGameStore((state) => state.bootReady);
   const screenView = useGameStore((state) => state.screenView);
+  const setMobileDevice = useGameStore((state) => state.setMobileDevice);
   const isSimpleLoginEnabled = isFeatureEnabled('simple_login');
   const isStartPhase = bootReady && phase === 'start';
   const handleVisibilityChange = useEffectEvent(() => {
@@ -56,6 +57,8 @@ export function App() {
       destroyGame(game);
     };
   }, []);
+
+  useEffect(() => subscribeToMobileDeviceChanges(setMobileDevice), [setMobileDevice]);
 
   useEffect(() => {
     document.addEventListener('visibilitychange', handleVisibilityChange);

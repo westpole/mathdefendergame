@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect } from 'react';
 
 import { useGameStore } from '@store/useGameStore';
-import type { GameStoreState } from '@store/types';
+import type { GameStoreState, PlayerProfile } from '@store/types';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
@@ -80,6 +80,72 @@ export const MobileLayout: Story = {
       grade: 'cadet',
       phase: 'start',
       practiceOperation: '/',
+    },
+  },
+};
+
+const acePilotProfile: PlayerProfile = {
+  username: 'AcePilot',
+  password: '',
+  bestScore: 120,
+  highestStage: 6,
+  preferredGrade: 'cadet',
+  createdAt: 1_756_000_000_000,
+  updatedAt: 1_756_000_000_000,
+};
+
+export const RulesHintVisible: Story = {
+  name: 'Rules hint visible',
+  args: {
+    initialState: {
+      activeUsername: 'AcePilot',
+      grade: 'cadet',
+      phase: 'start',
+      practiceOperation: '+',
+      profiles: { AcePilot: acePilotProfile },
+    },
+  },
+};
+
+export const RulesHintDismissed: Story = {
+  name: 'Rules hint dismissed',
+  args: {
+    initialState: {
+      activeUsername: 'AcePilot',
+      grade: 'cadet',
+      phase: 'start',
+      practiceOperation: '+',
+      profiles: { AcePilot: { ...acePilotProfile, rulesHintDismissed: true } },
+    },
+  },
+};
+
+export const MobileRulesHintVisible: Story = {
+  name: 'Mobile rules hint visible',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: {
+      activeUsername: 'AcePilot',
+      grade: 'cadet',
+      phase: 'start',
+      practiceOperation: '+',
+      isMobileDevice: true,
+      profiles: { AcePilot: acePilotProfile },
+    },
+  },
+};
+
+export const MobileRulesHintDismissed: Story = {
+  name: 'Mobile rules hint dismissed',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: {
+      activeUsername: 'AcePilot',
+      grade: 'cadet',
+      phase: 'start',
+      practiceOperation: '+',
+      isMobileDevice: true,
+      profiles: { AcePilot: { ...acePilotProfile, rulesHintDismissed: true } },
     },
   },
 };

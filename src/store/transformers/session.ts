@@ -30,6 +30,7 @@ export function buildMenuSnapshot(
     gameHistoryByProfile: state.gameHistoryByProfile,
     activeUsername: state.activeUsername,
     rememberedUsername: state.rememberedUsername,
+    isMobileDevice: state.isMobileDevice,
   };
 }
 
@@ -52,6 +53,7 @@ export function buildLogOffSnapshot(state: GameStoreState): Partial<GameStoreSta
     gameHistoryByProfile: state.gameHistoryByProfile,
     activeUsername: null,
     rememberedUsername: null,
+    isMobileDevice: state.isMobileDevice,
   };
 }
 

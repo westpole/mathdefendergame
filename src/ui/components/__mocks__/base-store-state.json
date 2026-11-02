@@ -2,6 +2,7 @@
   "phase": "booting",
   "screenView": "home",
   "bootReady": false,
+  "isMobileDevice": false,
   "activeUsername": null,
   "rememberedUsername": null,
   "profiles": {},

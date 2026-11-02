@@ -5,12 +5,18 @@ import { useGameStore } from '@store/useGameStore';
 const PRACTICE_OPERATIONS = ['+', '-', '*', '/'] as const;
 
 /**
- * Renders the home dashboard with quick-mode launch tiles for regular play and practice mode.
+ * Renders the home dashboard with quick-mode launch tiles for regular play and practice mode,
+ * plus a dismissible "Show game rules" hint that is remembered per profile.
  */
 export function HomeOverlay() {
   const { t } = useTranslation();
   const practiceOperation = useGameStore((state) => state.practiceOperation);
   const selectPracticeOperation = useGameStore((state) => state.selectPracticeOperation);
+  const openScreenView = useGameStore((state) => state.openScreenView);
+  const dismissRulesHint = useGameStore((state) => state.dismissRulesHint);
+  const isRulesHintDismissed = useGameStore((state) =>
+    state.activeUsername ? state.profiles[state.activeUsername]?.rulesHintDismissed === true : false,
+  );
 
   const handleStartRegularPlay = () => {
     void import('@game/scenes/UIScene').then(({ startGame }) => startGame({ mode: 'regular' }));
@@ -68,6 +74,23 @@ export function HomeOverlay() {
             </button>
           </article>
         </div>
+
+        {!isRulesHintDismissed && (
+          <div className="home-rules-hint" data-testid="home-rules-hint">
+            <button
+              type="button"
+              className="home-rules-hint__link"
+              data-testid="home-rules-hint-link"
+              onClick={() => openScreenView('rules')}
+            >
+              {t('rules.hint.link')}
+            </button>
+            <label className="home-rules-hint__dismiss">
+              <input type="checkbox" data-testid="home-rules-hint-dismiss" onChange={dismissRulesHint} />
+              {t('rules.hint.dismiss')}
+            </label>
+          </div>
+        )}
       </div>
     </div>
   );

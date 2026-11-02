@@ -64,6 +64,7 @@ export function createGameStoreSetters(
   get: GameStoreGetState,
 ): Pick<GameStoreState,
   | 'markBootReady'
+  | 'setMobileDevice'
   | 'setGrade'
   | 'selectPracticeOperation'
   | 'startRegularPlay'
@@ -86,6 +87,7 @@ export function createGameStoreSetters(
   | 'createAndLoginProfile'
   | 'createAndLoginSimpleProfile'
   | 'updateActiveProfileAvatar'
+  | 'dismissRulesHint'
   | 'getActiveProfile'
   | 'addGameHistory'
   | 'getGameHistory'
@@ -93,6 +95,7 @@ export function createGameStoreSetters(
   return {
     selectPracticeOperation: (operation) => set({ practiceOperation: operation }),
     startRegularPlay: () => set({ runMode: 'regular' }),
+    setMobileDevice: (isMobileDevice) => set({ isMobileDevice }),
     startPracticePlay: (operation = get().practiceOperation) => set({ runMode: 'practice', practiceOperation: operation }),
     markBootReady: () => {
       const rememberedUsername = get().rememberedUsername;
@@ -389,6 +392,25 @@ export function createGameStoreSetters(
       });
 
       return { success: true };
+    },
+    dismissRulesHint: () => {
+      const state = get();
+      const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
+
+      if (!activeProfile) {
+        return;
+      }
+
+      set({
+        profiles: {
+          ...state.profiles,
+          [activeProfile.username]: {
+            ...activeProfile,
+            rulesHintDismissed: true,
+            updatedAt: Date.now(),
+          },
+        },
+      });
     },
     getActiveProfile: () => {
       const state = get();

@@ -79,13 +79,46 @@
     "accuracyPercent": "Accuracy (%)",
     "avgSpeedSeconds": "Avg Speed (sec)",
     "masteryRating": "Mastery Rating",
-    "completeRunForPerformanceInsights": "Complete a run to unlock operator performance insights.",
-    "rulesTypeAnswerPressEnter": "Type the answer and press Enter.",
-    "rulesPressEscapeMenu": "Press Escape to return to the menu.",
-    "rulesBeginWithLives": "You begin with 3 lives.",
-    "rulesBaseShieldPoints": "The base shield has 5 shield points before a life is lost.",
-    "rulesReachStreakReward": "Reach 30 correct answers in a row to earn 1 extra life.",
-    "rulesClearStagesToWin": "Clear 28 stages to win."
+    "completeRunForPerformanceInsights": "Complete a run to unlock operator performance insights."
+  },
+  "rules": {
+    "regularPlay": {
+      "body": "Defend the city across {{stageCount}} stages. Answer enough meteors correctly to clear each stage. The run ends when you clear the last stage or lose all your lives."
+    },
+    "practiceMode": {
+      "body": "Train one operation (+, -, *, /) at a time with no stage limit. If you lose all your lives, practice restarts from stage 1."
+    },
+    "livesShield": {
+      "title": "Lives and shield",
+      "body": "You start with {{lives}} lives. The base shield absorbs {{shield}} meteor hits per stage. When it breaks, you lose a life."
+    },
+    "extraLife": {
+      "title": "Extra life",
+      "body": "Regular Play only: answer {{streak}} meteors correctly in a row to earn 1 extra life."
+    },
+    "hud": {
+      "title": "HUD",
+      "answer": "Answer",
+      "items": {
+        "score": "Points earned: +1 for each correct answer, -1 for each wrong one.",
+        "stage": "The stage you are defending right now.",
+        "baseShield": "Meteor hits the base can still take this stage. Green is safe, yellow is a warning, red is critical.",
+        "lives": "Lives left. Losing the shield costs one life.",
+        "streak": "Correct answers in a row. A wrong answer or a meteor hit resets it.",
+        "answer": "The number you are entering."
+      },
+      "desktop": "Type answers with the number keys, press Enter to fire and Backspace to erase a digit. Score and Stage are on the left panel; Base Shield, Lives and Streak are on the right panel.",
+      "mobile": "Use the on-screen keypad: tap digits, Enter to fire and Del to erase a digit. Score and Stage are in the top-left corner; Base Shield, Lives and Streak are in the top-right corner."
+    },
+    "pause": {
+      "title": "Pause and end game",
+      "desktop": "Press ESC to pause. From the pause screen you can resume or end the game.",
+      "mobile": "Tap anywhere on the game area to pause. From the pause screen you can resume or end the game."
+    },
+    "hint": {
+      "link": "Show game rules",
+      "dismiss": "Don't show this again"
+    }
   },
   "auth": {
     "chooseProfile": "Choose a profile to continue.",

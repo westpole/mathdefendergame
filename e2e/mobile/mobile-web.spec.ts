@@ -30,6 +30,8 @@ test.describe('Mobile web validation', () => {
 
     await page.getByTestId('menu-option-rules').tap();
     await expect(page.getByTestId('rules-overlay')).toBeVisible();
+    await expect(page.getByTestId('rules-overlay')).toHaveAttribute('data-device', 'mobile');
+    await expect(page.getByText(/tap anywhere on the game area to pause/i)).toBeAttached();
 
     const rulesBounds = await page.getByTestId('rules-overlay').boundingBox();
 

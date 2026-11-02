@@ -11,6 +11,7 @@ const originalVisibilityState = document.visibilityState;
 
 const platformMocks = vi.hoisted(() => ({
   subscribeToAppCloseEvents: vi.fn(),
+  subscribeToMobileDeviceChanges: vi.fn(),
 }));
 
 const uiSceneMocks = vi.hoisted(() => ({
@@ -33,6 +34,7 @@ const uiSceneMocks = vi.hoisted(() => ({
 
 vi.mock('../../../platform/adapter', () => ({
   subscribeToAppCloseEvents: platformMocks.subscribeToAppCloseEvents,
+  subscribeToMobileDeviceChanges: platformMocks.subscribeToMobileDeviceChanges,
 }));
 
 vi.mock('@game/scenes/UIScene', () => ({
@@ -72,6 +74,7 @@ describe('App start menu controls', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     platformMocks.subscribeToAppCloseEvents.mockReturnValue(vi.fn());
+    platformMocks.subscribeToMobileDeviceChanges.mockReturnValue(vi.fn());
     setVisibilityState('visible');
     setMockStoreState();
   });
@@ -294,6 +297,25 @@ describe('App start menu controls', () => {
     unmount();
 
     expect(uiSceneMocks.destroyGame).toHaveBeenCalledWith({ id: 'game-instance' });
+  });
+
+  it('syncs the detected device type into the store and unsubscribes on unmount', () => {
+    const unsubscribe = vi.fn();
+    platformMocks.subscribeToMobileDeviceChanges.mockReturnValue(unsubscribe);
+    setMockStoreState({ bootReady: true, phase: 'login' });
+
+    const { unmount } = render(<App />);
+    const onChange = platformMocks.subscribeToMobileDeviceChanges.mock.calls[0]?.[0];
+
+    act(() => onChange(true));
+    expect(useGameStore.getState().isMobileDevice).toBe(true);
+
+    act(() => onChange(false));
+    expect(useGameStore.getState().isMobileDevice).toBe(false);
+
+    unmount();
+
+    expect(unsubscribe).toHaveBeenCalledTimes(1);
   });
 
   it('pauses active gameplay when the document is hidden', () => {
