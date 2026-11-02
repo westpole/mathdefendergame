@@ -96,6 +96,7 @@ describe('App start menu controls', () => {
     rerender(<App />);
 
     expect(screen.getByTestId('menu-toggle-button')).toBeVisible();
+    expect(screen.getByTestId('menu-title')).toHaveTextContent('Math Defender');
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
@@ -127,6 +128,7 @@ describe('App start menu controls', () => {
     fireEvent.click(screen.getByTestId('menu-toggle-button'));
     expect(screen.getByTestId('menu-overlay')).toBeVisible();
     expect(screen.getByTestId('menu-close-button')).toBeVisible();
+    expect(screen.queryByTestId('menu-title')).not.toBeInTheDocument();
     expect(screen.getByTestId('menu-option-logoff')).toBeVisible();
 
     expect(screen.getByTestId('menu-options')).toBeVisible();

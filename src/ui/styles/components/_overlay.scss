@@ -18,6 +18,10 @@
    */
   pointer-events: auto;
   background-color: $bg-dark-overlay;
+
+  &.city-background-layer {
+    background-color: #1e2326;
+  }
 }
 
 .overlay-panel {

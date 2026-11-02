@@ -64,7 +64,26 @@
   left: $spacing-lg;
   z-index: $z-menu-overlay;
   display: flex;
+  align-items: center;
+  gap: $spacing-sm;
   pointer-events: auto;
+}
+
+// Game title beside the menu toggle; em-based so it scales with the inherited font size,
+// capped to the 52px toggle height and kept on a single line.
+.menu-title {
+  max-height: 52px;
+  font-family: $font-display;
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: $color-primary-yellow;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
 }
 
 .menu-button,
@@ -155,6 +174,7 @@
   border: 1px solid $border-panel-light;
   border-radius: $radius-lg;
   background: rgba(15, 23, 42, 0.28);
+  justify-content: space-between;
 
   h2 {
     margin: 0;
@@ -173,13 +193,14 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: center;
 }
 
 .practice-operation-button {
   width: 42px;
   height: 42px;
   border: 1px solid $border-panel-light;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(15, 23, 42, 0.25);
   color: $text-primary;
   font-size: 1.05rem;
@@ -701,6 +722,10 @@
   .menu-shell {
     top: $spacing-sm;
     left: $spacing-sm;
+  }
+
+  .menu-title {
+    font-size: 1.25em;
   }
 
   .menu-option {

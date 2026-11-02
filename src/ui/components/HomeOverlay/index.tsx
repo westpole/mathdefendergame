@@ -23,7 +23,7 @@ export function HomeOverlay() {
   };
 
   return (
-    <div className="overlay-screen overlay-screen--interactive" data-testid="main-menu">
+    <div className="overlay-screen overlay-screen--interactive city-background-layer" data-testid="main-menu">
       <div className="overlay-panel home-report-panel" data-testid="home-mode-select">
         <div className="home-quick-actions" data-testid="home-practice-controls">
           <article className="home-mode-tile" data-testid="home-regular-play-tile">
