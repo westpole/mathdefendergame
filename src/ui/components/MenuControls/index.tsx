@@ -7,10 +7,10 @@ import menuIcon from '@assets/menu.svg';
 import { MenuList } from './MenuList';
 
 /**
- * Displays the game menu toggle and opens the navigation menu overlay.
+ * Displays the game menu toggle with the game title and opens the navigation menu overlay.
  *
  * The component tracks the menu's open state and renders the list of available
- * actions when the user expands the menu.
+ * actions when the user expands the menu. The title is shown only while the menu is closed.
  */
 export function MenuControls() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +31,11 @@ export function MenuControls() {
         >
           <img alt="" className="menu-icon" src={menuIcon} />
         </button>
+      )}
+      {!isOpen && (
+        <span className="menu-title" data-testid="menu-title">
+          {t('ui.gameTitle')}
+        </span>
       )}
       {isOpen && (
         <button
