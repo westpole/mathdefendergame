@@ -1,3 +1,6 @@
+import { COARSE_POINTER_MEDIA_QUERY } from './constants';
+import { isMobileDevice } from './utilities/isMobileDevice';
+
 type AppCloseHandlers = {
   onCloseRequested: () => void;
   onCloseConfirmed: () => void;
@@ -62,6 +65,34 @@ export function subscribeToAppCloseEvents(handlers: AppCloseHandlers): () => voi
     window.removeEventListener(PLATFORM_EVENTS.closeRequested, handlers.onCloseRequested);
     window.removeEventListener(PLATFORM_EVENTS.closeConfirmed, handlers.onCloseConfirmed);
     window.removeEventListener(PLATFORM_EVENTS.closeCancelled, handlers.onCloseCancelled);
+  };
+}
+
+/**
+ * Reports the current device type immediately and again whenever the primary pointer changes
+ * (for example DevTools device emulation or a convertible laptop switching to tablet mode).
+ *
+ * @param onChange - Receives true when the app runs on a mobile device.
+ * @returns Cleanup function that removes the media-query listener.
+ */
+export function subscribeToMobileDeviceChanges(onChange: (isMobile: boolean) => void): () => void {
+  if (!canUseWindow()) {
+    return () => {};
+  }
+
+  onChange(isMobileDevice());
+
+  if (typeof window.matchMedia !== 'function') {
+    return () => {};
+  }
+
+  const mediaQueryList = window.matchMedia(COARSE_POINTER_MEDIA_QUERY);
+  const handleChange = () => onChange(isMobileDevice());
+
+  mediaQueryList.addEventListener('change', handleChange);
+
+  return () => {
+    mediaQueryList.removeEventListener('change', handleChange);
   };
 }
 

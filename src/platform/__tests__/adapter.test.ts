@@ -5,6 +5,7 @@ import {
   notifyAppCloseCancelled,
   notifyAppCloseReady,
   subscribeToAppCloseEvents,
+  subscribeToMobileDeviceChanges,
 } from '../adapter';
 
 const originalUserAgent = window.navigator.userAgent;
@@ -101,5 +102,50 @@ describe('platform adapter', () => {
     window.removeEventListener('math-defender-close-query-result', onQueryResult as EventListener);
     window.removeEventListener('math-defender-close-ready', onReady);
     window.removeEventListener('math-defender-close-cancelled', onFlowCancelled);
+  });
+});
+
+describe('subscribeToMobileDeviceChanges', () => {
+  function mockMatchMedia(matches: boolean) {
+    const mediaQueryList = {
+      matches,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    };
+
+    vi.spyOn(window, 'matchMedia').mockImplementation(() => mediaQueryList as unknown as MediaQueryList);
+
+    return mediaQueryList;
+  }
+
+  it('reports the current device type immediately', () => {
+    setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) Mobile/15E148');
+    mockMatchMedia(false);
+    const onChange = vi.fn();
+
+    subscribeToMobileDeviceChanges(onChange);
+
+    expect(onChange).toHaveBeenCalledWith(true);
+  });
+
+  it('re-detects the device when the pointer media query changes and cleans up the listener', () => {
+    setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64)');
+    const mediaQueryList = mockMatchMedia(false);
+    const onChange = vi.fn();
+
+    const unsubscribe = subscribeToMobileDeviceChanges(onChange);
+
+    expect(onChange).toHaveBeenLastCalledWith(false);
+    expect(window.matchMedia).toHaveBeenCalledWith('(pointer: coarse)');
+
+    const handleChange = mediaQueryList.addEventListener.mock.calls[0]?.[1] as () => void;
+    mediaQueryList.matches = true;
+    handleChange();
+
+    expect(onChange).toHaveBeenLastCalledWith(true);
+
+    unsubscribe();
+
+    expect(mediaQueryList.removeEventListener).toHaveBeenCalledWith('change', handleChange);
   });
 });

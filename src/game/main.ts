@@ -314,7 +314,7 @@ export class Game {
 
       let streakRewardTriggered = false;
 
-      if (this.mode !== 'practice' && isFeatureEnabled(STREAK_REWARD_FLAG) && this.streak >= 30) {
+      if (this.mode !== 'practice' && isFeatureEnabled(STREAK_REWARD_FLAG) && this.streak >= GAME_CONFIG.streakRewardThreshold) {
         this.lives += 1;
         this.streak = 0;
         streakRewardTriggered = true;
@@ -436,7 +436,7 @@ export class Game {
         return;
       }
 
-      if (this.stage > 28) {
+      if (this.stage > GAME_CONFIG.regularStageCount) {
         // Pre-calculate final score; let continueFromMessage handle the transition
         const total = this.correctCount + this.incorrectCount;
         const accuracy = total > 0 ? (this.correctCount / total) * 100 : 0;

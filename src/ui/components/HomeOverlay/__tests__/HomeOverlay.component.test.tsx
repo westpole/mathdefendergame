@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
-import type { GameStoreState } from '@store/types';
+import type { GameStoreState, PlayerProfile } from '@store/types';
 
 import { HomeOverlay } from '..';
 import baseStoreState from '../../__mocks__/base-store-state.json';
@@ -79,5 +79,63 @@ describe('HomeOverlay', () => {
     expect(screen.getByTestId('home-practice-start-button')).toBeVisible();
     expect(screen.queryByText(/Mission Control/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Major General/i)).not.toBeInTheDocument();
+  });
+
+  describe('rules hint', () => {
+    const aceProfile: PlayerProfile = {
+      username: 'AcePilot',
+      password: '',
+      bestScore: 0,
+      highestStage: 1,
+      preferredGrade: 'cadet',
+      createdAt: 1_000,
+      updatedAt: 1_000,
+    };
+
+    function setHintStoreState(profileOverrides: Partial<PlayerProfile> = {}) {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        phase: 'start',
+        screenView: 'home',
+        profiles: { AcePilot: { ...aceProfile, ...profileOverrides } },
+      });
+    }
+
+    it('shows the rules hint until the profile dismisses it', () => {
+      setHintStoreState();
+
+      render(<HomeOverlay />);
+
+      expect(screen.getByTestId('home-rules-hint')).toBeVisible();
+      expect(screen.getByTestId('home-rules-hint-dismiss')).not.toBeChecked();
+    });
+
+    it('opens the rules screen from the hint link', () => {
+      setHintStoreState();
+
+      render(<HomeOverlay />);
+      fireEvent.click(screen.getByTestId('home-rules-hint-link'));
+
+      expect(useGameStore.getState().screenView).toBe('rules');
+    });
+
+    it('remembers the dismissal on the active profile and hides the hint', () => {
+      setHintStoreState();
+
+      render(<HomeOverlay />);
+      fireEvent.click(screen.getByTestId('home-rules-hint-dismiss'));
+
+      expect(useGameStore.getState().profiles.AcePilot.rulesHintDismissed).toBe(true);
+      expect(screen.queryByTestId('home-rules-hint')).not.toBeInTheDocument();
+    });
+
+    it('does not render the hint for a profile that already dismissed it', () => {
+      setHintStoreState({ rulesHintDismissed: true });
+
+      render(<HomeOverlay />);
+
+      expect(screen.queryByTestId('home-rules-hint')).not.toBeInTheDocument();
+    });
   });
 });

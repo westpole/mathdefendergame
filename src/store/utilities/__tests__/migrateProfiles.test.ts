@@ -13,6 +13,7 @@ describe('migrateProfiles', () => {
         bestScore: 900,
         highestStage: 12,
         preferredGrade: 'commander',
+        rulesHintDismissed: true,
         createdAt: 1_000,
         updatedAt: 2_000,
       },
@@ -39,6 +40,7 @@ describe('migrateProfiles', () => {
       bestScore: 900,
       highestStage: 12,
       preferredGrade: 'commander',
+      rulesHintDismissed: true,
       createdAt: 1_000,
       updatedAt: 2_000,
     });
@@ -50,6 +52,7 @@ describe('migrateProfiles', () => {
       bestScore: 250,
       highestStage: 6,
       preferredGrade: 'major-general',
+      rulesHintDismissed: false,
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
     });
@@ -61,6 +64,7 @@ describe('migrateProfiles', () => {
       bestScore: 30,
       highestStage: 3,
       preferredGrade: 'trainee',
+      rulesHintDismissed: false,
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
     });
@@ -80,6 +84,7 @@ describe('migrateProfiles', () => {
       erin: {
         username: 42,
         password: 99,
+        rulesHintDismissed: 'yes',
       },
     })).toEqual({
       dave: {
@@ -89,6 +94,7 @@ describe('migrateProfiles', () => {
         bestScore: 0,
         highestStage: 4,
         preferredGrade: 'cadet',
+        rulesHintDismissed: false,
         createdAt: expect.any(Number),
         updatedAt: expect.any(Number),
       },
@@ -99,6 +105,7 @@ describe('migrateProfiles', () => {
         bestScore: 0,
         highestStage: 1,
         preferredGrade: 'trainee',
+        rulesHintDismissed: false,
         createdAt: expect.any(Number),
         updatedAt: expect.any(Number),
       },

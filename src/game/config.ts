@@ -71,6 +71,8 @@ export const GAME_CONFIG = {
   dangerZone: 100, // px from bottom on the legacy 700px-tall layout
   initialLives: 3,
   stageShieldMax: 5,
+  regularStageCount: 28, // stages to clear for a Regular Play victory
+  streakRewardThreshold: 30, // correct answers in a row for +1 life (Regular Play only)
   scorePerCorrectAnswer: 1,
   scorePenaltyPerIncorrectAnswer: 1,
 

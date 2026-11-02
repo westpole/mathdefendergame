@@ -34,6 +34,7 @@ export function migrateProfiles(rawProfiles: unknown): Record<string, PlayerProf
       bestScore: typeof profileRecord.bestScore === 'number' ? profileRecord.bestScore : 0,
       highestStage: typeof profileRecord.highestStage === 'number' ? profileRecord.highestStage : 1,
       preferredGrade,
+      rulesHintDismissed: profileRecord.rulesHintDismissed === true,
       createdAt: typeof profileRecord.createdAt === 'number' ? profileRecord.createdAt : Date.now(),
       updatedAt: typeof profileRecord.updatedAt === 'number' ? profileRecord.updatedAt : Date.now(),
     };

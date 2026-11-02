@@ -15,6 +15,7 @@ describe('useGameStore', () => {
       phase: 'booting',
       screenView: 'home',
       bootReady: false,
+      isMobileDevice: false,
       activeUsername: null,
       rememberedUsername: null,
       profiles: {},
@@ -178,6 +179,29 @@ describe('useGameStore', () => {
       useGameStore.getState().syncHUD({ score: 500 });
       expect(useGameStore.getState().score).toBe(500);
       expect(useGameStore.getState().lives).toBe(3); // unchanged
+    });
+  });
+
+  describe('device detection', () => {
+    it('stores the detected mobile device flag', () => {
+      useGameStore.getState().setMobileDevice(true);
+      expect(useGameStore.getState().isMobileDevice).toBe(true);
+
+      useGameStore.getState().setMobileDevice(false);
+      expect(useGameStore.getState().isMobileDevice).toBe(false);
+    });
+
+    it('keeps the device flag across menu navigation and log off', () => {
+      useGameStore.getState().setMobileDevice(true);
+
+      useGameStore.getState().openScreenView('rules');
+      expect(useGameStore.getState().isMobileDevice).toBe(true);
+
+      useGameStore.getState().openMenu();
+      expect(useGameStore.getState().isMobileDevice).toBe(true);
+
+      useGameStore.getState().logOff();
+      expect(useGameStore.getState().isMobileDevice).toBe(true);
     });
   });
 
@@ -428,6 +452,22 @@ describe('useGameStore', () => {
       expect(result.success).toBe(false);
       expect(result.error).toMatch(/invalid avatar/i);
       expect(useGameStore.getState().profiles.PilotOne.avatarId).toBe(DEFAULT_AVATAR_ID);
+    });
+
+    it('dismisses the rules hint for the active profile only', () => {
+      useGameStore.getState().createAndLoginProfile('PilotTwo', 'Abc12345');
+      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+
+      useGameStore.getState().dismissRulesHint();
+
+      expect(useGameStore.getState().profiles.PilotOne.rulesHintDismissed).toBe(true);
+      expect(useGameStore.getState().profiles.PilotTwo.rulesHintDismissed).toBeUndefined();
+    });
+
+    it('ignores rules hint dismissal when no profile is active', () => {
+      useGameStore.getState().dismissRulesHint();
+
+      expect(useGameStore.getState().profiles).toEqual({});
     });
 
     it('derives the login grade from cumulative game history', () => {

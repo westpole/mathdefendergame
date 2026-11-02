@@ -19,6 +19,7 @@ export const initialState = {
   runMode: 'regular' as const,
   practiceOperation: '+' as const,
   bootReady: false,
+  isMobileDevice: false,
   activeUsername: null as string | null,
   rememberedUsername: null as string | null,
   profiles: {} as Record<string, PlayerProfile>,
