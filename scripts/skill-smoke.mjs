@@ -4,7 +4,8 @@ import path from 'node:path';
 import { execSync } from 'node:child_process';
 
 const root = process.cwd();
-const skillRoot = path.join(root, '.github', 'skills');
+// Copilot (.github) and Claude Code (.claude) keep separate skill copies; validate both.
+const skillRoots = [path.join(root, '.github', 'skills'), path.join(root, '.claude', 'skills')];
 const SKILL_KEYWORDS = new Map([
   ['phaser-expert', ['phaser', 'scene', 'gameplay', 'input', 'enemy', 'wave', 'keyboard', 'pointer']],
   ['react-frontend-expert', ['react', 'ui', 'overlay', 'hud', 'menu', 'start screen', 'game over', 'layout']],
@@ -28,12 +29,11 @@ function findSkillFiles(targets = []) {
   if (targets.length > 0) {
     return targets
       .map((target) => path.resolve(root, target))
-      .filter((file) => file.includes(`${path.sep}.github${path.sep}skills${path.sep}`) && file.endsWith('SKILL.md'))
+      .filter((file) => skillRoots.some((skillRoot) => file.startsWith(`${skillRoot}${path.sep}`)) && file.endsWith('SKILL.md'))
       .filter((file, index, array) => array.indexOf(file) === index);
   }
 
   const files = [];
-  if (!fs.existsSync(skillRoot)) return files;
 
   const walk = (current) => {
     for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
@@ -46,7 +46,7 @@ function findSkillFiles(targets = []) {
     }
   };
 
-  walk(skillRoot);
+  skillRoots.filter((skillRoot) => fs.existsSync(skillRoot)).forEach(walk);
   return files;
 }
 

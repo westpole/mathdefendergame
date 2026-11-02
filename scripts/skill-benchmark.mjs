@@ -23,9 +23,11 @@ function normalize(value = '') {
   return value.toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-function loadSkillMetadata() {
+// Copilot (.github) and Claude Code (.claude) keep separate skill copies; benchmark each set on its own.
+const skillRoots = [path.join(root, '.github', 'skills'), path.join(root, '.claude', 'skills')];
+
+function loadSkillMetadata(skillRoot) {
   const skills = new Map();
-  const skillRoot = path.join(root, '.github', 'skills');
   if (!fs.existsSync(skillRoot)) return skills;
 
   const walk = (current) => {
@@ -93,7 +95,6 @@ if (files.length === 0) {
   process.exit(0);
 }
 
-const skillTextByName = loadSkillMetadata();
 const cases = [];
 for (const file of files) {
   const raw = JSON.parse(fs.readFileSync(path.join(benchmarkDir, file), 'utf8'));
@@ -104,26 +105,31 @@ for (const file of files) {
 }
 
 const failures = [];
-for (const entry of cases) {
-  const result = evaluateCase(entry, skillTextByName);
-  if (!result.pass) {
-    failures.push({
-      id: entry.id || 'unknown',
-      expectedSkill: entry.expectedSkill || 'none',
-      prompt: entry.prompt,
-      hits: result.hits,
-    });
+const evaluatedRoots = skillRoots.filter((skillRoot) => fs.existsSync(skillRoot));
+for (const skillRoot of evaluatedRoots) {
+  const skillTextByName = loadSkillMetadata(skillRoot);
+  for (const entry of cases) {
+    const result = evaluateCase(entry, skillTextByName);
+    if (!result.pass) {
+      failures.push({
+        id: entry.id || 'unknown',
+        skillRoot: path.relative(root, skillRoot),
+        expectedSkill: entry.expectedSkill || 'none',
+        prompt: entry.prompt,
+        hits: result.hits,
+      });
+    }
   }
 }
 
 if (failures.length > 0) {
   console.error('Skill benchmark failed:\n');
   for (const failure of failures) {
-    console.error(`- ${failure.id}: expected ${failure.expectedSkill}, got ${failure.hits.join(', ') || 'no match'}`);
+    console.error(`- [${failure.skillRoot}] ${failure.id}: expected ${failure.expectedSkill}, got ${failure.hits.join(', ') || 'no match'}`);
     console.error(`  Prompt: ${failure.prompt}`);
   }
   process.exit(1);
 }
 
 const total = cases.length;
-console.log(`Skill benchmark passed: ${total} prompt checks evaluated with no mismatches.`);
+console.log(`Skill benchmark passed: ${total} prompt checks evaluated against ${evaluatedRoots.length} skill root(s) with no mismatches.`);

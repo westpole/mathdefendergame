@@ -94,4 +94,4 @@ Vitest suppresses `stdout` output by default. To enable it for a run, set `VITES
 
 | Script | What it does | When to use it |
 | --- | --- | --- |
-| `npm run docs:sync-current-stack` | Rewrites the `Current Stack` section in `.github/copilot-instructions.md` from the major versions recorded in `package.json`. | Use after framework or tooling major-version changes so the instruction file stays aligned with `package.json`. |
+| `npm run docs:sync-current-stack` | Rewrites the `Current Stack` section in `.github/copilot-instructions.md` (Copilot) and `CLAUDE.md` (Claude Code) from the major versions recorded in `package.json`. | Use after framework or tooling major-version changes so both instruction files stay aligned with `package.json`. |

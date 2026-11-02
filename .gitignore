@@ -5,3 +5,4 @@ reports
 *storybook.log
 storybook-static
 test-results
+.claude/settings.local.json
