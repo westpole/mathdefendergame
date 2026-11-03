@@ -1,5 +1,4 @@
-import type { GameHistoryEntry, Grade, MathOperation } from '@shared/types';
-import { GameStoreState } from '@store/types';
+import type { Grade, GradeOperationStatus, MathOperation } from '@shared/types';
 
 export interface PerformanceAggregate {
   attempts: number;
@@ -16,14 +15,21 @@ export interface PerformanceRow {
   attempts: number;
 }
 
+/** One operation row in the grade-progress summary. */
+export interface GradeProgressOperation extends GradeOperationStatus {
+  met: boolean;
+  /** `current / required`, capped at 1. */
+  ratio: number;
+}
+
 export interface GradeProgressSummary {
   effectiveGrade: Grade;
-  progressScore: number;
-  currentThreshold: number;
+  /** Null at Major-General. */
   nextGrade: Grade | null;
-  nextThreshold: number | null;
-  pointsLeft: number;
-  progressRatio: number;
+  /** Rows for the next grade's requirements, or Major-General's requirements at the top grade. */
+  operations: GradeProgressOperation[];
+  /** Average of the capped operation ratios, for one summary bar. */
+  overallRatio: number;
 }
 
 export interface WeeklyProgressReport {
@@ -31,11 +37,4 @@ export interface WeeklyProgressReport {
   latestRunAt: number | null;
   runsCompleted: number;
   scoreEarned: number;
-}
-
-export interface BuildGradeProgressInput {
-  currentScore: number;
-  grade: Grade;
-  history: GameHistoryEntry[];
-  phase: GameStoreState['phase'];
 }

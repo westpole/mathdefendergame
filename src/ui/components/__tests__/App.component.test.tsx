@@ -343,4 +343,24 @@ describe('App start menu controls', () => {
 
     expect(uiSceneMocks.pauseGameForManualEnd).not.toHaveBeenCalled();
   });
+
+  it('shows the grade notice on the menu and game-over screens but not during play', () => {
+    const gradeNotice = { kind: 'promoted' as const, fromGrade: 'trainee' as const, toGrade: 'cadet' as const, operations: [] };
+
+    setMockStoreState({ activeUsername: 'AcePilot', bootReady: true, phase: 'start', gradeNotice });
+    const { rerender } = render(<App />);
+    expect(screen.getByTestId('grade-notice-overlay')).toBeVisible();
+
+    act(() => {
+      setMockStoreState({ activeUsername: 'AcePilot', bootReady: true, phase: 'gameover', gradeNotice });
+    });
+    rerender(<App />);
+    expect(screen.getByTestId('grade-notice-overlay')).toBeVisible();
+
+    act(() => {
+      setMockStoreState({ activeUsername: 'AcePilot', bootReady: true, phase: 'playing', gradeNotice });
+    });
+    rerender(<App />);
+    expect(screen.queryByTestId('grade-notice-overlay')).not.toBeInTheDocument();
+  });
 });

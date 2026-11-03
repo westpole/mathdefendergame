@@ -5,6 +5,7 @@ import { selectActiveProfileHistory } from '@store/selectors/performance';
 import { buildGradeProgressSummary, buildWeeklyProgressReport } from '@store/selectors/progress';
 import { useGameStore } from '@store/useGameStore';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
+import { GradeRequirementsList } from '@ui/components/GradeRequirementsList';
 
 import { formatShortDate, formatScore, formatAccuracy, toGradeTitle } from '../HomeOverlay/utilities';
 
@@ -18,17 +19,10 @@ export function WeeklyReportOverlay() {
   const activeUsername = useGameStore((state) => state.activeUsername);
   const activeProfile = useGameStore((state) => (state.activeUsername ? state.profiles[state.activeUsername] ?? null : null));
   const grade = useGameStore((state) => state.grade);
-  const phase = useGameStore((state) => state.phase);
-  const score = useGameStore((state) => state.score);
   const history = useGameStore(selectActiveProfileHistory);
   const [now] = useState(() => Date.now());
   const weeklyReport = buildWeeklyProgressReport(history, now);
-  const progress = buildGradeProgressSummary({
-    currentScore: score,
-    grade,
-    history,
-    phase,
-  });
+  const progress = buildGradeProgressSummary(history);
   const displayGrade = progress.effectiveGrade;
   const displayGradeLabel = t(`grades.${displayGrade}`, { defaultValue: toGradeTitle(displayGrade) });
   const iconGradeLabel = t(`grades.${grade}`, { defaultValue: toGradeTitle(grade) });
@@ -82,38 +76,17 @@ export function WeeklyReportOverlay() {
               </p>
             </div>
             <strong className="home-report-progress-score">
-              {t('ui.pointsShortLabel', { count: formatScore(progress.progressScore) })}
+              {nextGradeLabel
+                ? t('ui.nextGradeLabel', { grade: nextGradeLabel })
+                : t('ui.holdGradeLabel', { grade: displayGradeLabel })}
             </strong>
           </div>
 
-          {progress.nextGrade ? (
-            <>
-              <div className="profile-progress-labels home-report-progress-labels">
-                <span>{formatScore(progress.currentThreshold)}</span>
-                <span>{nextGradeLabel ? t('ui.nextGradeLabel', { grade: nextGradeLabel }) : t('ui.topGrade')}</span>
-                <span>{formatScore(progress.nextThreshold ?? progress.currentThreshold)}</span>
-              </div>
-
-              <div className="profile-progress-bar home-report-progress-bar">
-                <div
-                  className={`profile-progress-fill home-report-progress-fill home-report-progress-fill--${displayGrade}`}
-                  style={{ width: `${progress.progressRatio * 100}%` }}
-                />
-                <div
-                  className={`profile-progress-marker home-report-progress-marker home-report-progress-marker--${displayGrade}`}
-                  style={{ left: `${progress.progressRatio * 100}%` }}
-                />
-              </div>
-
-              <div className="profile-points-remaining home-report-points-remaining">
-                {t('ui.pointsToNextGrade', { count: formatScore(progress.pointsLeft) })}
-              </div>
-            </>
-          ) : (
-            <div className="profile-major-general-box home-report-major-general-box">
-              {t('ui.lifetimePointsSecured', { count: formatScore(progress.progressScore) })}
-            </div>
-          )}
+          <GradeRequirementsList
+            operations={progress.operations}
+            grade={displayGrade}
+            label={t('ui.gradeRequirementsAriaLabel')}
+          />
 
           {weeklyReport.latestRunAt ? (
             <p className="home-report-latest-run">

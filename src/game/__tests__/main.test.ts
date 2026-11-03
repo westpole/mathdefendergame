@@ -320,46 +320,7 @@ describe('Game', () => {
       expect(game.incorrectCount).toBe(0);
     });
 
-    it('promotes to cadet at score 101', () => {
-      game.spawnMeteor();
-      game.state = 'playing';
-      game.score = 100;
-
-      const meteor = game.meteors[0];
-      game.inputBuffer = meteor.answer.toString();
-      game.checkAnswer();
-
-      expect(game.score).toBe(101);
-      expect(game.grade).toBe('cadet');
-    });
-
-    it('promotes to commander at score 351', () => {
-      game.spawnMeteor();
-      game.state = 'playing';
-      game.score = 350;
-
-      const meteor = game.meteors[0];
-      game.inputBuffer = meteor.answer.toString();
-      game.checkAnswer();
-
-      expect(game.score).toBe(351);
-      expect(game.grade).toBe('commander');
-    });
-
-    it('promotes to major-general at score 751', () => {
-      game.spawnMeteor();
-      game.state = 'playing';
-      game.score = 750;
-
-      const meteor = game.meteors[0];
-      game.inputBuffer = meteor.answer.toString();
-      game.checkAnswer();
-
-      expect(game.score).toBe(751);
-      expect(game.grade).toBe('major-general');
-    });
-
-    it('carries grade progress across completed games', () => {
+    const seedHistory = (plusCorrect: number, minusCorrect: number) => {
       useGameStore.setState({
         activeUsername: 'PilotOne',
         gameHistoryByProfile: {
@@ -367,28 +328,49 @@ describe('Game', () => {
             {
               key: 'history-1',
               playedAt: 1,
-              correctAnswers: 10,
+              correctAnswers: plusCorrect + minusCorrect,
               incorrectAnswers: 0,
               averageAnswerTimeMs: 1000,
               mostProblematicOperation: null,
               operationStats: {
-                '+': { attempts: 4, incorrect: 0, avgTimeMs: 900 },
-                '-': { attempts: 3, incorrect: 0, avgTimeMs: 950 },
-                '*': { attempts: 2, incorrect: 0, avgTimeMs: 980 },
-                '/': { attempts: 1, incorrect: 0, avgTimeMs: 1000 },
+                '+': { attempts: plusCorrect, incorrect: 0, avgTimeMs: 900 },
+                '-': { attempts: minusCorrect, incorrect: 0, avgTimeMs: 950 },
+                '*': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+                '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
               },
-              gradeAtFinish: 'cadet',
-              finalScore: 350,
-              finalPerfScore: 90,
+              gradeAtFinish: 'trainee',
+              finalScore: plusCorrect + minusCorrect,
+              finalPerfScore: 100,
             },
           ],
         },
       });
+    };
+
+    it('starts the run at the grade earned by lifetime operation scores', () => {
+      seedHistory(250, 150);
 
       game.reset();
 
       expect(game.grade).toBe('cadet');
+    });
 
+    it('ignores the old lifetime score total when resolving the grade', () => {
+      seedHistory(200, 0);
+      useGameStore.setState((state) => ({
+        gameHistoryByProfile: {
+          PilotOne: state.gameHistoryByProfile.PilotOne.map((entry) => ({ ...entry, finalScore: 10_000 })),
+        },
+      }));
+
+      game.reset();
+
+      expect(game.grade).toBe('trainee');
+    });
+
+    it('keeps the grade fixed when correct answers would qualify for a promotion mid-run', () => {
+      seedHistory(249, 150);
+      game.reset();
       game.spawnMeteor();
       game.state = 'playing';
 
@@ -397,7 +379,20 @@ describe('Game', () => {
       game.checkAnswer();
 
       expect(game.score).toBe(1);
-      expect(game.grade).toBe('commander');
+      expect(game.grade).toBe('trainee');
+    });
+
+    it('keeps the grade fixed when wrong answers would break its requirements mid-run', () => {
+      seedHistory(250, 150);
+      game.reset();
+      game.spawnMeteor();
+      game.state = 'playing';
+
+      game.inputBuffer = '99999';
+      game.checkAnswer();
+
+      expect(game.incorrectCount).toBe(1);
+      expect(game.grade).toBe('cadet');
     });
   });
 

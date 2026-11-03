@@ -4,6 +4,7 @@ import type {
   DDAMathTier,
   DDAHeatState,
   GameMode,
+  GradeNotice,
   PracticeOperation,
 } from '@shared/types';
 import type { AvatarId } from '@shared/avatarCatalog';
@@ -82,6 +83,8 @@ export interface GameStoreState {
   stageMessage: StageMessageState | null;
   streakRewardMessage: StreakRewardMessageState | null;
   pauseOverlay: PauseOverlayState | null;
+  /** After-game promotion/demotion message. Transient: not persisted. */
+  gradeNotice: GradeNotice | null;
   gameHistoryByProfile: HistoryByProfile;
   markBootReady: () => void;
   setMobileDevice: (isMobileDevice: boolean) => void;
@@ -98,6 +101,7 @@ export interface GameStoreState {
   showSavingBeforeClose: () => void;
   showGameOver: (payload: Pick<GameStoreState, 'grade' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   persistPrematureGameEnd: (payload: PrematureGameEndPayload) => void;
+  dismissGradeNotice: () => void;
   startPlaying: () => void;
   openMenu: () => void;
   openScreenView: (screenView: ScreenView) => void;

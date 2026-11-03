@@ -31,6 +31,8 @@ export function buildMenuSnapshot(
     activeUsername: state.activeUsername,
     rememberedUsername: state.rememberedUsername,
     isMobileDevice: state.isMobileDevice,
+    // Keep the after-game grade notice visible when a finished run returns to the menu.
+    gradeNotice: state.gradeNotice,
   };
 }
 

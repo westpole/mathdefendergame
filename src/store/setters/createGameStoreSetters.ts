@@ -3,10 +3,12 @@ import type {
   LoginResult,
 } from '../types';
 import {
+  getLifetimeOperationScores,
   resolveActiveProfile,
   resolveLifetimeGrade,
   validatePassword,
 } from '../utilities/general';
+import { buildGradeNotice } from '@game/utilities/gradeProgress';
 import {
   encryptPassword,
   isEncryptedPassword,
@@ -78,6 +80,7 @@ export function createGameStoreSetters(
   | 'showSavingBeforeClose'
   | 'showGameOver'
   | 'persistPrematureGameEnd'
+  | 'dismissGradeNotice'
   | 'startPlaying'
   | 'openMenu'
   | 'openScreenView'
@@ -185,6 +188,10 @@ export function createGameStoreSetters(
           grade: resolvedGrade,
           stage: payload.stage,
           gameHistoryByProfile: nextGameHistoryByProfile,
+          gradeNotice: buildGradeNotice(
+            getLifetimeOperationScores(state.activeUsername, state.gameHistoryByProfile),
+            getLifetimeOperationScores(state.activeUsername, nextGameHistoryByProfile),
+          ),
         };
 
         if (activeProfile) {
@@ -202,11 +209,13 @@ export function createGameStoreSetters(
         return nextState;
       });
     },
+    dismissGradeNotice: () => set({ gradeNotice: null }),
     startPlaying: () => set({
       phase: 'playing',
       stageMessage: null,
       streakRewardMessage: null,
       pauseOverlay: null,
+      gradeNotice: null,
     }),
     openMenu: () => set((state) => buildMenuSnapshot(state, 'home')),
     openScreenView: (screenView) => set((state) => buildMenuSnapshot(state, screenView)),
@@ -419,12 +428,18 @@ export function createGameStoreSetters(
     addGameHistory: (entry) => {
       set((state) => {
         const profileKey = resolveProfileHistoryKey(state.activeUsername);
+        const nextGameHistoryByProfile = buildHistoryByProfileWithEntry(
+          state.gameHistoryByProfile,
+          profileKey,
+          entry,
+        );
 
         return {
-          gameHistoryByProfile: buildHistoryByProfileWithEntry(
-            state.gameHistoryByProfile,
-            profileKey,
-            entry,
+          gameHistoryByProfile: nextGameHistoryByProfile,
+          grade: resolveLifetimeGrade(state.activeUsername, nextGameHistoryByProfile),
+          gradeNotice: buildGradeNotice(
+            getLifetimeOperationScores(state.activeUsername, state.gameHistoryByProfile),
+            getLifetimeOperationScores(state.activeUsername, nextGameHistoryByProfile),
           ),
         };
       });

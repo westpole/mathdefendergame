@@ -11,7 +11,8 @@ import Phaser from 'phaser';
 import { useGameStore } from '@store/useGameStore';
 import type { ScreenView, PauseOverlayReason } from '@store/types';
 import type { GameMode, PracticeOperation } from '@shared/types';
-import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
+import { resolveLifetimeGrade } from '@store/utilities/general';
+import { GAME_CONFIG } from '@game/config';
 import { notifyAppCloseCancelled, notifyAppCloseReady } from '../../platform/adapter';
 
 import { BootScene } from './BootScene';
@@ -64,7 +65,7 @@ export function startGame(config?: { mode?: GameMode; practiceOperation?: Practi
   const mode = config?.mode ?? state.runMode ?? 'regular';
   const practiceOperation = config?.practiceOperation ?? state.practiceOperation ?? '+';
   const startingScore = Math.max(0, state.score);
-  const startingGrade = resolveGradeFromScore(startingScore);
+  const startingGrade = resolveLifetimeGrade(state.activeUsername, state.gameHistoryByProfile);
 
   state.setGrade(startingGrade);
   if (typeof state.startRegularPlay === 'function') {

@@ -2,11 +2,12 @@ import type {
   GameHistoryEntry,
   MathOperation,
   OperationHistoryStat,
+  OperationScores,
   Grade,
 } from '@shared/types';
 import { passwordPolicy, GUEST_HISTORY_BUCKET } from '../constants';
 import type { PlayerProfile, HistoryByProfile } from '@store/types';
-import { resolveGradeFromScore } from '@game/config';
+import { resolveGradeFromOperationScores, sumOperationScores } from '@game/utilities/gradeProgress';
 
 /**
  * Returns history entries ordered newest-first so recent play sessions appear first.
@@ -97,37 +98,31 @@ export function resolveActiveProfile(
 }
 
 /**
- * Calculates the total lifetime score for a profile, using the guest bucket when no
+ * Calculates lifetime operation scores for a profile, using the guest bucket when no
  * active username is present.
  *
  * @param activeUsername - The player username or null for the guest profile.
  * @param gameHistoryByProfile - Stored history grouped by profile key.
- * @returns The summed final score for the selected profile.
+ * @returns Lifetime score per operation (never negative).
  */
-function getLifetimeScoreForProfile(
+export function getLifetimeOperationScores(
   activeUsername: string | null,
   gameHistoryByProfile: HistoryByProfile,
-): number {
+): OperationScores {
   const profileKey = activeUsername ?? GUEST_HISTORY_BUCKET;
-
-  if (!gameHistoryByProfile[profileKey]) {
-    return 0;
-  }
-
-  return gameHistoryByProfile[profileKey]
-    .reduce((sum, entry) => sum + entry.finalScore, 0);
+  return sumOperationScores(gameHistoryByProfile[profileKey] ?? []);
 }
 
 /**
- * Derives the player's lifetime grade from their accumulated score history.
+ * Derives the player's lifetime grade from their per-operation scores in history.
  *
  * @param activeUsername - The active profile username or null for guest history.
  * @param gameHistoryByProfile - Stored history grouped by profile.
- * @returns The grade implied by the current lifetime score.
+ * @returns The highest grade whose requirements are all met.
  */
 export function resolveLifetimeGrade(
   activeUsername: string | null,
   gameHistoryByProfile: HistoryByProfile,
 ): Grade {
-  return resolveGradeFromScore(getLifetimeScoreForProfile(activeUsername, gameHistoryByProfile));
+  return resolveGradeFromOperationScores(getLifetimeOperationScores(activeUsername, gameHistoryByProfile));
 }

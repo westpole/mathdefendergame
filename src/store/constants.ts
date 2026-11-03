@@ -3,6 +3,7 @@ import type {
   DDAMathTier,
   DDAHeatState,
   Grade,
+  GradeNotice,
   MathOperation,
 } from '@shared/types';
 
@@ -10,7 +11,6 @@ import type {
   OverlayPhase,
   ScreenView,
   PlayerProfile,
-  GameStoreState,
 } from './types';
 
 export const initialState = {
@@ -41,6 +41,7 @@ export const initialState = {
   stageMessage: null,
   streakRewardMessage: null,
   pauseOverlay: null,
+  gradeNotice: null as GradeNotice | null,
   gameHistoryByProfile: {},
 };
 
@@ -58,4 +59,3 @@ export const OPERATION_LABELS: Record<MathOperation, string> = {
 };
 
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-export const ACTIVE_PROGRESS_PHASES = new Set<GameStoreState['phase']>(['playing', 'paused', 'stage-message']);

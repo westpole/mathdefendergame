@@ -12,6 +12,7 @@ import {
 import { subscribeToAppCloseEvents, subscribeToMobileDeviceChanges } from './platform/adapter';
 import { useGameStore } from '@store/useGameStore';
 import { GameOverOverlay } from '@ui/components/GameOverOverlay';
+import { GradeNoticeOverlay } from '@ui/components/GradeNoticeOverlay';
 import { HUDOverlay } from '@ui/components/HUDOverlay';
 import { HomeOverlay } from '@ui/components/HomeOverlay';
 import { PauseOverlay } from '@ui/components/PauseOverlay';
@@ -86,6 +87,7 @@ export function App() {
         {bootReady && phase === 'paused' && <PauseOverlay />}
         {bootReady && phase === 'stage-message' && <StageMessageOverlay />}
         {bootReady && phase === 'gameover' && <GameOverOverlay />}
+        {(isStartPhase || (bootReady && phase === 'gameover')) && <GradeNoticeOverlay />}
       </div>
     </div>
   );

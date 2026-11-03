@@ -22,6 +22,7 @@ import { isFeatureEnabled } from '@shared/featureFlags';
 
 import { GAME_CONFIG, getDangerZoneOffset, getMeteorSpawnPadding } from './config';
 import { DDAController, type DDAConfiguration } from './utilities/DDAController';
+import { resolveGradeFromOperationScores, sumOperationScores } from './utilities/gradeProgress';
 import { generateMath } from './utilities/mathGen';
 
 export interface GameCallbacks {
@@ -93,12 +94,16 @@ function sanitizeAnswerInput(rawValue: string): string {
   return nextValue.slice(0, MAX_ANSWER_INPUT_LENGTH);
 }
 
-function getLifetimeScoreBeforeCurrentRun(
+/**
+ * Resolves the grade a run is played at from the lifetime operation scores in history.
+ * The grade stays fixed for the whole run; the store recalculates it after the run.
+ */
+function resolveGradeAtRunStart(
   activeUsername: string | null,
   gameHistoryByProfile: Record<string, GameHistoryEntry[]>,
-): number {
+): Grade {
   const profileKey = activeUsername ?? GUEST_HISTORY_BUCKET;
-  return (gameHistoryByProfile[profileKey] ?? []).reduce((sum, entry) => sum + entry.finalScore, 0);
+  return resolveGradeFromOperationScores(sumOperationScores(gameHistoryByProfile[profileKey] ?? []));
 }
 
 export class Game {
@@ -144,7 +149,6 @@ export class Game {
   private pendingStageClearAfterStreakReward: boolean = false;
   private pendingGameOver: boolean = false;
   private pendingGameOverReason: GameOverReason = 'lives-depleted';
-  private lifetimeScoreAtRunStart: number = 0;
   private dda: DDAController;
 
   private readonly cb: GameCallbacks;
@@ -166,10 +170,6 @@ export class Game {
     this.lives = GAME_CONFIG.initialLives;
     this.shield = GAME_CONFIG.stageShieldMax;
     this.score = Math.max(0, startingScore);
-    this.lifetimeScoreAtRunStart = getLifetimeScoreBeforeCurrentRun(
-      storeState.activeUsername,
-      storeState.gameHistoryByProfile,
-    );
     this.stage = 1;
     this.stageScore = 0;
     this.correctCount = 0;
@@ -189,8 +189,7 @@ export class Game {
     this.pendingStageClearAfterStreakReward = false;
     this.pendingGameOver = false;
     this.pendingGameOverReason = 'lives-depleted';
-    this.applyGradeBaseline('trainee');
-    this.syncGradeFromScore();
+    this.applyGradeBaseline(resolveGradeAtRunStart(storeState.activeUsername, storeState.gameHistoryByProfile));
     this.captureStageCheckpoint();
     this.canvasWidth = GAME_CONFIG.CANVAS_WIDTH;
     this.canvasHeight = GAME_CONFIG.CANVAS_HEIGHT;
@@ -310,7 +309,6 @@ export class Game {
       this.correctCount++;
       this.streak += 1;
       this.inputBuffer = '';
-      this.syncGradeFromScore();
 
       let streakRewardTriggered = false;
 
@@ -348,7 +346,6 @@ export class Game {
       this.stageIncorrect++;
       this.streak = 0;
       this.score = Math.max(0, this.score - GAME_CONFIG.scorePenaltyPerIncorrectAnswer);
-      this.syncGradeFromScore();
       this.inputBuffer = '';
       this.cb.onShake();
     }
@@ -420,7 +417,6 @@ export class Game {
 
       if (this.stageIncorrect === 0) {
         this.score += GAME_CONFIG.grades[this.grade].cleanStageBonusPoints;
-        this.syncGradeFromScore();
       }
       // Notify UI (game.stage still points to the cleared stage at this moment)
       this.cb.onFinishStage(true);
@@ -473,7 +469,6 @@ export class Game {
       // Update the lives checkpoint so a second failure doesn't restore them.
       this.score = this.scoreAtStageStart;
       this.livesAtStageStart = this.lives;
-      this.syncGradeFromScore();
     }
 
     this.state = 'playing';
@@ -551,9 +546,9 @@ export class Game {
     this.finalPerfScore = parseFloat(accuracy.toFixed(2));
     const historyEntry = this.buildGameHistoryEntry();
 
-    useGameStore.getState().addGameHistory(historyEntry);
-
+    // Sync first: addGameHistory recalculates the store grade from the updated history.
     this.syncStore();
+    useGameStore.getState().addGameHistory(historyEntry);
     this.cb.onGameOver(win ? 'victory' : 'lives-depleted');
   }
 
@@ -620,23 +615,9 @@ export class Game {
     this.cb.onStreakReward(this.lives);
   }
 
-  private syncGradeFromScore(): void {
-    const nextGrade = resolveGradeFromScore(this.getLifetimeProgressScore());
-
-    if (nextGrade === this.grade) {
-      return;
-    }
-
-    this.applyGradeBaseline(nextGrade);
-  }
-
   private applyGradeBaseline(grade: Grade): void {
     this.grade = grade;
     this.dda = new DDAController(getDDAConfigForGrade(grade));
-  }
-
-  private getLifetimeProgressScore(): number {
-    return Math.max(0, this.lifetimeScoreAtRunStart + this.score);
   }
 
   private getOldestMeteor(): Meteor | null {
@@ -735,7 +716,6 @@ export class Game {
     this.pendingStageClearAfterStreakReward = false;
     this.pendingGameOver = false;
     this.pendingGameOverReason = 'lives-depleted';
-    this.syncGradeFromScore();
   }
 
   private resolveMostProblematicOperation(
@@ -784,16 +764,4 @@ function getDDAConfigForGrade(grade: Grade): Partial<DDAConfiguration> {
     baseFallSpeedPxSec: settings.baseFallSpeedPxSec,
     startingMathTier: settings.mathTier,
   };
-}
-
-function resolveGradeFromScore(score: number): Grade {
-  let resolved: Grade = 'trainee';
-
-  for (const grade of GAME_CONFIG.gradeOrder) {
-    if (score >= GAME_CONFIG.grades[grade].thresholdScore) {
-      resolved = grade;
-    }
-  }
-
-  return resolved;
 }

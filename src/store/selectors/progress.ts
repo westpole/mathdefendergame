@@ -1,50 +1,42 @@
-import { GAME_CONFIG, resolveGradeFromScore } from '@game/config';
+import { GAME_CONFIG } from '@game/config';
+import {
+  getRequirementStatuses,
+  resolveGradeFromOperationScores,
+  sumOperationScores,
+} from '@game/utilities/gradeProgress';
 import type { GameHistoryEntry } from '@shared/types';
-import { WEEK_MS, ACTIVE_PROGRESS_PHASES } from '@store/constants';
-import type { BuildGradeProgressInput, GradeProgressSummary, WeeklyProgressReport } from './types';
+import { WEEK_MS } from '@store/constants';
+import type { GradeProgressSummary, WeeklyProgressReport } from './types';
 
 /**
- * Builds a grade-progress summary that combines historical score data with the
- * current in-progress score when the game is in an active progression phase.
+ * Builds per-operation progress toward the next grade from lifetime history.
+ * Live run values are not included: grades change only after a run is saved.
  *
- * @param currentScore - The live score for the current run.
- * @param grade - The player's current grade before applying historical progress.
- * @param history - Prior runs used to calculate long-term progress.
- * @param phase - The current gameplay phase used to determine whether the
- * current score should contribute to progress.
- * @returns A summary including the effective grade, thresholds, remaining points,
- * and normalized progress toward the next grade.
+ * @param history - All runs for the active profile (any order).
+ * @returns The effective grade, the next grade, and one row per operation the next
+ * grade requires. At Major-General the rows show the Major-General requirements to hold.
+ * @example
+ * const progress = buildGradeProgressSummary(selectActiveProfileHistory(state));
  */
-export function buildGradeProgressSummary({
-  currentScore,
-  grade,
-  history,
-  phase,
-}: BuildGradeProgressInput): GradeProgressSummary {
-  const progressScore = Math.max(
-    history.reduce((sum, entry) => sum + entry.finalScore, 0)
-      + (ACTIVE_PROGRESS_PHASES.has(phase) ? Math.max(currentScore, 0) : 0),
-    0,
-  );
-  const effectiveGrade = history.length > 0 ? resolveGradeFromScore(progressScore) : grade;
+export function buildGradeProgressSummary(history: GameHistoryEntry[]): GradeProgressSummary {
+  const scores = sumOperationScores(history);
+  const effectiveGrade = resolveGradeFromOperationScores(scores);
   const gradeOrder = GAME_CONFIG.gradeOrder;
   const currentIndex = gradeOrder.indexOf(effectiveGrade);
-  const currentThreshold = GAME_CONFIG.grades[effectiveGrade].thresholdScore;
   const nextGrade = currentIndex < gradeOrder.length - 1 ? gradeOrder[currentIndex + 1] : null;
-  const nextThreshold = nextGrade ? GAME_CONFIG.grades[nextGrade].thresholdScore : null;
-  const pointsLeft = nextThreshold !== null ? Math.max(nextThreshold - progressScore, 0) : 0;
-  const progressRatio = nextThreshold !== null && nextThreshold > currentThreshold
-    ? Math.min(Math.max((progressScore - currentThreshold) / (nextThreshold - currentThreshold), 0), 1)
+  const operations = getRequirementStatuses(scores, nextGrade ?? effectiveGrade).map((status) => {
+    const ratio = Math.min(status.current / status.required, 1);
+    return { ...status, met: status.current >= status.required, ratio };
+  });
+  const overallRatio = operations.length > 0
+    ? operations.reduce((sum, operation) => sum + operation.ratio, 0) / operations.length
     : 0;
 
   return {
     effectiveGrade,
-    progressScore,
-    currentThreshold,
     nextGrade,
-    nextThreshold,
-    pointsLeft,
-    progressRatio,
+    operations,
+    overallRatio,
   };
 }
 

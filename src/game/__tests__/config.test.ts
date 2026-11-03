@@ -2,7 +2,6 @@ import {
   GAME_CONFIG,
   getDangerZoneOffset,
   getMeteorSpawnPadding,
-  resolveGradeFromScore,
 } from '../config';
 
 describe('game config', () => {
@@ -32,22 +31,27 @@ describe('game config', () => {
     });
   });
 
-  describe('resolveGradeFromScore', () => {
-    it('promotes players to the highest grade unlocked by their score in the happy path', () => {
-      expect(resolveGradeFromScore(0)).toBe('trainee');
-      expect(resolveGradeFromScore(GAME_CONFIG.grades.trainee.thresholdScore)).toBe('trainee');
-      expect(resolveGradeFromScore(GAME_CONFIG.grades.cadet.thresholdScore)).toBe('cadet');
-      expect(resolveGradeFromScore(GAME_CONFIG.grades.commander.thresholdScore)).toBe('commander');
-      expect(resolveGradeFromScore(GAME_CONFIG.grades['major-general'].thresholdScore)).toBe('major-general');
-      expect(resolveGradeFromScore(350)).toBe('cadet');
-      expect(resolveGradeFromScore(750)).toBe('commander');
-      expect(resolveGradeFromScore(10_000)).toBe('major-general');
+  describe('grade requirements', () => {
+    it('defines the per-operation requirements for each grade in the happy path', () => {
+      expect(GAME_CONFIG.grades.trainee.requirements).toEqual({});
+      expect(GAME_CONFIG.grades.cadet.requirements).toEqual({ '+': 250, '-': 150 });
+      expect(GAME_CONFIG.grades.commander.requirements).toEqual({ '+': 750, '-': 550, '*': 250 });
+      expect(GAME_CONFIG.grades['major-general'].requirements).toEqual({ '+': 1250, '-': 1050, '*': 550, '/': 250 });
     });
 
-    it('falls back to trainee for out-of-range or invalid scores in the fail path', () => {
-      expect(resolveGradeFromScore(-1)).toBe('trainee');
-      expect(resolveGradeFromScore(Number.NaN)).toBe('trainee');
-      expect(resolveGradeFromScore(Number.NEGATIVE_INFINITY)).toBe('trainee');
+    it('never lowers a requirement from one grade to the next in the fail path', () => {
+      const ops = ['+', '-', '*', '/'] as const;
+
+      GAME_CONFIG.gradeOrder.slice(1).forEach((grade, index) => {
+        const previous: Partial<Record<string, number>> = GAME_CONFIG.grades[GAME_CONFIG.gradeOrder[index]].requirements;
+        const current: Partial<Record<string, number>> = GAME_CONFIG.grades[grade].requirements;
+
+        for (const op of ops) {
+          if (previous[op] !== undefined) {
+            expect(current[op]).toBeGreaterThan(previous[op] as number);
+          }
+        }
+      });
     });
   });
 });

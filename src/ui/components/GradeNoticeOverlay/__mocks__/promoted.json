@@ -1,0 +1,9 @@
+{
+  "phase": "start",
+  "gradeNotice": {
+    "kind": "promoted",
+    "fromGrade": "trainee",
+    "toGrade": "cadet",
+    "operations": []
+  }
+}

@@ -37,6 +37,7 @@ describe('useGameStore', () => {
       stageMessage: null,
       streakRewardMessage: null,
       pauseOverlay: null,
+      gradeNotice: null,
       gameHistoryByProfile: {},
     });
   });
@@ -495,9 +496,9 @@ describe('useGameStore', () => {
               averageAnswerTimeMs: 1000,
               mostProblematicOperation: '+',
               operationStats: {
-                '+': { attempts: 6, incorrect: 1, avgTimeMs: 1100 },
-                '-': { attempts: 5, incorrect: 1, avgTimeMs: 1000 },
-                '*': { attempts: 5, incorrect: 0, avgTimeMs: 950 },
+                '+': { attempts: 752, incorrect: 1, avgTimeMs: 1100 },
+                '-': { attempts: 552, incorrect: 1, avgTimeMs: 1000 },
+                '*': { attempts: 250, incorrect: 0, avgTimeMs: 950 },
                 '/': { attempts: 4, incorrect: 0, avgTimeMs: 980 },
               },
               gradeAtFinish: 'commander',
@@ -705,9 +706,9 @@ describe('useGameStore', () => {
               averageAnswerTimeMs: 1200,
               mostProblematicOperation: '+',
               operationStats: {
-                '+': { attempts: 4, incorrect: 1, avgTimeMs: 1300 },
-                '-': { attempts: 3, incorrect: 1, avgTimeMs: 1100 },
-                '*': { attempts: 3, incorrect: 0, avgTimeMs: 1000 },
+                '+': { attempts: 752, incorrect: 1, avgTimeMs: 1300 },
+                '-': { attempts: 552, incorrect: 1, avgTimeMs: 1100 },
+                '*': { attempts: 250, incorrect: 0, avgTimeMs: 1000 },
                 '/': { attempts: 2, incorrect: 0, avgTimeMs: 1200 },
               },
               gradeAtFinish: 'cadet',
@@ -749,10 +750,10 @@ describe('useGameStore', () => {
               averageAnswerTimeMs: 900,
               mostProblematicOperation: null,
               operationStats: {
-                '+': { attempts: 7, incorrect: 0, avgTimeMs: 900 },
-                '-': { attempts: 6, incorrect: 0, avgTimeMs: 950 },
-                '*': { attempts: 6, incorrect: 0, avgTimeMs: 880 },
-                '/': { attempts: 6, incorrect: 1, avgTimeMs: 980 },
+                '+': { attempts: 1250, incorrect: 0, avgTimeMs: 900 },
+                '-': { attempts: 1050, incorrect: 0, avgTimeMs: 950 },
+                '*': { attempts: 550, incorrect: 0, avgTimeMs: 880 },
+                '/': { attempts: 252, incorrect: 1, avgTimeMs: 980 },
               },
               gradeAtFinish: 'major-general',
               finalScore: 800,
@@ -814,6 +815,13 @@ describe('useGameStore', () => {
               key: 'older-history',
               playedAt: baseHistoryEntry.playedAt - 1000,
               finalScore: 240,
+              // Cadet-level scores; the new run's − answers (+3) cross Commander's − 550.
+              operationStats: {
+                '+': { attempts: 750, incorrect: 0, avgTimeMs: 1700 },
+                '-': { attempts: 548, incorrect: 0, avgTimeMs: 1200 },
+                '*': { attempts: 250, incorrect: 0, avgTimeMs: 1300 },
+                '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+              },
             },
           ],
         },
@@ -835,6 +843,7 @@ describe('useGameStore', () => {
       expect(state.score).toBe(150);
       expect(state.stage).toBe(6);
       expect(state.grade).toBe('commander');
+      expect(state.gradeNotice).toEqual({ kind: 'promoted', fromGrade: 'cadet', toGrade: 'commander', operations: [] });
       expect(state.gameHistoryByProfile.PilotOne).toHaveLength(2);
       expect(state.gameHistoryByProfile.PilotOne[0].key).toBe('new-history');
       expect(state.profiles.PilotOne.bestScore).toBe(150);
@@ -966,6 +975,115 @@ describe('useGameStore', () => {
       useGameStore.getState().addGameHistory(baseHistoryEntry);
 
       expect(useGameStore.getState().getGameHistory(null, -1)).toEqual([]);
+    });
+  });
+
+  describe('grade notice', () => {
+    const buildEntry = (key: string, playedAt: number, plus: [number, number], minus: [number, number]): GameHistoryEntry => ({
+      key,
+      playedAt,
+      correctAnswers: plus[0] + minus[0],
+      incorrectAnswers: plus[1] + minus[1],
+      averageAnswerTimeMs: 1000,
+      mostProblematicOperation: null,
+      operationStats: {
+        '+': { attempts: plus[0] + plus[1], incorrect: plus[1], avgTimeMs: 1000 },
+        '-': { attempts: minus[0] + minus[1], incorrect: minus[1], avgTimeMs: 1000 },
+        '*': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+        '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+      },
+      gradeAtFinish: 'trainee',
+      finalScore: 0,
+      finalPerfScore: 0,
+    });
+    const cadetLevelHistory = [buildEntry('cadet-level', 1, [250, 0], [150, 0])];
+
+    it('sets a promotion notice and the new grade when a run crosses the next grade', () => {
+      useGameStore.setState({
+        activeUsername: 'PilotOne',
+        gameHistoryByProfile: { PilotOne: [buildEntry('older', 1, [240, 0], [150, 0])] },
+      });
+
+      useGameStore.getState().addGameHistory(buildEntry('newer', 2, [10, 0], [0, 0]));
+
+      const state = useGameStore.getState();
+      expect(state.grade).toBe('cadet');
+      expect(state.gradeNotice).toEqual({ kind: 'promoted', fromGrade: 'trainee', toGrade: 'cadet', operations: [] });
+    });
+
+    it('sets a demotion notice listing the operations below the old grade', () => {
+      useGameStore.setState({
+        activeUsername: 'PilotOne',
+        gameHistoryByProfile: { PilotOne: cadetLevelHistory },
+      });
+
+      useGameStore.getState().addGameHistory(buildEntry('bad-run', 2, [0, 0], [0, 1]));
+
+      const state = useGameStore.getState();
+      expect(state.grade).toBe('trainee');
+      expect(state.gradeNotice).toEqual({
+        kind: 'demoted',
+        fromGrade: 'cadet',
+        toGrade: 'trainee',
+        operations: [{ op: '-', current: 149, required: 150 }],
+      });
+    });
+
+    it('leaves the notice empty when the grade does not change', () => {
+      useGameStore.setState({
+        activeUsername: 'PilotOne',
+        gameHistoryByProfile: { PilotOne: cadetLevelHistory },
+      });
+
+      useGameStore.getState().addGameHistory(buildEntry('ordinary', 2, [20, 5], [10, 2]));
+
+      expect(useGameStore.getState().grade).toBe('cadet');
+      expect(useGameStore.getState().gradeNotice).toBeNull();
+    });
+
+    it('uses the guest history bucket when no profile is active', () => {
+      useGameStore.setState({ gameHistoryByProfile: { __guest__: [buildEntry('older', 1, [250, 0], [149, 0])] } });
+
+      useGameStore.getState().persistPrematureGameEnd({
+        grade: 'trainee',
+        score: 1,
+        stage: 2,
+        historyEntry: buildEntry('newer', 2, [0, 0], [1, 0]),
+      });
+
+      expect(useGameStore.getState().gradeNotice).toMatchObject({ kind: 'promoted', toGrade: 'cadet' });
+    });
+
+    it('keeps the notice when returning to the menu and clears it on dismiss, game start, or log off', () => {
+      const notice = { kind: 'promoted' as const, fromGrade: 'trainee' as const, toGrade: 'cadet' as const, operations: [] };
+
+      useGameStore.setState({ gradeNotice: notice });
+      useGameStore.getState().openMenu();
+      expect(useGameStore.getState().gradeNotice).toEqual(notice);
+
+      useGameStore.getState().openScreenView('profile');
+      expect(useGameStore.getState().gradeNotice).toEqual(notice);
+
+      useGameStore.getState().dismissGradeNotice();
+      expect(useGameStore.getState().gradeNotice).toBeNull();
+
+      useGameStore.setState({ gradeNotice: notice });
+      useGameStore.getState().startPlaying();
+      expect(useGameStore.getState().gradeNotice).toBeNull();
+
+      useGameStore.setState({ gradeNotice: notice });
+      useGameStore.getState().logOff();
+      expect(useGameStore.getState().gradeNotice).toBeNull();
+    });
+
+    it('does not persist the notice', () => {
+      useGameStore.setState({
+        gradeNotice: { kind: 'promoted', fromGrade: 'trainee', toGrade: 'cadet', operations: [] },
+      });
+
+      const persisted = useGameStore.persist.getOptions().partialize?.(useGameStore.getState());
+
+      expect(persisted).not.toHaveProperty('gradeNotice');
     });
   });
 });

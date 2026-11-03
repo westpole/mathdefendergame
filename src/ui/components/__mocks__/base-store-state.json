@@ -24,5 +24,6 @@
   "stageMessage": null,
   "streakRewardMessage": null,
   "pauseOverlay": null,
+  "gradeNotice": null,
   "gameHistoryByProfile": {}
 }

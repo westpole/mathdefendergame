@@ -51,6 +51,25 @@ export interface GameHistoryEntry {
 
 export type Grade = 'trainee' | 'cadet' | 'commander' | 'major-general';
 
+/** Lifetime (or per-run) operation score: correct minus incorrect answers per operation. */
+export type OperationScores = Record<MathOperation, number>;
+
+/** One operation's score compared with a grade requirement. */
+export interface GradeOperationStatus {
+  op: MathOperation;
+  current: number;
+  required: number;
+}
+
+/** After-game message describing a grade change. */
+export interface GradeNotice {
+  kind: 'promoted' | 'demoted';
+  fromGrade: Grade;
+  toGrade: Grade;
+  /** For a demotion: the operations below `fromGrade`'s requirements. Empty for a promotion. */
+  operations: GradeOperationStatus[];
+}
+
 export type DDAHeatState =
   | 'CRITICAL'
   | 'STRUGGLING'

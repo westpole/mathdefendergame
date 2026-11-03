@@ -1,7 +1,8 @@
-import type { DDAMathTier, Grade } from '@shared/types';
+import type { DDAMathTier, Grade, MathOperation } from '@shared/types';
 
 interface GradeConfig {
-  thresholdScore: number;
+  /** Lifetime operation scores required to hold this grade. Empty for the entry grade. */
+  requirements: Partial<Record<MathOperation, number>>;
   stageClearCorrectAnswers: number;
   cleanStageBonusPoints: number;
   baseFallSpeedPxSec: number;
@@ -18,7 +19,7 @@ const MIN_METEOR_SPAWN_PADDING = 40;
 export const GAME_CONFIG = {
   grades: {
     trainee: {
-      thresholdScore: 0,
+      requirements: {},
       stageClearCorrectAnswers: 7,
       cleanStageBonusPoints: 5,
       baseFallSpeedPxSec: 36,
@@ -28,7 +29,7 @@ export const GAME_CONFIG = {
       mathTier: 1,
     },
     cadet: {
-      thresholdScore: 101,
+      requirements: { '+': 250, '-': 150 },
       stageClearCorrectAnswers: 10,
       cleanStageBonusPoints: 7,
       baseFallSpeedPxSec: 52,
@@ -38,7 +39,7 @@ export const GAME_CONFIG = {
       mathTier: 2,
     },
     commander: {
-      thresholdScore: 351,
+      requirements: { '+': 750, '-': 550, '*': 250 },
       stageClearCorrectAnswers: 15,
       cleanStageBonusPoints: 10,
       baseFallSpeedPxSec: 72,
@@ -48,7 +49,7 @@ export const GAME_CONFIG = {
       mathTier: 3,
     },
     'major-general': {
-      thresholdScore: 751,
+      requirements: { '+': 1250, '-': 1050, '*': 550, '/': 250 },
       stageClearCorrectAnswers: 20,
       cleanStageBonusPoints: 15,
       baseFallSpeedPxSec: 92,
@@ -86,16 +87,4 @@ export function getDangerZoneOffset(canvasHeight: number): number {
 
 export function getMeteorSpawnPadding(canvasWidth: number): number {
   return Math.max(MIN_METEOR_SPAWN_PADDING, Math.round(canvasWidth * METEOR_SPAWN_HORIZONTAL_PADDING_RATIO));
-}
-
-export function resolveGradeFromScore(score: number): Grade {
-  let resolved: Grade = 'trainee';
-
-  for (const grade of GAME_CONFIG.gradeOrder) {
-    if (score >= GAME_CONFIG.grades[grade].thresholdScore) {
-      resolved = grade;
-    }
-  }
-
-  return resolved;
 }

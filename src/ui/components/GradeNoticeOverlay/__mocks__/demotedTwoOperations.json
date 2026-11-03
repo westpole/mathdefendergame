@@ -1,0 +1,12 @@
+{
+  "phase": "gameover",
+  "gradeNotice": {
+    "kind": "demoted",
+    "fromGrade": "major-general",
+    "toGrade": "commander",
+    "operations": [
+      { "op": "*", "current": 512, "required": 550 },
+      { "op": "/", "current": 238, "required": 250 }
+    ]
+  }
+}
