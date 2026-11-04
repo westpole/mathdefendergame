@@ -12,8 +12,15 @@ import { GAME_CONFIG } from '@game/config';
 import { tPhaser } from '@game/i18n/phaserI18n';
 import { useGameStore } from '@store/useGameStore';
 import type { PauseOverlayReason } from '@store/types';
-import type { GameMode, GameOverReason, Grade, PracticeOperation } from '@shared/types';
+import type { GameMode, GameOverReason, PracticeOperation } from '@shared/types';
 import { notifyAppCloseReady } from '../../platform/adapter';
+
+// Meteor texts are created without a stroke; the target gets one and is scaled up.
+const DEFAULT_METEOR_STROKE_COLOR = '#000000';
+const DEFAULT_METEOR_STROKE_WIDTH = 0;
+const TARGET_METEOR_STROKE_COLOR = '#ffffff';
+const TARGET_METEOR_STROKE_WIDTH = 4;
+const TARGET_METEOR_SCALE = 1.2;
 
 function colorToInt(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
@@ -23,6 +30,7 @@ export class GameScene extends Phaser.Scene {
   gameLogic!: Game;
 
   private meteorTexts: Map<number, Phaser.GameObjects.Text> = new Map();
+  private highlightedMeteorId: number | null = null;
   private particleGraphics!: Phaser.GameObjects.Graphics;
   private streakRewardTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly handleKeyDown = (e: KeyboardEvent): void => {
@@ -58,7 +66,7 @@ export class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
-  init(data?: { grade?: Grade; score?: number; mode?: GameMode; practiceOperation?: PracticeOperation }): void {
+  init(data?: { score?: number; mode?: GameMode; practiceOperation?: PracticeOperation }): void {
     this.gameLogic = new Game({
       onHUDUpdate: () => this.updateHUD(),
       onFinishStage: (success) => this.handleFinishStage(success),
@@ -73,7 +81,6 @@ export class GameScene extends Phaser.Scene {
       mode: data?.mode ?? 'regular',
       practiceOperation: data?.practiceOperation ?? '+',
     });
-    this.gameLogic.setGrade(data?.grade ?? 'trainee');
     this.gameLogic.state = 'playing';
     this.gameLogic.lastSpawn = Date.now();
     useGameStore.getState().startPlaying();
@@ -81,6 +88,7 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     this.meteorTexts = new Map();
+    this.highlightedMeteorId = null;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleShutdown, this);
 
     // ── Dynamic graphics ──────────────────────────────────────────────────────
@@ -131,6 +139,8 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    this.syncTargetHighlight();
+
     // ── Draw particles ────────────────────────────────────────────────────────
     this.particleGraphics.clear();
     for (const p of this.gameLogic.particles) {
@@ -138,6 +148,28 @@ export class GameScene extends Phaser.Scene {
       this.particleGraphics.fillStyle(colorToInt(p.color), alpha);
       this.particleGraphics.fillCircle(p.x, p.y, 4);
     }
+  }
+
+  // ── Target highlight ──────────────────────────────────────────────────────
+  // The target can change between frames (a hit, a base impact, or a new lowest meteor),
+  // so it is re-checked every frame but restyled only when it changes. Meteor texts are
+  // synced first, so the target's text always exists here.
+  private syncTargetHighlight(): void {
+    const targetId = this.gameLogic.getTargetMeteor()?.id ?? null;
+
+    if (targetId === this.highlightedMeteorId) {
+      return;
+    }
+
+    if (this.highlightedMeteorId !== null) {
+      this.meteorTexts.get(this.highlightedMeteorId)?.setStroke(DEFAULT_METEOR_STROKE_COLOR, DEFAULT_METEOR_STROKE_WIDTH).setScale(1);
+    }
+
+    if (targetId !== null) {
+      this.meteorTexts.get(targetId)?.setStroke(TARGET_METEOR_STROKE_COLOR, TARGET_METEOR_STROKE_WIDTH).setScale(TARGET_METEOR_SCALE);
+    }
+
+    this.highlightedMeteorId = targetId;
   }
 
   // ── HUD update ────────────────────────────────────────────────────────────
@@ -167,7 +199,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     useGameStore.getState().showGameOver({
-      grade:          this.gameLogic.grade,
       score:          this.gameLogic.score,
       correctCount:   this.gameLogic.correctCount,
       incorrectCount: this.gameLogic.incorrectCount,
@@ -290,6 +321,7 @@ export class GameScene extends Phaser.Scene {
   private clearTransientRenderables(): void {
     this.meteorTexts.forEach(t => t.destroy());
     this.meteorTexts.clear();
+    this.highlightedMeteorId = null;
     this.particleGraphics?.clear();
   }
 }

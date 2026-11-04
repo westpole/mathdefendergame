@@ -1,7 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { GameHistoryEntry } from '@shared/types';
-
 type MockScene = {
   continueFromOverlay: ReturnType<typeof vi.fn<() => void>>;
   setAnswerInputBuffer: ReturnType<typeof vi.fn<(value: string) => void>>;
@@ -28,8 +26,6 @@ type MockState = {
     phase: string;
     pauseOverlay: { reason: string; isSavingBeforeClose: boolean } | null;
     score: number;
-    activeUsername: string | null;
-    gameHistoryByProfile: Record<string, GameHistoryEntry[]>;
     setGrade: ReturnType<typeof vi.fn<(grade: string) => void>>;
     startPlaying: ReturnType<typeof vi.fn<() => void>>;
     openMenu: ReturnType<typeof vi.fn<() => void>>;
@@ -57,8 +53,6 @@ const mockState = vi.hoisted((): MockState => ({
     phase: 'start',
     pauseOverlay: null,
     score: 0,
-    activeUsername: null,
-    gameHistoryByProfile: {},
     setGrade: vi.fn<(grade: string) => void>(),
     startPlaying: vi.fn<() => void>(),
     openMenu: vi.fn<() => void>(),
@@ -136,8 +130,6 @@ describe('UIScene module', () => {
     mockState.store.phase = 'start';
     mockState.store.pauseOverlay = null;
     mockState.store.score = 0;
-    mockState.store.activeUsername = null;
-    mockState.store.gameHistoryByProfile = {};
     mockState.store.setGrade.mockReset();
     mockState.store.startPlaying.mockReset();
     mockState.store.openMenu.mockReset();
@@ -203,34 +195,14 @@ describe('UIScene module', () => {
     const uiScene = await loadModule();
     mockState.scenePlugin.isActive.mockReturnValue(true);
     mockState.store.score = 351;
-    mockState.store.activeUsername = 'PilotOne';
-    mockState.store.gameHistoryByProfile = {
-      PilotOne: [{
-        key: 'history-1',
-        playedAt: 1,
-        correctAnswers: 1550,
-        incorrectAnswers: 0,
-        averageAnswerTimeMs: 1000,
-        mostProblematicOperation: null,
-        operationStats: {
-          '+': { attempts: 750, incorrect: 0, avgTimeMs: 900 },
-          '-': { attempts: 550, incorrect: 0, avgTimeMs: 900 },
-          '*': { attempts: 250, incorrect: 0, avgTimeMs: 900 },
-          '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
-        },
-        gradeAtFinish: 'cadet',
-        finalScore: 351,
-        finalPerfScore: 100,
-      }],
-    };
 
     uiScene.startGame();
 
-    expect(mockState.store.setGrade).toHaveBeenCalledWith('commander');
+    // The run grade is resolved only by Game.reset(), so it is neither set here nor passed to the scene.
+    expect(mockState.store.setGrade).not.toHaveBeenCalled();
     expect(mockState.store.startPlaying).toHaveBeenCalledTimes(1);
     expect(mockState.scenePlugin.stop).toHaveBeenCalledWith('GameScene');
     expect(mockState.scenePlugin.start).toHaveBeenCalledWith('GameScene', {
-      grade: 'commander',
       score: 351,
     });
   });
@@ -245,7 +217,6 @@ describe('UIScene module', () => {
 
     expect(mockState.scenePlugin.stop).not.toHaveBeenCalled();
     expect(mockState.scenePlugin.start).toHaveBeenCalledWith('GameScene', {
-      grade: 'trainee',
       score: 44,
     });
   });

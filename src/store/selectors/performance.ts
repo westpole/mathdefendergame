@@ -1,7 +1,9 @@
+import { MATH_OPERATIONS } from '@shared/constants';
 import type { GameHistoryEntry, MathOperation } from '@shared/types';
 
 import type { GameStoreState } from '@store/types';
-import { OPERATION_LABELS, GUEST_HISTORY_BUCKET, MATH_OPERATIONS } from '@store/constants';
+import { OPERATION_LABELS } from '@store/constants';
+import { resolveProfileHistoryKey } from '@store/utilities/general';
 
 import type { PerformanceAggregate, PerformanceRow } from './types';
 
@@ -69,8 +71,7 @@ function resolveMasteryRating(accuracy: number, avgSpeedSeconds: number, attempt
  * @returns The history entries for the active player profile, or an empty array.
  */
 export function selectActiveProfileHistory(state: GameStoreState): GameHistoryEntry[] {
-  const profileKey = state.activeUsername ?? GUEST_HISTORY_BUCKET;
-  return state.gameHistoryByProfile[profileKey] ?? EMPTY_HISTORY;
+  return state.gameHistoryByProfile[resolveProfileHistoryKey(state.activeUsername)] ?? EMPTY_HISTORY;
 }
 
 /**

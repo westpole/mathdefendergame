@@ -52,6 +52,72 @@ describe('GradeRequirementsList', () => {
     expect(fills[1].style.width).toBe('20%');
   });
 
+  it('treats a score exactly at the requirement as met with a full bar', () => {
+    render(
+      <GradeRequirementsList
+        grade="cadet"
+        label="Grade requirements by operation"
+        operations={[{ op: '-', current: 150, required: 150 }]}
+      />,
+    );
+
+    const row = screen.getByTestId('grade-requirement-subtraction');
+
+    expect(row).toHaveClass('grade-requirement--met');
+    expect(within(row).getByRole('img', { name: 'Requirement met' })).toBeInTheDocument();
+    expect(row.querySelector<HTMLElement>('.profile-progress-fill')?.style.width).toBe('100%');
+  });
+
+  it('shows an empty bar and no checkmark at zero progress', () => {
+    render(
+      <GradeRequirementsList
+        grade="trainee"
+        label="Grade requirements by operation"
+        operations={[{ op: '+', current: 0, required: 250 }]}
+      />,
+    );
+
+    const row = screen.getByTestId('grade-requirement-addition');
+
+    expect(within(row).getByText('0 / 250')).toBeInTheDocument();
+    expect(row).not.toHaveClass('grade-requirement--met');
+    expect(row.querySelector<HTMLElement>('.profile-progress-fill')?.style.width).toBe('0%');
+  });
+
+  it('shows a full bar instead of dividing by zero when nothing is required', () => {
+    render(
+      <GradeRequirementsList
+        grade="trainee"
+        label="Grade requirements by operation"
+        operations={[{ op: '/', current: 0, required: 0 }]}
+      />,
+    );
+
+    const row = screen.getByTestId('grade-requirement-division');
+
+    expect(row).toHaveClass('grade-requirement--met');
+    expect(row.querySelector<HTMLElement>('.profile-progress-fill')?.style.width).toBe('100%');
+  });
+
+  it('formats large values with locale separators and names each operation', () => {
+    render(
+      <GradeRequirementsList
+        grade="major-general"
+        label="Grade requirements by operation"
+        operations={[
+          { op: '+', current: 1420, required: 1250 },
+          { op: '*', current: 731, required: 550 },
+        ]}
+      />,
+    );
+
+    const addition = screen.getByTestId('grade-requirement-addition');
+
+    expect(within(addition).getByText(`${(1420).toLocaleString()} / ${(1250).toLocaleString()}`)).toBeInTheDocument();
+    expect(within(addition).getByLabelText('Addition (+)')).toBeInTheDocument();
+    expect(within(screen.getByTestId('grade-requirement-multiplication')).getByLabelText('Multiplication (*)')).toBeInTheDocument();
+  });
+
   it('renders an empty list when there are no requirements', () => {
     render(<GradeRequirementsList grade="trainee" label="Grade requirements by operation" operations={[]} />);
 

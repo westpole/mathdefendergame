@@ -659,7 +659,6 @@ describe('useGameStore', () => {
   describe('game over', () => {
     it('should transition to game over phase', () => {
       useGameStore.getState().showGameOver({
-        grade: 'commander',
         score: 2000,
         correctCount: 50,
         incorrectCount: 10,
@@ -672,9 +671,11 @@ describe('useGameStore', () => {
       expect(state.finalPerfScore).toBe(85);
     });
 
-    it('resolves grade from lifetime history and updates the active profile', () => {
+    it('keeps the post-run grade set by addGameHistory and updates the active profile', () => {
       useGameStore.setState({
         activeUsername: 'PilotOne',
+        // addGameHistory runs before showGameOver and has already resolved this grade.
+        grade: 'commander',
         stage: 6,
         stageMessage: {
           success: false,
@@ -696,31 +697,9 @@ describe('useGameStore', () => {
             updatedAt: 2,
           },
         },
-        gameHistoryByProfile: {
-          PilotOne: [
-            {
-              key: 'history-1',
-              playedAt: 1,
-              correctAnswers: 10,
-              incorrectAnswers: 2,
-              averageAnswerTimeMs: 1200,
-              mostProblematicOperation: '+',
-              operationStats: {
-                '+': { attempts: 752, incorrect: 1, avgTimeMs: 1300 },
-                '-': { attempts: 552, incorrect: 1, avgTimeMs: 1100 },
-                '*': { attempts: 250, incorrect: 0, avgTimeMs: 1000 },
-                '/': { attempts: 2, incorrect: 0, avgTimeMs: 1200 },
-              },
-              gradeAtFinish: 'cadet',
-              finalScore: 400,
-              finalPerfScore: 83.3,
-            },
-          ],
-        },
       });
 
       useGameStore.getState().showGameOver({
-        grade: 'trainee',
         score: 150,
         correctCount: 20,
         incorrectCount: 5,
@@ -738,33 +717,26 @@ describe('useGameStore', () => {
       expect(state.profiles.PilotOne.preferredGrade).toBe('commander');
     });
 
-    it('uses lifetime history grade for guest game over state', () => {
-      useGameStore.setState({
-        gameHistoryByProfile: {
-          __guest__: [
-            {
-              key: 'guest-history-1',
-              playedAt: 1,
-              correctAnswers: 25,
-              incorrectAnswers: 1,
-              averageAnswerTimeMs: 900,
-              mostProblematicOperation: null,
-              operationStats: {
-                '+': { attempts: 1250, incorrect: 0, avgTimeMs: 900 },
-                '-': { attempts: 1050, incorrect: 0, avgTimeMs: 950 },
-                '*': { attempts: 550, incorrect: 0, avgTimeMs: 880 },
-                '/': { attempts: 252, incorrect: 1, avgTimeMs: 980 },
-              },
-              gradeAtFinish: 'major-general',
-              finalScore: 800,
-              finalPerfScore: 96.1,
-            },
-          ],
+    it('shows the guest grade resolved when the run was saved to history', () => {
+      useGameStore.getState().addGameHistory({
+        key: 'guest-history-1',
+        playedAt: 1,
+        correctAnswers: 25,
+        incorrectAnswers: 1,
+        averageAnswerTimeMs: 900,
+        mostProblematicOperation: null,
+        operationStats: {
+          '+': { attempts: 1250, incorrect: 0, avgTimeMs: 900 },
+          '-': { attempts: 1050, incorrect: 0, avgTimeMs: 950 },
+          '*': { attempts: 550, incorrect: 0, avgTimeMs: 880 },
+          '/': { attempts: 252, incorrect: 1, avgTimeMs: 980 },
         },
+        gradeAtFinish: 'trainee',
+        finalScore: 800,
+        finalPerfScore: 96.1,
       });
 
       useGameStore.getState().showGameOver({
-        grade: 'trainee',
         score: 90,
         correctCount: 12,
         incorrectCount: 1,

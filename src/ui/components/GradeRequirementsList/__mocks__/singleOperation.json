@@ -1,0 +1,6 @@
+{
+  "grade": "trainee",
+  "operations": [
+    { "op": "+", "current": 120, "required": 250 }
+  ]
+}

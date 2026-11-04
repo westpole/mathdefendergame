@@ -1,0 +1,8 @@
+{
+  "grade": "cadet",
+  "operations": [
+    { "op": "+", "current": 812, "required": 750 },
+    { "op": "-", "current": 550, "required": 550 },
+    { "op": "*", "current": 96, "required": 250 }
+  ]
+}

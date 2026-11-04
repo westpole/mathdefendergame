@@ -4,7 +4,8 @@
  * Pure helpers for per-operation grade progression. A grade is held while every
  * operation score meets that grade's requirements (`GAME_CONFIG.grades[grade].requirements`).
  * Operation scores are `correct − incorrect` per run; the lifetime total is clamped at 0
- * after each run so it can drop but never goes negative.
+ * after each run so it can drop but never goes negative. Practice runs only add, at a
+ * reduced weight (see `getEntryOperationScores`).
  *
  * Shared by the game core (grade at run start), the store (grade after a run and the
  * after-game notice), and the UI (progress toward the next grade).
@@ -19,10 +20,9 @@ import type {
   OperationHistoryStat,
   OperationScores,
 } from '@shared/types';
+import { MATH_OPERATIONS } from '@shared/constants';
 
 import { GAME_CONFIG } from '../config';
-
-const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
 
 type GradeRequirements = Partial<Record<MathOperation, number>>;
 
@@ -70,6 +70,32 @@ export function getRunOperationScores(stats: Record<MathOperation, OperationHist
 }
 
 /**
+ * Returns the operation scores a history entry contributes toward the grade.
+ * Regular runs count in full. Practice runs only add: a negative operation score counts as 0,
+ * and gains are scaled by `GAME_CONFIG.practiceScoreWeight` (rounded down), so practice is
+ * safe for the grade but slower to grind than real play.
+ *
+ * @param entry - One saved run.
+ * @returns Score per operation that the run adds to lifetime scores.
+ * @example
+ * // Practice run with '+' at 7 → 3 at weight 0.5; '-' at -4 → 0.
+ * getEntryOperationScores(practiceEntry);
+ */
+export function getEntryOperationScores(entry: GameHistoryEntry): OperationScores {
+  const scores = getRunOperationScores(entry.operationStats);
+
+  if (entry.mode !== 'practice') {
+    return scores;
+  }
+
+  for (const op of MATH_OPERATIONS) {
+    scores[op] = Math.floor(Math.max(0, scores[op]) * GAME_CONFIG.practiceScoreWeight);
+  }
+
+  return scores;
+}
+
+/**
  * Adds a run's scores to lifetime scores, clamping each operation at 0.
  *
  * @param lifetime - Lifetime scores before the run.
@@ -101,7 +127,7 @@ export function sumOperationScores(history: GameHistoryEntry[]): OperationScores
   const oldestFirst = [...history].sort((left, right) => left.playedAt - right.playedAt);
 
   return oldestFirst.reduce(
-    (lifetime, entry) => applyRunScores(lifetime, getRunOperationScores(entry.operationStats)),
+    (lifetime, entry) => applyRunScores(lifetime, getEntryOperationScores(entry)),
     createEmptyOperationScores(),
   );
 }

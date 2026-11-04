@@ -1,0 +1,9 @@
+{
+  "grade": "major-general",
+  "operations": [
+    { "op": "+", "current": 1420, "required": 1250 },
+    { "op": "-", "current": 1050, "required": 1050 },
+    { "op": "*", "current": 731, "required": 550 },
+    { "op": "/", "current": 268, "required": 250 }
+  ]
+}

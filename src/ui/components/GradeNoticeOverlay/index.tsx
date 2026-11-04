@@ -3,8 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useGameStore } from '@store/useGameStore';
 import { GradeRequirementsList } from '@ui/components/GradeRequirementsList';
-
-import { toGradeTitle } from '../ProfileOverlay/utilities';
+import { toGradeTitle } from '@ui/utilities/format';
 
 /**
  * After-game message for a grade change, shown on top of whatever screen follows the

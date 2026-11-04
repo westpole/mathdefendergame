@@ -1,18 +1,3 @@
-import type { Grade } from '@shared/types';
-
-/**
- * Converts a grade key into a readable title for display in the UI.
- *
- * @param grade - The grade identifier, such as "gold" or "advanced-1".
- * @returns The grade formatted as title case with spaces between parts.
- */
-export function toGradeTitle(grade: Grade): string {
-  return grade
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-}
-
 /**
  * Formats a numeric score using the current locale's thousands separators.
  *

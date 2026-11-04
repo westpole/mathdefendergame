@@ -45,7 +45,6 @@ export const initialState = {
   gameHistoryByProfile: {},
 };
 
-export const MATH_OPERATIONS: MathOperation[] = ['+', '-', '*', '/'];
 export const GUEST_HISTORY_BUCKET = '__guest__';
 export const gradeOrder: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
 export const leaderboardStorageKey = 'math-defender-game-store';

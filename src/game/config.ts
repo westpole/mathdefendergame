@@ -76,6 +76,7 @@ export const GAME_CONFIG = {
   streakRewardThreshold: 30, // correct answers in a row for +1 life (Regular Play only)
   scorePerCorrectAnswer: 1,
   scorePenaltyPerIncorrectAnswer: 1,
+  practiceScoreWeight: 0.5, // share of a practice run's per-operation gains that counts toward the grade; losses never count
 
   CANVAS_WIDTH: 540,
   CANVAS_HEIGHT: 900,

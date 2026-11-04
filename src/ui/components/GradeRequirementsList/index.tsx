@@ -1,13 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import type { Grade, GradeOperationStatus, MathOperation } from '@shared/types';
-
-const operationKeyByOperation: Record<MathOperation, string> = {
-  '+': 'performance.operation.addition',
-  '-': 'performance.operation.subtraction',
-  '*': 'performance.operation.multiplication',
-  '/': 'performance.operation.division',
-};
+import { OPERATION_I18N_KEYS } from '@ui/constants';
 
 const operationTestIdByOperation: Record<MathOperation, string> = {
   '+': 'addition',
@@ -41,7 +35,7 @@ export function GradeRequirementsList({ operations, grade, label }: GradeRequire
       {operations.map(({ op, current, required }) => {
         const isMet = current >= required;
         const ratio = required > 0 ? Math.min(current / required, 1) : 1;
-        const operationLabel = t(operationKeyByOperation[op]);
+        const operationLabel = t(OPERATION_I18N_KEYS[op]);
 
         return (
           <li

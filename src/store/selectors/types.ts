@@ -15,21 +15,12 @@ export interface PerformanceRow {
   attempts: number;
 }
 
-/** One operation row in the grade-progress summary. */
-export interface GradeProgressOperation extends GradeOperationStatus {
-  met: boolean;
-  /** `current / required`, capped at 1. */
-  ratio: number;
-}
-
 export interface GradeProgressSummary {
   effectiveGrade: Grade;
   /** Null at Major-General. */
   nextGrade: Grade | null;
   /** Rows for the next grade's requirements, or Major-General's requirements at the top grade. */
-  operations: GradeProgressOperation[];
-  /** Average of the capped operation ratios, for one summary bar. */
-  overallRatio: number;
+  operations: GradeOperationStatus[];
 }
 
 export interface WeeklyProgressReport {

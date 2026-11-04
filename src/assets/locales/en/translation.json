@@ -91,11 +91,16 @@
       "body": "Defend the city across {{stageCount}} stages. Answer enough meteors correctly to clear each stage. The run ends when you clear the last stage or lose all your lives."
     },
     "practiceMode": {
-      "body": "Train one operation (+, -, *, /) at a time with no stage limit. If you lose all your lives, practice restarts from stage 1."
+      "body": "Train one operation (+, -, *, /) at a time with no stage limit. If you lose all your lives, practice restarts from stage 1.",
+      "gradeNote": "Practice is safe for your grade: it never lowers your operation scores, and gains count at {{weight}}%."
     },
     "livesShield": {
       "title": "Lives and shield",
       "body": "You start with {{lives}} lives. The base shield absorbs {{shield}} meteor hits per stage. When it breaks, you lose a life."
+    },
+    "targetMeteor": {
+      "title": "Target meteor",
+      "body": "Always answer the highlighted meteor: the one closest to the base. An answer for any other meteor counts as a wrong answer."
     },
     "extraLife": {
       "title": "Extra life",

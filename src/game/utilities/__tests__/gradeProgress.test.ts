@@ -8,6 +8,7 @@ import {
   applyRunScores,
   buildGradeNotice,
   createEmptyOperationScores,
+  getEntryOperationScores,
   getRequirementStatuses,
   getRunOperationScores,
   meetsGradeRequirements,
@@ -81,6 +82,41 @@ describe('gradeProgress', () => {
 
       // −40 then +30 gives 30, not −10 and not 0.
       expect(sumOperationScores([newest, oldest])['+']).toBe(30);
+    });
+
+    it('never lets a bad practice run lower lifetime scores', () => {
+      const regular = buildEntry(1, { '-': [150, 0] });
+      const badPractice = { ...buildEntry(2, { '-': [0, 40] }), mode: 'practice' as const };
+
+      expect(sumOperationScores([regular, badPractice])['-']).toBe(150);
+    });
+
+    it('adds practice gains at the practice weight', () => {
+      const practice = { ...buildEntry(1, { '+': [10, 3] }), mode: 'practice' as const };
+
+      expect(sumOperationScores([practice])['+']).toBe(3);
+    });
+  });
+
+  describe('getEntryOperationScores', () => {
+    it('counts a regular run in full, including losses', () => {
+      const entry = { ...buildEntry(1, { '+': [10, 3], '*': [0, 5] }), mode: 'regular' as const };
+
+      expect(getEntryOperationScores(entry)).toEqual(scores({ '+': 7, '*': -5 }));
+    });
+
+    it('treats an entry without a mode as a regular run', () => {
+      expect(getEntryOperationScores(buildEntry(1, { '-': [2, 4] }))['-']).toBe(-2);
+    });
+
+    it('floors practice losses at 0 and rounds weighted gains down', () => {
+      // At weight 0.5: '+' 7 → 3, '-' 1 → 0, '*' −5 → 0, '/' 20 → 10.
+      const entry = {
+        ...buildEntry(1, { '+': [10, 3], '-': [1, 0], '*': [0, 5], '/': [20, 0] }),
+        mode: 'practice' as const,
+      };
+
+      expect(getEntryOperationScores(entry)).toEqual(scores({ '+': 3, '-': 0, '*': 0, '/': 10 }));
     });
   });
 

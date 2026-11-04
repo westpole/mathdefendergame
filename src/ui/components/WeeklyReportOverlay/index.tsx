@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { selectActiveProfileHistory } from '@store/selectors/performance';
@@ -6,8 +6,9 @@ import { buildGradeProgressSummary, buildWeeklyProgressReport } from '@store/sel
 import { useGameStore } from '@store/useGameStore';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
 import { GradeRequirementsList } from '@ui/components/GradeRequirementsList';
+import { toGradeTitle } from '@ui/utilities/format';
 
-import { formatShortDate, formatScore, formatAccuracy, toGradeTitle } from '../HomeOverlay/utilities';
+import { formatShortDate, formatScore, formatAccuracy } from './utilities';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -21,8 +22,8 @@ export function WeeklyReportOverlay() {
   const grade = useGameStore((state) => state.grade);
   const history = useGameStore(selectActiveProfileHistory);
   const [now] = useState(() => Date.now());
-  const weeklyReport = buildWeeklyProgressReport(history, now);
-  const progress = buildGradeProgressSummary(history);
+  const weeklyReport = useMemo(() => buildWeeklyProgressReport(history, now), [history, now]);
+  const progress = useMemo(() => buildGradeProgressSummary(history), [history]);
   const displayGrade = progress.effectiveGrade;
   const displayGradeLabel = t(`grades.${displayGrade}`, { defaultValue: toGradeTitle(displayGrade) });
   const iconGradeLabel = t(`grades.${grade}`, { defaultValue: toGradeTitle(grade) });

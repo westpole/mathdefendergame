@@ -42,6 +42,13 @@ describe('RulesOverlay', () => {
     expect(screen.getByText(/regular play only: answer 30 meteors correctly in a row/i)).toBeInTheDocument();
   });
 
+  it('explains the target meteor and how practice counts toward the grade', () => {
+    renderRules();
+
+    expect(within(screen.getByTestId('rules-section-target-meteor')).getByText(/closest to the base/i)).toBeInTheDocument();
+    expect(within(screen.getByTestId('rules-section-practice-mode')).getByText(/gains count at 50%/i)).toBeInTheDocument();
+  });
+
   it('explains every HUD value', () => {
     renderRules();
 
@@ -87,5 +94,7 @@ describe('RulesOverlay', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: /правила/i })).toBeInTheDocument();
     expect(screen.getByText(/торкніться ігрового поля/i)).toBeInTheDocument();
+    expect(within(screen.getByTestId('rules-section-target-meteor')).getByText(/найближче до бази/i)).toBeInTheDocument();
+    expect(within(screen.getByTestId('rules-section-practice-mode')).getByText(/зараховуються на 50%/i)).toBeInTheDocument();
   });
 });

@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { useGameStore } from '@store/useGameStore';
 import { selectActiveProfileHistory } from '@store/selectors/performance';
 import { buildGradeProgressSummary } from '@store/selectors/progress';
-import { toGradeTitle, formatApm } from './utilities';
+import { formatApm } from './utilities';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
 import { GradeRequirementsList } from '@ui/components/GradeRequirementsList';
+import { toGradeTitle } from '@ui/utilities/format';
 
 /**
  * Profile overlay component displaying user statistics and progress.

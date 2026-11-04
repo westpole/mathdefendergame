@@ -1,23 +1,9 @@
-import { GUEST_HISTORY_BUCKET } from '../constants';
 import { sortHistory } from '../utilities/general';
 import type {
   GameStoreState,
   PlayerProfile,
   PrematureGameEndPayload,
 } from '../types';
-
-/**
- * Resolves the history bucket key for the current active profile or guest runs.
- *
- * @param activeUsername - Active username in session, if any.
- * @returns Profile history bucket key.
- * @example
- * const key = resolveProfileHistoryKey('PilotOne');
- * const guestKey = resolveProfileHistoryKey(null);
- */
-export function resolveProfileHistoryKey(activeUsername: string | null): string {
-  return activeUsername ?? GUEST_HISTORY_BUCKET;
-}
 
 /**
  * Builds updated game history buckets by appending and re-sorting a new history entry.

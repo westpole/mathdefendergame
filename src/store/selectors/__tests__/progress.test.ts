@@ -33,14 +33,13 @@ describe('progress selectors', () => {
         effectiveGrade: 'trainee',
         nextGrade: 'cadet',
         operations: [
-          { op: '+', current: 0, required: 250, met: false, ratio: 0 },
-          { op: '-', current: 0, required: 150, met: false, ratio: 0 },
+          { op: '+', current: 0, required: 250 },
+          { op: '-', current: 0, required: 150 },
         ],
-        overallRatio: 0,
       });
     });
 
-    it('shows the next grade requirements with met flags and capped ratios', () => {
+    it('shows the next grade requirements with lifetime scores', () => {
       expect(buildGradeProgressSummary([
         createHistoryEntry('run-1', {
           playedAt: 1,
@@ -57,11 +56,10 @@ describe('progress selectors', () => {
         effectiveGrade: 'cadet',
         nextGrade: 'commander',
         operations: [
-          { op: '+', current: 800, required: 750, met: true, ratio: 1 },
-          { op: '-', current: 150, required: 550, met: false, ratio: 150 / 550 },
-          { op: '*', current: 0, required: 250, met: false, ratio: 0 },
+          { op: '+', current: 800, required: 750 },
+          { op: '-', current: 150, required: 550 },
+          { op: '*', current: 0, required: 250 },
         ],
-        overallRatio: (1 + (150 / 550)) / 3,
       });
     });
 
@@ -79,13 +77,12 @@ describe('progress selectors', () => {
 
       expect(summary.effectiveGrade).toBe('major-general');
       expect(summary.nextGrade).toBeNull();
-      expect(summary.operations.map(({ op, required, met }) => ({ op, required, met }))).toEqual([
-        { op: '+', required: 1250, met: true },
-        { op: '-', required: 1050, met: true },
-        { op: '*', required: 550, met: true },
-        { op: '/', required: 250, met: true },
+      expect(summary.operations).toEqual([
+        { op: '+', current: 1250, required: 1250 },
+        { op: '-', current: 1050, required: 1050 },
+        { op: '*', current: 550, required: 550 },
+        { op: '/', current: 300, required: 250 },
       ]);
-      expect(summary.overallRatio).toBe(1);
     });
   });
 

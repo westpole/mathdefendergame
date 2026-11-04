@@ -1,0 +1,9 @@
+{
+  "grade": "commander",
+  "operations": [
+    { "op": "+", "current": 1250, "required": 1250 },
+    { "op": "-", "current": 980, "required": 1050 },
+    { "op": "*", "current": 550, "required": 550 },
+    { "op": "/", "current": 12, "required": 250 }
+  ]
+}

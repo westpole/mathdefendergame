@@ -99,7 +99,8 @@ export interface GameStoreState {
   showPauseOverlay: (reason: PauseOverlayReason) => void;
   hidePauseOverlay: () => void;
   showSavingBeforeClose: () => void;
-  showGameOver: (payload: Pick<GameStoreState, 'grade' | 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
+  /** Shows the game-over screen. Must run after addGameHistory, which resolves the post-run grade. */
+  showGameOver: (payload: Pick<GameStoreState, 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   persistPrematureGameEnd: (payload: PrematureGameEndPayload) => void;
   dismissGradeNotice: () => void;
   startPlaying: () => void;

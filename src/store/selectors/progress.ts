@@ -24,19 +24,11 @@ export function buildGradeProgressSummary(history: GameHistoryEntry[]): GradePro
   const gradeOrder = GAME_CONFIG.gradeOrder;
   const currentIndex = gradeOrder.indexOf(effectiveGrade);
   const nextGrade = currentIndex < gradeOrder.length - 1 ? gradeOrder[currentIndex + 1] : null;
-  const operations = getRequirementStatuses(scores, nextGrade ?? effectiveGrade).map((status) => {
-    const ratio = Math.min(status.current / status.required, 1);
-    return { ...status, met: status.current >= status.required, ratio };
-  });
-  const overallRatio = operations.length > 0
-    ? operations.reduce((sum, operation) => sum + operation.ratio, 0) / operations.length
-    : 0;
 
   return {
     effectiveGrade,
     nextGrade,
-    operations,
-    overallRatio,
+    operations: getRequirementStatuses(scores, nextGrade ?? effectiveGrade),
   };
 }
 

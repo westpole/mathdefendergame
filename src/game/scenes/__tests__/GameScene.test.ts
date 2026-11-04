@@ -44,9 +44,10 @@ const mockGameState = vi.hoisted(() => ({
     pauseForManualEndPrompt: ReturnType<typeof vi.fn>;
     resumeFromManualPause: ReturnType<typeof vi.fn>;
     buildPrematureEndSnapshot: ReturnType<typeof vi.fn>;
-    setGrade: ReturnType<typeof vi.fn>;
   },
   lastCallbacks: undefined as GameCallbacks | undefined,
+  /** Grade the mocked Game.reset() resolves from history. */
+  historyGrade: 'trainee',
 }));
 
 type MockMeteor = {
@@ -80,8 +81,14 @@ vi.mock('../../main', () => ({
     meteors: MockMeteor[] = [];
     particles: MockParticle[] = [];
 
-    reset = vi.fn();
-  setCanvasSize = vi.fn();
+    reset = vi.fn(() => {
+      this.grade = mockGameState.historyGrade;
+    });
+    getTargetMeteor = vi.fn(() => this.meteors.reduce<MockMeteor | null>(
+      (target, meteor) => (!target || meteor.y > target.y ? meteor : target),
+      null,
+    ));
+    setCanvasSize = vi.fn();
     update = vi.fn();
     checkAnswer = vi.fn();
     setInputBuffer = vi.fn((nextValue: string) => {
@@ -162,10 +169,6 @@ vi.mock('../../main', () => ({
         finalPerfScore: this.finalPerfScore,
       },
     }));
-    setGrade = vi.fn((grade: string) => {
-      this.grade = grade;
-    });
-
     constructor(callbacks: GameCallbacks) {
       mockGameState.lastInstance = this;
       mockGameState.lastCallbacks = callbacks;
@@ -178,6 +181,8 @@ function createTextStub() {
     setOrigin: vi.fn().mockReturnThis(),
     setDepth: vi.fn().mockReturnThis(),
     setPosition: vi.fn().mockReturnThis(),
+    setStroke: vi.fn().mockReturnThis(),
+    setScale: vi.fn().mockReturnThis(),
     destroy: vi.fn(),
   };
 }
@@ -306,6 +311,7 @@ describe('GameScene', () => {
     vi.useFakeTimers();
     mockGameState.lastInstance = undefined;
     mockGameState.lastCallbacks = undefined;
+    mockGameState.historyGrade = 'trainee';
   });
 
   afterEach(() => {
@@ -323,11 +329,15 @@ describe('GameScene', () => {
     const { scene, store, phaser } = setupScene();
     const beforeInit = Date.now();
 
-    scene.init({ grade: 'major-general' });
+    mockGameState.historyGrade = 'major-general';
+
+    scene.init();
 
     expect(mockGameState.lastInstance).toBeDefined();
+    // The grade comes only from Game.reset(); init must not override it.
     expect(mockGameState.lastInstance?.grade).toBe('major-general');
     expect(mockGameState.lastInstance?.reset).toHaveBeenCalledTimes(1);
+    expect(mockGameState.lastInstance?.reset).toHaveBeenCalledWith(0, { mode: 'regular', practiceOperation: '+' });
     expect(mockGameState.lastInstance?.state).toBe('playing');
     expect(mockGameState.lastInstance?.lastSpawn).toBeGreaterThanOrEqual(beforeInit);
     expect(store.startPlaying).toHaveBeenCalledTimes(1);
@@ -339,7 +349,7 @@ describe('GameScene', () => {
   it('wires scene services during create and paints the initial HUD', () => {
     const { scene, store, phaser } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     scene.create();
 
     expect(phaser.events.once).toHaveBeenCalledWith(Phaser.Scenes.Events.SHUTDOWN, expect.any(Function), scene);
@@ -357,7 +367,7 @@ describe('GameScene', () => {
   it('updates the live canvas size when Phaser resizes', () => {
     const { scene } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
 
     (scene as unknown as GameScenePrivate).handleResize({ width: 390, height: 844 });
 
@@ -367,7 +377,7 @@ describe('GameScene', () => {
   it('routes overlay and game-over transitions through the matching store calls', () => {
     const { scene, store } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     mockGameState.lastInstance!.state = 'playing';
     scene.continueFromOverlay();
     expect(store.startPlaying).toHaveBeenCalledTimes(2);
@@ -382,7 +392,7 @@ describe('GameScene', () => {
   it('skips update work outside active play and clears existing streak reward timers', () => {
     const { scene, store } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     mockGameState.lastInstance!.state = 'paused';
     (scene as unknown as { update: (time: number, delta: number) => void }).update(0, 16);
     expect(mockGameState.lastInstance?.update).not.toHaveBeenCalled();
@@ -403,7 +413,7 @@ describe('GameScene', () => {
   it('ignores manual pause requests outside active states and clears stale reward timers', () => {
     const { scene, store } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     mockGameState.lastInstance!.state = 'message';
     scene.pauseForManualEndPrompt('escape');
     expect(store.showPauseOverlay).not.toHaveBeenCalled();
@@ -418,7 +428,7 @@ describe('GameScene', () => {
   it('forwards answer input actions and pause state changes to the active gameplay logic', () => {
     const { scene, store } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     mockGameState.lastInstance!.state = 'playing';
 
     scene.setAnswerInputBuffer('42');
@@ -443,7 +453,8 @@ describe('GameScene', () => {
     const { scene, store, phaser } = setupScene();
     const notifyAppCloseReadySpy = vi.spyOn(adapter, 'notifyAppCloseReady').mockImplementation(() => {});
 
-    scene.init({ grade: 'major-general' });
+    scene.init();
+    mockGameState.lastInstance!.grade = 'major-general';
     mockGameState.lastInstance!.state = 'paused';
     mockGameState.lastInstance!.score = 120;
 
@@ -464,7 +475,7 @@ describe('GameScene', () => {
   it('updates the HUD input buffer on backspace and keeps answer input sanitized', () => {
     const { scene, store } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     mockGameState.lastInstance!.state = 'playing';
     mockGameState.lastInstance!.inputBuffer = '123';
 
@@ -486,7 +497,7 @@ describe('GameScene', () => {
   it('submits entered answers and pauses with ESC while ignoring gameplay keys outside playing state', () => {
     const { scene, store, phaser } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     scene.create();
     mockGameState.lastInstance!.state = 'playing';
     mockGameState.lastInstance!.inputBuffer = '42';
@@ -510,7 +521,7 @@ describe('GameScene', () => {
   it('pauses from touch input on the game canvas without reacting to mouse clicks', () => {
     const { scene, store } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     mockGameState.lastInstance!.state = 'playing';
 
     (scene as unknown as GameScenePrivate).handlePointerDown({ wasTouch: false });
@@ -524,7 +535,8 @@ describe('GameScene', () => {
   it('persists and exits to profile when ending game early from pause prompt', () => {
     const { scene, store, phaser } = setupScene();
 
-    scene.init({ grade: 'commander' });
+    scene.init();
+    mockGameState.lastInstance!.grade = 'commander';
     mockGameState.lastInstance!.state = 'playing';
     mockGameState.lastInstance!.score = 222;
 
@@ -542,7 +554,7 @@ describe('GameScene', () => {
   it('synchronizes meteor text objects and particle drawing during update', () => {
     const { scene, phaser } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     scene.create();
 
     const staleText = createTextStub();
@@ -579,10 +591,64 @@ describe('GameScene', () => {
     expect(existingText.setPosition).toHaveBeenCalledWith(99, 88);
   });
 
+  it('highlights the meteor closest to the base and moves the highlight when the target changes', () => {
+    const { scene, phaser } = setupScene();
+
+    scene.init();
+    scene.create();
+    mockGameState.lastInstance!.state = 'playing';
+    mockGameState.lastInstance!.meteors = [
+      { id: 1, x: 10, y: 300, text: '1+1', op: '+' },
+      { id: 2, x: 30, y: 120, text: '2+2', op: '+' },
+    ] as MockMeteor[];
+
+    scene.update(0, 16);
+
+    const [lowerText, higherText] = phaser.textObjects;
+    expect(lowerText.setStroke).toHaveBeenCalledWith('#ffffff', 4);
+    expect(lowerText.setScale).toHaveBeenCalledWith(1.2);
+    expect(higherText.setStroke).not.toHaveBeenCalled();
+
+    // Same target on the next frame: no restyling.
+    scene.update(0, 16);
+    expect(lowerText.setStroke).toHaveBeenCalledTimes(1);
+
+    // The target is destroyed; the remaining meteor becomes the target.
+    mockGameState.lastInstance!.meteors = [{ id: 2, x: 30, y: 140, text: '2+2', op: '+' }] as MockMeteor[];
+
+    scene.update(0, 16);
+
+    expect(higherText.setStroke).toHaveBeenCalledWith('#ffffff', 4);
+    expect(higherText.setScale).toHaveBeenCalledWith(1.2);
+  });
+
+  it('moves the highlight to a meteor that overtakes the current target', () => {
+    const { scene, phaser } = setupScene();
+
+    scene.init();
+    scene.create();
+    mockGameState.lastInstance!.state = 'playing';
+    mockGameState.lastInstance!.meteors = [
+      { id: 1, x: 10, y: 300, text: '1+1', op: '+' },
+      { id: 2, x: 30, y: 120, text: '2+2', op: '+' },
+    ] as MockMeteor[];
+
+    scene.update(0, 16);
+
+    mockGameState.lastInstance!.meteors[1].y = 320;
+    scene.update(0, 16);
+
+    const [firstText, secondText] = phaser.textObjects;
+    expect(firstText.setStroke).toHaveBeenLastCalledWith('#000000', 0);
+    expect(firstText.setScale).toHaveBeenLastCalledWith(1);
+    expect(secondText.setStroke).toHaveBeenCalledWith('#ffffff', 4);
+  });
+
   it('bridges stage and game-over callbacks into the store', () => {
     const { scene, store, phaser } = setupScene();
 
-    scene.init({ grade: 'commander' });
+    scene.init();
+    mockGameState.lastInstance!.grade = 'commander';
     mockGameState.lastInstance!.stage = 4;
     mockGameState.lastInstance!.stageIncorrect = 2;
     mockGameState.lastInstance!.score = 150;
@@ -602,7 +668,6 @@ describe('GameScene', () => {
 
     mockGameState.lastCallbacks?.onGameOver('victory');
     expect(store.showGameOver).toHaveBeenCalledWith({
-      grade: 'commander',
       score: 150,
       correctCount: 12,
       incorrectCount: 5,
@@ -617,7 +682,7 @@ describe('GameScene', () => {
   it('shows a timed streak reward message and resumes game after 3 seconds', () => {
     const { scene, store } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
 
     mockGameState.lastInstance!.state = 'paused';
     mockGameState.lastCallbacks?.onStreakReward(6);
@@ -636,7 +701,7 @@ describe('GameScene', () => {
   it('resumes from overlay, clears renderables, and restarts play unless the game is over', () => {
     const { scene, store, phaser } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     scene.create();
 
     const meteorText = createTextStub();
@@ -660,7 +725,7 @@ describe('GameScene', () => {
   it('removes listeners and transient renderables during shutdown', () => {
     const { scene, phaser } = setupScene();
 
-    scene.init({ grade: 'trainee' });
+    scene.init();
     scene.create();
 
     const meteorText = createTextStub();
