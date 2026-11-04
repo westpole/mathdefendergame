@@ -1,19 +1,13 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { GAME_CONFIG } from '@game/config';
 import { useGameStore } from '@store/useGameStore';
-import type { Grade } from '@shared/types';
-import { toGradeTitle, formatScore, formatApm } from './utilities';
+import { selectActiveProfileHistory } from '@store/selectors/performance';
+import { buildGradeProgressSummary } from '@store/selectors/progress';
+import { formatApm } from './utilities';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
-
-const gradeOrder: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
-const EMPTY_HISTORY: Array<{
-  finalScore: number;
-  correctAnswers: number;
-  incorrectAnswers: number;
-  averageAnswerTimeMs: number;
-}> = [];
+import { GradeRequirementsList } from '@ui/components/GradeRequirementsList';
+import { toGradeTitle } from '@ui/utilities/format';
 
 /**
  * Profile overlay component displaying user statistics and progress.
@@ -24,18 +18,13 @@ export function ProfileOverlay() {
   const activeProfile = useGameStore((state) => (state.activeUsername ? state.profiles[state.activeUsername] ?? null : null));
   const phase = useGameStore((state) => state.phase);
   const grade = useGameStore((state) => state.grade);
-  const currentScore = useGameStore((state) => state.score);
   const correctCount = useGameStore((state) => state.correctCount);
-  const history = useGameStore((state) => {
-    const key = state.activeUsername ?? '__guest__';
-    return state.gameHistoryByProfile[key] ?? EMPTY_HISTORY;
-  });
+  const history = useGameStore(selectActiveProfileHistory);
   const incorrectCount = useGameStore((state) => state.incorrectCount);
 
   const hasUncommittedRunStats = phase === 'playing' || phase === 'paused' || phase === 'stage-message';
 
   const stats = useMemo(() => {
-    const totalScore = history.reduce((sum, entry) => sum + entry.finalScore, 0);
     const gameCount = history.length;
     const historyCorrectAnswers = history.reduce((sum, entry) => sum + entry.correctAnswers, 0);
     const historyIncorrectAnswers = history.reduce((sum, entry) => sum + entry.incorrectAnswers, 0);
@@ -57,7 +46,6 @@ export function ProfileOverlay() {
       : correctCount;
 
     return {
-      totalScore,
       gameCount,
       averageAnswersPerMinute,
       averageAccuracy,
@@ -65,17 +53,13 @@ export function ProfileOverlay() {
     };
   }, [correctCount, hasUncommittedRunStats, history, incorrectCount]);
 
-  const progressScore = Math.max(stats.totalScore + (hasUncommittedRunStats ? Math.max(currentScore, 0) : 0), 0);
-  const currentIndex = gradeOrder.indexOf(grade);
-  const currentThreshold = GAME_CONFIG.grades[grade].thresholdScore;
-  const nextGrade = currentIndex < gradeOrder.length - 1 ? gradeOrder[currentIndex + 1] : null;
-  const nextThreshold = nextGrade ? GAME_CONFIG.grades[nextGrade].thresholdScore : null;
-  const pointsLeft = nextThreshold !== null ? Math.max(nextThreshold - progressScore, 0) : 0;
-  const progressRatio = nextThreshold !== null && nextThreshold > currentThreshold
-    ? Math.min(Math.max((progressScore - currentThreshold) / (nextThreshold - currentThreshold), 0), 1)
-    : 0;
+  const progress = useMemo(() => buildGradeProgressSummary(history), [history]);
+  const progressGrade = progress.effectiveGrade;
   const currentGradeLabel = t(`grades.${grade}`, { defaultValue: toGradeTitle(grade) });
-  const nextGradeLabel = nextGrade ? t(`grades.${nextGrade}`, { defaultValue: toGradeTitle(nextGrade) }) : null;
+  const progressGradeLabel = t(`grades.${progressGrade}`, { defaultValue: toGradeTitle(progressGrade) });
+  const nextGradeLabel = progress.nextGrade
+    ? t(`grades.${progress.nextGrade}`, { defaultValue: toGradeTitle(progress.nextGrade) })
+    : null;
 
   return (
     <div className="overlay-screen overlay-screen--interactive" data-testid="profile-overlay">
@@ -113,35 +97,17 @@ export function ProfileOverlay() {
             </div>
           </div>
 
-          <div className="profile-progress-section">
-            {grade === 'major-general' ? (
-              <div className="profile-major-general-box profile-major-general-box--major-general">
-                <span>{formatScore(progressScore)}</span>
-              </div>
-            ) : (
-              <>
-                <div className="profile-progress-labels">
-                  <span>{formatScore(currentThreshold)}</span>
-                  <span>{nextGradeLabel ? t('ui.nextGradeLabel', { grade: nextGradeLabel }) : t('ui.topGrade')}</span>
-                  <span>{formatScore(nextThreshold ?? currentThreshold)}</span>
-                </div>
-
-                <div className="profile-progress-bar">
-                  <div
-                    className={`profile-progress-fill profile-progress-fill--${grade ?? 'trainee'}`}
-                    style={{ width: `${progressRatio * 100}%` }}
-                  />
-                  <div
-                    className={`profile-progress-marker profile-progress-marker--${grade ?? 'trainee'}`}
-                    style={{ left: `${progressRatio * 100}%` }}
-                  />
-                </div>
-
-                <div className="profile-points-remaining">
-                  {t('ui.pointsToNextGrade', { count: formatScore(pointsLeft) })}
-                </div>
-              </>
-            )}
+          <div className="profile-progress-section" data-testid="profile-grade-progress">
+            <div className="grade-requirements-heading">
+              {nextGradeLabel
+                ? t('ui.nextGradeLabel', { grade: nextGradeLabel })
+                : t('ui.holdGradeLabel', { grade: progressGradeLabel })}
+            </div>
+            <GradeRequirementsList
+              operations={progress.operations}
+              grade={progressGrade}
+              label={t('ui.gradeRequirementsAriaLabel')}
+            />
           </div>
       </section>
     </div>

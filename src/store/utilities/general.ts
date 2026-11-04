@@ -2,11 +2,19 @@ import type {
   GameHistoryEntry,
   MathOperation,
   OperationHistoryStat,
+  OperationScores,
   Grade,
+  GradeNotice,
 } from '@shared/types';
 import { passwordPolicy, GUEST_HISTORY_BUCKET } from '../constants';
 import type { PlayerProfile, HistoryByProfile } from '@store/types';
-import { resolveGradeFromScore } from '@game/config';
+import {
+  applyRunScores,
+  buildGradeNotice,
+  getEntryOperationScores,
+  resolveGradeFromOperationScores,
+  sumOperationScores,
+} from '@game/utilities/gradeProgress';
 
 /**
  * Returns history entries ordered newest-first so recent play sessions appear first.
@@ -97,37 +105,74 @@ export function resolveActiveProfile(
 }
 
 /**
- * Calculates the total lifetime score for a profile, using the guest bucket when no
+ * Resolves the history bucket key for the current active profile or guest runs.
+ * This is the only place that maps a username to a history key.
+ *
+ * @param activeUsername - Active username in session, if any.
+ * @returns Profile history bucket key.
+ * @example
+ * const key = resolveProfileHistoryKey('PilotOne');
+ * const guestKey = resolveProfileHistoryKey(null);
+ */
+export function resolveProfileHistoryKey(activeUsername: string | null): string {
+  return activeUsername ?? GUEST_HISTORY_BUCKET;
+}
+
+/**
+ * Calculates lifetime operation scores for a profile, using the guest bucket when no
  * active username is present.
  *
  * @param activeUsername - The player username or null for the guest profile.
  * @param gameHistoryByProfile - Stored history grouped by profile key.
- * @returns The summed final score for the selected profile.
+ * @returns Lifetime score per operation (never negative).
  */
-function getLifetimeScoreForProfile(
+export function getLifetimeOperationScores(
   activeUsername: string | null,
   gameHistoryByProfile: HistoryByProfile,
-): number {
-  const profileKey = activeUsername ?? GUEST_HISTORY_BUCKET;
-
-  if (!gameHistoryByProfile[profileKey]) {
-    return 0;
-  }
-
-  return gameHistoryByProfile[profileKey]
-    .reduce((sum, entry) => sum + entry.finalScore, 0);
+): OperationScores {
+  return sumOperationScores(gameHistoryByProfile[resolveProfileHistoryKey(activeUsername)] ?? []);
 }
 
 /**
- * Derives the player's lifetime grade from their accumulated score history.
+ * Derives the player's lifetime grade from their per-operation scores in history.
  *
  * @param activeUsername - The active profile username or null for guest history.
  * @param gameHistoryByProfile - Stored history grouped by profile.
- * @returns The grade implied by the current lifetime score.
+ * @returns The highest grade whose requirements are all met.
  */
 export function resolveLifetimeGrade(
   activeUsername: string | null,
   gameHistoryByProfile: HistoryByProfile,
 ): Grade {
-  return resolveGradeFromScore(getLifetimeScoreForProfile(activeUsername, gameHistoryByProfile));
+  return resolveGradeFromOperationScores(getLifetimeOperationScores(activeUsername, gameHistoryByProfile));
+}
+
+/**
+ * Resolves the grade and after-game notice for a run that is about to be saved.
+ * History is summed once; the new run is added on top, unless it is older than the
+ * newest stored run, in which case lifetime scores are recalculated with it included.
+ *
+ * @param activeUsername - The active profile username or null for guest history.
+ * @param gameHistoryByProfile - Stored history grouped by profile, before the run is added.
+ * @param entry - The run being saved.
+ * @returns The grade after the run and the promotion/demotion notice (null when unchanged).
+ * @example
+ * const { grade, gradeNotice } = buildGradeUpdate(state.activeUsername, state.gameHistoryByProfile, entry);
+ */
+export function buildGradeUpdate(
+  activeUsername: string | null,
+  gameHistoryByProfile: HistoryByProfile,
+  entry: GameHistoryEntry,
+): { grade: Grade; gradeNotice: GradeNotice | null } {
+  const history = gameHistoryByProfile[resolveProfileHistoryKey(activeUsername)] ?? [];
+  const scoresBefore = sumOperationScores(history);
+  const newestPlayedAt = history.reduce((newest, item) => Math.max(newest, item.playedAt), -Infinity);
+  const scoresAfter = entry.playedAt >= newestPlayedAt
+    ? applyRunScores(scoresBefore, getEntryOperationScores(entry))
+    : sumOperationScores([...history, entry]);
+
+  return {
+    grade: resolveGradeFromOperationScores(scoresAfter),
+    gradeNotice: buildGradeNotice(scoresBefore, scoresAfter),
+  };
 }

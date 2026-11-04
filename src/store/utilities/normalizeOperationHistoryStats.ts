@@ -1,4 +1,4 @@
-import { MATH_OPERATIONS } from '@store/constants';
+import { MATH_OPERATIONS } from '@shared/constants';
 import type { MathOperation, OperationHistoryStat } from '@shared/types';
 import { createEmptyOperationHistoryStats } from '@store/utilities/general';
 

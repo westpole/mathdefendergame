@@ -198,11 +198,11 @@ describe('UIScene module', () => {
 
     uiScene.startGame();
 
-    expect(mockState.store.setGrade).toHaveBeenCalledWith('commander');
+    // The run grade is resolved only by Game.reset(), so it is neither set here nor passed to the scene.
+    expect(mockState.store.setGrade).not.toHaveBeenCalled();
     expect(mockState.store.startPlaying).toHaveBeenCalledTimes(1);
     expect(mockState.scenePlugin.stop).toHaveBeenCalledWith('GameScene');
     expect(mockState.scenePlugin.start).toHaveBeenCalledWith('GameScene', {
-      grade: 'commander',
       score: 351,
     });
   });
@@ -217,7 +217,6 @@ describe('UIScene module', () => {
 
     expect(mockState.scenePlugin.stop).not.toHaveBeenCalled();
     expect(mockState.scenePlugin.start).toHaveBeenCalledWith('GameScene', {
-      grade: 'trainee',
       score: 44,
     });
   });

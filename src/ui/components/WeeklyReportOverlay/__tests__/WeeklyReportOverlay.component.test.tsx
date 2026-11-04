@@ -28,6 +28,16 @@ describe('WeeklyReportOverlay', () => {
     expect(screen.getByText('Grade Progress')).toBeInTheDocument();
   });
 
+  it('renders per-operation progress toward the next grade from lifetime history', () => {
+    render(<WeeklyReportOverlay />);
+
+    expect(screen.getByText('Next Cadet')).toBeInTheDocument();
+    // + (6−2) + (7−2) + (5−2) = 12; − (6−2) + (7−4) + (4−4) = 7
+    expect(screen.getByText('12 / 250')).toBeInTheDocument();
+    expect(screen.getByText('7 / 150')).toBeInTheDocument();
+    expect(screen.queryByTestId('grade-requirement-multiplication')).not.toBeInTheDocument();
+  });
+
   it('renders translated weekly report labels in Ukrainian', async () => {
     await i18n.changeLanguage('uk');
 

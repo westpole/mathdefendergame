@@ -6,6 +6,7 @@
 import { GAME_CONFIG, getDangerZoneOffset, getMeteorSpawnPadding } from '../config';
 import { Game } from '../main';
 import { useGameStore } from '@store/useGameStore';
+import type { MathOperation, Meteor } from '@shared/types';
 
 interface Callbacks {
   onHUDUpdate: () => void;
@@ -231,14 +232,6 @@ describe('Game', () => {
     });
   });
 
-  describe('grade control', () => {
-    it('applies a grade baseline directly', () => {
-      game.setGrade('major-general');
-
-      expect(game.grade).toBe('major-general');
-    });
-  });
-
   describe('streak reward and finish states', () => {
     it('pauses the game when a streak reward triggers stage completion', () => {
       const target = GAME_CONFIG.grades[game.grade].stageClearCorrectAnswers - 1;
@@ -320,46 +313,7 @@ describe('Game', () => {
       expect(game.incorrectCount).toBe(0);
     });
 
-    it('promotes to cadet at score 101', () => {
-      game.spawnMeteor();
-      game.state = 'playing';
-      game.score = 100;
-
-      const meteor = game.meteors[0];
-      game.inputBuffer = meteor.answer.toString();
-      game.checkAnswer();
-
-      expect(game.score).toBe(101);
-      expect(game.grade).toBe('cadet');
-    });
-
-    it('promotes to commander at score 351', () => {
-      game.spawnMeteor();
-      game.state = 'playing';
-      game.score = 350;
-
-      const meteor = game.meteors[0];
-      game.inputBuffer = meteor.answer.toString();
-      game.checkAnswer();
-
-      expect(game.score).toBe(351);
-      expect(game.grade).toBe('commander');
-    });
-
-    it('promotes to major-general at score 751', () => {
-      game.spawnMeteor();
-      game.state = 'playing';
-      game.score = 750;
-
-      const meteor = game.meteors[0];
-      game.inputBuffer = meteor.answer.toString();
-      game.checkAnswer();
-
-      expect(game.score).toBe(751);
-      expect(game.grade).toBe('major-general');
-    });
-
-    it('carries grade progress across completed games', () => {
+    const seedHistory = (plusCorrect: number, minusCorrect: number) => {
       useGameStore.setState({
         activeUsername: 'PilotOne',
         gameHistoryByProfile: {
@@ -367,28 +321,49 @@ describe('Game', () => {
             {
               key: 'history-1',
               playedAt: 1,
-              correctAnswers: 10,
+              correctAnswers: plusCorrect + minusCorrect,
               incorrectAnswers: 0,
               averageAnswerTimeMs: 1000,
               mostProblematicOperation: null,
               operationStats: {
-                '+': { attempts: 4, incorrect: 0, avgTimeMs: 900 },
-                '-': { attempts: 3, incorrect: 0, avgTimeMs: 950 },
-                '*': { attempts: 2, incorrect: 0, avgTimeMs: 980 },
-                '/': { attempts: 1, incorrect: 0, avgTimeMs: 1000 },
+                '+': { attempts: plusCorrect, incorrect: 0, avgTimeMs: 900 },
+                '-': { attempts: minusCorrect, incorrect: 0, avgTimeMs: 950 },
+                '*': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
+                '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
               },
-              gradeAtFinish: 'cadet',
-              finalScore: 350,
-              finalPerfScore: 90,
+              gradeAtFinish: 'trainee',
+              finalScore: plusCorrect + minusCorrect,
+              finalPerfScore: 100,
             },
           ],
         },
       });
+    };
+
+    it('starts the run at the grade earned by lifetime operation scores', () => {
+      seedHistory(250, 150);
 
       game.reset();
 
       expect(game.grade).toBe('cadet');
+    });
 
+    it('ignores the old lifetime score total when resolving the grade', () => {
+      seedHistory(200, 0);
+      useGameStore.setState((state) => ({
+        gameHistoryByProfile: {
+          PilotOne: state.gameHistoryByProfile.PilotOne.map((entry) => ({ ...entry, finalScore: 10_000 })),
+        },
+      }));
+
+      game.reset();
+
+      expect(game.grade).toBe('trainee');
+    });
+
+    it('keeps the grade fixed when correct answers would qualify for a promotion mid-run', () => {
+      seedHistory(249, 150);
+      game.reset();
       game.spawnMeteor();
       game.state = 'playing';
 
@@ -397,7 +372,20 @@ describe('Game', () => {
       game.checkAnswer();
 
       expect(game.score).toBe(1);
-      expect(game.grade).toBe('commander');
+      expect(game.grade).toBe('trainee');
+    });
+
+    it('keeps the grade fixed when wrong answers would break its requirements mid-run', () => {
+      seedHistory(250, 150);
+      game.reset();
+      game.spawnMeteor();
+      game.state = 'playing';
+
+      game.inputBuffer = '99999';
+      game.checkAnswer();
+
+      expect(game.incorrectCount).toBe(1);
+      expect(game.grade).toBe('cadet');
     });
   });
 
@@ -501,6 +489,84 @@ describe('Game', () => {
       game.checkAnswer();
 
       expect(mockCallbacks.onHUDUpdate).toHaveBeenCalled();
+    });
+  });
+
+  describe('target meteor', () => {
+    const meteorAt = (id: number, y: number, op: MathOperation, answer: number, spawnTimeMs = 1_000): Meteor => ({
+      id,
+      x: 100,
+      y,
+      text: `${answer}`,
+      answer,
+      op,
+      speed: 50,
+      spawnTimeMs,
+    });
+
+    beforeEach(() => {
+      game.state = 'playing';
+      game.meteors = [];
+    });
+
+    it('returns null when there are no meteors', () => {
+      expect(game.getTargetMeteor()).toBeNull();
+    });
+
+    it('targets the meteor closest to the base, not the oldest one', () => {
+      const older = meteorAt(1, 100, '+', 4, 1_000);
+      const newerAndLower = meteorAt(2, 300, '*', 12, 2_000);
+      game.meteors = [older, newerAndLower];
+
+      expect(game.getTargetMeteor()).toBe(newerAndLower);
+    });
+
+    it('breaks a height tie in favour of the older meteor', () => {
+      const newer = meteorAt(1, 200, '+', 4, 2_000);
+      const older = meteorAt(2, 200, '-', 3, 1_000);
+      game.meteors = [newer, older];
+
+      expect(game.getTargetMeteor()).toBe(older);
+    });
+
+    it('destroys the target on a correct answer', () => {
+      const higher = meteorAt(1, 100, '+', 4);
+      const target = meteorAt(2, 300, '*', 12);
+      game.meteors = [higher, target];
+      game.inputBuffer = '12';
+
+      game.checkAnswer();
+
+      expect(game.meteors).toEqual([higher]);
+      expect(game.correctCount).toBe(1);
+      expect(game.roundOperationTelemetry['*']).toMatchObject({ attempts: 1, incorrect: 0 });
+    });
+
+    it("counts another meteor's answer as a miss charged to the target's operation", () => {
+      const higher = meteorAt(1, 100, '*', 12);
+      const target = meteorAt(2, 300, '+', 4);
+      game.meteors = [higher, target];
+      game.inputBuffer = '12';
+
+      game.checkAnswer();
+
+      expect(game.meteors).toEqual([higher, target]);
+      expect(game.correctCount).toBe(0);
+      expect(game.incorrectCount).toBe(1);
+      expect(game.roundOperationTelemetry['+']).toMatchObject({ attempts: 1, incorrect: 1 });
+      expect(game.roundOperationTelemetry['*']).toMatchObject({ attempts: 0, incorrect: 0 });
+    });
+
+    it('records a miss without an operation when no meteors are on screen', () => {
+      game.inputBuffer = '7';
+
+      game.checkAnswer();
+
+      expect(game.incorrectCount).toBe(1);
+      expect(game.roundResolvedAnswerCount).toBe(1);
+      for (const op of ['+', '-', '*', '/'] as const) {
+        expect(game.roundOperationTelemetry[op].attempts).toBe(0);
+      }
     });
   });
 

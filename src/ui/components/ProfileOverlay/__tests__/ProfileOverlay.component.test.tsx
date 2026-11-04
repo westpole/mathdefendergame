@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
@@ -20,16 +20,21 @@ describe('ProfileOverlay', () => {
     setMockStoreState();
   });
 
-  it('uses completed game history for profile progress in the menu', () => {
+  it('shows per-operation progress toward the next grade from completed history', () => {
     render(<ProfileOverlay />);
 
     expect(screen.getByText('Avg. APM')).toBeInTheDocument();
     expect(screen.getByText('55.7')).toBeInTheDocument();
     expect(screen.getByText('88%')).toBeInTheDocument();
-    expect(screen.getByText('1 pts to next grade')).toBeInTheDocument();
+    expect(screen.getByText('Next Cadet')).toBeInTheDocument();
+    // + (4−2) + (4−0) = 6; − (3−2) + (4−2) = 3
+    expect(within(screen.getByTestId('grade-requirement-addition')).getByText('6 / 250')).toBeInTheDocument();
+    expect(within(screen.getByTestId('grade-requirement-subtraction')).getByText('3 / 150')).toBeInTheDocument();
+    expect(screen.queryByTestId('grade-requirement-multiplication')).not.toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: 'Requirement met' })).not.toBeInTheDocument();
   });
 
-  it('includes the active run score while a game is still in progress', () => {
+  it('ignores live run values while a game is still in progress', () => {
     useGameStore.setState({
       phase: 'playing',
       grade: 'commander',
@@ -38,27 +43,39 @@ describe('ProfileOverlay', () => {
 
     render(<ProfileOverlay />);
 
-    expect(screen.getByText('55.7')).toBeInTheDocument();
     expect(screen.getByText('86%')).toBeInTheDocument();
-    expect(screen.getByText('381 pts to next grade')).toBeInTheDocument();
+    expect(screen.getByText('Next Cadet')).toBeInTheDocument();
+    expect(screen.getByText('6 / 250')).toBeInTheDocument();
   });
 
-  it('renders the max-rank completion panel when the player has reached major-general', () => {
+  it('shows the Major-General requirements to hold with checkmarks at the top grade', () => {
     setMockStoreState({
-      activeUsername: 'AcePilot',
-      phase: 'start',
       grade: 'major-general',
       gameHistoryByProfile: {
-        AcePilot: [],
+        AcePilot: [{
+          key: 'top-run',
+          playedAt: 1,
+          correctAnswers: 3200,
+          incorrectAnswers: 0,
+          averageAnswerTimeMs: 1000,
+          mostProblematicOperation: null,
+          operationStats: {
+            '+': { attempts: 1300, incorrect: 0, avgTimeMs: 900 },
+            '-': { attempts: 1100, incorrect: 0, avgTimeMs: 900 },
+            '*': { attempts: 550, incorrect: 0, avgTimeMs: 900 },
+            '/': { attempts: 250, incorrect: 0, avgTimeMs: 900 },
+          },
+          gradeAtFinish: 'major-general',
+          finalScore: 3200,
+          finalPerfScore: 100,
+        }],
       },
-      score: 0,
-      correctCount: 0,
-      incorrectCount: 0,
     });
 
     render(<ProfileOverlay />);
 
-    expect(document.querySelector('.profile-major-general-box--major-general')).toBeInTheDocument();
+    expect(screen.getByText('Keep Major General')).toBeInTheDocument();
+    expect(screen.getAllByRole('img', { name: 'Requirement met' })).toHaveLength(4);
     expect(screen.getByText('AcePilot')).toBeInTheDocument();
   });
 });

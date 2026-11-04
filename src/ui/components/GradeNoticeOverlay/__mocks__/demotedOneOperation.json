@@ -1,0 +1,11 @@
+{
+  "phase": "start",
+  "gradeNotice": {
+    "kind": "demoted",
+    "fromGrade": "commander",
+    "toGrade": "cadet",
+    "operations": [
+      { "op": "-", "current": 549, "required": 550 }
+    ]
+  }
+}

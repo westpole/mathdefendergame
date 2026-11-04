@@ -7,8 +7,10 @@ import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
-import commanderRexMock from './__mocks__/commanderRex.json';
-import generalVossMock from './__mocks__/generalVoss.json';
+import cadetNoMultiplicationMock from './__mocks__/cadetNoMultiplication.json';
+import freshTraineeMock from './__mocks__/freshTrainee.json';
+import majorGeneralMock from './__mocks__/majorGeneral.json';
+import traineePartialMock from './__mocks__/traineePartial.json';
 import { ProfileOverlay } from '.';
 
 interface StoryArgs {
@@ -49,24 +51,62 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-  name: 'Commander profile',
+export const FreshTrainee: Story = {
+  name: 'Fresh Trainee (no history)',
   args: {
-    initialState: commanderRexMock,
+    initialState: freshTraineeMock,
+  },
+};
+
+export const TraineePartial: Story = {
+  name: 'Trainee, + met and − partly met',
+  args: {
+    initialState: traineePartialMock,
+  },
+};
+
+export const CadetNoMultiplication: Story = {
+  name: 'Cadet with × at 0',
+  args: {
+    initialState: cadetNoMultiplicationMock,
   },
 };
 
 export const MajorGeneral: Story = {
-  name: 'Major General profile',
+  name: 'Major General (requirements to hold)',
   args: {
-    initialState: generalVossMock,
+    initialState: majorGeneralMock,
   },
 };
 
-export const MobileProfile: Story = {
-  name: 'Mobile commander profile',
+export const MobileFreshTrainee: Story = {
+  name: 'Mobile fresh Trainee',
   args: {
     frame: popularMobileStoryFrame,
-    initialState: commanderRexMock,
+    initialState: freshTraineeMock,
+  },
+};
+
+export const MobileTraineePartial: Story = {
+  name: 'Mobile Trainee, + met and − partly met',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: traineePartialMock,
+  },
+};
+
+export const MobileCadetNoMultiplication: Story = {
+  name: 'Mobile Cadet with × at 0',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: cadetNoMultiplicationMock,
+  },
+};
+
+export const MobileMajorGeneral: Story = {
+  name: 'Mobile Major General',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: majorGeneralMock,
   },
 };

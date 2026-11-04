@@ -1,0 +1,21 @@
+{
+  "activeUsername": "RookieNova",
+  "score": 0,
+  "correctCount": 0,
+  "incorrectCount": 0,
+  "grade": "trainee",
+  "profiles": {
+    "RookieNova": {
+      "username": "RookieNova",
+      "password": "Abc12345",
+      "bestScore": 0,
+      "highestStage": 1,
+      "preferredGrade": "trainee",
+      "createdAt": 1710000000000,
+      "updatedAt": 1710000000000
+    }
+  },
+  "gameHistoryByProfile": {
+    "RookieNova": []
+  }
+}

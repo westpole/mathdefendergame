@@ -6,16 +6,9 @@ import {
   buildPerformanceRows,
   selectActiveProfileHistory,
 } from '@store/selectors/performance';
-import type { MathOperation } from '@shared/types';
+import { OPERATION_I18N_KEYS } from '@ui/constants';
 
 import { formatAccuracy, formatSpeed } from './utilities';
-
-const operationKeyByOperation: Record<MathOperation, string> = {
-  '+': 'performance.operation.addition',
-  '-': 'performance.operation.subtraction',
-  '*': 'performance.operation.multiplication',
-  '/': 'performance.operation.division',
-};
 
 const masteryKeyByRating: Record<string, string> = {
   'No Data': 'performance.mastery.noData',
@@ -72,7 +65,7 @@ export function PerformanceOverlay() {
               <tbody>
                 {rows.map((row) => (
                   <tr key={row.operation}>
-                    <th scope="row">{t(operationKeyByOperation[row.operation])}</th>
+                    <th scope="row">{t(OPERATION_I18N_KEYS[row.operation])}</th>
                     <td>{formatAccuracy(row.accuracy)}</td>
                     <td>{formatSpeed(row.avgSpeedSeconds)}</td>
                     <td>{t(masteryKeyByRating[row.masteryRating] ?? row.masteryRating)}</td>

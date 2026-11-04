@@ -1,0 +1,39 @@
+{
+  "activeUsername": "GeneralVoss",
+  "score": 0,
+  "correctCount": 0,
+  "incorrectCount": 0,
+  "grade": "major-general",
+  "profiles": {
+    "GeneralVoss": {
+      "username": "GeneralVoss",
+      "password": "Abc12345",
+      "bestScore": 120,
+      "highestStage": 12,
+      "preferredGrade": "major-general",
+      "createdAt": 1710000000000,
+      "updatedAt": 1710000000000
+    }
+  },
+  "gameHistoryByProfile": {
+    "GeneralVoss": [
+      {
+        "key": "lifetime-run",
+        "playedAt": 1710000001000,
+        "correctAnswers": 3235,
+        "incorrectAnswers": 0,
+        "averageAnswerTimeMs": 1500,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": { "attempts": 1310, "incorrect": 0, "avgTimeMs": 1400 },
+          "-": { "attempts": 1080, "incorrect": 0, "avgTimeMs": 1500 },
+          "*": { "attempts": 580, "incorrect": 0, "avgTimeMs": 1700 },
+          "/": { "attempts": 265, "incorrect": 0, "avgTimeMs": 1900 }
+        },
+        "gradeAtFinish": "major-general",
+        "finalScore": 3235,
+        "finalPerfScore": 100
+      }
+    ]
+  }
+}

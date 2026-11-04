@@ -38,6 +38,7 @@ export function RulesOverlay() {
 
         <RulesSection id="practice-mode" title={t('ui.practiceMode')}>
           <p>{t('rules.practiceMode.body')}</p>
+          <p>{t('rules.practiceMode.gradeNote', { weight: Math.round(GAME_CONFIG.practiceScoreWeight * 100) })}</p>
         </RulesSection>
 
         <RulesSection id="lives-shield" title={t('rules.livesShield.title')}>
@@ -47,6 +48,10 @@ export function RulesOverlay() {
               shield: GAME_CONFIG.stageShieldMax,
             })}
           </p>
+        </RulesSection>
+
+        <RulesSection id="target-meteor" title={t('rules.targetMeteor.title')}>
+          <p>{t('rules.targetMeteor.body')}</p>
         </RulesSection>
 
         {isStreakRewardEnabled && (

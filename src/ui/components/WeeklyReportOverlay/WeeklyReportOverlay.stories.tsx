@@ -9,6 +9,8 @@ import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks
 
 import emptyWeekMock from '../HomeOverlay/__mocks__/empty-week.json';
 import weeklyProgressMock from '../HomeOverlay/__mocks__/weekly-progress.json';
+import cadetNoMultiplicationMock from '../ProfileOverlay/__mocks__/cadetNoMultiplication.json';
+import majorGeneralMock from '../ProfileOverlay/__mocks__/majorGeneral.json';
 import { WeeklyReportOverlay } from '.';
 
 interface StoryArgs {
@@ -62,10 +64,40 @@ export const EmptyWeek: Story = {
   },
 };
 
+export const CadetNoMultiplication: Story = {
+  name: 'Cadet with × at 0',
+  args: {
+    initialState: cadetNoMultiplicationMock,
+  },
+};
+
+export const MajorGeneral: Story = {
+  name: 'Major General (requirements to hold)',
+  args: {
+    initialState: majorGeneralMock,
+  },
+};
+
 export const Mobile: Story = {
   name: 'Mobile weekly report',
   args: {
     frame: popularMobileStoryFrame,
     initialState: weeklyProgressMock,
+  },
+};
+
+export const MobileCadetNoMultiplication: Story = {
+  name: 'Mobile Cadet with × at 0',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: cadetNoMultiplicationMock,
+  },
+};
+
+export const MobileMajorGeneral: Story = {
+  name: 'Mobile Major General',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: majorGeneralMock,
   },
 };

@@ -3,8 +3,10 @@ import type {
   LoginResult,
 } from '../types';
 import {
+  buildGradeUpdate,
   resolveActiveProfile,
   resolveLifetimeGrade,
+  resolveProfileHistoryKey,
   validatePassword,
 } from '../utilities/general';
 import {
@@ -20,7 +22,6 @@ import {
 import {
   buildHistoryByProfileWithEntry,
   buildProgressedProfile,
-  resolveProfileHistoryKey,
 } from '../transformers/history';
 import {
   buildHidePauseOverlayState,
@@ -78,6 +79,7 @@ export function createGameStoreSetters(
   | 'showSavingBeforeClose'
   | 'showGameOver'
   | 'persistPrematureGameEnd'
+  | 'dismissGradeNotice'
   | 'startPlaying'
   | 'openMenu'
   | 'openScreenView'
@@ -137,7 +139,8 @@ export function createGameStoreSetters(
     showGameOver: (payload) => {
       set((state) => {
         const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
-        const resolvedGrade = resolveLifetimeGrade(state.activeUsername, state.gameHistoryByProfile);
+        // addGameHistory runs first and has already resolved the post-run grade.
+        const resolvedGrade = state.grade;
 
         if (!activeProfile) {
           return {
@@ -172,19 +175,22 @@ export function createGameStoreSetters(
     persistPrematureGameEnd: (payload) => {
       set((state) => {
         const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
-        const profileKey = resolveProfileHistoryKey(state.activeUsername);
-        const nextGameHistoryByProfile = buildHistoryByProfileWithEntry(
+        const { grade: resolvedGrade, gradeNotice } = buildGradeUpdate(
+          state.activeUsername,
           state.gameHistoryByProfile,
-          profileKey,
           payload.historyEntry,
         );
-        const resolvedGrade = resolveLifetimeGrade(state.activeUsername, nextGameHistoryByProfile);
 
         const nextState: Partial<GameStoreState> = {
           score: payload.score,
           grade: resolvedGrade,
           stage: payload.stage,
-          gameHistoryByProfile: nextGameHistoryByProfile,
+          gameHistoryByProfile: buildHistoryByProfileWithEntry(
+            state.gameHistoryByProfile,
+            resolveProfileHistoryKey(state.activeUsername),
+            payload.historyEntry,
+          ),
+          gradeNotice,
         };
 
         if (activeProfile) {
@@ -202,11 +208,13 @@ export function createGameStoreSetters(
         return nextState;
       });
     },
+    dismissGradeNotice: () => set({ gradeNotice: null }),
     startPlaying: () => set({
       phase: 'playing',
       stageMessage: null,
       streakRewardMessage: null,
       pauseOverlay: null,
+      gradeNotice: null,
     }),
     openMenu: () => set((state) => buildMenuSnapshot(state, 'home')),
     openScreenView: (screenView) => set((state) => buildMenuSnapshot(state, screenView)),
@@ -417,17 +425,14 @@ export function createGameStoreSetters(
       return resolveActiveProfile(state.activeUsername, state.profiles);
     },
     addGameHistory: (entry) => {
-      set((state) => {
-        const profileKey = resolveProfileHistoryKey(state.activeUsername);
-
-        return {
-          gameHistoryByProfile: buildHistoryByProfileWithEntry(
-            state.gameHistoryByProfile,
-            profileKey,
-            entry,
-          ),
-        };
-      });
+      set((state) => ({
+        ...buildGradeUpdate(state.activeUsername, state.gameHistoryByProfile, entry),
+        gameHistoryByProfile: buildHistoryByProfileWithEntry(
+          state.gameHistoryByProfile,
+          resolveProfileHistoryKey(state.activeUsername),
+          entry,
+        ),
+      }));
     },
     getGameHistory: (username = null, limit = 20) => {
       const state = get();
