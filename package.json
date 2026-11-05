@@ -105,7 +105,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
-    "happy-dom": "^20.11.0",
+    "happy-dom": "^21.0.4",
     "jsdom": "^29.1.1",
     "knip": "^5.68.2",
     "playwright": "^1.62.1",
