@@ -95,7 +95,7 @@
     "@vitest/coverage-v8": "^4.1.9",
     "@vitest/ui": "^4.1.9",
     "clsx": "^2.1.1",
-    "concurrently": "^10.0.3",
+    "concurrently": "^10.0.6",
     "conventional-changelog": "^8.1.0",
     "conventional-changelog-conventionalcommits": "^10.2.1",
     "conventional-recommended-bump": "^12.1.0",
@@ -118,7 +118,7 @@
     "vite-plugin-singlefile": "^2.3.3",
     "vitest": "^4.1.9",
     "vitest-canvas-mock": "^1.1.4",
-    "wait-on": "^9.0.10"
+    "wait-on": "^9.5.1"
   },
   "build": {
     "appId": "com.iwestpole.mathdefendergame",
