@@ -62,10 +62,10 @@ Vitest suppresses `stdout` output by default. To enable it for a run, set `VITES
 | Script | What it does | When to use it |
 | --- | --- | --- |
 | `npm run deps:audit` | Runs `npm audit` against installed dependencies. | Use for a quick local security audit of the dependency tree. |
-| `npm run deps:audit:ci` | Runs `audit-ci` for CI-friendly dependency vulnerability enforcement. | Use when you want stricter audit behavior aligned with automated pipelines. |
+| `npm run deps:audit:ci` | Runs `npm audit --audit-level=high`, which exits non-zero when any high or critical advisory exists. | Use as the security gate. Low and moderate advisories are still reported but do not fail the command. |
+| `npm run deps:signatures` | Runs `npm audit signatures` to verify the registry signatures of installed packages. | Use after dependency changes to confirm packages match what the registry signed. |
 | `npm run deps:outdated` | Lists outdated packages with additional version details. | Use when planning dependency updates. |
-| `npm run deps:unused` | Runs Knip to detect unused dependencies and related dead references. | Use when trimming dependencies or validating package cleanup work. |
-| `npm run deps:check-updates` | Uses `npm-check-updates` to show available package.json upgrades. | Use when reviewing what dependency versions could be bumped. |
+| `npm run deps:unused` | Runs Knip with `--dependencies` to report dependency issues only. Exceptions are listed in `knip.json`. | Use when trimming dependencies or validating package cleanup work. For unused files and exports as well, use `npm run quality:unused`. |
 
 ## Storybook
 
