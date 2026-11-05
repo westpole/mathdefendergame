@@ -62,7 +62,7 @@ If #149 or #150 stays `Blocked`, its file is the only ticket file left in this f
 | #135 | Upgrade happy-dom to 21 | Security | P1 | S | Done | #134 |
 | #136 | Refresh vulnerable transitive packages in the lockfile | Security | P0 | S | Done | #130, #131, #132, #133, #134, #135 |
 | #137 | Upgrade Playwright to 1.64.1 | Maintenance | P2 | S | Done | #129 |
-| [#138](138-upgrade-react-19-3.md) | Upgrade React to 19.3 with types and Testing Library | Maintenance | P2 | M | Ready | #129 |
+| #138 | Upgrade React to 19.3 with types and Testing Library | Maintenance | P2 | M | Done | #129 |
 | [#139](139-upgrade-phaser-zustand-patches.md) | Upgrade Phaser to 4.2.1 and Zustand to 5.0.16 | Maintenance | P2 | S | Ready | #129 |
 | [#140](140-upgrade-i18next-group.md) | Upgrade the i18next packages | Maintenance | P2 | S | Ready | #129 |
 | [#141](141-upgrade-lint-type-tooling.md) | Upgrade typescript-eslint, react-refresh plugin and type-coverage | Maintenance | P3 | S | Ready | #129 |
