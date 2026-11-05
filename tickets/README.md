@@ -16,7 +16,7 @@ Data as of 2026-11-04, from `npm audit`, `npm outdated` and registry metadata. R
 
 | Ticket | Title | Type | Priority | Size | Status | Blocked by |
 | --- | --- | --- | --- | --- | --- | --- |
-| [#129](129-deps-scripts-replace-audit-ci-and-ncu.md) | Make the deps scripts trustworthy and remove audit-ci and npm-check-updates | Chore | P0 | S | Ready | None |
+| [#129](129-deps-scripts-replace-audit-ci-and-ncu.md) | Make the deps scripts trustworthy and remove audit-ci and npm-check-updates | Chore | P0 | S | Done | None |
 | #130 | Upgrade Storybook to 10.6.5 | Security | P0 | M | Done | #129 |
 | [#131](131-upgrade-concurrently-wait-on.md) | Upgrade concurrently and wait-on | Security | P0 | S | Ready | #129 |
 | [#132](132-upgrade-electron-42-11-electron-builder.md) | Upgrade Electron to 42.11.18 and electron-builder to 26.18.0 | Security | P0 | M | Ready | #129 |
