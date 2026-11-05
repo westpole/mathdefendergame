@@ -56,7 +56,7 @@ If #149 or #150 stays `Blocked`, its file is the only ticket file left in this f
 | [#129](129-deps-scripts-replace-audit-ci-and-ncu.md) | Make the deps scripts trustworthy and remove audit-ci and npm-check-updates | Chore | P0 | S | Done | None |
 | #130 | Upgrade Storybook to 10.6.5 | Security | P0 | M | Done | #129 |
 | #131 | Upgrade concurrently and wait-on | Security | P0 | S | Done | #129 |
-| [#132](132-upgrade-electron-42-11-electron-builder.md) | Upgrade Electron to 42.11.18 and electron-builder to 26.18.0 | Security | P0 | M | Ready | #129 |
+| #132 | Upgrade Electron to 42.11.18 and electron-builder to 26.18.0 | Security | P0 | M | Done | #129 |
 | [#133](133-upgrade-vite-8-3-build-tools.md) | Upgrade Vite to 8.3.5 with sass and vite-plugin-singlefile | Security | P1 | M | Ready | #129 |
 | [#134](134-upgrade-vitest-4-1-12.md) | Upgrade Vitest to 4.1.12 | Security | P1 | S | Ready | #129 |
 | [#135](135-upgrade-happy-dom-21.md) | Upgrade happy-dom to 21 | Security | P1 | S | Ready | #134 |
