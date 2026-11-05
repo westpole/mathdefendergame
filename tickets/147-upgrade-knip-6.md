@@ -71,59 +71,30 @@ If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the 
 1. `npm run deps:audit`: compare with the table in Section 3 and confirm the expected packages are gone.
 2. `npm run deps:audit:ci`: this stays red until #136 is merged, so before then treat its result as information only.
 
-## 6. Manual Regression (Alpha Testing)
-
-A person runs this on the PR branch before merge. Record the commit, OS, device and browser, and mark each row pass or fail. Add a screenshot for each failure.
-
-Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue. Do not merge with an open blocker. Log minor issues in the PR.
-
-### A. Dependency scripts
-
-**Setup:** Run these from a terminal.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Run `npm run deps:audit:ci` | It exits non-zero while any high or critical advisory remains, and exits 0 once none remain. |
-| [ ] | Run `npm run deps:outdated` | A table of outdated packages is printed. |
-| [ ] | Run `npm run deps:unused` | Only dependency issues are reported, and `conventional-changelog-conventionalcommits` is not listed. |
-| [ ] | Run `npm run deps:signatures` | Registry signatures verify without errors. |
-
-### B. Web smoke (desktop browser)
-
-**Setup:** Run `npm run dev:web` and open `http://localhost:5173`. Use a fresh private window so no old `localStorage` is reused.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Load the app | The loading screen clears and the login screen appears. No errors in the browser console. |
-| [ ] | Create a profile and log in | The home screen opens and shows the new profile. |
-| [ ] | Open Profile, Performance, Rules and Settings, returning home each time | Each screen renders fully, with no clipped or unstyled content. |
-| [ ] | Reload the page | The app starts again without errors. |
-
-## 7. Acceptance Criteria
+## 6. Acceptance Criteria
 
 - [ ] `npm run deps:unused` reports no new issues compared with its result before the upgrade.
 - [ ] Any difference in `npm run quality:unused` output is explained in the PR.
 
-## 8. Dependencies & Risks
+## 7. Dependencies & Risks
 
 - **Blocked by:** #129
 - **Blocks:** #150
 - `npm run quality:unused` already exits non-zero on `master`: 3 unused files, 4 exports and 3 exported types. Treat these as existing findings.
 
-## 9. Close the Ticket
+## 8. Close the Ticket
 
-Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+Do these in order, once Agent Validation passes.
 
 1. Merge `147-upgrade-knip-6` into `dev/upgrade-npm`.
 2. On `dev/upgrade-npm`, delete `tickets/147-upgrade-knip-6.md`.
 3. In `tickets/README.md`, set #147 to `Done` and replace its link with plain `#147`.
 4. Commit steps 2 and 3 together using `chore: #147 close ticket`.
 
-## 10. Definition of Done
+## 9. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
-- [ ] Manual regression signed off by a person
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill

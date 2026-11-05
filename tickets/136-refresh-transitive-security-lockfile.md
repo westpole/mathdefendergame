@@ -102,70 +102,13 @@ If `electron-visual` fails, inspect the diff in `test-results/` first. Run `npm 
 1. `npm run deps:audit`: compare with the table in Section 3 and confirm the expected packages are gone.
 2. `npm run deps:audit:ci`: this stays red until #136 is merged, so before then treat its result as information only.
 
-## 6. Manual Regression (Alpha Testing)
-
-A person runs this on the PR branch before merge. Record the commit, OS, device and browser, and mark each row pass or fail. Add a screenshot for each failure.
-
-Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue. Do not merge with an open blocker. Log minor issues in the PR.
-
-### A. Web smoke (desktop browser)
-
-**Setup:** Run `npm run dev:web` and open `http://localhost:5173`. Use a fresh private window so no old `localStorage` is reused.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Load the app | The loading screen clears and the login screen appears. No errors in the browser console. |
-| [ ] | Create a profile and log in | The home screen opens and shows the new profile. |
-| [ ] | Open Profile, Performance, Rules and Settings, returning home each time | Each screen renders fully, with no clipped or unstyled content. |
-| [ ] | Reload the page | The app starts again without errors. |
-
-### B. Core gameplay
-
-**Setup:** Use the app from the previous section (or start it with `npm run dev:web`).
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Start a regular game | Meteors fall smoothly and the HUD shows score, lives and stage. |
-| [ ] | Type a correct answer and press Enter | The meteor is destroyed and the score rises. |
-| [ ] | Type digits, press Backspace, then finish the answer | The input edits correctly and the answer is accepted. |
-| [ ] | Submit a wrong answer, then let a meteor reach the base | The game reacts to the wrong answer and a life or shield is lost when the meteor lands. |
-| [ ] | Press Esc, wait a few seconds, then resume | The game pauses (meteors stop), then continues from the same state. |
-| [ ] | Clear a stage | The stage message appears and the next stage starts. |
-| [ ] | Lose all lives | The game-over screen shows final score and accuracy. |
-| [ ] | Start practice mode once each for `+`, `-`, `*` and `/` | Each run only asks questions for the chosen operation. |
-
-### C. Desktop app (Electron)
-
-**Setup:** Run `npm run build:win`, then install `dist/*.exe` on Windows. If only the unit-test flake blocks that script, run `npx vite build` and `npx electron-builder` instead.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Install and start the packaged app | The window opens at about 900x900 with the title "Math Defender", with no blank or white screen. |
-| [ ] | Play one full stage in the packaged app | Rendering and keyboard input match the web build. |
-| [ ] | During a game, click the window X, then cancel the confirmation | The confirmation appears and the game continues. |
-| [ ] | Click the window X again and confirm | The app closes cleanly and no process stays in Task Manager. |
-| [ ] | With the app open, start it a second time | The existing window is focused and no second window opens. |
-| [ ] | Reopen the app after a finished game | Profile, leaderboard and history are still there. |
-
-### D. Storybook
-
-**Setup:** Run `npm run storybook` and open `http://localhost:6006`.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Open HUDOverlay, HomeOverlay, GameOverOverlay and SettingsOverlay stories | Each renders with seeded state and no error panel. |
-| [ ] | Switch between the desktop and mobile stories for one component | The layout changes as it did before the upgrade. |
-| [ ] | Open the Accessibility panel on one story | The panel loads and lists results. |
-| [ ] | Open the Docs page for one component | The docs page renders. |
-| [ ] | Run `npm run build-storybook` | The build finishes without errors. |
-
-## 7. Acceptance Criteria
+## 6. Acceptance Criteria
 
 - [ ] `npm run deps:audit:ci` exits 0, which means no high or critical advisories remain.
 - [ ] Only moderate `minimatch` and `glob` advisories remain, plus packages that inherit them.
 - [ ] `package.json` is unchanged, unless an override was needed.
 
-## 8. Dependencies & Risks
+## 7. Dependencies & Risks
 
 - **Blocked by:** #130, #131, #132, #133, #134, #135
 - **Blocks:** #148
@@ -173,20 +116,19 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - `minimatch` (GHSA-g3hv-75wg-m249, fixed in 11.0.1) cannot be cleared. No parent allows 11 yet, including ESLint 10 and `app-builder-lib`. It is build-time only, with patterns from our own config. Record it as accepted risk in the PR.
 - `glob` (GHSA-3g3m-2fjr-6pw4) has the same status through the Storybook docgen plugin.
 
-## 9. Close the Ticket
+## 8. Close the Ticket
 
-Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+Do these in order, once Agent Validation passes.
 
 1. Merge `136-refresh-transitive-security-lockfile` into `dev/upgrade-npm`.
 2. On `dev/upgrade-npm`, delete `tickets/136-refresh-transitive-security-lockfile.md`.
 3. In `tickets/README.md`, set #136 to `Done` and replace its link with plain `#136`.
 4. Commit steps 2 and 3 together using `chore: #136 close ticket`.
 
-## 10. Definition of Done
+## 9. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
-- [ ] Manual regression signed off by a person
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill

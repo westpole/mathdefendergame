@@ -75,76 +75,31 @@ If `electron-visual` fails, inspect the diff in `test-results/` first. Run `npm 
 1. `npm run deps:audit`: compare with the table in Section 3 and confirm the expected packages are gone.
 2. `npm run deps:audit:ci`: this stays red until #136 is merged, so before then treat its result as information only.
 
-## 6. Manual Regression (Alpha Testing)
-
-A person runs this on the PR branch before merge. Record the commit, OS, device and browser, and mark each row pass or fail. Add a screenshot for each failure.
-
-Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue. Do not merge with an open blocker. Log minor issues in the PR.
-
-### A. Web smoke (desktop browser)
-
-**Setup:** Run `npm run dev:web` and open `http://localhost:5173`. Use a fresh private window so no old `localStorage` is reused.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Load the app | The loading screen clears and the login screen appears. No errors in the browser console. |
-| [ ] | Create a profile and log in | The home screen opens and shows the new profile. |
-| [ ] | Open Profile, Performance, Rules and Settings, returning home each time | Each screen renders fully, with no clipped or unstyled content. |
-| [ ] | Reload the page | The app starts again without errors. |
-
-### B. Core gameplay
-
-**Setup:** Use the app from the previous section (or start it with `npm run dev:web`).
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Start a regular game | Meteors fall smoothly and the HUD shows score, lives and stage. |
-| [ ] | Type a correct answer and press Enter | The meteor is destroyed and the score rises. |
-| [ ] | Type digits, press Backspace, then finish the answer | The input edits correctly and the answer is accepted. |
-| [ ] | Submit a wrong answer, then let a meteor reach the base | The game reacts to the wrong answer and a life or shield is lost when the meteor lands. |
-| [ ] | Press Esc, wait a few seconds, then resume | The game pauses (meteors stop), then continues from the same state. |
-| [ ] | Clear a stage | The stage message appears and the next stage starts. |
-| [ ] | Lose all lives | The game-over screen shows final score and accuracy. |
-| [ ] | Start practice mode once each for `+`, `-`, `*` and `/` | Each run only asks questions for the chosen operation. |
-
-### C. Storybook
-
-**Setup:** Run `npm run storybook` and open `http://localhost:6006`.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Open HUDOverlay, HomeOverlay, GameOverOverlay and SettingsOverlay stories | Each renders with seeded state and no error panel. |
-| [ ] | Switch between the desktop and mobile stories for one component | The layout changes as it did before the upgrade. |
-| [ ] | Open the Accessibility panel on one story | The panel loads and lists results. |
-| [ ] | Open the Docs page for one component | The docs page renders. |
-| [ ] | Run `npm run build-storybook` | The build finishes without errors. |
-
-## 7. Acceptance Criteria
+## 6. Acceptance Criteria
 
 - [ ] `npm ls @vitejs/plugin-react` shows 6.2.1.
 - [ ] Production and e2e builds both succeed.
 - [ ] Hot reload keeps component state on a simple edit.
 
-## 8. Dependencies & Risks
+## 7. Dependencies & Risks
 
 - **Blocked by:** #133
 - **Blocks:** None
 - Babel may stay in the lockfile through other packages, which is fine.
 
-## 9. Close the Ticket
+## 8. Close the Ticket
 
-Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+Do these in order, once Agent Validation passes.
 
 1. Merge `145-upgrade-vite-plugin-react-6` into `dev/upgrade-npm`.
 2. On `dev/upgrade-npm`, delete `tickets/145-upgrade-vite-plugin-react-6.md`.
 3. In `tickets/README.md`, set #145 to `Done` and replace its link with plain `#145`.
 4. Commit steps 2 and 3 together using `chore: #145 close ticket`.
 
-## 10. Definition of Done
+## 9. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
-- [ ] Manual regression signed off by a person
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill

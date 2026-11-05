@@ -90,77 +90,14 @@ If `electron-visual` fails, inspect the diff in `test-results/` first. Run `npm 
 1. `npm run deps:audit`: compare with the table in Section 3 and confirm the expected packages are gone.
 2. `npm run deps:audit:ci`: this stays red until #136 is merged, so before then treat its result as information only.
 
-## 6. Manual Regression (Alpha Testing)
-
-A person runs this on the PR branch before merge. Record the commit, OS, device and browser, and mark each row pass or fail. Add a screenshot for each failure.
-
-Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue. Do not merge with an open blocker. Log minor issues in the PR.
-
-### A. Desktop app (Electron)
-
-**Setup:** Run `npm run build:win`, then install `dist/*.exe` on Windows. If only the unit-test flake blocks that script, run `npx vite build` and `npx electron-builder` instead.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Install and start the packaged app | The window opens at about 900x900 with the title "Math Defender", with no blank or white screen. |
-| [ ] | Play one full stage in the packaged app | Rendering and keyboard input match the web build. |
-| [ ] | During a game, click the window X, then cancel the confirmation | The confirmation appears and the game continues. |
-| [ ] | Click the window X again and confirm | The app closes cleanly and no process stays in Task Manager. |
-| [ ] | With the app open, start it a second time | The existing window is focused and no second window opens. |
-| [ ] | Reopen the app after a finished game | Profile, leaderboard and history are still there. |
-
-### B. Upgrade over an existing install
-
-**Setup:** Install the current `master` build first, create a profile and finish one game.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Install the new build over the old one without uninstalling | The installer finishes without errors. |
-| [ ] | Start the new build | The old profile, leaderboard and history are all still there. |
-| [ ] | Change window size down to the 700x700 minimum | The canvas and overlays scale correctly. |
-
-### C. Core gameplay
-
-**Setup:** Use the app from the previous section (or start it with `npm run dev:web`).
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Start a regular game | Meteors fall smoothly and the HUD shows score, lives and stage. |
-| [ ] | Type a correct answer and press Enter | The meteor is destroyed and the score rises. |
-| [ ] | Type digits, press Backspace, then finish the answer | The input edits correctly and the answer is accepted. |
-| [ ] | Submit a wrong answer, then let a meteor reach the base | The game reacts to the wrong answer and a life or shield is lost when the meteor lands. |
-| [ ] | Press Esc, wait a few seconds, then resume | The game pauses (meteors stop), then continues from the same state. |
-| [ ] | Clear a stage | The stage message appears and the next stage starts. |
-| [ ] | Lose all lives | The game-over screen shows final score and accuracy. |
-| [ ] | Start practice mode once each for `+`, `-`, `*` and `/` | Each run only asks questions for the chosen operation. |
-
-### D. Saved data
-
-**Setup:** Finish at least one game first.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Open Performance after the game | The finished game appears in the history and stats. |
-| [ ] | Fully close and reopen the app | The profile, leaderboard and history are still there. |
-
-### E. Language
-
-**Setup:** Use the app from the previous section.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Switch from English to Ukrainian | React screens and in-game Phaser text switch language, with no raw keys such as `ui.save`. |
-| [ ] | Reload the app | Ukrainian is still selected. |
-| [ ] | Play one stage in Ukrainian, then switch back to English | Text fits its layout in both languages. |
-
-## 7. Acceptance Criteria
+## 6. Acceptance Criteria
 
 - [ ] `npm ls electron` shows 45.2.2 and the binary reports the same version.
 - [ ] The packaged x64 installer builds, installs and runs.
 - [ ] `webPreferences` is unchanged.
 - [ ] Existing saved data survives an install over the previous build.
 
-## 8. Dependencies & Risks
+## 7. Dependencies & Risks
 
 - **Blocked by:** #132, #137
 - **Blocks:** None
@@ -168,20 +105,19 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - CI only runs the web e2e lane, so the local Windows Electron run is the only automated cover for this ticket.
 - Electron 46 (about 2027-01-05) moves to Node 26 and removes more APIs, so plan the next upgrade by then.
 
-## 9. Close the Ticket
+## 8. Close the Ticket
 
-Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+Do these in order, once Agent Validation passes.
 
 1. Merge `143-upgrade-electron-45` into `dev/upgrade-npm`.
 2. On `dev/upgrade-npm`, delete `tickets/143-upgrade-electron-45.md`.
 3. In `tickets/README.md`, set #143 to `Done` and replace its link with plain `#143`.
 4. Commit steps 2 and 3 together using `chore: #143 close ticket`.
 
-## 10. Definition of Done
+## 9. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
-- [ ] Manual regression signed off by a person
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill

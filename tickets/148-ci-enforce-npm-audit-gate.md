@@ -67,49 +67,31 @@ If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the 
 1. `npm run deps:audit`: compare with the table in Section 3 and confirm the expected packages are gone.
 2. `npm run deps:audit:ci`: this stays red until #136 is merged, so before then treat its result as information only.
 
-## 6. Manual Regression (Alpha Testing)
-
-A person runs this on the PR branch before merge. Record the commit, OS, device and browser, and mark each row pass or fail. Add a screenshot for each failure.
-
-Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue. Do not merge with an open blocker. Log minor issues in the PR.
-
-### A. Dependency scripts
-
-**Setup:** Run these from a terminal.
-
-| Done | Action | Expected result |
-| --- | --- | --- |
-| [ ] | Run `npm run deps:audit:ci` | It exits non-zero while any high or critical advisory remains, and exits 0 once none remain. |
-| [ ] | Run `npm run deps:outdated` | A table of outdated packages is printed. |
-| [ ] | Run `npm run deps:unused` | Only dependency issues are reported, and `conventional-changelog-conventionalcommits` is not listed. |
-| [ ] | Run `npm run deps:signatures` | Registry signatures verify without errors. |
-
-## 7. Acceptance Criteria
+## 6. Acceptance Criteria
 
 - [ ] A PR run shows the `Dependency audit` step passing.
 - [ ] The step fails when a high advisory exists. Prove this on a throwaway branch, for example by restoring an old `package-lock.json`, and do not merge that branch.
 
-## 8. Dependencies & Risks
+## 7. Dependencies & Risks
 
 - **Blocked by:** #130, #131, #132, #133, #134, #135, #136
 - **Blocks:** None
 - New advisories will block unrelated PRs. That is the purpose, but plan for a quick patch ticket when it happens.
 - `pr-tests-runner.yml` only runs on PRs into `master`, so a PR into `dev/upgrade-npm` does not run this step. Meeting the acceptance criteria needs a PR that targets `master`.
 
-## 9. Close the Ticket
+## 8. Close the Ticket
 
-Do these in order, once Agent Validation and Manual Regression pass with no open blocker. After step 1, stop and follow the #148 entry under Exceptions in `tickets/README.md` before doing steps 2 to 4.
+Do these in order, once Agent Validation passes. After step 1, stop and follow the #148 entry under Exceptions in `tickets/README.md` before doing steps 2 to 4.
 
 1. Merge `148-ci-enforce-npm-audit-gate` into `dev/upgrade-npm`.
 2. On `dev/upgrade-npm`, delete `tickets/148-ci-enforce-npm-audit-gate.md`.
 3. In `tickets/README.md`, set #148 to `Done` and replace its link with plain `#148`.
 4. Commit steps 2 and 3 together using `chore: #148 close ticket`.
 
-## 10. Definition of Done
+## 9. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
-- [ ] Manual regression signed off by a person
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill

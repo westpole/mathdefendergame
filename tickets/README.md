@@ -22,6 +22,10 @@ Every ticket follows these steps. Each ticket file gives its exact branch and fi
 4. Delete the ticket file.
 5. In the table below, set the ticket's status to `Done` and remove its link.
 
+### Manual testing
+
+Tickets have no manual testing step, so no ticket waits for one. A person tests the `dev/upgrade-npm` branch once, after all tickets are implemented.
+
 ### Exceptions
 
 These rules override the Workflow above and the Close the Ticket section in each ticket.
