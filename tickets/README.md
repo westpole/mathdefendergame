@@ -58,7 +58,7 @@ If #149 or #150 stays `Blocked`, its file is the only ticket file left in this f
 | #131 | Upgrade concurrently and wait-on | Security | P0 | S | Done | #129 |
 | #132 | Upgrade Electron to 42.11.18 and electron-builder to 26.18.0 | Security | P0 | M | Done | #129 |
 | #133 | Upgrade Vite to 8.3.5 with sass and vite-plugin-singlefile | Security | P1 | M | Done | #129 |
-| [#134](134-upgrade-vitest-4-1-12.md) | Upgrade Vitest to 4.1.12 | Security | P1 | S | Ready | #129 |
+| #134 | Upgrade Vitest to 4.1.12 | Security | P1 | S | Done | #129 |
 | [#135](135-upgrade-happy-dom-21.md) | Upgrade happy-dom to 21 | Security | P1 | S | Ready | #134 |
 | [#136](136-refresh-transitive-security-lockfile.md) | Refresh vulnerable transitive packages in the lockfile | Security | P0 | S | Ready | #130, #131, #132, #133, #134, #135 |
 | [#137](137-upgrade-playwright-1-64.md) | Upgrade Playwright to 1.64.1 | Maintenance | P2 | S | Ready | #129 |
