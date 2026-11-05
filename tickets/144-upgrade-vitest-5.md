@@ -43,7 +43,7 @@ Move all Vitest packages from 4.1.12 to 5.1.0 and adapt the test config.
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `144-upgrade-vitest-5` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `144-upgrade-vitest-5` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. Run `npm install -D vitest@^5.1.0 @vitest/browser-playwright@^5.1.0 @vitest/coverage-v8@^5.1.0 @vitest/ui@^5.1.0 --ignore-scripts`.
 4. Read the [Vitest 5 migration guide](https://vitest.dev/guide/migration.html).
@@ -88,7 +88,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 **Security**
 
@@ -108,7 +108,7 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 | Done | Action | Expected result |
 | --- | --- | --- |
 | [ ] | Run `npm run test:ui` and open the printed URL | The Vitest UI loads and lists test projects. |
-| [ ] | Run `npm run test:all:coverage` | The coverage report is written to `reports/unit-tests/coverage` and thresholds behave as they did on `master`. |
+| [ ] | Run `npm run test:all:coverage` | The coverage report is written to `reports/unit-tests/coverage` and thresholds behave as they did on `dev/upgrade-npm`. |
 | [ ] | Open the HTML unit test report | The report shows the latest run. |
 
 ### B. Storybook
@@ -148,7 +148,16 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - The `clearMocks` change can make tests pass for the wrong reason or fail in bulk. Investigate each failure rather than restoring the old default straight away.
 - Check `@storybook/addon-vitest` against the installed version. Version 10.6.5 allows `vitest` `^4` or `^5`.
 
-## 9. Definition of Done
+## 9. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+
+1. Merge `144-upgrade-vitest-5` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/144-upgrade-vitest-5.md`.
+3. In `tickets/README.md`, set #144 to `Done` and replace its link with plain `#144`.
+4. Commit steps 2 and 3 together using `chore: #144 close ticket`.
+
+## 10. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -156,3 +165,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/144-upgrade-vitest-5.md` deleted, so no ticket file is left, and #144 is `Done` in `tickets/README.md`

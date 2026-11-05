@@ -43,7 +43,7 @@ Move from the end-of-life Electron 42 line to 45.2.2, bringing Chromium from M14
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `143-upgrade-electron-45` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `143-upgrade-electron-45` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. Run `npm install -D electron@^45.2.2 --ignore-scripts`.
 4. Read the 43, 44 and 45 sections of the [Electron breaking changes](https://www.electronjs.org/docs/latest/breaking-changes) and confirm the assessment in Section 3 still holds.
@@ -81,7 +81,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 If `electron-visual` fails, inspect the diff in `test-results/` first. Run `npm run test:e2e:update-snapshots` only after a person confirms the change is expected, and list each updated snapshot in the PR.
 
@@ -168,7 +168,16 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - CI only runs the web e2e lane, so the local Windows Electron run is the only automated cover for this ticket.
 - Electron 46 (about 2027-01-05) moves to Node 26 and removes more APIs, so plan the next upgrade by then.
 
-## 9. Definition of Done
+## 9. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+
+1. Merge `143-upgrade-electron-45` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/143-upgrade-electron-45.md`.
+3. In `tickets/README.md`, set #143 to `Done` and replace its link with plain `#143`.
+4. Commit steps 2 and 3 together using `chore: #143 close ticket`.
+
+## 10. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -176,3 +185,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/143-upgrade-electron-45.md` deleted, so no ticket file is left, and #143 is `Done` in `tickets/README.md`

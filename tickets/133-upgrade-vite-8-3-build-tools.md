@@ -39,7 +39,7 @@ Upgrade the renderer build tools. This closes Vite dev-server advisories, includ
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `133-upgrade-vite-8-3-build-tools` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `133-upgrade-vite-8-3-build-tools` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. Run `npm install -D vite@^8.3.5 vite-plugin-singlefile@^2.3.4 sass@^1.107.1 --ignore-scripts`.
 4. `vite.config.ts` sets both `rolldownOptions` and `rollupOptions`. Check for deprecation warnings in the build output and confirm that `__mocks__`, `__tests__` and stories stay out of the bundle.
@@ -74,7 +74,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 If `electron-visual` fails, inspect the diff in `test-results/` first. Run `npm run test:e2e:update-snapshots` only after a person confirms the change is expected, and list each updated snapshot in the PR.
 
@@ -150,7 +150,16 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - **Blocks:** #136, #145, #148
 - A Sass change can alter styling without failing a test, so compare the overlays visually.
 
-## 9. Definition of Done
+## 9. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+
+1. Merge `133-upgrade-vite-8-3-build-tools` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/133-upgrade-vite-8-3-build-tools.md`.
+3. In `tickets/README.md`, set #133 to `Done` and replace its link with plain `#133`.
+4. Commit steps 2 and 3 together using `chore: #133 close ticket`.
+
+## 10. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -158,3 +167,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/133-upgrade-vite-8-3-build-tools.md` deleted, so no ticket file is left, and #133 is `Done` in `tickets/README.md`

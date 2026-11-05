@@ -31,7 +31,7 @@ Apply patch upgrades to the game engine and the shared store. Both sit on the Ph
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `139-upgrade-phaser-zustand-patches` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `139-upgrade-phaser-zustand-patches` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. Run `npm install phaser@^4.2.1 zustand@^5.0.16 --ignore-scripts`.
 4. Do not change gameplay logic in `src/game/main.ts` unless the upgrade forces it.
@@ -66,7 +66,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 If `electron-visual` fails, inspect the diff in `test-results/` first. Run `npm run test:e2e:update-snapshots` only after a person confirms the change is expected, and list each updated snapshot in the PR.
 
@@ -150,7 +150,16 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - **Blocks:** None
 - Canvas rendering differences show up in `electron-visual` snapshots. Review any diff before changing a snapshot.
 
-## 9. Definition of Done
+## 9. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+
+1. Merge `139-upgrade-phaser-zustand-patches` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/139-upgrade-phaser-zustand-patches.md`.
+3. In `tickets/README.md`, set #139 to `Done` and replace its link with plain `#139`.
+4. Commit steps 2 and 3 together using `chore: #139 close ticket`.
+
+## 10. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -158,3 +167,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/139-upgrade-phaser-zustand-patches.md` deleted, so no ticket file is left, and #139 is `Done` in `tickets/README.md`

@@ -28,7 +28,7 @@ Add `npm run deps:audit:ci` to the PR workflow so new high or critical advisorie
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `148-ci-enforce-npm-audit-gate` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `148-ci-enforce-npm-audit-gate` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. In `.github/workflows/pr-tests-runner.yml`, add a `Dependency audit` step that runs `npm run deps:audit:ci` straight after `npm ci`.
 4. Confirm the gate passes first. If it fails, stop and finish #136.
@@ -60,7 +60,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 **Security**
 
@@ -94,8 +94,18 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - **Blocked by:** #130, #131, #132, #133, #134, #135, #136
 - **Blocks:** None
 - New advisories will block unrelated PRs. That is the purpose, but plan for a quick patch ticket when it happens.
+- `pr-tests-runner.yml` only runs on PRs into `master`, so a PR into `dev/upgrade-npm` does not run this step. Meeting the acceptance criteria needs a PR that targets `master`.
 
-## 9. Definition of Done
+## 9. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker. After step 1, stop and follow the #148 entry under Exceptions in `tickets/README.md` before doing steps 2 to 4.
+
+1. Merge `148-ci-enforce-npm-audit-gate` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/148-ci-enforce-npm-audit-gate.md`.
+3. In `tickets/README.md`, set #148 to `Done` and replace its link with plain `#148`.
+4. Commit steps 2 and 3 together using `chore: #148 close ticket`.
+
+## 10. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -103,3 +113,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/148-ci-enforce-npm-audit-gate.md` deleted, so no ticket file is left, and #148 is `Done` in `tickets/README.md`

@@ -38,7 +38,7 @@ Take the last Electron 42 patch and the latest electron-builder. This is the fas
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `132-upgrade-electron-42-11-electron-builder` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `132-upgrade-electron-42-11-electron-builder` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. Run `npm install -D electron@^42.11.18 electron-builder@^26.18.0 --ignore-scripts`.
 4. The `electron` package has no install script. After installing, run `npx install-electron`, then confirm that `node_modules/electron/dist/version` shows 42.11.18.
@@ -72,7 +72,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 If `electron-visual` fails, inspect the diff in `test-results/` first. Run `npm run test:e2e:update-snapshots` only after a person confirms the change is expected, and list each updated snapshot in the PR.
 
@@ -124,7 +124,16 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - Moderate advisories through `app-builder-lib` stay. `app-builder-lib@26.18.0` still pins `@electron/asar@3.4.1`, which depends on `minimatch@^3`. This is an expected leftover.
 - Several Electron 45 behaviour changes were backported to 42.11.3, so this is not a no-op. The app has no preload script or workers, so none are expected to affect it.
 
-## 9. Definition of Done
+## 9. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+
+1. Merge `132-upgrade-electron-42-11-electron-builder` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/132-upgrade-electron-42-11-electron-builder.md`.
+3. In `tickets/README.md`, set #132 to `Done` and replace its link with plain `#132`.
+4. Commit steps 2 and 3 together using `chore: #132 close ticket`.
+
+## 10. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -132,3 +141,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/132-upgrade-electron-42-11-electron-builder.md` deleted, so no ticket file is left, and #132 is `Done` in `tickets/README.md`

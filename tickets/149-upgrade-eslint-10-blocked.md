@@ -40,7 +40,7 @@ Do not start until these are met:
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `149-upgrade-eslint-10-blocked` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `149-upgrade-eslint-10-blocked` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. Check with `npm view eslint-plugin-react peerDependencies`.
 4. Read the [ESLint 10 migration guide](https://eslint.org/docs/latest/use/migrate-to-10.0.0).
@@ -76,7 +76,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 **Security**
 
@@ -111,7 +111,16 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - **Blocks:** None
 - JSX references are now tracked, which may add `no-unused-vars` reports.
 
-## 10. Definition of Done
+## 10. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+
+1. Merge `149-upgrade-eslint-10-blocked` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/149-upgrade-eslint-10-blocked.md`.
+3. In `tickets/README.md`, set #149 to `Done` and replace its link with plain `#149`.
+4. Commit steps 2 and 3 together using `chore: #149 close ticket`.
+
+## 11. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -119,3 +128,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/149-upgrade-eslint-10-blocked.md` deleted, so no ticket file is left, and #149 is `Done` in `tickets/README.md`

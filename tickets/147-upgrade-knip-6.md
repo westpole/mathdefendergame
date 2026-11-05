@@ -30,7 +30,7 @@ Upgrade Knip to 6.44.1, which replaces its TypeScript backend with oxc and no lo
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `147-upgrade-knip-6` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `147-upgrade-knip-6` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. Run `npm install -D knip@^6.44.1 --ignore-scripts`.
 4. Compare `npm run quality:unused` before and after the upgrade.
@@ -64,7 +64,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 **Security**
 
@@ -110,7 +110,16 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - **Blocks:** #150
 - `npm run quality:unused` already exits non-zero on `master`: 3 unused files, 4 exports and 3 exported types. Treat these as existing findings.
 
-## 9. Definition of Done
+## 9. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+
+1. Merge `147-upgrade-knip-6` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/147-upgrade-knip-6.md`.
+3. In `tickets/README.md`, set #147 to `Done` and replace its link with plain `#147`.
+4. Commit steps 2 and 3 together using `chore: #147 close ticket`.
+
+## 10. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -118,3 +127,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/147-upgrade-knip-6.md` deleted, so no ticket file is left, and #147 is `Done` in `tickets/README.md`

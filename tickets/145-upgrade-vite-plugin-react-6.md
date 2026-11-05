@@ -30,7 +30,7 @@ Move to the Vite 8 native version of the React plugin, which removes Babel from 
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `145-upgrade-vite-plugin-react-6` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `145-upgrade-vite-plugin-react-6` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. Run `npm install -D @vitejs/plugin-react@^6.2.1 --ignore-scripts`.
 4. Confirm no `babel` option is passed to `react()` in either config.
@@ -66,7 +66,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 If `electron-visual` fails, inspect the diff in `test-results/` first. Run `npm run test:e2e:update-snapshots` only after a person confirms the change is expected, and list each updated snapshot in the PR.
 
@@ -131,7 +131,16 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - **Blocks:** None
 - Babel may stay in the lockfile through other packages, which is fine.
 
-## 9. Definition of Done
+## 9. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+
+1. Merge `145-upgrade-vite-plugin-react-6` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/145-upgrade-vite-plugin-react-6.md`.
+3. In `tickets/README.md`, set #145 to `Done` and replace its link with plain `#145`.
+4. Commit steps 2 and 3 together using `chore: #145 close ticket`.
+
+## 10. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -139,3 +148,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/145-upgrade-vite-plugin-react-6.md` deleted, so no ticket file is left, and #145 is `Done` in `tickets/README.md`

@@ -12,6 +12,39 @@ Data as of 2026-11-04, from `npm audit`, `npm outdated` and registry metadata. R
 - Unit tests: 535 of 536 passing, with one known `UIScene` flake. Typecheck and lint pass.
 - E2E tests: no baseline recorded.
 
+### Workflow
+
+Every ticket follows these steps. Each ticket file gives its exact branch and file names.
+
+1. Create the ticket branch from `dev/upgrade-npm`.
+2. Complete the ticket and verify the changes.
+3. Merge the ticket branch into `dev/upgrade-npm`.
+4. Delete the ticket file.
+5. In the table below, set the ticket's status to `Done` and remove its link.
+
+### Exceptions
+
+These rules override the Workflow above and the Close the Ticket section in each ticket.
+
+- **#148:** Merge the ticket branch into `dev/upgrade-npm` as usual, but keep the ticket file. Its acceptance criteria need a PR into `master`, because CI does not run on PRs into `dev/upgrade-npm`.
+  1. Open the PR from `dev/upgrade-npm` into `master` and confirm the `Dependency audit` step passes.
+  2. Prove the step fails on a throwaway branch, using a PR into `master` that is never merged.
+  3. Delete the ticket file and update its status on `dev/upgrade-npm`, before that PR merges.
+- **#149 and #150:** Check the ticket's Unblock Criteria when its turn comes. If they are met, follow the normal Workflow. If not, leave the ticket file in place and the status as `Blocked`. The PR into `master` does not wait for these tickets.
+
+### Definition of done
+
+The plan is done when #150 has been processed:
+
+- Every ticket from #132 to #148 is `Done` and its file is deleted.
+- #149 and #150 are each either `Done` with the file deleted, or still `Blocked` after their Unblock Criteria were checked.
+
+If #149 or #150 stays `Blocked`, its file is the only ticket file left in this folder.
+
+### CI coverage
+
+`pr-tests-runner.yml` only runs on PRs into `master`, so CI does not check merges into `dev/upgrade-npm`. Each ticket's Agent Validation is the check for those merges.
+
 ### Tickets
 
 | Ticket | Title | Type | Priority | Size | Status | Blocked by |

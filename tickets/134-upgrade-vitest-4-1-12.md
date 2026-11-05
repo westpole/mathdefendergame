@@ -41,7 +41,7 @@ Move all Vitest packages to 4.1.12 to close the mocker advisories, staying on ma
 
 Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that skill with `/npm-upgrade`. Never use `--force` or `--legacy-peer-deps`, and stop and ask if peer dependencies conflict.
 
-1. From an up-to-date `master`, create branch `134-upgrade-vitest-4-1-12` and confirm `git status` is clean.
+1. From an up-to-date `dev/upgrade-npm`, create branch `134-upgrade-vitest-4-1-12` and confirm `git status` is clean.
 2. Run `npm ci`.
 3. Run `npm install -D vitest@^4.1.12 @vitest/browser-playwright@^4.1.12 @vitest/coverage-v8@^4.1.12 @vitest/ui@^4.1.12 vitest-canvas-mock@^1.2.0 --ignore-scripts`.
 4. Do not move to Vitest 5 here. That is #144.
@@ -77,7 +77,7 @@ Stop any server on port 4173 first. Locally, Playwright reuses a running server,
 1. `npm run test:e2e:web`
 2. `npm run test:e2e:electron` (local Windows only, because CI does not run this lane and snapshots exist only for `win32`)
 
-If an e2e test fails, run the same test on `master` before blaming the upgrade. No e2e baseline was recorded for this plan.
+If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the upgrade. No e2e baseline was recorded for this plan.
 
 **Security**
 
@@ -97,7 +97,7 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 | Done | Action | Expected result |
 | --- | --- | --- |
 | [ ] | Run `npm run test:ui` and open the printed URL | The Vitest UI loads and lists test projects. |
-| [ ] | Run `npm run test:all:coverage` | The coverage report is written to `reports/unit-tests/coverage` and thresholds behave as they did on `master`. |
+| [ ] | Run `npm run test:all:coverage` | The coverage report is written to `reports/unit-tests/coverage` and thresholds behave as they did on `dev/upgrade-npm`. |
 | [ ] | Open the HTML unit test report | The report shows the latest run. |
 
 ### B. Web smoke (desktop browser)
@@ -123,7 +123,16 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - **Blocks:** #135, #136, #144, #148
 - `vitest-canvas-mock` 1.2.0 feeds the Phaser project through `vitest-phaser.setup.ts`, so run the Phaser lane on its own too.
 
-## 9. Definition of Done
+## 9. Close the Ticket
+
+Do these in order, once Agent Validation and Manual Regression pass with no open blocker.
+
+1. Merge `134-upgrade-vitest-4-1-12` into `dev/upgrade-npm`.
+2. On `dev/upgrade-npm`, delete `tickets/134-upgrade-vitest-4-1-12.md`.
+3. In `tickets/README.md`, set #134 to `Done` and replace its link with plain `#134`.
+4. Commit steps 2 and 3 together using `chore: #134 close ticket`.
+
+## 10. Definition of Done
 
 - [ ] Acceptance criteria met
 - [ ] Agent validation passed, with any known flake recorded
@@ -131,3 +140,5 @@ Blocker: crash, blank screen, lost saved data, or gameplay that cannot continue.
 - [ ] `package-lock.json` committed with `package.json`
 - [ ] `code-reviewer` agent run before committing
 - [ ] PR uses the output format from the `npm-upgrade` skill
+- [ ] Ticket branch merged into `dev/upgrade-npm`
+- [ ] `tickets/134-upgrade-vitest-4-1-12.md` deleted, so no ticket file is left, and #134 is `Done` in `tickets/README.md`
