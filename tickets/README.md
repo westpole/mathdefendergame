@@ -67,7 +67,7 @@ If #149 or #150 stays `Blocked`, its file is the only ticket file left in this f
 | #140 | Upgrade the i18next packages | Maintenance | P2 | S | Done | #129 |
 | #141 | Upgrade typescript-eslint, react-refresh plugin and type-coverage | Maintenance | P3 | S | Done | #129 |
 | #142 | Upgrade the conventional-changelog tools | Maintenance | P3 | S | Done | #129 |
-| [#143](143-upgrade-electron-45.md) | Upgrade Electron to 45 | Upgrade | P1 | L | Ready | #132, #137 |
+| #143 | Upgrade Electron to 45 | Upgrade | P1 | L | Done | #132, #137 |
 | [#144](144-upgrade-vitest-5.md) | Upgrade Vitest to 5 | Upgrade | P2 | L | Ready | #130, #134, #135 |
 | [#145](145-upgrade-vite-plugin-react-6.md) | Upgrade @vitejs/plugin-react to 6 | Upgrade | P2 | S | Ready | #133 |
 | [#146](146-upgrade-jest-dom-7.md) | Upgrade @testing-library/jest-dom to 7 | Upgrade | P3 | S | Ready | #138 |
