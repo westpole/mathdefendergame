@@ -30,12 +30,13 @@
       "Bash(npm run release:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(npm update *)"
     ],
     "deny": [
       "Bash(npm *--force*)",
       "Bash(npm *--legacy-peer-deps*)",
-      "Bash(npm update:*)",
+      "Bash(npm update)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
       "Read(./.env)",
