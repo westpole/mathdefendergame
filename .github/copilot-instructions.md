@@ -20,7 +20,7 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 - React 19 for DOM overlays.
 - Zustand 5 for shared UI state and persisted leaderboard data.
 - Vite 8 + TypeScript for the renderer build.
-- Electron 42 for the desktop wrapper.
+- Electron 45 for the desktop wrapper.
 - Storybook 10 and Vitest 4 for component work and testing.
 
 ## Code Ownership
