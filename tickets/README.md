@@ -65,7 +65,7 @@ If #149 or #150 stays `Blocked`, its file is the only ticket file left in this f
 | #138 | Upgrade React to 19.3 with types and Testing Library | Maintenance | P2 | M | Done | #129 |
 | #139 | Upgrade Phaser to 4.2.1 and Zustand to 5.0.16 | Maintenance | P2 | S | Done | #129 |
 | #140 | Upgrade the i18next packages | Maintenance | P2 | S | Done | #129 |
-| [#141](141-upgrade-lint-type-tooling.md) | Upgrade typescript-eslint, react-refresh plugin and type-coverage | Maintenance | P3 | S | Ready | #129 |
+| #141 | Upgrade typescript-eslint, react-refresh plugin and type-coverage | Maintenance | P3 | S | Done | #129 |
 | [#142](142-upgrade-release-tooling.md) | Upgrade the conventional-changelog tools | Maintenance | P3 | S | Ready | #129 |
 | [#143](143-upgrade-electron-45.md) | Upgrade Electron to 45 | Upgrade | P1 | L | Ready | #132, #137 |
 | [#144](144-upgrade-vitest-5.md) | Upgrade Vitest to 5 | Upgrade | P2 | L | Ready | #130, #134, #135 |
