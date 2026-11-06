@@ -69,7 +69,7 @@ If #149 or #150 stays `Blocked`, its file is the only ticket file left in this f
 | #142 | Upgrade the conventional-changelog tools | Maintenance | P3 | S | Done | #129 |
 | #143 | Upgrade Electron to 45 | Upgrade | P1 | L | Done | #132, #137 |
 | [#144](144-upgrade-vitest-5.md) | Upgrade Vitest to 5 | Upgrade | P2 | L | Ready | #130, #134, #135 |
-| [#145](145-upgrade-vite-plugin-react-6.md) | Upgrade @vitejs/plugin-react to 6 | Upgrade | P2 | S | Ready | #133 |
+| #145 | Upgrade @vitejs/plugin-react to 6 | Upgrade | P2 | S | Done | #133 |
 | [#146](146-upgrade-jest-dom-7.md) | Upgrade @testing-library/jest-dom to 7 | Upgrade | P3 | S | Ready | #138 |
 | [#147](147-upgrade-knip-6.md) | Upgrade Knip to 6 | Upgrade | P3 | S | Ready | #129 |
 | [#148](148-ci-enforce-npm-audit-gate.md) | Enforce the npm audit gate in CI | Chore | P1 | S | Ready | #130, #131, #132, #133, #134, #135, #136 |
