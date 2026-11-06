@@ -2,6 +2,7 @@
 name: code-reviewer
 description: Strict pre-commit code review of staged, unstaged, or branch changes against project guidelines in CLAUDE.md. Use proactively after implementing a change and before committing.
 tools: Read, Grep, Glob, Bash
+model: sonnet
 ---
 
 # Role
