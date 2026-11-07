@@ -74,7 +74,7 @@ If #149 or #150 stays `Blocked`, its file is the only ticket file left in this f
 | #146 | Upgrade @testing-library/jest-dom to 7 | Upgrade | P3 | S | Done | #138 |
 | #147 | Upgrade Knip to 6 | Upgrade | P3 | S | Done | #129 |
 | #148 | Enforce the npm audit gate in CI | Chore | P1 | S | Done | #130, #131, #132, #133, #134, #135, #136 |
-| [#149](149-upgrade-eslint-10-blocked.md) | Upgrade ESLint to 10 | Upgrade | P3 | M | Ready | #141, #151 |
+| #149 | Upgrade ESLint to 10 | Upgrade | P3 | M | Done | #141, #151 |
 | [#150](150-upgrade-typescript-7-blocked.md) | Upgrade TypeScript to 7 | Upgrade | P3 | L | Blocked | #141, #147 |
 | #151 | Replace eslint-plugin-react with @eslint-react/eslint-plugin | Upgrade | P3 | S | Done | #141 |
 
