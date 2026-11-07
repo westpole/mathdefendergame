@@ -1,7 +1,7 @@
 # [UPGRADE] #149 Upgrade ESLint to 10
 
 > **Ticket type:** Upgrade
-> **Status:** Blocked
+> **Status:** Ready for Dev
 > **Priority:** P3
 > **Epic:** #128 Audit npm dependencies
 > **Estimate:** M
@@ -33,7 +33,7 @@ Upgrade `eslint` and `@eslint/js` to 10 once #151 has replaced `eslint-plugin-re
 
 Do not start until these are met:
 
-- [ ] #151 is `Done`: `eslint-plugin-react` is replaced with `@eslint-react/eslint-plugin`, which accepts any ESLint version.
+- [x] #151 is `Done`: `eslint-plugin-react` is replaced with `@eslint-react/eslint-plugin`, which accepts any ESLint version.
 
 Decision on 2026-11-07: replace the plugin (#151) instead of waiting for an `eslint-plugin-react` release with `^10` in its peer range ([#3977](https://github.com/jsx-eslint/eslint-plugin-react/issues/3977), [PR #4022](https://github.com/jsx-eslint/eslint-plugin-react/pull/4022)). On that date, 7.37.5 was still the latest release.
 
