@@ -34,13 +34,14 @@ These rules override the Workflow above and the Close the Ticket section in each
   1. Open the PR from `dev/upgrade-npm` into `master` and confirm the `Dependency audit` step passes.
   2. Prove the step fails on a throwaway branch, using a PR into `master` that is never merged.
   3. Delete the ticket file and update its status on `dev/upgrade-npm`, before that PR merges.
+- **#151:** Added on 2026-11-07 to unblock #149, by replacing `eslint-plugin-react`. Run it before #149. It follows the normal Workflow, and its Close the Ticket section also marks #149 `Ready`.
 - **#149 and #150:** Check the ticket's Unblock Criteria when its turn comes. If they are met, follow the normal Workflow. If not, leave the ticket file in place and the status as `Blocked`. The PR into `master` does not wait for these tickets.
 
 ### Definition of done
 
 The plan is done when #150 has been processed:
 
-- Every ticket from #132 to #148 is `Done` and its file is deleted.
+- Every ticket from #132 to #148, and #151, is `Done` and its file is deleted.
 - #149 and #150 are each either `Done` with the file deleted, or still `Blocked` after their Unblock Criteria were checked.
 
 If #149 or #150 stays `Blocked`, its file is the only ticket file left in this folder.
@@ -73,8 +74,9 @@ If #149 or #150 stays `Blocked`, its file is the only ticket file left in this f
 | #146 | Upgrade @testing-library/jest-dom to 7 | Upgrade | P3 | S | Done | #138 |
 | #147 | Upgrade Knip to 6 | Upgrade | P3 | S | Done | #129 |
 | #148 | Enforce the npm audit gate in CI | Chore | P1 | S | Done | #130, #131, #132, #133, #134, #135, #136 |
-| [#149](149-upgrade-eslint-10-blocked.md) | Upgrade ESLint to 10 | Upgrade | P3 | M | Blocked | #141 |
+| [#149](149-upgrade-eslint-10-blocked.md) | Upgrade ESLint to 10 | Upgrade | P3 | M | Blocked | #141, #151 |
 | [#150](150-upgrade-typescript-7-blocked.md) | Upgrade TypeScript to 7 | Upgrade | P3 | L | Blocked | #141, #147 |
+| [#151](151-replace-eslint-plugin-react.md) | Replace eslint-plugin-react with @eslint-react/eslint-plugin | Upgrade | P3 | S | Ready | #141 |
 
 ### Expected end state
 

@@ -12,7 +12,7 @@
 
 ## 1. Summary
 
-Upgrade `eslint` and `@eslint/js` to 10 once `eslint-plugin-react` supports it.
+Upgrade `eslint` and `@eslint/js` to 10 once #151 has replaced `eslint-plugin-react`.
 
 ## 2. Why
 
@@ -33,8 +33,9 @@ Upgrade `eslint` and `@eslint/js` to 10 once `eslint-plugin-react` supports it.
 
 Do not start until these are met:
 
-- [ ] `eslint-plugin-react` publishes a release with `^10` in its peer range ([#3977](https://github.com/jsx-eslint/eslint-plugin-react/issues/3977), [PR #4022](https://github.com/jsx-eslint/eslint-plugin-react/pull/4022)).
-- [ ] Alternative needing a decision: replace it with `@eslint-react/eslint-plugin`. This changes the rule set, so assess it separately.
+- [ ] #151 is `Done`: `eslint-plugin-react` is replaced with `@eslint-react/eslint-plugin`, which accepts any ESLint version.
+
+Decision on 2026-11-07: replace the plugin (#151) instead of waiting for an `eslint-plugin-react` release with `^10` in its peer range ([#3977](https://github.com/jsx-eslint/eslint-plugin-react/issues/3977), [PR #4022](https://github.com/jsx-eslint/eslint-plugin-react/pull/4022)). On that date, 7.37.5 was still the latest release.
 
 ## 5. Agent Implementation Steps
 
@@ -42,7 +43,7 @@ Follow the rules in `.claude/skills/npm-upgrade/SKILL.md`. A person starts that 
 
 1. From an up-to-date `dev/upgrade-npm`, create branch `149-upgrade-eslint-10-blocked` and confirm `git status` is clean.
 2. Run `npm ci`.
-3. Check with `npm view eslint-plugin-react peerDependencies`.
+3. Confirm `npm ls eslint-plugin-react` shows nothing, and check `npm view @eslint-react/eslint-plugin peerDependencies`, `npm view eslint-plugin-react-hooks peerDependencies` and `npm view eslint-plugin-react-refresh peerDependencies` all allow ESLint 10.
 4. Read the [ESLint 10 migration guide](https://eslint.org/docs/latest/use/migrate-to-10.0.0).
 5. Handle the three new recommended rules: `no-unassigned-vars`, `no-useless-assignment` and `preserve-caught-error`.
 6. Remove `/* eslint-env node */` from `tools/sync-current-stack.mjs`, because these comments are now errors.
@@ -90,7 +91,7 @@ If an e2e test fails, run the same test on `dev/upgrade-npm` before blaming the 
 
 ## 8. Dependencies & Risks
 
-- **Blocked by:** #141
+- **Blocked by:** #141, #151
 - **Blocks:** None
 - JSX references are now tracked, which may add `no-unused-vars` reports.
 
