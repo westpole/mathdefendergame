@@ -90,9 +90,9 @@ function generateOrderOfOperationsExpression(stageOps: MathOperation[]): MathExp
   const innerOp: MathOperation = innerOps[Math.floor(Math.random() * innerOps.length)] ?? '*';
 
   const a = randomInt(10, 99);
-  let b = 0;
-  let c = 0;
-  let innerResult = 0;
+  let b: number;
+  let c: number;
+  let innerResult: number;
 
   if (innerOp === '*') {
     b = randomInt(2, 15);
