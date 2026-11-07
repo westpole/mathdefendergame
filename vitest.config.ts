@@ -98,11 +98,8 @@ export default defineConfig({
 
     reporters: [
       'default',
-      'html',
+      ['html', { outputDir: './reports/unit-tests' }],
     ],
-    outputFile: {
-      html: './reports/unit-tests/index.html',
-    },
 
     // 1. GLOBAL COVERAGE MANAGEMENT
     // Configured here because Vitest aggregates coverage globally across projects.
