@@ -36,7 +36,7 @@ Subagents in `.claude/agents/`:
 - Zustand 5 for shared UI state and persisted leaderboard data.
 - Vite 8 + TypeScript for the renderer build.
 - Electron 45 for the desktop wrapper.
-- Storybook 10 and Vitest 4 for component work and testing.
+- Storybook 10 and Vitest 5 for component work and testing.
 
 ## Code Ownership
 

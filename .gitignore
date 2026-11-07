@@ -2,6 +2,7 @@ node_modules
 dist
 build
 reports
+.vitest
 *storybook.log
 storybook-static
 test-results
