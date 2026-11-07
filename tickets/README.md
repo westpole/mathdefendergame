@@ -72,7 +72,7 @@ If #149 or #150 stays `Blocked`, its file is the only ticket file left in this f
 | #145 | Upgrade @vitejs/plugin-react to 6 | Upgrade | P2 | S | Done | #133 |
 | #146 | Upgrade @testing-library/jest-dom to 7 | Upgrade | P3 | S | Done | #138 |
 | #147 | Upgrade Knip to 6 | Upgrade | P3 | S | Done | #129 |
-| [#148](148-ci-enforce-npm-audit-gate.md) | Enforce the npm audit gate in CI | Chore | P1 | S | Ready | #130, #131, #132, #133, #134, #135, #136 |
+| #148 | Enforce the npm audit gate in CI | Chore | P1 | S | Done | #130, #131, #132, #133, #134, #135, #136 |
 | [#149](149-upgrade-eslint-10-blocked.md) | Upgrade ESLint to 10 | Upgrade | P3 | M | Blocked | #141 |
 | [#150](150-upgrade-typescript-7-blocked.md) | Upgrade TypeScript to 7 | Upgrade | P3 | L | Blocked | #141, #147 |
 
