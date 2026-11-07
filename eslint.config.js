@@ -1,7 +1,7 @@
 // @ts-check
 import eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
-import reactPlugin from 'eslint-plugin-react';
+import eslintReact from '@eslint-react/eslint-plugin';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactRefreshPlugin from 'eslint-plugin-react-refresh';
 
@@ -41,20 +41,24 @@ export default tseslint.config(
       },
     },
     plugins: {
-      react: reactPlugin,
+      ...eslintReact.configs['recommended-typescript'].plugins,
       'react-hooks': reactHooksPlugin,
       'react-refresh': reactRefreshPlugin,
     },
-    settings: {
-      react: {
-        version: 'detect',
-      },
-    },
     rules: {
       // React rules
-      ...reactPlugin.configs.recommended.rules,
-      ...reactPlugin.configs['jsx-runtime'].rules,
-      'react/prop-types': 'off', // TypeScript handles this
+      ...eslintReact.configs['recommended-typescript'].rules,
+
+      // eslint-plugin-react-hooks owns hook rules; turn off the @eslint-react duplicates
+      '@eslint-react/rules-of-hooks': 'off',
+      '@eslint-react/exhaustive-deps': 'off',
+      '@eslint-react/error-boundaries': 'off',
+      '@eslint-react/purity': 'off',
+      '@eslint-react/set-state-in-effect': 'off',
+      '@eslint-react/set-state-in-render': 'off',
+      '@eslint-react/static-components': 'off',
+      '@eslint-react/unsupported-syntax': 'off',
+      '@eslint-react/use-memo': 'off',
 
       // React Hooks rules
       ...reactHooksPlugin.configs.recommended.rules,
