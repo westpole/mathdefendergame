@@ -176,15 +176,22 @@ vi.mock('../../main', () => ({
   },
 }));
 
-function createTextStub() {
-  return {
+function createTextStub(x = 0, y = 0) {
+  const text = {
+    x,
+    y,
+    width: 40,
+    height: 30,
     setOrigin: vi.fn().mockReturnThis(),
     setDepth: vi.fn().mockReturnThis(),
-    setPosition: vi.fn().mockReturnThis(),
-    setStroke: vi.fn().mockReturnThis(),
-    setScale: vi.fn().mockReturnThis(),
+    setPosition: vi.fn((nextX: number, nextY: number) => {
+      text.x = nextX;
+      text.y = nextY;
+      return text;
+    }),
     destroy: vi.fn(),
   };
+  return text;
 }
 
 function createGraphicsStub() {
@@ -193,6 +200,8 @@ function createGraphicsStub() {
     clear: vi.fn().mockReturnThis(),
     fillStyle: vi.fn().mockReturnThis(),
     fillCircle: vi.fn().mockReturnThis(),
+    lineStyle: vi.fn().mockReturnThis(),
+    strokeRoundedRect: vi.fn().mockReturnThis(),
   };
 }
 
@@ -241,7 +250,10 @@ function setupScene() {
 
   vi.spyOn(useGameStore, 'getState').mockReturnValue(state);
 
+  // create() adds the particle layer first, then the target-frame layer.
   const graphics = createGraphicsStub();
+  const frameGraphics = createGraphicsStub();
+  const graphicsQueue = [graphics, frameGraphics];
   const keyboard = {
     on: vi.fn(),
     off: vi.fn(),
@@ -259,9 +271,9 @@ function setupScene() {
   };
   const textObjects: ReturnType<typeof createTextStub>[] = [];
   const add = {
-    graphics: vi.fn(() => graphics),
-    text: vi.fn(() => {
-      const text = createTextStub();
+    graphics: vi.fn(() => graphicsQueue.shift() ?? createGraphicsStub()),
+    text: vi.fn((x: number, y: number) => {
+      const text = createTextStub(x, y);
       textObjects.push(text);
       return text;
     }),
@@ -302,7 +314,7 @@ function setupScene() {
       openScreenView,
       openMenu,
     },
-    phaser: { graphics, input, keyboard, scale, add, events, stop, shake, textObjects },
+    phaser: { graphics, frameGraphics, input, keyboard, scale, add, events, stop, shake, textObjects },
   };
 }
 
@@ -353,8 +365,9 @@ describe('GameScene', () => {
     scene.create();
 
     expect(phaser.events.once).toHaveBeenCalledWith(Phaser.Scenes.Events.SHUTDOWN, expect.any(Function), scene);
-    expect(phaser.add.graphics).toHaveBeenCalledTimes(1);
+    expect(phaser.add.graphics).toHaveBeenCalledTimes(2);
     expect(phaser.graphics.setDepth).toHaveBeenCalledWith(6);
+    expect(phaser.frameGraphics.setDepth).toHaveBeenCalledWith(4);
     expect(phaser.keyboard.off).toHaveBeenCalledWith('keydown', expect.any(Function), scene);
     expect(phaser.keyboard.on).toHaveBeenCalledWith('keydown', expect.any(Function), scene);
     expect(phaser.input.off).toHaveBeenCalledWith('pointerdown', expect.any(Function), scene);
@@ -604,22 +617,35 @@ describe('GameScene', () => {
 
     scene.update(0, 16);
 
-    const [lowerText, higherText] = phaser.textObjects;
-    expect(lowerText.setStroke).toHaveBeenCalledWith('#ffffff', 4);
-    expect(lowerText.setScale).toHaveBeenCalledWith(1.2);
-    expect(higherText.setStroke).not.toHaveBeenCalled();
-
-    // Same target on the next frame: no restyling.
-    scene.update(0, 16);
-    expect(lowerText.setStroke).toHaveBeenCalledTimes(1);
+    // Text stub is 40x30; the frame adds 5px padding on every side, 5px radius.
+    expect(phaser.frameGraphics.clear).toHaveBeenCalled();
+    expect(phaser.frameGraphics.lineStyle).toHaveBeenCalledWith(2, 0xeeeeee, 1);
+    expect(phaser.frameGraphics.strokeRoundedRect).toHaveBeenLastCalledWith(-15, 280, 50, 40, 5);
+    expect(phaser.frameGraphics.strokeRoundedRect).toHaveBeenCalledTimes(1);
 
     // The target is destroyed; the remaining meteor becomes the target.
     mockGameState.lastInstance!.meteors = [{ id: 2, x: 30, y: 140, text: '2+2', op: '+' }] as MockMeteor[];
 
     scene.update(0, 16);
 
-    expect(higherText.setStroke).toHaveBeenCalledWith('#ffffff', 4);
-    expect(higherText.setScale).toHaveBeenCalledWith(1.2);
+    expect(phaser.frameGraphics.strokeRoundedRect).toHaveBeenLastCalledWith(5, 120, 50, 40, 5);
+  });
+
+  it('clears the target frame when no meteors remain', () => {
+    const { scene, phaser } = setupScene();
+
+    scene.init();
+    scene.create();
+    mockGameState.lastInstance!.state = 'playing';
+    mockGameState.lastInstance!.meteors = [{ id: 1, x: 10, y: 300, text: '1+1', op: '+' }] as MockMeteor[];
+    scene.update(0, 16);
+
+    mockGameState.lastInstance!.meteors = [];
+    phaser.frameGraphics.clear.mockClear();
+    scene.update(0, 16);
+
+    expect(phaser.frameGraphics.clear).toHaveBeenCalledTimes(1);
+    expect(phaser.frameGraphics.strokeRoundedRect).toHaveBeenCalledTimes(1);
   });
 
   it('moves the highlight to a meteor that overtakes the current target', () => {
@@ -638,10 +664,7 @@ describe('GameScene', () => {
     mockGameState.lastInstance!.meteors[1].y = 320;
     scene.update(0, 16);
 
-    const [firstText, secondText] = phaser.textObjects;
-    expect(firstText.setStroke).toHaveBeenLastCalledWith('#000000', 0);
-    expect(firstText.setScale).toHaveBeenLastCalledWith(1);
-    expect(secondText.setStroke).toHaveBeenCalledWith('#ffffff', 4);
+    expect(phaser.frameGraphics.strokeRoundedRect).toHaveBeenLastCalledWith(5, 300, 50, 40, 5);
   });
 
   it('bridges stage and game-over callbacks into the store', () => {
