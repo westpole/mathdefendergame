@@ -15,12 +15,11 @@ import type { PauseOverlayReason } from '@store/types';
 import type { GameMode, GameOverReason, PracticeOperation } from '@shared/types';
 import { notifyAppCloseReady } from '../../platform/adapter';
 
-// Meteor texts are created without a stroke; the target gets one and is scaled up.
-const DEFAULT_METEOR_STROKE_COLOR = '#000000';
-const DEFAULT_METEOR_STROKE_WIDTH = 0;
-const TARGET_METEOR_STROKE_COLOR = '#ffffff';
-const TARGET_METEOR_STROKE_WIDTH = 4;
-const TARGET_METEOR_SCALE = 1.2;
+// The target meteor is outlined with a rounded frame drawn around its text bounds.
+const TARGET_FRAME_PADDING = 5;
+const TARGET_FRAME_RADIUS = 5;
+const TARGET_FRAME_COLOR = '#eeeeee';
+const TARGET_FRAME_WIDTH = 2;
 
 function colorToInt(hex: string): number {
   return parseInt(hex.replace('#', ''), 16);
@@ -30,7 +29,7 @@ export class GameScene extends Phaser.Scene {
   gameLogic!: Game;
 
   private meteorTexts: Map<number, Phaser.GameObjects.Text> = new Map();
-  private highlightedMeteorId: number | null = null;
+  private targetFrameGraphics!: Phaser.GameObjects.Graphics;
   private particleGraphics!: Phaser.GameObjects.Graphics;
   private streakRewardTimer: ReturnType<typeof setTimeout> | null = null;
   private readonly handleKeyDown = (e: KeyboardEvent): void => {
@@ -88,11 +87,11 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     this.meteorTexts = new Map();
-    this.highlightedMeteorId = null;
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleShutdown, this);
 
     // ── Dynamic graphics ──────────────────────────────────────────────────────
     this.particleGraphics = this.add.graphics().setDepth(6);
+    this.targetFrameGraphics = this.add.graphics().setDepth(4);
 
     // ── Keyboard input ────────────────────────────────────────────────────────
     this.input.keyboard?.off('keydown', this.handleKeyDown, this);
@@ -151,25 +150,23 @@ export class GameScene extends Phaser.Scene {
   }
 
   // ── Target highlight ──────────────────────────────────────────────────────
-  // The target can change between frames (a hit, a base impact, or a new lowest meteor),
-  // so it is re-checked every frame but restyled only when it changes. Meteor texts are
-  // synced first, so the target's text always exists here.
+  // The target moves and can change between frames (a hit, a base impact, or a new lowest
+  // meteor), so its frame is redrawn every frame. Meteor texts are synced first, so the
+  // target's text always exists here.
   private syncTargetHighlight(): void {
-    const targetId = this.gameLogic.getTargetMeteor()?.id ?? null;
+    this.targetFrameGraphics.clear();
 
-    if (targetId === this.highlightedMeteorId) {
+    const targetId = this.gameLogic.getTargetMeteor()?.id;
+    const txt = targetId === undefined ? undefined : this.meteorTexts.get(targetId);
+    if (!txt) {
       return;
     }
 
-    if (this.highlightedMeteorId !== null) {
-      this.meteorTexts.get(this.highlightedMeteorId)?.setStroke(DEFAULT_METEOR_STROKE_COLOR, DEFAULT_METEOR_STROKE_WIDTH).setScale(1);
-    }
-
-    if (targetId !== null) {
-      this.meteorTexts.get(targetId)?.setStroke(TARGET_METEOR_STROKE_COLOR, TARGET_METEOR_STROKE_WIDTH).setScale(TARGET_METEOR_SCALE);
-    }
-
-    this.highlightedMeteorId = targetId;
+    const width = txt.width + TARGET_FRAME_PADDING * 2;
+    const height = txt.height + TARGET_FRAME_PADDING * 2;
+    this.targetFrameGraphics
+      .lineStyle(TARGET_FRAME_WIDTH, colorToInt(TARGET_FRAME_COLOR), 1)
+      .strokeRoundedRect(txt.x - width / 2, txt.y - height / 2, width, height, TARGET_FRAME_RADIUS);
   }
 
   // ── HUD update ────────────────────────────────────────────────────────────
@@ -321,7 +318,7 @@ export class GameScene extends Phaser.Scene {
   private clearTransientRenderables(): void {
     this.meteorTexts.forEach(t => t.destroy());
     this.meteorTexts.clear();
-    this.highlightedMeteorId = null;
     this.particleGraphics?.clear();
+    this.targetFrameGraphics?.clear();
   }
 }
