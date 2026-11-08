@@ -67,6 +67,14 @@ Vitest suppresses `stdout` output by default. To enable it for a run, set `VITES
 | `npm run deps:outdated` | Lists outdated packages with additional version details. | Use when planning dependency updates. |
 | `npm run deps:unused` | Runs Knip with `--dependencies` to report dependency issues only. Exceptions are listed in `knip.json`. | Use when trimming dependencies or validating package cleanup work. For unused files and exports as well, use `npm run quality:unused`. |
 
+### Version holds
+
+`npm run deps:outdated` reports these packages as outdated on purpose. Do not upgrade them until the condition is met.
+
+| Package | Held at | Latest checked | Upgrade when |
+| --- | --- | --- | --- |
+| `typescript` | `^6.0.3` | 7.0.2 (2026-11-07) | `npm view typescript-eslint peerDependencies` includes `typescript@>=7.0.2`. Also confirm that `@eslint-react/eslint-plugin`, `type-coverage` and Storybook docgen work with TypeScript 7, because 7.x no longer exports the classic JS compiler API (`ts.createProgram` and the rest). On 2026-11-07, `typescript-eslint@8.72.1` and its canary still required `<6.1.0`. |
+
 ## Storybook
 
 | Script | What it does | When to use it |

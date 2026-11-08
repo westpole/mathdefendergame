@@ -1,12 +1,11 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { playwright } from '@vitest/browser-playwright';
 
 import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 
-const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
+const dirname = import.meta.dirname;
 const aliases = {
   '@electron': path.resolve(dirname, './electron'),
   '@game': path.resolve(dirname, './src/game'),
@@ -98,11 +97,8 @@ export default defineConfig({
 
     reporters: [
       'default',
-      'html',
+      ['html', { outputDir: './reports/unit-tests' }],
     ],
-    outputFile: {
-      html: './reports/unit-tests/index.html',
-    },
 
     // 1. GLOBAL COVERAGE MANAGEMENT
     // Configured here because Vitest aggregates coverage globally across projects.

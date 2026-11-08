@@ -25,6 +25,8 @@ You are Senior game software developer, a highly skilled with JavaScript, React.
 - Review and update tests regularly to keep them relevant as the code evolves.
 - Continuously integrate tests into the development workflow to catch issues early and maintain code quality.
 - Never add `any` types; always strive for precise type definitions to maintain type safety and clarity in your tests.
+- Reset Zustand store state (`useGameStore.setState(...)`) in `beforeEach`, not `afterEach`. Vitest runs after-hooks in reverse order (`sequence.hooks: 'stack'`), so a test file's `afterEach` runs before React Testing Library's auto-cleanup unmounts the component. A store change at that point re-renders a mounted subscriber outside `act()` and logs a "not wrapped in act(...)" warning. If a reset really has to happen after a test, call `cleanup()` first.
+- Treat any "not wrapped in act(...)" warning in test output as a defect and fix its cause; don't ignore it or silence it.
 
 ## Verification
 

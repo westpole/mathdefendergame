@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
 
@@ -22,13 +22,12 @@ function renderRules(isMobileDevice = false) {
 
 describe('RulesOverlay', () => {
   beforeEach(async () => {
+    // Reset before rendering: an afterEach reset would run before RTL's cleanup unmounts,
+    // re-rendering the subscribed component outside act().
+    useGameStore.setState({ isMobileDevice: false });
     featureFlagMocks.isFeatureEnabled.mockReset();
     featureFlagMocks.isFeatureEnabled.mockReturnValue(true);
     await i18n.changeLanguage('en');
-  });
-
-  afterEach(() => {
-    useGameStore.setState({ isMobileDevice: false });
   });
 
   it('describes both game modes, lives, shield, and the extra life reward', () => {
