@@ -1,83 +1,119 @@
 # Generated tickets by agent
 
-## Dependency upgrade plan (epic #128)
+> **How to use this file:** This README is the single tracker for one batch of agent-generated tickets.
+> Replace every `<placeholder>` below, create one ticket file per row in the [Tickets](#tickets) table,
+> and keep the table in sync as tickets move through their lifecycle. Leave the instructions in
+> blockquotes as-is or delete them once the batch is filled in.
 
-Data as of 2026-11-04, from `npm audit`, `npm outdated` and registry metadata. Run the tickets in number order unless their dependencies allow otherwise.
+> **Dev branch:** `dev-<yyyymmdd>-<batch-slug>` (e.g. `dev-20261108-settings-overlay`)
+> **Batch issue:** #<number> — GitHub issue that represents the whole batch; used for the dev → master PR.
+> **Batch status:** Draft / In Progress / In Review / Done
+
+## Goal
+
+<One or two sentences describing the outcome this batch of tickets delivers and why it matters.>
 
 ### Starting point
 
-- `npm audit`: 60 vulnerable packages (4 critical, 17 high, 39 moderate), from 26 root causes.
-- `npm audit --omit=dev`: 0. This is misleading, because Electron is a dev dependency but ships inside the installer.
-- 46 outdated packages, all assigned to a ticket below.
-- Unit tests: 535 of 536 passing, with one known `UIScene` flake. Typecheck and lint pass.
-- E2E tests: no baseline recorded.
+<Current state of the codebase/feature before any ticket is worked: what exists, what is missing, known constraints. Link relevant files, e.g. `src/game/main.ts`.>
 
 ### Workflow
 
-Every ticket follows these steps. Each ticket file gives its exact branch and file names.
+> Default workflow for an agent picking up tickets from this batch. Adjust if the batch needs something different.
+> Assumes a small project with a single developer: one ticket in progress at a time, no parallel ticket branches.
 
-1. Create the ticket branch from `dev/upgrade-npm`.
-2. Complete the ticket and verify the changes.
-3. Merge the ticket branch into `dev/upgrade-npm`.
-4. Delete the ticket file.
-5. In the table below, set the ticket's status to `Done` and remove its link.
+1. Pick the highest-priority ticket in the [Tickets](#tickets) table whose status is `Ready for Dev` and whose **Blocked by** tickets are all `Done`.
+2. Set its status to `In Progress` in both the ticket file and the table.
+3. Check out the dev branch, pull it, and create the ticket branch from it (see [Branching rules](#branching-rules)).
+4. Implement the ticket in its owning layer (see `CLAUDE.md` → Code Ownership), add/update tests and stories.
+5. Run verification locally — CI only runs on PRs to `master`, so the local run is the gate for ticket merges:
+   `npm run typecheck`, `npm run lint`, the narrowest test lane, then `npm run test:all` if cross-cutting.
+   Skip e2e (`npm run test:e2e*`) for now; it needs a Docker image to match the CI environment.
+6. Run the `code-reviewer` subagent and address findings.
+7. Commit using `<type>: #<ticket> <description>`, then set status to `In Review`.
+8. Merge into the dev branch (see [Merge rules](#merge-rules)), set status to `Done`, and unblock dependent tickets.
+9. When every ticket is `Done`, open the dev → master PR and set **Batch status** to `In Review`.
 
-### Manual testing
+### Branching rules
 
-Tickets have no manual testing step, so no ticket waits for one. A person tests the `dev/upgrade-npm` branch once, after all tickets are implemented.
+| Branch | Name | Created from | Merges into |
+| --- | --- | --- | --- |
+| Dev (batch bucket) | `dev-<yyyymmdd>-<batch-slug>` | `master`, when the batch starts | `master`, once per batch |
+| Ticket | `<ticket-number>-<short-slug>` (e.g. `142-add-settings-overlay`) | the dev branch | the dev branch |
+
+- Use the date the batch starts, in `yyyymmdd` format, plus a short kebab-case slug of the batch goal.
+- Use a hyphen, not a slash (`dev-...`, never `dev/...`) — git cannot hold both a `dev` branch and `dev/*` branches.
+- Never branch a ticket from `master` or from another ticket branch.
+- Never commit directly to the dev branch except for README/ticket status updates and syncing with `master`.
+- Record the dev branch name in the header of this README before the first ticket starts.
+
+### Merge rules
+
+- **Ticket → dev:** squash-merge, so the dev branch has exactly one commit per ticket:
+  `<type>: #<ticket> <description>`. Delete the ticket branch afterwards.
+- **Dev → master:** open a PR from the dev branch to `master` (this is where CI runs) and merge with a
+  **merge commit** (no squash, no rebase) so per-ticket commits stay in `master` history.
+  - PR title / merge commit: `merge: #<batch-issue> <batch-slug> into master`
+    (e.g. `merge: #150 settings-overlay into master`).
+  - PR description: link this README and list the tickets included.
+- **Syncing with master:** single-developer assumption — `master` rarely moves during a batch. If it does,
+  merge `master` into the dev branch before starting the next ticket. Do not rebase the dev branch.
+- **After the batch merges:** delete the dev branch and set **Batch status** to `Done`.
 
 ### Exceptions
 
-These rules override the Workflow above and the Close the Ticket section in each ticket.
+> Cases where the agent must stop and ask instead of proceeding.
 
-- **#148:** Merge the ticket branch into `dev/upgrade-npm` as usual, but keep the ticket file. Its acceptance criteria need a PR into `master`, because CI does not run on PRs into `dev/upgrade-npm`.
-  1. Open the PR from `dev/upgrade-npm` into `master` and confirm the `Dependency audit` step passes.
-  2. Prove the step fails on a throwaway branch, using a PR into `master` that is never merged.
-  3. Delete the ticket file and update its status on `dev/upgrade-npm`, before that PR merges.
-- **#151:** Added on 2026-11-07 to unblock #149, by replacing `eslint-plugin-react`. Run it before #149. It follows the normal Workflow, and its Close the Ticket section also marks #149 `Ready`.
-- **#149 and #150:** Check the ticket's Unblock Criteria when its turn comes. If they are met, follow the normal Workflow. If not, leave the ticket file in place and the status as `Blocked`. The PR into `master` does not wait for these tickets.
-- **#150:** Discarded on 2026-11-07 instead of being left `Blocked`. Its file was deleted, and the follow-up is tracked in `docs/package-scripts.md` under Version holds.
+- <A ticket requires changing the Electron security posture (`contextIsolation`, `nodeIntegration`).>
+- <Acceptance criteria are ambiguous or contradict another ticket.>
+- <A dependency upgrade or release is needed (`/npm-upgrade`, `/release-workflow` are user-invoked only).>
+- The dev branch is behind `master` and merging `master` into it produces conflicts.
+- No dev branch is recorded in the header, or the recorded branch does not exist.
+- <Other batch-specific exceptions.>
 
 ### Definition of done
 
-The plan is done when #150 has been processed:
+> Applies to the batch as a whole. Each ticket also has its own Definition of Done (section 7 of the ticket template).
 
-- Every ticket from #132 to #148, and #151, is `Done` and its file is deleted.
-- #149 is `Done` and its file is deleted.
-- #150 is `Discarded` and its file is deleted. It was discarded on 2026-11-07 because `typescript-eslint` does not support TypeScript 7 yet. The reminder to recheck lives in `docs/package-scripts.md` under Version holds.
-
-### CI coverage
-
-`pr-tests-runner.yml` only runs on PRs into `master`, so CI does not check merges into `dev/upgrade-npm`. Each ticket's Agent Validation is the check for those merges.
+- [ ] All tickets in the table are `Done` and squash-merged into the dev branch
+- [ ] `npm run typecheck`, `npm run lint`, and `npm run test:all` pass locally on the dev branch
+- [ ] Dev → master PR is green in CI and merged with a merge commit
+- [ ] Desktop and mobile stories exist for any changed UI
+- [ ] Documentation updated where behavior changed
+- [ ] <Batch-specific criterion>
 
 ### Tickets
 
+> - One row per ticket. Ticket files live next to this README as `tickets/<number>-<short-slug>.md`
+>   and follow [docs/AgileTicketTemplate.md](../docs/AgileTicketTemplate.md).
+> - Link the **Ticket** cell to the ticket file.
+> - **Type:** Feature / Bug / Chore / Refactor / Test / Docs / Spike
+> - **Priority:** P0 (critical) / P1 (high) / P2 (medium) / P3 (low)
+> - **Size:** XS / S / M / L / XL
+> - **Status:** Draft / Ready for Dev / In Progress / In Review / Done — must match the ticket file's header.
+> - **Blocked by:** comma-separated ticket numbers, or `—` if none.
+
 | Ticket | Title | Type | Priority | Size | Status | Blocked by |
 | --- | --- | --- | --- | --- | --- | --- |
-| [#129](129-deps-scripts-replace-audit-ci-and-ncu.md) | Make the deps scripts trustworthy and remove audit-ci and npm-check-updates | Chore | P0 | S | Done | None |
-| #130 | Upgrade Storybook to 10.6.5 | Security | P0 | M | Done | #129 |
-| #131 | Upgrade concurrently and wait-on | Security | P0 | S | Done | #129 |
-| #132 | Upgrade Electron to 42.11.18 and electron-builder to 26.18.0 | Security | P0 | M | Done | #129 |
-| #133 | Upgrade Vite to 8.3.5 with sass and vite-plugin-singlefile | Security | P1 | M | Done | #129 |
-| #134 | Upgrade Vitest to 4.1.12 | Security | P1 | S | Done | #129 |
-| #135 | Upgrade happy-dom to 21 | Security | P1 | S | Done | #134 |
-| #136 | Refresh vulnerable transitive packages in the lockfile | Security | P0 | S | Done | #130, #131, #132, #133, #134, #135 |
-| #137 | Upgrade Playwright to 1.64.1 | Maintenance | P2 | S | Done | #129 |
-| #138 | Upgrade React to 19.3 with types and Testing Library | Maintenance | P2 | M | Done | #129 |
-| #139 | Upgrade Phaser to 4.2.1 and Zustand to 5.0.16 | Maintenance | P2 | S | Done | #129 |
-| #140 | Upgrade the i18next packages | Maintenance | P2 | S | Done | #129 |
-| #141 | Upgrade typescript-eslint, react-refresh plugin and type-coverage | Maintenance | P3 | S | Done | #129 |
-| #142 | Upgrade the conventional-changelog tools | Maintenance | P3 | S | Done | #129 |
-| #143 | Upgrade Electron to 45 | Upgrade | P1 | L | Done | #132, #137 |
-| #144 | Upgrade Vitest to 5 | Upgrade | P2 | L | Done | #130, #134, #135 |
-| #145 | Upgrade @vitejs/plugin-react to 6 | Upgrade | P2 | S | Done | #133 |
-| #146 | Upgrade @testing-library/jest-dom to 7 | Upgrade | P3 | S | Done | #138 |
-| #147 | Upgrade Knip to 6 | Upgrade | P3 | S | Done | #129 |
-| #148 | Enforce the npm audit gate in CI | Chore | P1 | S | Done | #130, #131, #132, #133, #134, #135, #136 |
-| #149 | Upgrade ESLint to 10 | Upgrade | P3 | M | Done | #141, #151 |
-| #150 | Upgrade TypeScript to 7 | Upgrade | P3 | L | Discarded | #141, #147 |
-| #151 | Replace eslint-plugin-react with @eslint-react/eslint-plugin | Upgrade | P3 | S | Done | #141 |
+| [#<number>](./<number>-<short-slug>.md) | <Concise, action-oriented title> | Feature | P1 | M | Draft | — |
 
 ### Expected end state
 
-After #136, no high or critical advisories should remain. Moderate `minimatch` and `glob` advisories stay, along with packages that inherit them, because no parent package allows a fixed version yet. This outcome is calculated from lockfile and registry data and has not been confirmed by a trial install.
+<Describe what the product and codebase look like once every ticket is Done: user-visible behavior, new/changed modules, tests and stories added.>
+
+---
+
+## Ticket file template
+
+> Copy [docs/AgileTicketTemplate.md](../docs/AgileTicketTemplate.md) into `tickets/<number>-<short-slug>.md` for each ticket.
+> Agent-specific guidance when filling it in:
+
+- **Title:** replace `[FEATURE]` with the ticket type (`[BUG]`, `[CHORE]`, …) when it is not a feature.
+- **Header fields:** `Status`, `Priority`, and `Estimate` must match the row in the table above.
+- **Epic:** link back to this README and the batch issue.
+- **Sprint:** the dev branch name.
+- **User stories:** keep each story independently testable; always fill in **Out of scope**.
+- **Design & reference assets:** prefer repo paths (`docs/assets/...`) or existing components/stories under `src/ui/components/**`, with a text fallback for every visual.
+- **Technical notes:** name the owning layer (`src/game/main.ts`, `GameScene`, `useGameStore`, React overlay, Electron) and which test lane covers it.
+- **Dependencies:** `Blocked by` / `Blocks` must match the table above.
+- **Definition of done:** drop items that do not apply (e.g. analytics, PM sign-off) rather than leaving them unchecked.
