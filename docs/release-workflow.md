@@ -1,6 +1,6 @@
 # Using the `/release-workflow` Command
 
-`/release-workflow` is the Claude Code command for shipping a production release of Math Defender Game. It runs preflight checks, picks the version bump, builds the Web and Windows packages, runs the release command (version bump, changelog, commit, tag, push), and generates an HTML release report.
+`/release-workflow` is the Claude Code command for shipping a production release of Math Defender Game. It runs one scripted pipeline, `npm run release:run`. The pipeline handles preflight checks, picks the version bump, builds the Web and Windows packages, runs the release command (version bump, changelog, commit, tag, push), and writes a JSON release report.
 
 The command is user-invoked only: Claude never starts it on its own. Its definition lives in `.claude/skills/release-workflow/`.
 
@@ -10,56 +10,43 @@ Use it to release work that is already merged into `master`. Do not use it for g
 
 ## How to Run It
 
-Type the command in Claude Code:
+From Claude Code:
 
 ```text
 /release-workflow
-```
-
-You can append optional release notes or constraints:
-
-```text
+/release-workflow dry run
 /release-workflow stop before pushing
 ```
 
-```text
-/release-workflow mention the new DDA tuning changes in the summary
+Or directly, without an agent:
+
+```bash
+npm run release:run              # full release
+npm run release:run -- --dry-run # checks + builds only, no version bump
+npm run release:run -- --no-push # bump, changelog, commit locally, no push
 ```
 
-You do not choose the release type. The workflow runs `npm run which:version` and uses the recommended bump (`patch`, `minor`, or `major`) based on conventional commits.
+You do not choose the release type. The pipeline runs `npm run which:version` and uses the recommended bump (`patch`, `minor`, or `major`) based on conventional commits.
 
-## Workflow Steps
+## Pipeline Steps
 
-1. Determine the bump with `npm run which:version`.
-2. Verify git state: on `master`, clean worktree, up to date with the remote.
-3. Check release eligibility with `npm run release:guard` (at least one releasable commit since the latest tag).
-4. Run checks in order: `npm run lint`, `npm run typecheck`, `npm run test:all`.
-5. Build: `npm run build:web`, then `npm run build:win`.
-6. Run exactly one of `npm run release:patch`, `npm run release:minor`, or `npm run release:major`.
-7. Generate the report with `npm run release:report:build`.
+1. `bump`: determine the bump with `npm run which:version`.
+2. `git-branch`, `git-clean`, `git-sync`: on `master`, clean worktree, in sync with the remote.
+3. `guard`: `npm run release:guard` requires at least one releasable commit since the latest tag.
+4. `lint`, `typecheck`, `test-all`.
+5. `build-web` (`npm run build:web:bundle`), then `build-win` (`npm run build:win:package`, stamped with the next version).
+6. `release`: exactly one of `npm run release:patch`, `release:minor`, or `release:major`, then a check of the version, tag, and push.
 
-The workflow stops at the first failing step and reports only that blocking condition.
+The pipeline stops at the first failing step and exits with code `1`. In `--dry-run` mode, git preflight failures are recorded as warnings, so you can test the checks and builds from a feature branch.
 
-## Preconditions
+## Output
 
-Before running the command, make sure:
+- `reports/current-prod-build/release-report.json`: the single result file. It is rewritten after every step.
+- `reports/current-prod-build/logs/<step>.log`: full output of each command.
 
-- you are on the `master` branch
-- the worktree is clean and in sync with the remote
-- there is at least one commit since the latest release tag
-- you are clear about whether the release should push or stop for review
-
-## Expected Outcome
-
-A successful run leaves you with:
-
-- updated version metadata and changelog
-- built Web (`build/`) and Windows (`dist/`) artifacts
-- a release commit and tag, pushed to the remote
-- release report data at `reports/current-prod-build/prod-build-report.json`
-- release report HTML at `reports/current-prod-build/index.html`
+To view the report, run `npm run release:report` and open http://localhost:4784 (see `tools/release-report/README.md`).
 
 ## Notes
 
-- The release step (`npm run release:*`) commits, tags, and pushes in one go. If you want a review checkpoint before any irreversible git step, say so in the command arguments.
-- Claude asks for permission before writing the report files.
+- The release step commits, tags, and pushes in one go. Use `--no-push` (or "stop before pushing") if you want a review checkpoint before publishing.
+- `--no-push` runs `npm version`, `npm run changelog`, and `npm run git:commit`. Push later with `npm run git:push`.
