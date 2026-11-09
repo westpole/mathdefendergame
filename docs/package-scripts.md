@@ -85,7 +85,7 @@ Vitest suppresses `stdout` output by default. To enable it for a run, set `VITES
 
 | Script | What it does | When to use it |
 | --- | --- | --- |
-| `npm run release:guard` | Runs the project release guard checks from `.github/skills/release-workflow/assets/scripts/release-guard.mjs`. | Use before versioning or pushing a release to ensure release prerequisites are satisfied. |
+| `npm run release:guard` | Runs the project release guard checks from `.claude/skills/release-workflow/scripts/release-guard.mjs`. | Use before versioning or pushing a release to ensure release prerequisites are satisfied. |
 | `npm run changelog` | Regenerates `CHANGELOG.md` from conventional commits. | Use when preparing release notes from commit history. |
 | `npm run git:commit` | Stages all changes and creates a release-style commit. | Use only inside the existing release workflow when all pending changes are intended for that commit. |
 | `npm run git:push` | Pushes `master` and all tags to `origin`. | Use only when the local release commit and tags are ready to publish. |
@@ -102,4 +102,4 @@ Vitest suppresses `stdout` output by default. To enable it for a run, set `VITES
 
 | Script | What it does | When to use it |
 | --- | --- | --- |
-| `npm run docs:sync-current-stack` | Rewrites the `Current Stack` section in `.github/copilot-instructions.md` (Copilot) and `CLAUDE.md` (Claude Code) from the major versions recorded in `package.json`. | Use after framework or tooling major-version changes so both instruction files stay aligned with `package.json`. |
+| `npm run docs:sync-current-stack` | Rewrites the `Current Stack` section in `CLAUDE.md` from the major versions recorded in `package.json`. | Use after framework or tooling major-version changes so the instructions file stays aligned with `package.json`. |

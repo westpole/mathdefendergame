@@ -11,7 +11,7 @@ The game state is centralized in `src/store/useGameStore.ts` using Zustand. The 
 - `src/store/transformers/` contains pure state transformers used by setters.
 - `src/store/utilities/` contains reusable store-level helpers and migrations.
 
-All new functions in `setters` and `transformers` should include complete JSDoc (`@param`, `@returns`, `@example`, and `@throws` when relevant) to improve Copilot context and maintainability.
+All new functions in `setters` and `transformers` should include complete JSDoc (`@param`, `@returns`, `@example`, and `@throws` when relevant) to improve AI assistant context and maintainability.
 
 ### Store structure diagram
 
@@ -100,7 +100,7 @@ The live run state such as score, stage, lives, shield, input buffer, and overla
 
 Profile persistence uses a normalized migration step. Persisted profile payloads are converted into the canonical `PlayerProfile` shape, malformed profile entries are dropped, and only the canonical keys are written back.
 
-### Additional info useful to Copilot
+### Additional info useful to AI assistants
 
 - Keep gameplay logic in `src/game/main.ts` and Phaser rendering in `src/game/scenes/GameScene.ts`; avoid duplicating run-state behavior in the store.
 - Treat Zustand as the integration boundary between React UI and Phaser gameplay state.
@@ -110,7 +110,7 @@ Profile persistence uses a normalized migration step. Persisted profile payloads
 - Prefer editing the owning layer instead of scattering logic across overlay, Phaser, and React components.
 - The `gameHistoryByProfile` data is profile-scoped, with guest sessions falling back to `__guest__`.
 
-### Suggested Copilot prompts
+### Suggested AI assistant prompts
 
 - "Show how the store transitions from login to playing and then to gameover."
 - "Where should I add a new gameplay stat so it stays in sync with the Phaser scene and React HUD?"

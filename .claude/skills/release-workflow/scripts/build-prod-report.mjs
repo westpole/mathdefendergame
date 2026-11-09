@@ -3,14 +3,8 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-const TEMPLATE_RELATIVE_PATH = path.join(
-  '.github',
-  'skills',
-  'release-workflow',
-  'assets',
-  'templates',
-  'prod-build-report-template.html',
-);
+// Resolved relative to this script so the template follows the skill folder, regardless of cwd.
+const TEMPLATE_PATH = path.join(import.meta.dirname, '..', 'assets', 'templates', 'prod-build-report-template.html');
 const REPORT_DATA_RELATIVE_PATH = path.join('reports', 'current-prod-build', 'prod-build-report.json');
 const REPORT_OUTPUT_RELATIVE_PATH = path.join('reports', 'current-prod-build', 'index.html');
 const REPORT_DATA_MARKER = '<!-- REPORT_DATA_INJECTION -->';
@@ -22,7 +16,7 @@ function fail(message) {
 
 function parseArgs(argv) {
   const options = {
-    template: path.resolve(process.cwd(), TEMPLATE_RELATIVE_PATH),
+    template: TEMPLATE_PATH,
     data: path.resolve(process.cwd(), REPORT_DATA_RELATIVE_PATH),
     output: path.resolve(process.cwd(), REPORT_OUTPUT_RELATIVE_PATH),
   };

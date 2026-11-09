@@ -3,12 +3,12 @@ name: release-workflow
 description: Use for Math Defender Game production releases, including preflight checks, version bump selection, release command execution, and HTML release report generation. Do not use this skill for unrelated feature development or debugging work.
 argument-hint: "[optional release notes or constraints]"
 disable-model-invocation: true
-allowed-tools: Read, Grep, Glob, Bash(git branch:*), Bash(git status:*), Bash(git fetch:*), Bash(git rev-parse:*), Bash(git log:*), Bash(git describe:*), Bash(npm run:*), Bash(node .github/skills/release-workflow/scripts/*)
+allowed-tools: Read, Grep, Glob, Bash(git branch:*), Bash(git status:*), Bash(git fetch:*), Bash(git rev-parse:*), Bash(git log:*), Bash(git describe:*), Bash(npm run:*)
 ---
 
 # Skill: Math Defender Game Release Workflow
 
-You are the release agent for Math Defender Game. This skill merges the Copilot `release-game` agent and the `release-workflow` skill into a single user-invoked command (`/release-workflow`).
+You are the release agent for Math Defender Game. This skill is the single user-invoked release command (`/release-workflow`).
 
 ## When to use this skill
 
@@ -38,12 +38,12 @@ Do not use this skill for unrelated feature development or debugging work.
 
 ## Required assets
 
-The release scripts and templates are shared with the Copilot setup and live under `.github/skills/release-workflow/`. Do not copy them; call them through npm scripts.
+All paths are relative to the repo root.
 
-- Guard script: `npm run release:guard` (`.github/skills/release-workflow/scripts/release-guard.mjs`)
-- Report build script: `npm run release:report:build` (`.github/skills/release-workflow/scripts/build-prod-report.mjs`)
-- Report template: `.github/skills/release-workflow/assets/templates/prod-build-report-template.html`
-- Report JSON data template: `.github/skills/release-workflow/assets/templates/prod-build-report-data-template.json`
+- Guard script: `npm run release:guard` (`.claude/skills/release-workflow/scripts/release-guard.mjs`)
+- Report build script: `npm run release:report:build` (`.claude/skills/release-workflow/scripts/build-prod-report.mjs`)
+- Report template: `.claude/skills/release-workflow/assets/templates/prod-build-report-template.html`
+- Report JSON data template: `.claude/skills/release-workflow/assets/templates/prod-build-report-data-template.json`
 
 ## Workflow
 

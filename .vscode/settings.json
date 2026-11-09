@@ -1,10 +1,5 @@
 {
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
-  "editor.detectIndentation": false,
-  "chat.useClaudeMdFile": false,
-  "chat.agentSkillsLocations": {
-    ".github/skills": true,
-    ".claude/skills": false
-  }
+  "editor.detectIndentation": false
 }

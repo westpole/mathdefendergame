@@ -4,8 +4,8 @@ import path from 'node:path';
 import { execSync } from 'node:child_process';
 
 const root = process.cwd();
-// Copilot (.github) and Claude Code (.claude) keep separate skill copies; validate both.
-const skillRoots = [path.join(root, '.github', 'skills'), path.join(root, '.claude', 'skills')];
+// Skills live under .claude/skills (Claude Code).
+const skillRoots = [path.join(root, '.claude', 'skills')];
 const SKILL_KEYWORDS = new Map([
   ['phaser-expert', ['phaser', 'scene', 'gameplay', 'input', 'enemy', 'wave', 'keyboard', 'pointer']],
   ['react-frontend-expert', ['react', 'ui', 'overlay', 'hud', 'menu', 'start screen', 'game over', 'layout']],
