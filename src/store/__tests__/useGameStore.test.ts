@@ -206,6 +206,49 @@ describe('useGameStore', () => {
     });
   });
 
+  describe('practice run setup', () => {
+    const profile = {
+      username: 'AcePilot',
+      password: '',
+      bestScore: 0,
+      highestStage: 1,
+      preferredGrade: 'cadet' as const,
+      createdAt: 1_000,
+      updatedAt: 1_000,
+    };
+
+    it("sets practice mode and records the operation on the active profile's lastPracticeOperation", () => {
+      useGameStore.setState({ activeUsername: 'AcePilot', profiles: { AcePilot: profile, Other: { ...profile, username: 'Other' } } });
+
+      useGameStore.getState().startPracticePlay('*');
+
+      const state = useGameStore.getState();
+      expect(state.runMode).toBe('practice');
+      expect(state.practiceOperation).toBe('*');
+      expect(state.profiles.AcePilot.lastPracticeOperation).toBe('*');
+      expect(state.profiles.AcePilot.updatedAt).toBeGreaterThan(1_000);
+      expect(state.profiles.Other.lastPracticeOperation).toBeUndefined();
+    });
+
+    it('falls back to the current practiceOperation when none is passed', () => {
+      useGameStore.setState({ activeUsername: 'AcePilot', profiles: { AcePilot: profile }, practiceOperation: '-' });
+
+      useGameStore.getState().startPracticePlay();
+
+      expect(useGameStore.getState().profiles.AcePilot.lastPracticeOperation).toBe('-');
+    });
+
+    it('leaves profiles untouched when no profile is active', () => {
+      const profiles = { AcePilot: profile };
+      useGameStore.setState({ activeUsername: null, profiles });
+
+      useGameStore.getState().startPracticePlay('/');
+
+      expect(useGameStore.getState().runMode).toBe('practice');
+      expect(useGameStore.getState().profiles).toBe(profiles);
+    });
+  });
+
   describe('menu navigation', () => {
     it('should switch to rules view', () => {
       useGameStore.getState().openScreenView('rules');

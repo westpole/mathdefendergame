@@ -67,7 +67,6 @@ export function createGameStoreSetters(
   | 'markBootReady'
   | 'setMobileDevice'
   | 'setGrade'
-  | 'selectPracticeOperation'
   | 'startRegularPlay'
   | 'startPracticePlay'
   | 'syncHUD'
@@ -95,10 +94,28 @@ export function createGameStoreSetters(
   | 'getGameHistory'
 > {
   return {
-    selectPracticeOperation: (operation) => set({ practiceOperation: operation }),
     startRegularPlay: () => set({ runMode: 'regular' }),
     setMobileDevice: (isMobileDevice) => set({ isMobileDevice }),
-    startPracticePlay: (operation = get().practiceOperation) => set({ runMode: 'practice', practiceOperation: operation }),
+    startPracticePlay: (operation = get().practiceOperation) => {
+      const state = get();
+      const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
+
+      set({
+        runMode: 'practice',
+        practiceOperation: operation,
+        // Remember the pick per profile so the practice selector can mark it as "Last practiced".
+        ...(activeProfile && {
+          profiles: {
+            ...state.profiles,
+            [activeProfile.username]: {
+              ...activeProfile,
+              lastPracticeOperation: operation,
+              updatedAt: Date.now(),
+            },
+          },
+        }),
+      });
+    },
     markBootReady: () => {
       const rememberedUsername = get().rememberedUsername;
 

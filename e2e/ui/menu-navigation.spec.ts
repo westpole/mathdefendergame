@@ -106,6 +106,56 @@ test.describe('Menu Navigation', () => {
     await expect(page.getByTestId('home-rules-hint')).toHaveCount(0);
   });
 
+  test('starts regular play by clicking the Regular Play tile', async ({ page }) => {
+    await loginToStartMenu(page);
+
+    await page.getByTestId('home-regular-play-tile').click();
+
+    await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().phase === 'playing', { timeout: 5000 });
+    const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
+    expect(state.runMode).toBe('regular');
+    await expect(page.getByTestId('main-menu')).toHaveCount(0);
+  });
+
+  test('pauses the practice start on the operation selector, then plays the picked operation', async ({ page }) => {
+    await loginToStartMenu(page);
+
+    await page.getByTestId('home-practice-tile').click();
+
+    await expect(page.getByTestId('practice-select-overlay')).toBeVisible();
+    // A brand-new profile has no practice history, so nothing is marked "Last practiced".
+    await expect(page.getByTestId('practice-operation-last')).toHaveCount(0);
+    let state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
+    expect(state.phase).toBe('start');
+    expect(state.screenView).toBe('practice-select');
+
+    await page.getByTestId('practice-operation-*').click();
+
+    await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().phase === 'playing', { timeout: 5000 });
+    state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
+    expect(state.runMode).toBe('practice');
+    expect(state.practiceOperation).toBe('*');
+    expect(state.profiles[state.activeUsername!]?.lastPracticeOperation).toBe('*');
+    await expect(page.getByTestId('practice-select-overlay')).toHaveCount(0);
+  });
+
+  test('opens the practice operation selector from the React menu and can go back home', async ({ page }) => {
+    await loginToStartMenu(page);
+
+    await page.getByTestId('menu-toggle-button').click();
+    await page.getByTestId('menu-option-practice').click();
+
+    await expect(page.getByTestId('practice-select-overlay')).toBeVisible();
+    await expect(page.getByTestId('menu-options')).toHaveCount(0);
+
+    await page.getByTestId('practice-select-back').click();
+
+    await expect(page.getByTestId('main-menu')).toBeVisible();
+    const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());
+    expect(state.phase).toBe('start');
+    expect(state.screenView).toBe('home');
+  });
+
   test('can navigate to the performance view from the React menu', async ({ page }) => {
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
     await loginToStartMenu(page);

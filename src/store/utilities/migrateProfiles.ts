@@ -1,6 +1,18 @@
 import type { PlayerProfile } from '@store/types';
 import { normalizeGrade } from '@store/utilities/general';
 import { resolveAvatarId } from '@shared/avatarCatalog';
+import { MATH_OPERATIONS } from '@shared/constants';
+import type { PracticeOperation } from '@shared/types';
+
+/**
+ * Keeps a persisted practice operation only when it is one of the supported operations.
+ *
+ * @param value - Raw persisted value.
+ * @returns The operation, or `undefined` when missing or malformed.
+ */
+function resolvePracticeOperation(value: unknown): PracticeOperation | undefined {
+  return MATH_OPERATIONS.find((operation) => operation === value);
+}
 
 /**
  * Normalizes persisted profile data into the current PlayerProfile contract.
@@ -27,6 +39,8 @@ export function migrateProfiles(rawProfiles: unknown): Record<string, PlayerProf
     const profileRecord = profile as Record<string, unknown>;
     const preferredGrade = normalizeGrade(profileRecord.preferredGrade);
 
+    const lastPracticeOperation = resolvePracticeOperation(profileRecord.lastPracticeOperation);
+
     migrated[username] = {
       username: typeof profileRecord.username === 'string' ? profileRecord.username : username,
       password: typeof profileRecord.password === 'string' ? profileRecord.password : '',
@@ -35,6 +49,7 @@ export function migrateProfiles(rawProfiles: unknown): Record<string, PlayerProf
       highestStage: typeof profileRecord.highestStage === 'number' ? profileRecord.highestStage : 1,
       preferredGrade,
       rulesHintDismissed: profileRecord.rulesHintDismissed === true,
+      ...(lastPracticeOperation && { lastPracticeOperation }),
       createdAt: typeof profileRecord.createdAt === 'number' ? profileRecord.createdAt : Date.now(),
       updatedAt: typeof profileRecord.updatedAt === 'number' ? profileRecord.updatedAt : Date.now(),
     };

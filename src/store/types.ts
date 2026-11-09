@@ -10,7 +10,14 @@ import type {
 import type { AvatarId } from '@shared/avatarCatalog';
 
 export type OverlayPhase = 'booting' | 'login' | 'start' | 'playing' | 'paused' | 'stage-message' | 'gameover';
-export type ScreenView = 'home' | 'profile' | 'performance' | 'rules' | 'weekly-report' | 'settings';
+export type ScreenView =
+  | 'home'
+  | 'practice-select'
+  | 'profile'
+  | 'performance'
+  | 'rules'
+  | 'weekly-report'
+  | 'settings';
 export type HistoryByProfile = Record<string, GameHistoryEntry[]>;
 export type PauseOverlayReason = 'escape' | 'window-close' | 'background';
 
@@ -22,6 +29,8 @@ export interface PlayerProfile {
   highestStage: number;
   preferredGrade: Grade;
   rulesHintDismissed?: boolean;
+  /** Operation picked for this profile's most recent practice run; unset until one is started. */
+  lastPracticeOperation?: PracticeOperation;
   createdAt: number;
   updatedAt: number;
 }
@@ -89,7 +98,6 @@ export interface GameStoreState {
   markBootReady: () => void;
   setMobileDevice: (isMobileDevice: boolean) => void;
   setGrade: (grade: Grade) => void;
-  selectPracticeOperation: (operation: PracticeOperation) => void;
   startRegularPlay: () => void;
   startPracticePlay: (operation?: PracticeOperation) => void;
   syncHUD: (payload: Partial<Pick<GameStoreState, 'grade' | 'score' | 'lives' | 'shield' | 'stage' | 'stageScore' | 'inputBuffer' | 'correctCount' | 'incorrectCount' | 'streak' | 'finalPerfScore' | 'ddaHeatState' | 'ddaMathTier' | 'ddaSpeedMultiplier' | 'ddaIsCooloffActive'>>) => void;

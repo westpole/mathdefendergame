@@ -11,18 +11,18 @@ interface MenuListProps {
 
 /**
  * Renders the menu options for navigation, starting a game, and logging out.
+ * Practice Mode opens the practice operation selector instead of starting a run directly.
  *
  * @param props - Controls the menu visibility after a user makes a selection.
  */
 export function MenuList({ setIsOpen }: MenuListProps) {
   const { t, i18n } = useTranslation();
   const activeView = useGameStore((state) => state.screenView);
-  const practiceOperation = useGameStore((state) => state.practiceOperation);
 
   const menuItems = [
     { id: 'home', label: t('ui.home'), type: 'view', view: 'home' },
-    { id: 'play', label: t('ui.regularPlay'), type: 'start', mode: 'regular' },
-    { id: 'practice', label: t('ui.practiceMode'), type: 'start', mode: 'practice' },
+    { id: 'play', label: t('ui.regularPlay'), type: 'start' },
+    { id: 'practice', label: t('ui.practiceMode'), type: 'view', view: 'practice-select' },
     { id: 'weekly-report', label: t('ui.weeklyReport'), type: 'view', view: 'weekly-report' },
     { id: 'profile', label: t('ui.profile'), type: 'view', view: 'profile' },
     { id: 'settings', label: t('ui.settings'), type: 'view', view: 'settings' },
@@ -33,12 +33,7 @@ export function MenuList({ setIsOpen }: MenuListProps) {
 
   const handleMenuSelect = (item: (typeof menuItems)[number]) => {
     if (item.type === 'start') {
-      void import('@game/scenes/UIScene').then(({ startGame }) => {
-        startGame({
-          mode: item.mode ?? 'regular',
-          practiceOperation: item.mode === 'practice' ? practiceOperation : undefined,
-        });
-      });
+      void import('@game/scenes/UIScene').then(({ startGame }) => startGame({ mode: 'regular' }));
       setIsOpen(false);
       return;
     }

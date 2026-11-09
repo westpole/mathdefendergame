@@ -7,6 +7,16 @@ import type { GameStoreState, PlayerProfile } from '@store/types';
 import { HomeOverlay } from '..';
 import baseStoreState from '../../__mocks__/base-store-state.json';
 
+const uiSceneMocks = vi.hoisted(() => ({
+  openScreenView: vi.fn(),
+  startGame: vi.fn(),
+}));
+
+vi.mock('@game/scenes/UIScene', () => ({
+  openScreenView: uiSceneMocks.openScreenView,
+  startGame: uiSceneMocks.startGame,
+}));
+
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
   useGameStore.setState({
     ...(structuredClone(baseStoreState) as Partial<GameStoreState>),
@@ -16,6 +26,8 @@ function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
 
 describe('HomeOverlay', () => {
   beforeEach(() => {
+    uiSceneMocks.startGame.mockReset();
+    uiSceneMocks.openScreenView.mockReset();
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2026-08-31T12:00:00.000Z'));
   });
@@ -24,7 +36,7 @@ describe('HomeOverlay', () => {
     vi.useRealTimers();
   });
 
-  it('renders the home launch tiles and default practice operation selector', () => {
+  it('renders both mode tiles as clickable buttons without nested buttons', () => {
     setMockStoreState({
       activeUsername: 'AcePilot',
       bootReady: true,
@@ -38,30 +50,56 @@ describe('HomeOverlay', () => {
     expect(screen.getByTestId('main-menu')).toBeVisible();
     expect(screen.getByTestId('home-mode-select')).toBeVisible();
     expect(screen.getByTestId('home-practice-controls')).toBeVisible();
-    expect(screen.getByTestId('home-regular-play-tile')).toBeVisible();
-    expect(screen.getByTestId('home-practice-tile')).toBeVisible();
     expect(screen.queryByText(/Mission Control/i)).not.toBeInTheDocument();
-    expect(screen.getByTestId('practice-operation-+')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('practice-operation-*')).toHaveAttribute('aria-pressed', 'false');
-    expect(screen.getByTestId('home-practice-start-button')).toBeVisible();
+
+    const regularTile = screen.getByRole('button', { name: /Regular Play/i });
+    const practiceTile = screen.getByRole('button', { name: /Practice Mode/i });
+
+    expect(regularTile).toBe(screen.getByTestId('home-regular-play-tile'));
+    expect(practiceTile).toBe(screen.getByTestId('home-practice-tile'));
+    expect(regularTile.querySelector('button')).toBeNull();
+    expect(practiceTile.querySelector('button')).toBeNull();
+    expect(screen.queryByTestId('practice-operation-+')).not.toBeInTheDocument();
   });
 
-  it('allows the practice operation to be switched before starting the drill', () => {
-    setMockStoreState({
-      activeUsername: 'AcePilot',
-      bootReady: true,
-      grade: 'cadet',
-      phase: 'start',
-      practiceOperation: '+',
-    });
+  it('starts a regular run when the Regular Play tile is clicked', async () => {
+    setMockStoreState({ activeUsername: 'AcePilot', bootReady: true, phase: 'start' });
 
     render(<HomeOverlay />);
+    fireEvent.click(screen.getByTestId('home-regular-play-tile'));
 
-    fireEvent.click(screen.getByTestId('practice-operation-*'));
+    await vi.waitFor(() => {
+      expect(uiSceneMocks.startGame).toHaveBeenCalledWith({ mode: 'regular' });
+    });
+  });
 
-    expect(screen.getByTestId('practice-operation-*')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByTestId('practice-operation-+')).toHaveAttribute('aria-pressed', 'false');
-    expect(useGameStore.getState().practiceOperation).toBe('*');
+  it('starts only one regular run when the Regular Play tile is clicked repeatedly', async () => {
+    setMockStoreState({ activeUsername: 'AcePilot', bootReady: true, phase: 'start' });
+
+    render(<HomeOverlay />);
+    const regularTile = screen.getByTestId('home-regular-play-tile');
+    fireEvent.click(regularTile);
+    fireEvent.click(regularTile);
+    fireEvent.click(screen.getByTestId('home-practice-tile'));
+
+    await vi.waitFor(() => {
+      expect(uiSceneMocks.startGame).toHaveBeenCalledTimes(1);
+    });
+    expect(regularTile).toBeDisabled();
+    expect(screen.getByTestId('home-practice-tile')).toBeDisabled();
+    expect(uiSceneMocks.openScreenView).not.toHaveBeenCalled();
+  });
+
+  it('opens the practice operation selector through UIScene instead of starting when the Practice Mode tile is clicked', async () => {
+    setMockStoreState({ activeUsername: 'AcePilot', bootReady: true, phase: 'start', screenView: 'home' });
+
+    render(<HomeOverlay />);
+    fireEvent.click(screen.getByTestId('home-practice-tile'));
+
+    await vi.waitFor(() => {
+      expect(uiSceneMocks.openScreenView).toHaveBeenCalledWith('practice-select');
+    });
+    expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
   });
 
   it('keeps the home screen available without weekly report content', () => {
@@ -75,8 +113,8 @@ describe('HomeOverlay', () => {
     render(<HomeOverlay />);
 
     expect(screen.queryByTestId('home-weekly-report')).not.toBeInTheDocument();
-    expect(screen.getByTestId('home-regular-play-button')).toBeVisible();
-    expect(screen.getByTestId('home-practice-start-button')).toBeVisible();
+    expect(screen.getByTestId('home-regular-play-tile')).toBeVisible();
+    expect(screen.getByTestId('home-practice-tile')).toBeVisible();
     expect(screen.queryByText(/Mission Control/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Major General/i)).not.toBeInTheDocument();
   });

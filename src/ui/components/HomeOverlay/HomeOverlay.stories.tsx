@@ -5,7 +5,11 @@ import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState, PlayerProfile } from '@store/types';
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
-import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
+import {
+  minimumDesktopStoryFrame,
+  popularMobileStoryFrame,
+  type StoryFrame,
+} from '@ui/components/__mocks__/storyFrames';
 
 import { HomeOverlay } from '.';
 
@@ -54,19 +58,18 @@ export const Default: Story = {
       activeUsername: 'AcePilot',
       grade: 'cadet',
       phase: 'start',
-      practiceOperation: '+',
     },
   },
 };
 
-export const PracticeOperationSelected: Story = {
-  name: 'Practice mode operation selected',
+export const DesktopLayout: Story = {
+  name: 'Desktop home layout (clickable tiles)',
   args: {
+    frame: minimumDesktopStoryFrame,
     initialState: {
       activeUsername: 'AcePilot',
-      grade: 'commander',
+      grade: 'cadet',
       phase: 'start',
-      practiceOperation: '*',
     },
   },
 };
@@ -79,7 +82,6 @@ export const MobileLayout: Story = {
       activeUsername: 'AcePilot',
       grade: 'cadet',
       phase: 'start',
-      practiceOperation: '/',
     },
   },
 };
@@ -101,7 +103,6 @@ export const RulesHintVisible: Story = {
       activeUsername: 'AcePilot',
       grade: 'cadet',
       phase: 'start',
-      practiceOperation: '+',
       profiles: { AcePilot: acePilotProfile },
     },
   },
@@ -114,7 +115,6 @@ export const RulesHintDismissed: Story = {
       activeUsername: 'AcePilot',
       grade: 'cadet',
       phase: 'start',
-      practiceOperation: '+',
       profiles: { AcePilot: { ...acePilotProfile, rulesHintDismissed: true } },
     },
   },
@@ -128,7 +128,6 @@ export const MobileRulesHintVisible: Story = {
       activeUsername: 'AcePilot',
       grade: 'cadet',
       phase: 'start',
-      practiceOperation: '+',
       isMobileDevice: true,
       profiles: { AcePilot: acePilotProfile },
     },
@@ -143,7 +142,6 @@ export const MobileRulesHintDismissed: Story = {
       activeUsername: 'AcePilot',
       grade: 'cadet',
       phase: 'start',
-      practiceOperation: '+',
       isMobileDevice: true,
       profiles: { AcePilot: { ...acePilotProfile, rulesHintDismissed: true } },
     },

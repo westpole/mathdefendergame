@@ -37,7 +37,7 @@ flowchart TD
 | Key | Type | Description |
 | --- | --- | --- |
 | `phase` | `OverlayPhase` | Current overlay lifecycle: booting, login, start, playing, paused, stage-message, gameover. |
-| `screenView` | `ScreenView` | Active React screen: home, profile, settings, performance, rules, or weekly-report. |
+| `screenView` | `ScreenView` | Active React screen: home, practice-select (practice operation picker shown before a practice run), profile, settings, performance, rules, or weekly-report. |
 | `bootReady` | `boolean` | Set once the boot sequence finishes and the app can render the main menu flow. |
 | `activeUsername` | `string \| null` | Logged-in profile currently active for the session. |
 | `rememberedUsername` | `string \| null` | Persisted username used to restore a session after reload. |

@@ -112,6 +112,18 @@ describe('migrateProfiles', () => {
     });
   });
 
+  it('keeps a valid lastPracticeOperation and drops missing or malformed values', () => {
+    const migrated = migrateProfiles({
+      valid: { lastPracticeOperation: '/' },
+      malformed: { lastPracticeOperation: 'x' },
+      missing: {},
+    });
+
+    expect(migrated.valid?.lastPracticeOperation).toBe('/');
+    expect(migrated.malformed).not.toHaveProperty('lastPracticeOperation');
+    expect(migrated.missing).not.toHaveProperty('lastPracticeOperation');
+  });
+
   it('does not read legacy preferredDifficulty in canonical migrations', () => {
     const migrated = migrateProfiles({
       alpha: {

@@ -205,58 +205,105 @@
   }
 }
 
-.home-mode-tile {
+// Shared look and interaction states for clickable tile buttons (home mode tiles, practice options).
+.interactive-tile {
   display: flex;
   flex-direction: column;
   gap: $spacing-sm;
-  padding: $spacing-lg;
   border: 1px solid $border-panel-light;
   border-radius: $radius-lg;
   background: rgba(15, 23, 42, 0.28);
-  justify-content: space-between;
-
-  h2 {
-    margin: 0;
-    color: $text-primary;
-    font-size: 1.1rem;
-  }
-
-  p {
-    margin: 0;
-    color: $text-secondary;
-    line-height: 1.5;
-  }
-}
-
-.practice-operation-picker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-
-.practice-operation-button {
-  width: 42px;
-  height: 42px;
-  border: 1px solid $border-panel-light;
-  border-radius: 10px;
-  background: rgba(15, 23, 42, 0.25);
-  color: $text-primary;
-  font-size: 1.05rem;
-  font-weight: 700;
+  font: inherit;
   cursor: pointer;
   transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
 
-  &:hover {
-    border-color: rgba(255, 255, 255, 0.28);
+  &:hover:not(:disabled) {
+    border-color: rgba(255, 224, 102, 0.72);
+    background: rgba(15, 23, 42, 0.4);
     transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(255, 224, 102, 0.9);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.7;
   }
 }
 
-.practice-operation-button--active {
+.home-mode-tile {
+  width: 100%;
+  padding: $spacing-lg;
+  color: inherit;
+  text-align: left;
+}
+
+.home-mode-tile__title {
+  color: $text-primary;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.home-mode-tile__description {
+  color: $text-secondary;
+  line-height: 1.5;
+}
+
+.practice-select-panel {
+  width: min(100%, 760px);
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.practice-select-hint {
+  margin: 0;
+  color: $text-secondary;
+  line-height: 1.5;
+}
+
+.practice-select-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: $spacing-md;
+}
+
+.practice-select-option {
+  align-items: center;
+  padding: $spacing-lg $spacing-sm;
+  color: $text-primary;
+  text-align: center;
+}
+
+.practice-select-option--last {
   border-color: $color-primary-yellow;
-  background: rgba(250, 204, 21, 0.18);
-  box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.28);
+  background: rgba(250, 204, 21, 0.12);
+}
+
+.practice-select-option__symbol {
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.practice-select-option__label {
+  color: $text-secondary;
+  font-size: 0.9rem;
+}
+
+.practice-select-option__badge {
+  color: $color-primary-yellow;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.practice-select-actions {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .home-report-panel {
@@ -874,6 +921,10 @@ p.grade-notice-grade--major-general {
 
   .home-quick-actions {
     grid-template-columns: 1fr;
+  }
+
+  .practice-select-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .profile-progress-bar {
