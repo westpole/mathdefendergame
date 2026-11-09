@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Release Report</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <span class="eyebrow">Math Defender Game · Production release</span>
+        <h1 id="title">Release Report</h1>
+        <p class="subhead" id="subhead">Loading report…</p>
+      </header>
+
+      <section id="loader" class="panel" hidden>
+        <h2>Load a report</h2>
+        <p class="muted" id="loader-message"></p>
+        <input type="file" id="file-input" accept="application/json,.json" />
+      </section>
+
+      <div id="report" hidden>
+        <section class="grid" id="summary"></section>
+
+        <section class="panel">
+          <h2>Steps</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Status</th><th>Step</th><th>Command</th><th>Duration</th><th>Details</th></tr>
+              </thead>
+              <tbody id="steps"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Builds</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Build</th><th>Role</th><th>Path</th><th>Size</th><th>Files</th></tr>
+              </thead>
+              <tbody id="builds"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h2>Release outcome</h2>
+          <div class="grid" id="release"></div>
+        </section>
+      </div>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>

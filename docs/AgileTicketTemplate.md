@@ -62,7 +62,7 @@ Write each story in standard format, independently testable, and small enough to
 
 ## 4. Design & Reference Assets
 
-Copilot agents can't "see" a Figma file the way a human can, so give both a visual reference AND a text description of what matters in it.
+AI agents can't "see" a Figma file the way a human can, so give both a visual reference AND a text description of what matters in it.
 
 | Asset | Link | What to look at |
 |---|---|---|

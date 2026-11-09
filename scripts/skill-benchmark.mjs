@@ -23,8 +23,8 @@ function normalize(value = '') {
   return value.toLowerCase().replace(/[^a-z0-9\s-]/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
-// Copilot (.github) and Claude Code (.claude) keep separate skill copies; benchmark each set on its own.
-const skillRoots = [path.join(root, '.github', 'skills'), path.join(root, '.claude', 'skills')];
+// Skills live under .claude/skills (Claude Code).
+const skillRoots = [path.join(root, '.claude', 'skills')];
 
 function loadSkillMetadata(skillRoot) {
   const skills = new Map();

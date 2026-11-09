@@ -1,106 +1,39 @@
 ---
 name: release-workflow
-description: Use for Math Defender Game production releases, including preflight checks, version bump selection, release command execution, and HTML release report generation. Do not use this skill for unrelated feature development or debugging work.
-argument-hint: "[optional release notes or constraints]"
+description: Use for Math Defender Game production releases. Runs the scripted release pipeline (preflight, checks, builds, version bump, JSON report). Do not use this skill for unrelated feature development or debugging work.
+argument-hint: "[optional: dry run | no push | release notes]"
 disable-model-invocation: true
-allowed-tools: Read, Grep, Glob, Bash(git branch:*), Bash(git status:*), Bash(git fetch:*), Bash(git rev-parse:*), Bash(git log:*), Bash(git describe:*), Bash(npm run:*), Bash(node .github/skills/release-workflow/scripts/*)
+allowed-tools: Read, Bash(npm run release:run:*)
 ---
 
 # Skill: Math Defender Game Release Workflow
 
-You are the release agent for Math Defender Game. This skill merges the Copilot `release-game` agent and the `release-workflow` skill into a single user-invoked command (`/release-workflow`).
+The whole release is scripted in `npm run release:run` (`.claude/skills/release-workflow/scripts/release.mjs`). Your job is to run it once and relay the outcome. Do not run release steps by hand, retry failed steps, or edit source files.
 
-## When to use this skill
+User arguments: $ARGUMENTS
 
-Use this skill when a request includes:
+## Run
 
-- production release execution
-- patch/minor/major version bump workflow
-- changelog/tag/push release flow
-- release validation and release reporting
+1. Choose flags from the arguments:
+   - "dry run", "test", "don't release" → `--dry-run` (checks and builds only; git preflight failures become warnings)
+   - "stop before pushing", "no push", "local only" → `--no-push`
+   - otherwise no flags (full release, including push)
+2. Run exactly one command: `npm run release:run -- [flags]`
+3. Do not run anything else. The script decides the bump with `which:version`, then stops at the first failure.
 
-Do not use this skill for unrelated feature development or debugging work.
+## What the script does, in order
 
-## Operating rules
+`bump` → `git-branch` (master) → `git-clean` → `git-sync` (fetch, not ahead or behind) → `guard` (releasable commits since the last tag) → `lint` → `typecheck` → `test-all` → `build-web` → `build-win` (stamped with the next version) → `release` (`npm run release:<bump>`) → verify the version, tag, and push.
 
-1. Treat release work as high risk. Stop immediately on the first blocking condition.
-2. Reject release requests when the current branch is not `master`.
-3. Reject release requests when git state is unexpected (dirty worktree, not up to date with remote, failed checks/builds, or no releasable commits).
-4. Use existing npm scripts; do not invent ad hoc release commands.
-5. Run exactly one release command matching the recommended bump (`patch`, `minor`, or `major`) only after all checks and builds pass.
-6. Do not edit source files unless the user explicitly asks for release-related code changes.
+## Reading the result
 
-## Inputs
+- The console prints one `[status] step (time) - message` line per step, then `RESULT <status> [step=<id>] report=<path>`.
+- A non-zero exit code means the release failed. Report only the failed step, its message, and the log excerpt the script printed. Then stop.
+- Read `reports/current-prod-build/release-report.json` only if you need detail the console did not give.
+- Full command output lives in `reports/current-prod-build/logs/<step>.log`. Read a log only when the printed excerpt is not enough.
 
-- Release type is derived automatically by running `npm run which:version`.
-- Never ask the user to type a version number; use the recommended bump from `npm run which:version` (`patch`, `minor`, or `major`).
-- Optional release notes or constraints from the user: $ARGUMENTS
+## Output to the user
 
-## Required assets
-
-The release scripts and templates are shared with the Copilot setup and live under `.github/skills/release-workflow/`. Do not copy them; call them through npm scripts.
-
-- Guard script: `npm run release:guard` (`.github/skills/release-workflow/scripts/release-guard.mjs`)
-- Report build script: `npm run release:report:build` (`.github/skills/release-workflow/scripts/build-prod-report.mjs`)
-- Report template: `.github/skills/release-workflow/assets/templates/prod-build-report-template.html`
-- Report JSON data template: `.github/skills/release-workflow/assets/templates/prod-build-report-data-template.json`
-
-## Workflow
-
-1. **Determine release bump**
-   - Run `npm run which:version`.
-   - Use the recommended bump from that command (`patch`, `minor`, or `major`).
-   - Do not ask the user to type a version number or pick a bump manually.
-
-2. **Verify git state**
-   - `git branch --show-current` must be `master`.
-   - `git status --short` must be empty.
-   - Run `git fetch`.
-   - Verify local `master` is up to date with remote.
-   - Stop at the first failing condition.
-
-3. **Check release eligibility**
-   - Use the recommended bump from step 1.
-   - Ensure at least one releasable commit exists since the latest release tag.
-   - Use `npm run release:guard` to enforce release checks.
-
-4. **Run required checks in order**
-   - `npm run lint`
-   - `npm run typecheck`
-   - `npm run test:all`
-   - Stop immediately if any check fails.
-
-5. **Build artifacts**
-   - Run web build first: `npm run build:web`
-   - Run Windows build second: `npm run build:win`
-   - Stop immediately if any build fails.
-
-6. **Run exactly one release command**
-   - `patch` → `npm run release:patch`
-   - `minor` → `npm run release:minor`
-   - `major` → `npm run release:major`
-
-7. **Generate release report**
-   - Remove old files in `reports/current-prod-build`.
-   - Write report data to `reports/current-prod-build/prod-build-report.json`, following the JSON data template.
-   - Generate `reports/current-prod-build/index.html` from the template asset and JSON data:
-     - `npm run release:report:build`
-   - Report must include:
-     - commands executed
-     - checks and outcomes
-     - build status and build sizes
-     - release outcome (commit/tag/push)
-   - Build listing order:
-     1) Primary build: web (`build` directory)
-     2) Additional builds: Windows installer (`dist`, excluding `dist/win-unpacked`) and Windows portable (`dist/win-unpacked`)
-
-## Output contract
-
-- List exact commands executed in order.
-- If blocked, report only the first blocking condition and stop.
-- If successful, summarize:
-  - release type used
-  - resulting version bump
-  - preflight/check/build results
-  - commit/tag/push status
-  - report output path
+- On failure: the failed step, its reason, and the log path.
+- On success: release type, `previous → next` version, tag, commit, push status, and a one-line check/build summary.
+- Always close with: "View the report: `npm run release:report` → http://localhost:4784".

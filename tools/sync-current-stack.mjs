@@ -6,10 +6,7 @@ const scriptPath = fileURLToPath(import.meta.url);
 const scriptDir = path.dirname(scriptPath);
 const repoRoot = path.resolve(scriptDir, '..');
 const packageJsonPath = path.join(repoRoot, 'package.json');
-const instructionsPaths = [
-  path.join(repoRoot, '.github', 'copilot-instructions.md'),
-  path.join(repoRoot, 'CLAUDE.md'),
-];
+const instructionsPaths = [path.join(repoRoot, 'CLAUDE.md')];
 
 const args = new Set(process.argv.slice(2));
 const checkOnly = args.has('--check');

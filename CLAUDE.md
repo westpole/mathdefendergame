@@ -2,8 +2,6 @@
 
 Keep changes minimal and aligned with the current repo structure. Prefer updating the owning layer instead of spreading logic across Phaser, React, and Electron.
 
-> This project keeps two AI setups side by side for learning purposes: GitHub Copilot (`.github/`) and Claude Code (`CLAUDE.md`, `.claude/`). Claude Code uses only the files under `.claude/`; do not edit `.github/copilot-instructions.md`, `.github/agents/**`, or `.github/skills/**/SKILL.md` unless explicitly asked.
-
 ## Skills, Agents, and Commands
 
 Project skills live in `.claude/skills/` and load automatically based on their descriptions:
@@ -73,5 +71,5 @@ Subagents in `.claude/agents/`:
 
 ## Utilities
 
-- Run `npm run docs:sync-current-stack` to update the Current Stack section in both `CLAUDE.md` and `.github/copilot-instructions.md`.
+- Run `npm run docs:sync-current-stack` to update the Current Stack section in `CLAUDE.md`.
 - Revisit this file after updating the Current Stack section to ensure consistency.

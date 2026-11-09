@@ -7,7 +7,7 @@ The player defends a base from falling meteors containing math expressions by ty
 * Development and Release:
   - [General information](/docs/general.md)
   - [Mobile device testing](/docs/mobile-device-testing.md)
-  - [Using the `release-game` agent](/docs/release-game-agent.md)
+  - [Using the `/release-workflow` command](/docs/release-workflow.md)
   - [Tips and Tricks](/docs/tips-and-tricks.md)
   - [Game Overview on engine and wiring](/docs/ui-overlay-game-engine-wiring.md)
   - [Feature Flags](/tools/feature-flags/README.md)
@@ -16,7 +16,7 @@ The player defends a base from falling meteors containing math expressions by ty
 
 ## Agents
 
-`.github\agents` contains project's agents that were designed to help in development of each game components.
+The project uses Claude Code. Project instructions live in `CLAUDE.md`; skills, subagents, and commands that help develop each game component live in `.claude/` (`.claude/skills/` and `.claude/agents/`).
 
 ## Skill validation
 

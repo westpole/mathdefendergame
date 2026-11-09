@@ -3,7 +3,6 @@ name: Skill validation
 on:
   pull_request:
     paths:
-      - '.github/skills/**'
       - '.claude/skills/**'
       - 'benchmark/skills/**'
       - 'scripts/skill-smoke.mjs'
