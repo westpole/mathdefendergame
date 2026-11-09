@@ -16,6 +16,7 @@ import { GradeNoticeOverlay } from '@ui/components/GradeNoticeOverlay';
 import { HUDOverlay } from '@ui/components/HUDOverlay';
 import { HomeOverlay } from '@ui/components/HomeOverlay';
 import { PauseOverlay } from '@ui/components/PauseOverlay';
+import { PracticeOperationOverlay } from '@ui/components/PracticeOperationOverlay';
 import { StageMessageOverlay } from '@ui/components/StageMessageOverlay';
 import { Loading } from '@ui/components/Loading';
 import { PerformanceOverlay } from '@ui/components/PerformanceOverlay';
@@ -77,6 +78,7 @@ export function App() {
         {!bootReady && <Loading />}
         {bootReady && phase === 'login' && (isSimpleLoginEnabled ? <ProfileSelector /> : <LoginOverlay />)}
         {isStartPhase && screenView === 'home' && <HomeOverlay />}
+        {isStartPhase && screenView === 'practice-select' && <PracticeOperationOverlay />}
         {isStartPhase && screenView === 'profile' && <ProfileOverlay />}
         {isStartPhase && screenView === 'settings' && <SettingsOverlay />}
         {isStartPhase && screenView === 'performance' && <PerformanceOverlay />}

@@ -20,6 +20,7 @@ Add these to make E2E tests more reliable:
 
 **UI Overlays:**
 - ✅ `main-menu` - HomeOverlay (added)
+- ✅ `practice-select-overlay` - PracticeOperationOverlay (added)
 - `rules-overlay` - RulesOverlay
 - `game-over-overlay` - GameOverOverlay
 - `hud-overlay` - HUDOverlay
@@ -27,6 +28,8 @@ Add these to make E2E tests more reliable:
 - `loading-overlay` - Loading
 
 **Interactive Elements:**
+- ✅ `home-regular-play-tile` / `home-practice-tile` - Clickable Home mode tiles
+- ✅ `practice-operation-<op>` / `practice-select-back` - Practice operation selector
 - `start-defense-button` - Start game button
 - `answer-input` - Game answer input field
 - `submit-answer-button` - Submit answer button

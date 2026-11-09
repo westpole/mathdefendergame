@@ -54,7 +54,7 @@ Subagents in `.claude/agents/`:
 - Put gameplay rule changes in `src/game/main.ts`; keep `GameScene` focused on rendering, input, and store synchronization.
 - Treat Zustand as the integration boundary between Phaser and React. Do not duplicate gameplay state in React local state if it already exists in the game core or store.
 - Before editing, identify the owning layer; if a change crosses layers, update shared store contracts first, then adapters and consumers.
-- Overlay flow is driven by `phase` (`booting | login | start | playing | paused | stage-message | gameover`) and `screenView` (`home | profile | performance | rules`). Gameplay-driven transitions should originate from game logic/store updates; view-only transitions can originate from React UI actions.
+- Overlay flow is driven by `phase` (`booting | login | start | playing | paused | stage-message | gameover`) and `screenView` (`home | practice-select | profile | settings | performance | rules | weekly-report`). Gameplay-driven transitions should originate from game logic/store updates; view-only transitions can originate from React UI actions.
 - Stories live beside components in `src/ui/components/**`; use the `storybook-expert` skill instead of inventing a new store-mocking pattern.
 - Preserve the existing Electron security posture: `contextIsolation: true` and `nodeIntegration: false`, unless an explicit security-reviewed requirement says otherwise.
 - When UI behavior, states, or visuals change, add or update desktop and mobile device stories.

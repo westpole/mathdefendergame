@@ -202,10 +202,47 @@ describe('App start menu controls', () => {
     fireEvent.click(screen.getByTestId('menu-option-play'));
 
     await waitFor(() => {
-      expect(uiSceneMocks.startGame).toHaveBeenCalledTimes(1);
+      expect(uiSceneMocks.startGame).toHaveBeenCalledWith({ mode: 'regular' });
     });
     expect(uiSceneMocks.openScreenView).not.toHaveBeenCalledWith('home');
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
+  });
+
+  it('opens the practice operation selector from the menu instead of starting a run', async () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        phase: 'start',
+      });
+    });
+
+    render(<App />);
+
+    fireEvent.click(screen.getByTestId('menu-toggle-button'));
+    fireEvent.click(screen.getByTestId('menu-option-practice'));
+
+    await waitFor(() => {
+      expect(uiSceneMocks.openScreenView).toHaveBeenCalledWith('practice-select');
+    });
+    expect(uiSceneMocks.startGame).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
+  });
+
+  it('renders the practice operation selector when the menu view is set to practice-select', () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        screenView: 'practice-select',
+        phase: 'start',
+      });
+    });
+
+    render(<App />);
+
+    expect(screen.getByTestId('practice-select-overlay')).toBeVisible();
+    expect(screen.queryByTestId('main-menu')).not.toBeInTheDocument();
   });
 
   it('routes the Log off menu option through UIScene', async () => {
