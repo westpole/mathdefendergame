@@ -20,7 +20,9 @@ import { spawnSync } from 'node:child_process';
 import { closeSync, existsSync, mkdirSync, openSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-const ROOT = process.cwd();
+// Uppercase the Windows drive letter: a lowercase `e:` cwd makes Vitest load modules twice
+// (once per path spelling), which breaks jest-dom matchers and test collection.
+const ROOT = process.cwd().replace(/^[a-z]:/, (drive) => drive.toUpperCase());
 const REPORT_DIR = path.join(ROOT, 'reports', 'current-prod-build');
 const LOG_DIR = path.join(REPORT_DIR, 'logs');
 const REPORT_PATH = path.join(REPORT_DIR, 'release-report.json');
