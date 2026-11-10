@@ -39,5 +39,49 @@ jobs:
       - name: Run all unit/component tests
         run: npm run test:all
 
-      - name: Run all end-to-end tests
-        run: npm run test:e2e:web
+  # E2E runs in the Docker images from docker/e2e/Dockerfile, one target per matrix job.
+  e2e:
+    name: E2E (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: web
+            command: npm run test:e2e:web
+          # TODO: switch to `npm run test:e2e:electron` once *-electron-visual-linux.png baselines are committed.
+          - target: electron
+            command: npm run test:e2e:electron:functional
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build e2e image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/e2e/Dockerfile
+          target: ${{ matrix.target }}
+          tags: mathdefender-e2e-${{ matrix.target }}
+          load: true
+          cache-from: type=gha,scope=e2e-${{ matrix.target }}
+          cache-to: type=gha,mode=max,scope=e2e-${{ matrix.target }}
+
+      - name: Run e2e tests
+        run: |
+          mkdir -p e2e-artifacts && chmod 777 e2e-artifacts
+          docker run --rm --ipc=host --init \
+            -v "${{ github.workspace }}/e2e-artifacts:/app/e2e-artifacts" \
+            mathdefender-e2e-${{ matrix.target }} ${{ matrix.command }}
+
+      - name: Upload e2e artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ matrix.target }}-report
+          path: e2e-artifacts/
+          retention-days: 7

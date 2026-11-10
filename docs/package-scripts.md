@@ -28,6 +28,12 @@ This document describes each script defined in `package.json` and when to use it
 | `npm run test:e2e` | Runs the full Playwright end-to-end suite. | Use before releases or when a change may affect complete user flows across targets. |
 | `npm run test:e2e:web` | Runs the mobile web Playwright projects only. | Use when validating browser behavior and responsive mobile flows. |
 | `npm run test:e2e:electron` | Runs the Electron-focused Playwright projects, including smoke, UI, integration, game, and visual coverage. | Use when desktop behavior, packaging assumptions, or Electron rendering flows changed. |
+| `npm run test:e2e:electron:functional` | Runs the Electron Playwright projects without `electron-visual`. | Use where no snapshot baselines exist for the platform (CI uses it until Linux baselines are committed). |
+| `npm run test:e2e:docker:build` | Builds both Docker e2e images (`e2e-web`, `e2e-electron`) from `docker/e2e/Dockerfile`. | Use to prebuild images, for example after a lockfile change. |
+| `npm run test:e2e:docker:web` | Rebuilds and runs the mobile web projects in the `e2e-web` container. Artifacts go to `test-results/docker-web/`. | Use for a Linux, CI-equivalent web e2e run without installing browsers locally. |
+| `npm run test:e2e:docker:electron` | Rebuilds and runs all Electron projects under Xvfb in the `e2e-electron` container. Artifacts go to `test-results/docker-electron/`. | Use for a Linux, CI-equivalent Electron e2e run. Visual tests need committed `-linux.png` baselines. |
+| `npm run test:e2e:docker` | Runs the Docker web lane, then the Docker Electron lane. | Use before releases to validate both targets in Linux containers. |
+| `npm run test:e2e:docker:update-snapshots` | Re-records Electron visual snapshots in the container and writes `*-linux.png` files back to `e2e/visual/`. | Use only when visual changes are intentional; commit the Linux baselines alongside the `win32` ones. |
 | `npm run test:e2e:ui` | Opens the Playwright UI runner. | Use when debugging end-to-end tests interactively. |
 | `npm run test:e2e:update-snapshots` | Re-records snapshots for the Electron visual test project. | Use only when visual changes are intentional and the new snapshots should become the baseline. |
 

@@ -20,9 +20,11 @@ export const test = base.extend<Fixtures>({
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { ELECTRON_RUN_AS_NODE, ...inheritedEnv } = process.env;
     const env = { ...inheritedEnv, E2E: 'true', PLAYWRIGHT_ELECTRON_RUN: '1' }; // flags app is under Playwright E2E test
+    // Docker (docker/e2e/Dockerfile): npm-installed Electron has no SUID chrome-sandbox, and Xvfb has no GPU.
+    const containerArgs = process.env.E2E_DOCKER === '1' ? ['--no-sandbox', '--disable-gpu'] : [];
 
     const app = await electron.launch({
-      args: [appRoot, `--user-data-dir=${userDataDir}`],
+      args: [...containerArgs, appRoot, `--user-data-dir=${userDataDir}`],
       env,
     });
     await use(app);
