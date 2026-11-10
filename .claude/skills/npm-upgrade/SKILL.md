@@ -83,7 +83,10 @@ Execute the following commands in sequence. If any step fails, analyze the error
   4. Production build:
      - Default renderer build: `npm run build:web`
      - Electron packaging only when the upgraded package affects Electron runtime or packaging: `npm run build:win`
-  5. When the upgrade is security-driven, run `npm run deps:audit:ci` after install if the dependency class makes an audit regression plausible.
+  5. Docker e2e images (`docker/e2e/`):
+     - `@playwright/test` / `playwright` upgrades: update `PLAYWRIGHT_VERSION` in both `docker/e2e/Dockerfile` and `docker/e2e/compose.yml` to the exact installed version (the web image build fails on drift).
+     - `electron` upgrades: run `npm run test:e2e:docker:electron` when Docker is available, to catch missing Linux system libraries in the `electron` stage.
+  6. When the upgrade is security-driven, run `npm run deps:audit:ci` after install if the dependency class makes an audit regression plausible.
 
 ### Step 4a: Validation Interpretation Rules
   1. Treat pre-existing unrelated failures separately from regressions introduced by the upgrade.

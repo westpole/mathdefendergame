@@ -49,6 +49,33 @@ npm run test:e2e:ui
 npm run test:e2e -- --update-snapshots
 ```
 
+## Running Tests in Docker
+
+Two images are built from one multi-stage file, [`docker/e2e/Dockerfile`](../docker/e2e/Dockerfile), and wired up in [`docker/e2e/compose.yml`](../docker/e2e/compose.yml). Requires Docker with Compose v2.13+ (Docker Desktop on Windows/macOS).
+
+| Image | Target | Base | Runs |
+|---|---|---|---|
+| `mathdefender-e2e-web` | `web` | `mcr.microsoft.com/playwright:v<version>-noble` | `npm run test:e2e:web` (no Electron binary) |
+| `mathdefender-e2e-electron` | `electron` | `node:24-bookworm-slim` + Xvfb + Electron libraries | `npm run test:e2e:electron` under `xvfb-run` (no Playwright browsers) |
+
+```bash
+npm run test:e2e:docker:web               # mobile web lane
+npm run test:e2e:docker:electron          # Electron lane
+npm run test:e2e:docker                   # both
+npm run test:e2e:docker:update-snapshots  # re-record Linux visual baselines
+
+# Any other command inside a container (the Electron image wraps it in xvfb-run automatically)
+docker compose -f docker/e2e/compose.yml run --rm --build e2e-electron npm run test:e2e:electron:functional
+```
+
+How it works:
+- **Source is copied into the image** (no repo bind mount), so `node_modules` is always Linux-native and builds are not slowed by Windows file sharing. `--build` rebuilds on each run; the `npm ci` layer stays cached until `package-lock.json` changes.
+- **Artifacts** (traces, screenshots, HTML report) are written to `test-results/docker-web/` or `test-results/docker-electron/` on the host via `E2E_ARTIFACTS_DIR`.
+- **`E2E_TARGET=electron`** disables the Playwright `webServer`; the Electron image prebuilds `build/` with `npm run build:web:e2e`.
+- **`E2E_DOCKER=1`** makes `fixtures/electron-app.ts` launch Electron with `--no-sandbox --disable-gpu`. npm-installed Electron has no SUID `chrome-sandbox`, and Xvfb has no GPU. `electron/main.ts` is unchanged.
+- **Visual baselines are per platform.** Containers compare against `*-electron-visual-linux.png`; local Windows runs keep using `*-win32.png`. Until Linux baselines are committed, run `npm run test:e2e:docker:update-snapshots` once, review the images, and commit them. CI runs `test:e2e:electron:functional` until then.
+- **Version pin:** `PLAYWRIGHT_VERSION` in `docker/e2e/Dockerfile` and `compose.yml` must match the installed `@playwright/test`. The web image build fails with a clear message on drift.
+
 ## Writing Tests
 
 ### Basic Test Example

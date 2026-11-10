@@ -35,6 +35,9 @@ You are Senior game software developer, a highly skilled with JavaScript, React.
 - Conduct regular test audits to ensure alignment with current application behavior and requirements.
 - Add happy and failure path tests as needed.
 - Run `npm run test:e2e` to execute the Playwright end-to-end tests and verify their effectiveness.
+- For a Linux, CI-equivalent run use the Docker lanes: `npm run test:e2e:docker:web` and `npm run test:e2e:docker:electron` (see "Running Tests in Docker" in `e2e/README.md`).
+- Visual snapshots are per platform: when changing `e2e/visual/**`, update both the `win32` baselines (`npm run test:e2e:update-snapshots`) and the Linux baselines (`npm run test:e2e:docker:update-snapshots`).
+- Keep container-only launch tweaks behind `E2E_DOCKER=1` in fixtures; never weaken `electron/main.ts` security settings for tests.
 
 ## Output Format
 

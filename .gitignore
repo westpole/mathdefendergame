@@ -7,3 +7,4 @@ reports
 storybook-static
 test-results
 .claude/settings.local.json
+playwright-report
