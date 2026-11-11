@@ -61,7 +61,6 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "release:guard": "node .claude/skills/release-workflow/scripts/release-guard.mjs",
-    "release:run": "node .claude/skills/release-workflow/scripts/release.mjs",
     "release:report": "node tools/release-report/server.mjs",
     "docs:sync-current-stack": "node tools/sync-current-stack.mjs",
     "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 0",

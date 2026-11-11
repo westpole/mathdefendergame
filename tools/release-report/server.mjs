@@ -33,7 +33,7 @@ const server = createServer((req, res) => {
     try {
       send(res, 200, 'application/json; charset=utf-8', readFileSync(reportPath));
     } catch {
-      send(res, 404, 'application/json; charset=utf-8', JSON.stringify({ error: 'No release report found. Run npm run release:run first.' }));
+      send(res, 404, 'application/json; charset=utf-8', JSON.stringify({ error: 'No release report found. Run /release-workflow first.' }));
     }
     return;
   }

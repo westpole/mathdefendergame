@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "project": "Math Defender Game",
+  "startedAt": "<ISO timestamp>",
+  "finishedAt": null,
+  "durationMs": 0,
+  "status": "running",
+  "options": {
+    "dryRun": false,
+    "noPush": false
+  },
+  "failedStep": null,
+  "git": {
+    "branch": null,
+    "commit": null,
+    "latestTag": null
+  },
+  "releaseType": null,
+  "previousVersion": "<package.json version>",
+  "nextVersion": null,
+  "steps": [],
+  "builds": [],
+  "release": {
+    "performed": false,
+    "version": null,
+    "tag": null,
+    "tagCreated": false,
+    "commit": null,
+    "pushed": false
+  }
+}
