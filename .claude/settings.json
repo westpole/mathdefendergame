@@ -40,7 +40,15 @@
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
       "Read(./.env)",
-      "Read(./.env.*)"
-    ]
+      "Read(./.env.*)",
+      "Read(~/.ssh/**)", "Edit(~/.ssh/**)",
+      "Read(~/.aws/**)", "Read(~/.azure/**)", "Read(~/.gnupg/**)",
+      "Read(~/.npmrc)", "Read(~/.git-credentials)",
+      "Read(~/Documents/**)", "Read(~/Desktop/**)", "Read(~/Downloads/**)",
+      "Read(//d/**)", "Edit(//d/**)",
+      "Read(../**)", "Edit(../**)"
+    ],
+    "disableBypassPermissionsMode": "disable",
+    "additionalDirectories": []
   }
 }
