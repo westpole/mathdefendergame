@@ -1,4 +1,22 @@
 
+## [1.6.0](https://github.com/westpole/mathdefendergame/compare/v1.5.0...v1.6.0) (2026-11-11)
+
+### Features
+
+* [#118](https://github.com/westpole/mathdefendergame/issues/118) introduce Claude Code configuration alongside Copilot setup ([c2fc72f](https://github.com/westpole/mathdefendergame/commit/c2fc72f1ce9a49f10d13aac4dba7e0b633aa48bf))
+* [#120](https://github.com/westpole/mathdefendergame/issues/120) add game title to menu controls and update styles for improved layout ([a14ab73](https://github.com/westpole/mathdefendergame/commit/a14ab73ac7c01833bb1528718291a4ebdf0f6e1f))
+* [#123](https://github.com/westpole/mathdefendergame/issues/123) implement release pipeline and report generation ([dee680b](https://github.com/westpole/mathdefendergame/commit/dee680b5bd1bd4bafae215280a51b59a6fd48fa2))
+* [#124](https://github.com/westpole/mathdefendergame/issues/124) revisit grade ladder logic ([6103194](https://github.com/westpole/mathdefendergame/commit/610319476e158638af0e86b2fa7ea4955b6b39be))
+* [#125](https://github.com/westpole/mathdefendergame/issues/125) implement practice mode functionality and UI updates ([db52e67](https://github.com/westpole/mathdefendergame/commit/db52e6758307ed3a0b32c41cf358df025fc1af0d))
+* [#127](https://github.com/westpole/mathdefendergame/issues/127) update target meteor highlight style with rounded frame ([780ed2d](https://github.com/westpole/mathdefendergame/commit/780ed2d1f6898635e7e3d33af29e4d1b266d0e16))
+* [#134](https://github.com/westpole/mathdefendergame/issues/134) add Docker support for end-to-end testing and update related documentation ([07befb9](https://github.com/westpole/mathdefendergame/commit/07befb911de98231e47bae14e2a03c6a432d8d10))
+* [#35](https://github.com/westpole/mathdefendergame/issues/35) add mobile device detection and rules hint functionality ([a6519e1](https://github.com/westpole/mathdefendergame/commit/a6519e12138e0a93f9bffaab75df325ec1ac87b0))
+
+### Bug Fixes
+
+* [#144](https://github.com/westpole/mathdefendergame/issues/144) ensure Windows drive letter is uppercase to prevent module loading issues ([74deda1](https://github.com/westpole/mathdefendergame/commit/74deda19e4e7b7d6dd61083c3231ecfb6051b82e))
+* [#144](https://github.com/westpole/mathdefendergame/issues/144) update release workflow scripts and documentation for improved clarity and functionality ([5b76ec1](https://github.com/westpole/mathdefendergame/commit/5b76ec13e52cc6267f01c8ca93f1c654339dc37f))
+
 ## [1.5.0](https://github.com/westpole/mathdefendergame/compare/v1.4.0...v1.5.0) (2026-10-30)
 
 ### Features
