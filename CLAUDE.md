@@ -4,28 +4,12 @@ Keep changes minimal and aligned with the current repo structure. Prefer updatin
 
 ## Skills, Agents, and Commands
 
-Project skills live in `.claude/skills/` and load automatically based on their descriptions:
-
-- `phaser-expert` — Phaser 4 scene, rendering, input, and gameplay architecture.
-- `phaser-unit-tests` — unit tests for Phaser scenes and game logic.
-- `react-frontend-expert` — game UI overlay layouts with React and Zustand.
-- `react-unit-tests` — Vitest + React Testing Library tests for UI components and hooks.
-- `storybook-expert` — `*.stories.tsx` and Zustand store seeding in Storybook.
-- `electron-expert` — changes to the Electron shell.
-- `electron-unit-tests` — unit tests for the Electron main/renderer code.
-- `e2e-test-expert` — Playwright end-to-end tests under `e2e/`.
-- `zustand-unit-tests` — unit tests for Zustand stores and migrations.
-- `coverage-analysis` — running and interpreting coverage reports.
-- `file-organization` — organizing types, constants, and utilities.
-
 User-invoked only (never start these on your own):
 
 - `/release-workflow` — production release (preflight, checks, builds, version bump, report).
 - `/npm-upgrade <package>` — isolated, verified dependency upgrade.
 
-Subagents in `.claude/agents/`:
-
-- `code-reviewer` — strict review of the current changes; run it before committing.
+Run the `code-reviewer` subagent (`.claude/agents/`) before committing.
 
 ## Current Stack
 
@@ -56,7 +40,6 @@ Subagents in `.claude/agents/`:
 - Stories live beside components in `src/ui/components/**`; use the `storybook-expert` skill instead of inventing a new store-mocking pattern.
 - Preserve the existing Electron security posture: `contextIsolation: true` and `nodeIntegration: false`, unless an explicit security-reviewed requirement says otherwise.
 - When UI behavior, states, or visuals change, add or update desktop and mobile device stories.
-- Make sure new and modified components, hooks, and utilities are properly documented and tested.
 
 ## Verification
 
