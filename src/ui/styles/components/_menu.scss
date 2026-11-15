@@ -191,20 +191,6 @@
   cursor: pointer;
 }
 
-.home-rules-hint__dismiss {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  cursor: pointer;
-
-  input {
-    width: 1.1rem;
-    height: 1.1rem;
-    accent-color: $color-primary-yellow;
-    cursor: pointer;
-  }
-}
-
 // Shared look and interaction states for clickable tile buttons (home mode tiles, practice options).
 .interactive-tile {
   display: flex;

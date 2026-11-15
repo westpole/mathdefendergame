@@ -28,7 +28,6 @@ export interface PlayerProfile {
   bestScore: number;
   highestStage: number;
   preferredGrade: Grade;
-  rulesHintDismissed?: boolean;
   /** Operation picked for this profile's most recent practice run; unset until one is started. */
   lastPracticeOperation?: PracticeOperation;
   createdAt: number;
@@ -120,7 +119,6 @@ export interface GameStoreState {
   createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;
   createAndLoginSimpleProfile: (username: string) => LoginResult;
   updateActiveProfileAvatar: (avatarId: string) => LoginResult;
-  dismissRulesHint: () => void;
   getActiveProfile: () => PlayerProfile | null;
   addGameHistory: (entry: GameHistoryEntry) => void;
   getGameHistory: (username?: string | null, limit?: number) => GameHistoryEntry[];

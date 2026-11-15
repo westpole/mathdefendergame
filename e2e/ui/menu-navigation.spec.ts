@@ -92,7 +92,7 @@ test.describe('Menu Navigation', () => {
     expect(state.screenView).toBe('rules');
   });
 
-  test('opens rules from the home hint and remembers its dismissal', async ({ page }) => {
+  test('opens rules from the home hint', async ({ page }) => {
     await loginToStartMenu(page);
 
     await page.getByTestId('home-rules-hint-link').click();
@@ -100,10 +100,8 @@ test.describe('Menu Navigation', () => {
 
     await page.getByTestId('menu-toggle-button').click();
     await page.getByTestId('menu-option-home').click();
-    // The hint unmounts as soon as it is dismissed, so click instead of check (which re-reads the state).
-    await page.getByTestId('home-rules-hint-dismiss').click();
 
-    await expect(page.getByTestId('home-rules-hint')).toHaveCount(0);
+    await expect(page.getByTestId('home-rules-hint')).toBeVisible();
   });
 
   test('starts regular play by clicking the Regular Play tile', async ({ page }) => {

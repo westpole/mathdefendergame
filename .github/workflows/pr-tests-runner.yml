@@ -49,9 +49,8 @@ jobs:
         include:
           - target: web
             command: npm run test:e2e:web
-          # TODO: switch to `npm run test:e2e:electron` once *-electron-visual-linux.png baselines are committed.
           - target: electron
-            command: npm run test:e2e:electron:functional
+            command: npm run test:e2e:electron
 
     steps:
       - name: Checkout code

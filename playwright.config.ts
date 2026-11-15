@@ -9,6 +9,8 @@ const e2eBaseUrl = 'http://127.0.0.1:4173';
  */
 const isElectronOnlyTarget = process.env.E2E_TARGET === 'electron';
 const artifactsDir = process.env.E2E_ARTIFACTS_DIR;
+/** Visual baselines are Linux-only and recorded in Docker; skip snapshot assertions on host runs. */
+const isDockerRun = process.env.E2E_DOCKER === '1';
 const htmlReporterOptions = artifactsDir ? { outputFolder: `${artifactsDir}/playwright-report`, open: 'never' as const } : {};
 
 export default defineConfig({
@@ -50,7 +52,8 @@ export default defineConfig({
     {
       name: 'electron-visual',
       testDir: './e2e/visual',
-      expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.01 } },
+      ignoreSnapshots: !isDockerRun,
+      expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.0001 } },
     },
   ],
   reporter: process.env.CI ? [['html', htmlReporterOptions], ['github']] : 'list',

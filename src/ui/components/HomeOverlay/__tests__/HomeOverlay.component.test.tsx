@@ -130,23 +130,24 @@ describe('HomeOverlay', () => {
       updatedAt: 1_000,
     };
 
-    function setHintStoreState(profileOverrides: Partial<PlayerProfile> = {}) {
+    function setHintStoreState() {
       setMockStoreState({
         activeUsername: 'AcePilot',
         bootReady: true,
         phase: 'start',
         screenView: 'home',
-        profiles: { AcePilot: { ...aceProfile, ...profileOverrides } },
+        profiles: { AcePilot: aceProfile },
       });
     }
 
-    it('shows the rules hint until the profile dismisses it', () => {
+    it('shows the rules hint without a dismiss option', () => {
       setHintStoreState();
 
       render(<HomeOverlay />);
 
       expect(screen.getByTestId('home-rules-hint')).toBeVisible();
-      expect(screen.getByTestId('home-rules-hint-dismiss')).not.toBeChecked();
+      expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+      expect(screen.queryByText(/don't show this again/i)).not.toBeInTheDocument();
     });
 
     it('opens the rules screen from the hint link', () => {
@@ -156,24 +157,6 @@ describe('HomeOverlay', () => {
       fireEvent.click(screen.getByTestId('home-rules-hint-link'));
 
       expect(useGameStore.getState().screenView).toBe('rules');
-    });
-
-    it('remembers the dismissal on the active profile and hides the hint', () => {
-      setHintStoreState();
-
-      render(<HomeOverlay />);
-      fireEvent.click(screen.getByTestId('home-rules-hint-dismiss'));
-
-      expect(useGameStore.getState().profiles.AcePilot.rulesHintDismissed).toBe(true);
-      expect(screen.queryByTestId('home-rules-hint')).not.toBeInTheDocument();
-    });
-
-    it('does not render the hint for a profile that already dismissed it', () => {
-      setHintStoreState({ rulesHintDismissed: true });
-
-      render(<HomeOverlay />);
-
-      expect(screen.queryByTestId('home-rules-hint')).not.toBeInTheDocument();
     });
   });
 });

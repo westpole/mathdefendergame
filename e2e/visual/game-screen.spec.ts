@@ -1,8 +1,50 @@
+import type { Page } from '@playwright/test';
+
 import { test, expect } from '../fixtures/electron-app';
 
 import type { E2EWindow } from '../types';
 
 test.describe('Visual Regression Tests', () => {
+  test('select profile screen should match snapshot', async ({ page }) => {
+    await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().bootReady === true, {
+      timeout: 5000,
+    });
+
+    // Seed fixed profiles; the remembered one is preselected so the dropdown shows a stable value.
+    await page.evaluate(() => {
+      const createdAt = Date.UTC(2026, 0, 1);
+      const profile = (username: string, bestScore: number) => ({
+        username,
+        password: 'enc:v1:e2e',
+        bestScore,
+        highestStage: 3,
+        preferredGrade: 'cadet' as const,
+        createdAt,
+        updatedAt: createdAt,
+      });
+
+      const e2e = (window as E2EWindow).__e2e!;
+      // Unmount the selector first: it reads rememberedUsername only on mount (remember-me checkbox).
+      e2e.setStoreState({ bootReady: false });
+      e2e.setStoreState({
+        bootReady: true,
+        phase: 'login',
+        activeUsername: null,
+        rememberedUsername: 'CommanderRex',
+        profiles: {
+          AcePilot: profile('AcePilot', 340),
+          CommanderRex: profile('CommanderRex', 12250),
+        },
+      });
+    });
+
+    const selector = page.getByTestId('profile-selector-screen');
+    await expect(selector).toBeVisible();
+    await expect(selector.locator('#profile-selector-username')).toContainText('CommanderRex');
+
+    await expectStableScreenshot(page, 'select-profile-screen.png');
+  });
+
   test('profile screen should match snapshot', async ({ page }) => {
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
 
@@ -79,12 +121,9 @@ test.describe('Visual Regression Tests', () => {
       });
     });
 
-    await page.waitForSelector('[data-testid="profile-overlay"]');
-    await page.waitForTimeout(1500);
+    await expect(page.getByTestId('profile-overlay')).toBeVisible();
 
-    await expect(page).toHaveScreenshot('profile-screen.png', {
-      maxDiffPixelRatio: 0.01,
-    });
+    await expectStableScreenshot(page, 'profile-screen.png');
   });
 
   test('performance screen should match snapshot', async ({ page }) => {
@@ -174,4 +213,167 @@ test.describe('Visual Regression Tests', () => {
       maxDiffPixelRatio: 0.01,
     });
   });
+
+  test('home screen should match snapshot', async ({ page }) => {
+    await seedStartScreen(page, 'home');
+
+    const home = page.getByTestId('main-menu');
+    await expect(home).toBeVisible();
+    await expect(page.getByTestId('home-rules-hint')).toBeVisible();
+
+    await expectStableScreenshot(page, 'home-screen.png');
+  });
+
+  test('menu screen should match snapshot', async ({ page }) => {
+    await seedStartScreen(page, 'home');
+    await expect(page.getByTestId('main-menu')).toBeVisible();
+
+    await page.getByTestId('menu-toggle-button').click();
+    await expect(page.getByTestId('menu-options')).toBeVisible();
+    await expect(page.getByTestId('menu-option-home')).toHaveAttribute('aria-current', 'page');
+
+    await expectStableScreenshot(page, 'menu-screen.png');
+  });
+
+  test('settings screen should match snapshot', async ({ page }) => {
+    await seedStartScreen(page, 'settings');
+
+    await expect(page.getByTestId('settings-overlay')).toBeVisible();
+    await expect(page.getByTestId('settings-avatar-option-avatar-3')).toBeVisible();
+
+    await expectStableScreenshot(page, 'settings-screen.png');
+  });
+
+  test('rules screen should match snapshot', async ({ page }) => {
+    await seedStartScreen(page, 'rules');
+
+    await expect(page.getByTestId('rules-overlay')).toBeVisible();
+
+    await expectStableScreenshot(page, 'rules-screen.png');
+  });
+
+  test('weekly report screen should match snapshot', async ({ page }) => {
+    // The overlay reads Date.now() once on mount for the week window, so seed with the clock pinned.
+    await seedStartScreen(page, 'weekly-report', { pinClock: true });
+
+    const report = page.getByTestId('weekly-report-overlay');
+    await expect(report).toBeVisible();
+    await expect(report).toContainText('Jan 9 - Jan 15');
+    await expect(page.getByTestId('home-weekly-empty-state')).toHaveCount(0);
+
+    await expectStableScreenshot(page, 'weekly-report-screen.png');
+  });
 });
+
+type StartScreenView = 'home' | 'settings' | 'rules' | 'weekly-report';
+
+/** Fixed reference time (2026-01-15 12:00 UTC) for seeded run history and the pinned clock. */
+const REFERENCE_NOW = Date.UTC(2026, 0, 15, 12);
+
+/**
+ * Seeds a logged-in profile with fixed data and opens the given start-phase screen view.
+ *
+ * @param page - Electron renderer page.
+ * @param screenView - Start-phase view to open.
+ * @param options.pinClock - Pins `Date.now()` to `REFERENCE_NOW` while the view mounts, then restores it.
+ */
+async function seedStartScreen(page: Page, screenView: StartScreenView, { pinClock = false } = {}) {
+  await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().bootReady === true, {
+    timeout: 5000,
+  });
+
+  await page.evaluate(
+    async ({ view, referenceNow, shouldPinClock }) => {
+      const e2e = (window as E2EWindow).__e2e!;
+      const createdAt = Date.UTC(2026, 0, 1);
+      const dayMs = 24 * 60 * 60 * 1000;
+      const realNow = Date.now;
+
+      if (shouldPinClock) {
+        Date.now = () => referenceNow;
+      }
+
+      try {
+        e2e.setStoreState({
+          bootReady: true,
+          phase: 'start',
+          screenView: view,
+          activeUsername: 'CommanderRex',
+          grade: 'commander',
+          gradeNotice: null,
+          profiles: {
+            CommanderRex: {
+              username: 'CommanderRex',
+              password: 'enc:v1:e2e',
+              bestScore: 12250,
+              highestStage: 3,
+              preferredGrade: 'cadet',
+              avatarId: 'avatar-3',
+              createdAt,
+              updatedAt: createdAt,
+            },
+          },
+          gameHistoryByProfile: {
+            CommanderRex: [
+              {
+                key: 'weekly-run-1',
+                playedAt: referenceNow - 3 * dayMs,
+                finalScore: 8600,
+                finalPerfScore: 79,
+                gradeAtFinish: 'commander',
+                correctAnswers: 23,
+                incorrectAnswers: 7,
+                averageAnswerTimeMs: 3900,
+                mostProblematicOperation: '/',
+                operationStats: {
+                  '+': { attempts: 11, incorrect: 1, avgTimeMs: 2200 },
+                  '-': { attempts: 8, incorrect: 1, avgTimeMs: 2400 },
+                  '*': { attempts: 8, incorrect: 2, avgTimeMs: 2800 },
+                  '/': { attempts: 9, incorrect: 3, avgTimeMs: 3600 },
+                },
+              },
+              {
+                key: 'weekly-run-2',
+                playedAt: referenceNow - dayMs,
+                finalScore: 11800,
+                finalPerfScore: 86,
+                gradeAtFinish: 'commander',
+                correctAnswers: 31,
+                incorrectAnswers: 10,
+                averageAnswerTimeMs: 3600,
+                mostProblematicOperation: '/',
+                operationStats: {
+                  '+': { attempts: 13, incorrect: 1, avgTimeMs: 1900 },
+                  '-': { attempts: 11, incorrect: 2, avgTimeMs: 2200 },
+                  '*': { attempts: 10, incorrect: 3, avgTimeMs: 2500 },
+                  '/': { attempts: 11, incorrect: 4, avgTimeMs: 3300 },
+                },
+              },
+            ],
+          },
+        });
+
+        if (shouldPinClock) {
+          // Two frames let React commit the mount that reads Date.now() before the real clock returns.
+          await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+        }
+      } finally {
+        Date.now = realNow;
+      }
+    },
+    { view: screenView, referenceNow: REFERENCE_NOW, shouldPinClock: pinClock },
+  );
+}
+
+/**
+ * Waits for fonts, then captures a full-page snapshot with animations and caret disabled.
+ * `toHaveScreenshot` retries until two consecutive captures match, so no fixed sleep is needed.
+ * The diff tolerance comes from the `electron-visual` project config.
+ */
+async function expectStableScreenshot(page: Page, name: string) {
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page).toHaveScreenshot(name, {
+    animations: 'disabled',
+    caret: 'hide',
+  });
+}

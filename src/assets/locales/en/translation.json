@@ -128,8 +128,7 @@
       "mobile": "Tap anywhere on the game area to pause. From the pause screen you can resume or end the game."
     },
     "hint": {
-      "link": "Show game rules",
-      "dismiss": "Don't show this again"
+      "link": "Show game rules"
     }
   },
   "auth": {

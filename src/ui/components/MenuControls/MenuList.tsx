@@ -1,6 +1,9 @@
+import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useGameStore } from '@store/useGameStore';
+import { Select } from '@ui/components/Select';
+import { LANGUAGE_OPTIONS } from '@ui/constants';
 
 /**
  * Props for the menu list overlay.
@@ -18,6 +21,7 @@ interface MenuListProps {
 export function MenuList({ setIsOpen }: MenuListProps) {
   const { t, i18n } = useTranslation();
   const activeView = useGameStore((state) => state.screenView);
+  const languageLabelId = useId();
 
   const menuItems = [
     { id: 'home', label: t('ui.home'), type: 'view', view: 'home' },
@@ -52,21 +56,18 @@ export function MenuList({ setIsOpen }: MenuListProps) {
     <div className="menu-overlay" data-testid="menu-overlay">
       <div className="menu-panel" data-testid="menu-options" id="menu-options" role="menu">
         <div className="menu-language-picker">
-          <label className="field-label" htmlFor="menu-language-select">
+          <label className="field-label" id={languageLabelId}>
             {t('ui.language')}
           </label>
-          <select
+          <Select
             id="menu-language-select"
-            aria-label={t('ui.selectLanguage')}
-            className="text-input"
-            value={i18n.resolvedLanguage ?? 'en'}
-            onChange={(event) => {
-              void i18n.changeLanguage(event.target.value);
+            labelId={languageLabelId}
+            onChange={(nextLanguage) => {
+              void i18n.changeLanguage(nextLanguage);
             }}
-          >
-            <option value="en">English</option>
-            <option value="uk">Українська</option>
-          </select>
+            options={LANGUAGE_OPTIONS}
+            value={i18n.resolvedLanguage ?? 'en'}
+          />
         </div>
         <div className="menu-options">
           {menuItems.map((item) => (

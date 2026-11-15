@@ -9,7 +9,7 @@ User-invoked only (never start these on your own):
 - `/release-workflow` — production release (preflight, checks, builds, version bump, report).
 - `/npm-upgrade <package>` — isolated, verified dependency upgrade.
 
-Run the `code-reviewer` subagent (`.claude/agents/`) before committing.
+Run the `code-reviewer` subagent (`.claude/agents/`) before committing. A project Stop hook (`.claude/hooks/review-on-stop.mjs`) asks for this review automatically when a turn leaves unreviewed changes.
 
 ## Current Stack
 

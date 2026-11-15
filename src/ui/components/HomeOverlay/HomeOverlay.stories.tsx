@@ -108,18 +108,6 @@ export const RulesHintVisible: Story = {
   },
 };
 
-export const RulesHintDismissed: Story = {
-  name: 'Rules hint dismissed',
-  args: {
-    initialState: {
-      activeUsername: 'AcePilot',
-      grade: 'cadet',
-      phase: 'start',
-      profiles: { AcePilot: { ...acePilotProfile, rulesHintDismissed: true } },
-    },
-  },
-};
-
 export const MobileRulesHintVisible: Story = {
   name: 'Mobile rules hint visible',
   args: {
@@ -130,20 +118,6 @@ export const MobileRulesHintVisible: Story = {
       phase: 'start',
       isMobileDevice: true,
       profiles: { AcePilot: acePilotProfile },
-    },
-  },
-};
-
-export const MobileRulesHintDismissed: Story = {
-  name: 'Mobile rules hint dismissed',
-  args: {
-    frame: popularMobileStoryFrame,
-    initialState: {
-      activeUsername: 'AcePilot',
-      grade: 'cadet',
-      phase: 'start',
-      isMobileDevice: true,
-      profiles: { AcePilot: { ...acePilotProfile, rulesHintDismissed: true } },
     },
   },
 };

@@ -88,7 +88,6 @@ export function createGameStoreSetters(
   | 'createAndLoginProfile'
   | 'createAndLoginSimpleProfile'
   | 'updateActiveProfileAvatar'
-  | 'dismissRulesHint'
   | 'getActiveProfile'
   | 'addGameHistory'
   | 'getGameHistory'
@@ -417,25 +416,6 @@ export function createGameStoreSetters(
       });
 
       return { success: true };
-    },
-    dismissRulesHint: () => {
-      const state = get();
-      const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
-
-      if (!activeProfile) {
-        return;
-      }
-
-      set({
-        profiles: {
-          ...state.profiles,
-          [activeProfile.username]: {
-            ...activeProfile,
-            rulesHintDismissed: true,
-            updatedAt: Date.now(),
-          },
-        },
-      });
     },
     getActiveProfile: () => {
       const state = get();

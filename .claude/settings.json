@@ -50,5 +50,19 @@
     ],
     "disableBypassPermissionsMode": "disable",
     "additionalDirectories": []
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/review-on-stop.mjs\"",
+            "timeout": 30,
+            "statusMessage": "Checking for unreviewed changes..."
+          }
+        ]
+      }
+    ]
   }
 }

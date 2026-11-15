@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useGameStore } from '@store/useGameStore';
 
 /**
- * Renders the home dashboard with two clickable mode tiles plus a dismissible
- * "Show game rules" hint that is remembered per profile.
+ * Renders the home dashboard with two clickable mode tiles plus a "Show game rules" hint link.
  *
  * - The Regular Play tile starts a campaign run immediately; both tiles are disabled after
  *   that click so repeat clicks cannot start a second run while `UIScene` is loading.
@@ -16,10 +15,6 @@ export function HomeOverlay() {
   const { t } = useTranslation();
   const [isStarting, setIsStarting] = useState(false);
   const openScreenView = useGameStore((state) => state.openScreenView);
-  const dismissRulesHint = useGameStore((state) => state.dismissRulesHint);
-  const isRulesHintDismissed = useGameStore((state) =>
-    state.activeUsername ? state.profiles[state.activeUsername]?.rulesHintDismissed === true : false,
-  );
 
   const handleStartRegularPlay = () => {
     if (isStarting) {
@@ -61,22 +56,16 @@ export function HomeOverlay() {
           </button>
         </div>
 
-        {!isRulesHintDismissed && (
-          <div className="home-rules-hint" data-testid="home-rules-hint">
-            <button
-              type="button"
-              className="home-rules-hint__link"
-              data-testid="home-rules-hint-link"
-              onClick={() => openScreenView('rules')}
-            >
-              {t('rules.hint.link')}
-            </button>
-            <label className="home-rules-hint__dismiss">
-              <input type="checkbox" data-testid="home-rules-hint-dismiss" onChange={dismissRulesHint} />
-              {t('rules.hint.dismiss')}
-            </label>
-          </div>
-        )}
+        <div className="home-rules-hint" data-testid="home-rules-hint">
+          <button
+            type="button"
+            className="home-rules-hint__link"
+            data-testid="home-rules-hint-link"
+            onClick={() => openScreenView('rules')}
+          >
+            {t('rules.hint.link')}
+          </button>
+        </div>
       </div>
     </div>
   );

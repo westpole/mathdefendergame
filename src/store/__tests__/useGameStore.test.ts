@@ -498,22 +498,6 @@ describe('useGameStore', () => {
       expect(useGameStore.getState().profiles.PilotOne.avatarId).toBe(DEFAULT_AVATAR_ID);
     });
 
-    it('dismisses the rules hint for the active profile only', () => {
-      useGameStore.getState().createAndLoginProfile('PilotTwo', 'Abc12345');
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
-
-      useGameStore.getState().dismissRulesHint();
-
-      expect(useGameStore.getState().profiles.PilotOne.rulesHintDismissed).toBe(true);
-      expect(useGameStore.getState().profiles.PilotTwo.rulesHintDismissed).toBeUndefined();
-    });
-
-    it('ignores rules hint dismissal when no profile is active', () => {
-      useGameStore.getState().dismissRulesHint();
-
-      expect(useGameStore.getState().profiles).toEqual({});
-    });
-
     it('derives the login grade from cumulative game history', () => {
       useGameStore.setState({
         phase: 'login',
