@@ -1,4 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 
 import { Select, type SelectOption } from '..';
 
@@ -30,7 +31,7 @@ describe('Select', () => {
     unmount();
 
     render(<Select id="b" labelId="l" onChange={vi.fn()} options={options} placeholder="Choose" value="bravo" />);
-    expect(screen.getByText('Bravo')).not.toHaveClass('custom-select__placeholder');
+    expect(within(screen.getByRole('button')).getByText('Bravo')).not.toHaveClass('custom-select__placeholder');
   });
 
   it('opens on click and reports the clicked option', () => {
