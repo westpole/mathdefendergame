@@ -1,7 +1,7 @@
 import type { TFunction } from 'i18next';
 
 import type { AchievementId, EarnedAchievement } from '@shared/types';
-import { STREAK_TIER_IDS } from '@store/selectors/achievements';
+import { MASTERY_IDS, STREAK_TIER_IDS } from '@store/selectors/achievements';
 import { OPERATION_I18N_KEYS } from '@ui/constants';
 
 import { RELENTLESS_TIER_NAMES } from './constants';
@@ -13,7 +13,13 @@ const ACHIEVEMENT_ICONS: Partial<Record<AchievementId, string>> = {
   'weekly-goal-met': '🎯',
   'personal-best-week': '📈',
   'focus-of-the-week': '🔍',
+  'mastery-add': '⚡',
+  'mastery-sub': '⚡',
+  'mastery-mul': '⚡',
+  'mastery-div': '⚡',
 };
+
+const MASTERY_ID_LIST: readonly AchievementId[] = Object.values(MASTERY_IDS);
 
 /** i18n keys for badges whose title and rule don't depend on the award's details. */
 const BADGE_TEXT_KEYS: Partial<Record<AchievementId, { earned: string; rule: string }>> = {
@@ -48,6 +54,10 @@ export function getAchievementEarnedTitle(t: TFunction, achievement: EarnedAchie
     });
   }
 
+  if (MASTERY_ID_LIST.includes(achievement.id) && achievement.operation) {
+    return t('achievements.badges.mastery.earned', { operation: t(OPERATION_I18N_KEYS[achievement.operation]) });
+  }
+
   const keys = BADGE_TEXT_KEYS[achievement.id];
   return keys ? t(keys.earned) : achievement.id;
 }
@@ -62,6 +72,10 @@ export function getAchievementEarnedTitle(t: TFunction, achievement: EarnedAchie
 export function getAchievementRule(t: TFunction, achievement: EarnedAchievement): string | null {
   if (STREAK_TIER_IDS.some((id) => id === achievement.id)) {
     return t('achievements.relentless.subtitle');
+  }
+
+  if (MASTERY_ID_LIST.includes(achievement.id)) {
+    return t('achievements.badges.mastery.rule');
   }
 
   const keys = BADGE_TEXT_KEYS[achievement.id];

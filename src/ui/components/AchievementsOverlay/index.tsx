@@ -2,12 +2,15 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { selectActiveProfileHistory } from '@store/selectors/performance';
+import { MATH_OPERATIONS } from '@shared/constants';
 import {
   computeFocusProgress,
+  computeOperationMastery,
   computePersonalBestStatus,
   computeWeeklyGoalProgress,
   computeWeeklyStreak,
   evaluateNewAchievements,
+  MASTERY_IDS,
   toWeekKey,
 } from '@store/selectors/achievements';
 import { useGameStore } from '@store/useGameStore';
@@ -16,6 +19,7 @@ import { toGradeTitle } from '@ui/utilities/format';
 
 import { BadgeGrid } from './BadgeGrid';
 import { FocusTile } from './FocusTile';
+import { MasteryTile } from './MasteryTile';
 import { GoalCard } from './GoalCard';
 import { MedalShelf } from './MedalShelf';
 import { StreakCard } from './StreakCard';
@@ -54,6 +58,15 @@ export function AchievementsOverlay({ now: nowOverride }: AchievementsOverlayPro
   );
   const focus = useMemo(() => computeFocusProgress(history, now), [history, now]);
   const focusEarnedThisWeek = earned.find((award) => award.id === 'focus-of-the-week' && award.weekKey === toWeekKey(now));
+  const masteryTiles = useMemo(() => {
+    // Same runs as the award check: nothing after the reference time.
+    const pastRuns = history.filter((entry) => entry.playedAt <= now);
+
+    return MATH_OPERATIONS.map((operation) => ({
+      mastery: computeOperationMastery(pastRuns, operation),
+      earned: earned.find((award) => award.id === MASTERY_IDS[operation]),
+    }));
+  }, [earned, history, now]);
   const gradeLabel = t(`grades.${grade}`, { defaultValue: toGradeTitle(grade) });
 
   return (
@@ -79,6 +92,9 @@ export function AchievementsOverlay({ now: nowOverride }: AchievementsOverlayPro
         <GoalCard isGuest={!activeProfile} progress={goalProgress} />
         <BadgeGrid earned={earned} personalBest={personalBest}>
           <FocusTile earnedThisWeek={focusEarnedThisWeek} focus={focus} />
+          {masteryTiles.map(({ mastery, earned: masteryAward }) => (
+            <MasteryTile key={mastery.operation} earned={masteryAward} mastery={mastery} />
+          ))}
         </BadgeGrid>
       </div>
     </div>

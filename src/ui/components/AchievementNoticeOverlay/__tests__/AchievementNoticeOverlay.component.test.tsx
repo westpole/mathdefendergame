@@ -147,10 +147,19 @@ describe('AchievementNoticeOverlay', () => {
     expect(screen.getByTestId(`achievement-notice-${id}`)).toHaveTextContent(`${icon}${title}${rule}`);
   });
 
-  it('falls back to the raw id and a generic icon for awards without display text yet', () => {
-    seed({ achievementNotice: [{ id: 'mastery-add', earnedAt: 1, operation: '+' }] });
+  it('shows a mastery award with its operation', () => {
+    seed({ achievementNotice: [{ id: 'mastery-mul', earnedAt: 1, operation: '*' }] });
     render(<AchievementNoticeOverlay />);
 
-    expect(screen.getByTestId('achievement-notice-mastery-add')).toHaveTextContent('🏅mastery-add');
+    expect(screen.getByTestId('achievement-notice-mastery-mul')).toHaveTextContent(
+      '⚡Mastery: Multiplication (*)!90% accuracy and quick answers over your last 50 tries',
+    );
+  });
+
+  it('falls back to the raw id for a mastery award saved without an operation', () => {
+    seed({ achievementNotice: [{ id: 'mastery-add', earnedAt: 1 }] });
+    render(<AchievementNoticeOverlay />);
+
+    expect(screen.getByTestId('achievement-notice-mastery-add')).toHaveTextContent('⚡mastery-add');
   });
 });

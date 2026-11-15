@@ -317,6 +317,16 @@
         "earned": "Focus of the Week!",
         "rule": "3 accurate practice runs: {{operation}}",
         "tag": "Focus"
+      },
+      "mastery": {
+        "name": "Mastery {{symbol}}",
+        "attempts": "{{attempts}} / {{window}} attempts",
+        "needs": "needs {{accuracy}} / {{time}}",
+        "seconds": "{{value}}s",
+        "earnedOn": "Earned {{date}}",
+        "earned": "Mastery: {{operation}}!",
+        "rule": "90% accuracy and quick answers over your last 50 tries",
+        "statusLabel": "Accuracy {{accuracy}}, average time {{time}}; needs {{minAccuracy}} and {{maxTime}}"
       }
     }
   }

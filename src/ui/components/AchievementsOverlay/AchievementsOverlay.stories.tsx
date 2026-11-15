@@ -20,6 +20,9 @@ import goalCappedTodayMock from './__mocks__/goalCappedToday.json';
 import goalMetMock from './__mocks__/goalMet.json';
 import goalPartialMock from './__mocks__/goalPartial.json';
 import goalZeroMock from './__mocks__/goalZero.json';
+import masteryAllEarnedMock from './__mocks__/masteryAllEarned.json';
+import masteryLockedMock from './__mocks__/masteryLocked.json';
+import masteryMixedMock from './__mocks__/masteryMixed.json';
 import midWeekMock from './__mocks__/midWeek.json';
 import shieldBankedMock from './__mocks__/shieldBanked.json';
 import twoWeekStreakMock from './__mocks__/twoWeekStreak.json';
@@ -235,4 +238,34 @@ export const FocusEarned: Story = {
 export const MobileFocusEarned: Story = {
   name: 'Mobile focus of the Week earned',
   args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: focusEarnedMock as Partial<GameStoreState> },
+};
+
+export const MasteryLocked: Story = {
+  name: 'Mastery all locked',
+  args: { now: STORY_NOW, initialState: masteryLockedMock as Partial<GameStoreState> },
+};
+
+export const MobileMasteryLocked: Story = {
+  name: 'Mobile mastery all locked',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: masteryLockedMock as Partial<GameStoreState> },
+};
+
+export const MasteryMixed: Story = {
+  name: 'Mastery mixed progress',
+  args: { now: STORY_NOW, initialState: masteryMixedMock as Partial<GameStoreState> },
+};
+
+export const MobileMasteryMixed: Story = {
+  name: 'Mobile mastery mixed progress',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: masteryMixedMock as Partial<GameStoreState> },
+};
+
+export const MasteryAllEarned: Story = {
+  name: 'Mastery all earned',
+  args: { now: STORY_NOW, initialState: masteryAllEarnedMock as Partial<GameStoreState> },
+};
+
+export const MobileMasteryAllEarned: Story = {
+  name: 'Mobile mastery all earned',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: masteryAllEarnedMock as Partial<GameStoreState> },
 };

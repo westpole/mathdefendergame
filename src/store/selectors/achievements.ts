@@ -12,6 +12,9 @@ import {
   GOAL_MIN_ANSWERS,
   GOAL_SUGGESTION_MULTIPLIER,
   GOAL_SUGGESTION_ROUND_TO,
+  MASTERY_MAX_AVG_MS,
+  MASTERY_MIN_ACCURACY,
+  MASTERY_WINDOW_ATTEMPTS,
   SHIELD_EVERY_N_WEEKS,
   SHIELD_MAX_BANKED,
   STREAK_MIN_DAYS_PER_WEEK,
@@ -1045,10 +1048,108 @@ const evaluateFocusOfTheWeek: AchievementEvaluator = ({ history, now }) => {
   return awards;
 };
 
+/** Mastery award id per operation. */
+export const MASTERY_IDS = {
+  '+': 'mastery-add',
+  '-': 'mastery-sub',
+  '*': 'mastery-mul',
+  '/': 'mastery-div',
+} as const satisfies Record<MathOperation, AchievementId>;
+
+/** Mastery progress for one operation over its recent attempts. */
+export interface OperationMastery {
+  operation: MathOperation;
+  /** Attempts in the window (all attempts while fewer than `MASTERY_WINDOW_ATTEMPTS`). */
+  attempts: number;
+  /** Accuracy from 0 to 1 over the window. */
+  accuracy: number;
+  /** Attempt-weighted average answer time over the window, in ms. */
+  avgTimeMs: number;
+  accuracyMet: boolean;
+  speedMet: boolean;
+  /** Enough attempts, accurate enough and fast enough. */
+  mastered: boolean;
+  /** Newest run in the window, or null with no attempts. */
+  latestPlayedAt: number | null;
+}
+
+/**
+ * Measures mastery of one operation over its most recent attempts: walks runs from newest
+ * to oldest, adding that operation's stats until at least `MASTERY_WINDOW_ATTEMPTS`
+ * attempts (the last run is included whole). Mastered at `MASTERY_MIN_ACCURACY` or more and
+ * an average time at or under `MASTERY_MAX_AVG_MS`.
+ *
+ * @param history - Runs in any order.
+ * @param operation - Operation to measure.
+ * @returns Window size, accuracy, weighted average time and which thresholds are met.
+ * @example
+ * computeOperationMastery(history, '*'); // { attempts: 52, accuracy: 0.86, avgTimeMs: 4600, mastered: false, ... }
+ */
+export function computeOperationMastery(history: GameHistoryEntry[], operation: MathOperation): OperationMastery {
+  let attempts = 0;
+  let incorrect = 0;
+  let totalTimeMs = 0;
+  let latestPlayedAt: number | null = null;
+
+  for (const entry of [...history].sort((left, right) => right.playedAt - left.playedAt)) {
+    if (attempts >= MASTERY_WINDOW_ATTEMPTS) {
+      break;
+    }
+
+    const stat = entry.operationStats[operation];
+
+    if (!stat || stat.attempts <= 0) {
+      continue;
+    }
+
+    latestPlayedAt ??= entry.playedAt;
+    attempts += stat.attempts;
+    incorrect += stat.incorrect;
+    totalTimeMs += stat.avgTimeMs * stat.attempts;
+  }
+
+  const accuracy = attempts > 0 ? (attempts - incorrect) / attempts : 0;
+  const avgTimeMs = attempts > 0 ? totalTimeMs / attempts : 0;
+  const accuracyMet = attempts > 0 && accuracy >= MASTERY_MIN_ACCURACY;
+  const speedMet = attempts > 0 && avgTimeMs <= MASTERY_MAX_AVG_MS[operation];
+
+  return {
+    operation,
+    attempts,
+    accuracy,
+    avgTimeMs,
+    accuracyMet,
+    speedMet,
+    mastered: attempts >= MASTERY_WINDOW_ATTEMPTS && accuracyMet && speedMet,
+    latestPlayedAt,
+  };
+}
+
+/**
+ * Mastery (+ − × ÷): earned once per operation when its recent attempts are accurate and
+ * fast enough. Checked from current history, so the login check backfills it; saved
+ * awards are never removed if performance drops later.
+ *
+ * @param context - Evaluation inputs.
+ * @returns One award per mastered operation, dated by the newest run in its window.
+ */
+const evaluateMastery: AchievementEvaluator = ({ history, now }) => {
+  const pastRuns = history.filter((entry) => entry.playedAt <= now);
+
+  return MATH_OPERATIONS.flatMap((operation) => {
+    const mastery = computeOperationMastery(pastRuns, operation);
+
+    return mastery.mastered
+      ? [{ id: MASTERY_IDS[operation], earnedAt: mastery.latestPlayedAt ?? now, operation }]
+      : [];
+  });
+};
+
 /** Badge evaluators, in the order their awards are announced. Later badges add one here. */
 const ACHIEVEMENT_EVALUATORS: AchievementEvaluator[] = [
   evaluateStreakMedals,
   evaluateGoalMet,
   evaluatePersonalBest,
   evaluateFocusOfTheWeek,
+  evaluateMastery,
 ];

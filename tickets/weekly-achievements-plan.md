@@ -90,7 +90,7 @@
 | [#154](./154-weekly-accuracy-goal.md) | Weekly accuracy goal: set in Settings, track progress | Feature | P1 | L | Done | 151, 152 |
 | [#155](./155-goal-met-personal-best-badges.md) | Goal Met and Personal Best Week badges, plus suggested goal | Feature | P2 | M | Done | 152, 154 |
 | [#156](./156-focus-of-the-week-badge.md) | Focus of the Week badge for the weakest operation | Feature | P2 | M | Done | 152, 155 |
-| [#157](./157-operation-mastery-badges.md) | Operation mastery badges (accuracy and speed) | Feature | P2 | M | Ready for Dev | 152, 155 |
+| [#157](./157-operation-mastery-badges.md) | Operation mastery badges (accuracy and speed) | Feature | P2 | M | Done | 152, 155 |
 
 Order: ticket-number order, 151 → 152 → 153 → 154 → 155 → 156 → 157 (see [Workflow](#workflow)). Each ticket is a vertical slice that ships something the player can see, from store to UI, with its own tests and stories.
 

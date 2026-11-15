@@ -329,6 +329,16 @@
         "earned": "Фокус тижня!",
         "rule": "3 точні тренування: {{operation}}",
         "tag": "Фокус"
+      },
+      "mastery": {
+        "name": "Майстерність {{symbol}}",
+        "attempts": "{{attempts}} з {{window}} спроб",
+        "needs": "потрібно {{accuracy}} / {{time}}",
+        "seconds": "{{value}} с",
+        "earnedOn": "Здобуто {{date}}",
+        "earned": "Майстерність: {{operation}}!",
+        "rule": "90% точності та швидкі відповіді в останніх 50 спробах",
+        "statusLabel": "Точність {{accuracy}}, середній час {{time}}; потрібно {{minAccuracy}} і {{maxTime}}"
       }
     }
   }

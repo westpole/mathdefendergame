@@ -458,3 +458,13 @@
 .practice-select-option__badge--focus {
   color: $text-link;
 }
+
+// Mastery tiles
+.achievements-mastery__value {
+  color: $color-success-green;
+  font-weight: 600;
+}
+
+.achievements-mastery__value--unmet {
+  color: $color-primary-yellow;
+}

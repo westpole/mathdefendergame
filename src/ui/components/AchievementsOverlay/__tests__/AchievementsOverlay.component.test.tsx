@@ -345,6 +345,70 @@ describe('AchievementsOverlay', () => {
       expect(screen.getByTestId('achievements-badge-focus')).not.toHaveClass('achievements-badge--locked');
     });
 
+    it('shows all four mastery tiles locked with attempts needed', () => {
+      seed([makeRun(at(2026, 11, 10), { operationStats: statsFor('+', 12, 0, 2000) })]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-badge-mastery-add')).toHaveTextContent('Mastery +');
+      expect(screen.getByTestId('achievements-badge-mastery-add')).toHaveTextContent('12 / 50 attempts');
+      expect(screen.getByTestId('achievements-badge-mastery-div')).toHaveTextContent('Mastery ÷');
+      expect(screen.getByTestId('achievements-badge-mastery-div')).toHaveTextContent('0 / 50 attempts');
+      expect(screen.getByTestId('achievements-badge-mastery-mul')).toHaveClass('achievements-badge--locked');
+    });
+
+    it('shows accuracy and speed against the thresholds, highlighting what is not met yet', () => {
+      seed([makeRun(at(2026, 11, 10), { operationStats: statsFor('*', 50, 7, 4600) })]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      const progress = screen.getByTestId('achievements-mastery-progress-mastery-mul');
+      expect(progress).toHaveTextContent('86% / 4.6s → needs 90% / 4.0s');
+      expect(within(progress).getByText('86%')).toHaveClass('achievements-mastery__value--unmet');
+      expect(within(progress).getByText('4.6s')).toHaveClass('achievements-mastery__value--unmet');
+      expect(within(progress).getByText('Accuracy 86%, average time 4.6s; needs 90% and 4.0s')).toHaveClass('visually-hidden');
+    });
+
+    it('rounds an unmet time up so it never matches the limit', () => {
+      seed([makeRun(at(2026, 11, 10), { operationStats: statsFor('/', 50, 9, 4040) })]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-mastery-progress-mastery-div')).toHaveTextContent('82% / 4.1s → needs 90% / 4.0s');
+    });
+
+    it('ignores runs after the reference time', () => {
+      seed([makeRun(at(2026, 11, 20), { operationStats: statsFor('+', 30, 0, 2000) })]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-badge-mastery-add')).toHaveTextContent('0 / 50 attempts');
+    });
+
+    it('highlights only the speed when accuracy is already met', () => {
+      seed([makeRun(at(2026, 11, 10), { operationStats: statsFor('-', 50, 2, 3500) })]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      const progress = screen.getByTestId('achievements-mastery-progress-mastery-sub');
+      expect(within(progress).getByText('96%')).not.toHaveClass('achievements-mastery__value--unmet');
+      expect(within(progress).getByText('3.5s')).toHaveClass('achievements-mastery__value--unmet');
+    });
+
+    it('shows the earned date for a saved mastery badge', () => {
+      const earnedAt = at(2026, 11, 3);
+      seed([], { achievements: [{ id: 'mastery-add', earnedAt, operation: '+' }] });
+      render(<AchievementsOverlay now={NOW} />);
+
+      const expectedDate = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(earnedAt);
+      expect(screen.getByTestId('achievements-badge-mastery-add')).toHaveTextContent(`Earned ${expectedDate}`);
+      expect(screen.getByTestId('achievements-badge-mastery-add')).not.toHaveClass('achievements-badge--locked');
+    });
+
+    it('formats mastery figures in Ukrainian', async () => {
+      await i18n.changeLanguage('uk');
+      seed([makeRun(at(2026, 11, 10), { operationStats: statsFor('*', 50, 7, 4600) })]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-badge-mastery-mul')).toHaveTextContent('Майстерність ×');
+      expect(screen.getByTestId('achievements-mastery-progress-mastery-mul')).toHaveTextContent('4,6 с → потрібно 90% / 4,0 с');
+    });
+
     it('renders badge names in Ukrainian', async () => {
       await i18n.changeLanguage('uk');
       seed([]);

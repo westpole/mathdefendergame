@@ -93,3 +93,14 @@ export const BASELINE_MIN_WEEKS = 2;
 export const FOCUS_WINDOW_WEEKS = 2;
 /** Qualifying practice runs in the focus operation that earn Focus of the Week. */
 export const FOCUS_PRACTICE_RUNS_REQUIRED = 3;
+/** Lowest accuracy (0–1) over the recent window for a mastery badge. */
+export const MASTERY_MIN_ACCURACY = 0.9;
+/** Recent attempts per operation that mastery is measured over. */
+export const MASTERY_WINDOW_ATTEMPTS = 50;
+/** Slowest average answer time (ms) for a mastery badge, per operation. Tunable after release. */
+export const MASTERY_MAX_AVG_MS: Record<MathOperation, number> = {
+  '+': 3000,
+  '-': 3000,
+  '*': 4000,
+  '/': 4000,
+};
