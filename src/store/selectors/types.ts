@@ -39,4 +39,10 @@ export interface WeeklyStreakSummary {
   thisWeekActiveDayKeys: string[];
   /** Active days still needed this week to make it a streak week (0 when reached). */
   daysNeeded: number;
+  /** Streak shields banked now (0 or 1). Worked out from history, never saved. */
+  shieldBanked: number;
+  /** Completed short weeks a shield covered, oldest first. */
+  shieldUsedWeekKeys: string[];
+  /** From Friday on: the streak needs every remaining day of this week to survive (or can't). */
+  atRisk: boolean;
 }

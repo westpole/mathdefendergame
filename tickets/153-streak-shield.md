@@ -1,7 +1,7 @@
 # [FEATURE] Streak shield protects one missed week
 
 > **Ticket type:** Feature
-> **Status:** Ready for Dev
+> **Status:** Done
 > **Priority:** P2
 > **Epic:** [Weekly achievements plan and tracker](./weekly-achievements-plan.md) · issue #25
 > **Sprint:** `25-idea-add-medals`

@@ -69,3 +69,7 @@ export const ACTIVE_DAY_MIN_CORRECT = 10;
 export const STREAK_MIN_DAYS_PER_WEEK = 3;
 /** Streak weeks in a row needed for the Relentless Bronze, Silver and Gold medals. */
 export const STREAK_TIERS = [3, 6, 12] as const;
+/** Streak weeks in a row that bank one streak shield. */
+export const SHIELD_EVERY_N_WEEKS = 4;
+/** Most streak shields a player can hold at once. */
+export const SHIELD_MAX_BANKED = 1;

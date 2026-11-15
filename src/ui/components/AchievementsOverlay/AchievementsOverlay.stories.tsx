@@ -8,14 +8,19 @@ import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import allMedalsMock from './__mocks__/allMedals.json';
+import atRiskMock from './__mocks__/atRisk.json';
+import atRiskWithShieldMock from './__mocks__/atRiskWithShield.json';
 import bronzeEarnedMock from './__mocks__/bronzeEarned.json';
 import emptyMock from './__mocks__/empty.json';
 import midWeekMock from './__mocks__/midWeek.json';
+import shieldBankedMock from './__mocks__/shieldBanked.json';
 import twoWeekStreakMock from './__mocks__/twoWeekStreak.json';
 import { AchievementsOverlay } from '.';
 
 /** Thursday 12 Nov 2026, 12:00 UTC. Fixtures are built around this week. */
 const STORY_NOW = 1794484800000;
+/** Saturday 14 Nov 2026, 12:00 UTC, when the at-risk warning can show. */
+const STORY_SATURDAY = 1794657600000;
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
@@ -112,4 +117,34 @@ export const MobileBronzeEarned: Story = {
 export const MobileAllMedals: Story = {
   name: 'Mobile all Relentless medals earned',
   args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: allMedalsMock as Partial<GameStoreState> },
+};
+
+export const ShieldBanked: Story = {
+  name: 'Streak shield banked',
+  args: { now: STORY_NOW, initialState: shieldBankedMock as Partial<GameStoreState> },
+};
+
+export const AtRisk: Story = {
+  name: 'Streak at risk (Saturday)',
+  args: { now: STORY_SATURDAY, initialState: atRiskMock as Partial<GameStoreState> },
+};
+
+export const AtRiskWithShield: Story = {
+  name: 'At risk, shield will protect',
+  args: { now: STORY_SATURDAY, initialState: atRiskWithShieldMock as Partial<GameStoreState> },
+};
+
+export const MobileShieldBanked: Story = {
+  name: 'Mobile streak shield banked',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: shieldBankedMock as Partial<GameStoreState> },
+};
+
+export const MobileAtRisk: Story = {
+  name: 'Mobile streak at risk',
+  args: { now: STORY_SATURDAY, frame: popularMobileStoryFrame, initialState: atRiskMock as Partial<GameStoreState> },
+};
+
+export const MobileAtRiskWithShield: Story = {
+  name: 'Mobile at risk, shield will protect',
+  args: { now: STORY_SATURDAY, frame: popularMobileStoryFrame, initialState: atRiskWithShieldMock as Partial<GameStoreState> },
 };

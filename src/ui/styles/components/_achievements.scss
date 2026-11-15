@@ -255,3 +255,43 @@
     display: none;
   }
 }
+
+// Streak shield and at-risk warning
+.achievements-streak-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+
+  .home-report-eyebrow {
+    margin: 0;
+  }
+}
+
+.achievements-shield {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px $spacing-sm;
+  border: 1px solid $text-link;
+  border-radius: $radius-full;
+  color: $text-link;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.achievements-risk {
+  padding: $spacing-xs $spacing-sm;
+  border: 1px solid $color-warning-yellow;
+  border-radius: $radius-md;
+  background: rgba(234, 179, 8, 0.12);
+  color: $color-primary-yellow;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.achievements-risk--shielded {
+  border-color: $text-link;
+  background: rgba(147, 197, 253, 0.12);
+  color: $text-link;
+}

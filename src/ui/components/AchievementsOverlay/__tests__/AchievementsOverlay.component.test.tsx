@@ -153,6 +153,52 @@ describe('AchievementsOverlay', () => {
     expect(screen.getByTestId('achievements-medal-gold')).toHaveTextContent('Незламний: золото');
   });
 
+  it('shows a banked streak shield with its tooltip', () => {
+    seed(Array.from({ length: 4 }, (_, index) => activeWeek(mondayWeeksBefore(MONDAY, index + 1))).flat());
+    render(<AchievementsOverlay now={NOW} />);
+
+    const shield = screen.getByRole('img', { name: 'Streak Shield: One missed week will be forgiven' });
+    expect(shield).toHaveAttribute('title', 'One missed week will be forgiven');
+    expect(screen.getByTestId('achievements-shield-note')).toHaveTextContent('One missed week will be forgiven');
+    expect(screen.queryByTestId('achievements-streak-risk')).not.toBeInTheDocument();
+  });
+
+  it('warns that the streak is at risk on Saturday without a shield', () => {
+    seed([...activeWeek(mondayWeeksBefore(MONDAY, 1)), ...activeWeek(MONDAY, [0])]);
+    render(<AchievementsOverlay now={at(2026, 11, 14)} />);
+
+    expect(screen.getByTestId('achievements-streak-risk')).toHaveTextContent('Streak at risk');
+    expect(screen.queryByTestId('achievements-shield')).not.toBeInTheDocument();
+  });
+
+  it('says the shield will protect an at-risk streak', () => {
+    seed(Array.from({ length: 4 }, (_, index) => activeWeek(mondayWeeksBefore(MONDAY, index + 1))).flat());
+    render(<AchievementsOverlay now={at(2026, 11, 14)} />);
+
+    expect(screen.getByTestId('achievements-streak-risk')).toHaveTextContent('Your shield will protect your streak');
+    expect(screen.getByTestId('achievements-streak-risk')).toHaveClass('achievements-risk--shielded');
+  });
+
+  it('marks last week as protected when a shield covered it', () => {
+    seed([
+      ...Array.from({ length: 4 }, (_, index) => activeWeek(mondayWeeksBefore(MONDAY, index + 2))).flat(),
+      ...activeWeek(mondayWeeksBefore(MONDAY, 1), [0]),
+    ]);
+    render(<AchievementsOverlay now={NOW} />);
+
+    expect(screen.getByTestId('achievements-week-shielded')).toHaveTextContent('Last week: Week protected by shield');
+    expect(screen.getByTestId('achievements-streak-weeks')).toHaveTextContent('4 weeks in a row');
+  });
+
+  it('shows shield and risk text in Ukrainian', async () => {
+    await i18n.changeLanguage('uk');
+    seed(Array.from({ length: 4 }, (_, index) => activeWeek(mondayWeeksBefore(MONDAY, index + 1))).flat());
+    render(<AchievementsOverlay now={at(2026, 11, 14)} />);
+
+    expect(screen.getByRole('img', { name: 'Щит серії: Один пропущений тиждень не зламає серію' })).toBeInTheDocument();
+    expect(screen.getByTestId('achievements-streak-risk')).toHaveTextContent('Щит збереже твою серію');
+  });
+
   it('falls back to the time the screen opened when no reference time is given', () => {
     seed([]);
     render(<AchievementsOverlay />);

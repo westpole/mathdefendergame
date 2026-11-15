@@ -232,7 +232,8 @@
       "dayActive": "{{day}}, active",
       "dayInactive": "{{day}}, not active",
       "today": "today",
-      "activeDayRule": "A day counts when your runs that day total at least 10 correct answers."
+      "activeDayRule": "A day counts when your runs that day total at least 10 correct answers.",
+      "atRisk": "Streak at risk"
     },
     "weekday": {
       "short": {
@@ -259,6 +260,13 @@
       "title_other": "New achievements!",
       "body": "Your regular practice is paying off. Keep it up!",
       "dismiss": "Continue"
+    },
+    "shield": {
+      "title": "Streak Shield",
+      "tooltip": "One missed week will be forgiven",
+      "willProtect": "Your shield will protect your streak",
+      "weekShielded": "Week protected by shield",
+      "lastWeekShielded": "Last week: {{status}}"
     }
   }
 }

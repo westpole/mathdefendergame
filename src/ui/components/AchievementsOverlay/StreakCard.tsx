@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { useTranslation } from 'react-i18next';
 
 import { STREAK_TIERS } from '@store/constants';
-import { buildWeekDays, findNextStreakTier, toDayKey } from '@store/selectors/achievements';
+import { buildWeekDays, findNextStreakTier, toDayKey, toPreviousWeekKey } from '@store/selectors/achievements';
 import type { WeeklyStreakSummary } from '@store/selectors/types';
 
 import { RELENTLESS_TIER_NAMES, WEEKDAY_KEYS } from './constants';
@@ -13,8 +13,9 @@ interface StreakCardProps {
 }
 
 /**
- * Weekly streak card: streak length, the next Relentless tier, the rule, and one dot per
- * day of the current week (filled when active, outlined for today).
+ * Weekly streak card: streak length, the next Relentless tier, the rule, one dot per day
+ * of the current week (filled when active, outlined for today), the streak shield, and an
+ * at-risk warning from Friday on.
  */
 export function StreakCard({ streak, now }: StreakCardProps) {
   const { t } = useTranslation();
@@ -22,6 +23,8 @@ export function StreakCard({ streak, now }: StreakCardProps) {
   const todayKey = toDayKey(now);
   const activeDayKeys = new Set(streak.thisWeekActiveDayKeys);
   const weekDays = buildWeekDays(now);
+  const hasShield = streak.shieldBanked > 0;
+  const wasLastWeekShielded = streak.shieldUsedWeekKeys.includes(toPreviousWeekKey(now));
 
   return (
     <section
@@ -29,7 +32,21 @@ export function StreakCard({ streak, now }: StreakCardProps) {
       className="achievements-card achievements-streak-card"
       data-testid="achievements-streak-card"
     >
-      <p className="home-report-eyebrow" id="achievements-streak-title">{t('achievements.streak.cardLabel')}</p>
+      <div className="achievements-streak-card__top">
+        <p className="home-report-eyebrow" id="achievements-streak-title">{t('achievements.streak.cardLabel')}</p>
+        {hasShield ? (
+          <span
+            aria-label={`${t('achievements.shield.title')}: ${t('achievements.shield.tooltip')}`}
+            className="achievements-shield"
+            data-testid="achievements-shield"
+            role="img"
+            title={t('achievements.shield.tooltip')}
+          >
+            <span aria-hidden="true">🛡️</span>
+            <span aria-hidden="true" className="achievements-shield__label">{t('achievements.shield.title')}</span>
+          </span>
+        ) : null}
+      </div>
       <strong className="achievements-streak-count" data-testid="achievements-streak-weeks">
         {t('achievements.streak.weeksInARow', { count: streak.streakWeeks })}
       </strong>
@@ -77,11 +94,32 @@ export function StreakCard({ streak, now }: StreakCardProps) {
         })}
       </ul>
 
+      {streak.atRisk ? (
+        <p
+          className={clsx('achievements-risk', hasShield && 'achievements-risk--shielded')}
+          data-testid="achievements-streak-risk"
+          role="status"
+        >
+          <span aria-hidden="true">{hasShield ? '🛡️ ' : '⚠️ '}</span>
+          {hasShield ? t('achievements.shield.willProtect') : t('achievements.streak.atRisk')}
+        </p>
+      ) : null}
+
       <p className="achievements-streak-status" data-testid="achievements-streak-status" role="status">
         {streak.daysNeeded > 0
           ? t('achievements.streak.daysNeeded', { count: streak.daysNeeded })
           : t('achievements.streak.weekComplete')}
       </p>
+      {hasShield && !streak.atRisk ? (
+        <p className="achievements-note" data-testid="achievements-shield-note">
+          {t('achievements.shield.tooltip')}
+        </p>
+      ) : null}
+      {wasLastWeekShielded ? (
+        <p className="achievements-note" data-testid="achievements-week-shielded">
+          {t('achievements.shield.lastWeekShielded', { status: t('achievements.shield.weekShielded') })}
+        </p>
+      ) : null}
       <p className="achievements-note">{t('achievements.streak.activeDayRule')}</p>
     </section>
   );

@@ -3,6 +3,8 @@ import type { AchievementId, EarnedAchievement, GameHistoryEntry } from '@shared
 import {
   ACTIVE_DAY_MIN_CORRECT,
   DAY_MS,
+  SHIELD_EVERY_N_WEEKS,
+  SHIELD_MAX_BANKED,
   STREAK_MIN_DAYS_PER_WEEK,
   STREAK_TIERS,
 } from '@store/constants';
@@ -168,12 +170,19 @@ interface StreakWalk {
   streakWeeks: number;
   /** First time the streak reached each length. */
   firstReachedByLength: Map<number, StreakMilestone>;
+  /** Shields banked now. */
+  shieldBanked: number;
+  /** Completed short weeks covered by a shield, oldest first. */
+  shieldUsedWeekKeys: string[];
 }
 
 /**
  * Walks every calendar week from the oldest run's week to the current week, counting
- * streak weeks in a row. Completed short weeks break the streak; the current week only
- * adds to it once it reaches the minimum and never breaks it.
+ * streak weeks in a row. Every `SHIELD_EVERY_N_WEEKS` streak weeks bank a shield (at most
+ * `SHIELD_MAX_BANKED`). A completed short week uses a banked shield (the streak continues
+ * without counting that week) or else breaks the streak. The current week only adds to
+ * the streak once it reaches the minimum and never breaks it. Shields are never saved:
+ * they are worked out from history every time.
  *
  * @param timesByWeek - Output of `buildActiveDayTimesByWeek`.
  * @param oldestPlayedAt - Timestamp of the oldest run, or null with no history.
@@ -186,10 +195,12 @@ function walkStreakWeeks(
   now: number,
 ): StreakWalk {
   const firstReachedByLength = new Map<number, StreakMilestone>();
+  const shieldUsedWeekKeys: string[] = [];
   let streakWeeks = 0;
+  let shieldBanked = 0;
 
   if (oldestPlayedAt === null) {
-    return { streakWeeks, firstReachedByLength };
+    return { streakWeeks, firstReachedByLength, shieldBanked, shieldUsedWeekKeys };
   }
 
   const currentWeekStart = startOfLocalWeek(now);
@@ -211,12 +222,22 @@ function walkStreakWeeks(
           reachedAt: activeDayTimes[STREAK_MIN_DAYS_PER_WEEK - 1],
         });
       }
+
+      if (streakWeeks % SHIELD_EVERY_N_WEEKS === 0) {
+        shieldBanked = Math.min(shieldBanked + 1, SHIELD_MAX_BANKED);
+      }
     } else if (weekStart < currentWeekStart) {
-      streakWeeks = 0;
+      if (streakWeeks > 0 && shieldBanked > 0) {
+        shieldBanked -= 1;
+        shieldUsedWeekKeys.push(weekKey);
+      } else {
+        streakWeeks = 0;
+        shieldBanked = 0;
+      }
     }
   }
 
-  return { streakWeeks, firstReachedByLength };
+  return { streakWeeks, firstReachedByLength, shieldBanked, shieldUsedWeekKeys };
 }
 
 /**
@@ -244,22 +265,41 @@ function buildStreakWalk(
  *
  * @param history - Runs in any order.
  * @param now - Reference time; the current week is the calendar week containing it.
- * @returns Streak length, this week's active days, and days still needed.
+ * @returns Streak length, this week's active days, days still needed, shield state and risk.
  * @example
  * const streak = computeWeeklyStreak(history, Date.now());
- * // { streakWeeks: 2, thisWeekActiveDays: 1, thisWeekActiveDayKeys: ['2026-11-09'], daysNeeded: 2 }
+ * // { streakWeeks: 2, thisWeekActiveDays: 1, daysNeeded: 2, shieldBanked: 0, atRisk: false, ... }
  */
 export function computeWeeklyStreak(history: GameHistoryEntry[], now: number): WeeklyStreakSummary {
   const { timesByWeek, walk } = buildStreakWalk(history, now);
   const thisWeekActiveDayKeys = (timesByWeek.get(toWeekKey(now)) ?? []).map(toDayKey);
   const thisWeekActiveDays = thisWeekActiveDayKeys.length;
+  const daysNeeded = Math.max(0, STREAK_MIN_DAYS_PER_WEEK - thisWeekActiveDays);
+  const weekday = toMondayBasedWeekday(now);
+  const isTodayActive = thisWeekActiveDayKeys.includes(toDayKey(now));
+  // Days still open for practice this week, including today when it isn't active yet.
+  const daysLeft = (6 - weekday) + (isTodayActive ? 0 : 1);
 
   return {
     streakWeeks: walk.streakWeeks,
     thisWeekActiveDays,
     thisWeekActiveDayKeys,
-    daysNeeded: Math.max(0, STREAK_MIN_DAYS_PER_WEEK - thisWeekActiveDays),
+    daysNeeded,
+    shieldBanked: walk.shieldBanked,
+    shieldUsedWeekKeys: walk.shieldUsedWeekKeys,
+    // From Friday on, a streak is at risk when it needs every remaining day (or more).
+    atRisk: walk.streakWeeks > 0 && daysNeeded > 0 && weekday >= 4 && daysLeft <= daysNeeded,
   };
+}
+
+/**
+ * Returns the week key of the calendar week before the one containing `now`.
+ *
+ * @param now - Reference time.
+ * @returns The previous week's key.
+ */
+export function toPreviousWeekKey(now: number): string {
+  return toWeekKey(addLocalDays(startOfLocalWeek(now), -7));
 }
 
 /**

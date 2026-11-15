@@ -10,6 +10,7 @@ import {
   getAchievementKey,
   findNextStreakTier,
   startOfLocalWeek,
+  toPreviousWeekKey,
   toDayKey,
   toWeekKey,
 } from '../achievements';
@@ -120,6 +121,9 @@ describe('achievement selectors', () => {
         thisWeekActiveDays: 0,
         thisWeekActiveDayKeys: [],
         daysNeeded: 3,
+        shieldBanked: 0,
+        shieldUsedWeekKeys: [],
+        atRisk: false,
       });
     });
 
@@ -216,6 +220,121 @@ describe('achievement selectors', () => {
 
       expect(toWeekKey(at(2025, 12, 22))).toBe('2025-W52');
       expect(computeWeeklyStreak(history, at(2026, 1, 8, 15)).streakWeeks).toBe(3);
+    });
+  });
+
+  describe('streak shield', () => {
+    const streakWeeks = (count: number, endWeeksBack = 1) => Array.from(
+      { length: count },
+      (_, index) => activeWeek(mondayWeeksBefore(MONDAY, index + endWeeksBack)),
+    ).flat();
+
+    it('banks a shield after 4 streak weeks and holds at most 1 after 8', () => {
+      expect(computeWeeklyStreak(streakWeeks(3), MONDAY).shieldBanked).toBe(0);
+      expect(computeWeeklyStreak(streakWeeks(4), MONDAY).shieldBanked).toBe(1);
+      expect(computeWeeklyStreak(streakWeeks(8), MONDAY).shieldBanked).toBe(1);
+    });
+
+    it('uses the shield on a completed short week: the streak continues without counting it', () => {
+      const history = [...streakWeeks(4, 2), ...activeWeek(mondayWeeksBefore(MONDAY, 1), [0, 1])];
+      const streak = computeWeeklyStreak(history, MONDAY);
+
+      expect(streak.streakWeeks).toBe(4);
+      expect(streak.shieldBanked).toBe(0);
+      expect(streak.shieldUsedWeekKeys).toEqual(['2026-W45']);
+      expect(toPreviousWeekKey(MONDAY)).toBe('2026-W45');
+    });
+
+    it('resets the streak on a short week without a shield', () => {
+      const history = [...streakWeeks(3, 2), ...activeWeek(mondayWeeksBefore(MONDAY, 1), [0, 1])];
+
+      expect(computeWeeklyStreak(history, MONDAY).streakWeeks).toBe(0);
+    });
+
+    it('resets after the second of two short weeks with only one shield', () => {
+      const history = streakWeeks(4, 3);
+      const streak = computeWeeklyStreak(history, MONDAY);
+
+      expect(streak.streakWeeks).toBe(0);
+      expect(streak.shieldBanked).toBe(0);
+      expect(streak.shieldUsedWeekKeys).toEqual(['2026-W44']);
+    });
+
+    it('banks the next shield at 8 streak weeks after one was used', () => {
+      const history = [
+        ...streakWeeks(4, 1),
+        ...activeWeek(mondayWeeksBefore(MONDAY, 5), [0]),
+        ...streakWeeks(4, 6),
+      ];
+      const streak = computeWeeklyStreak(history, MONDAY);
+
+      expect(streak.streakWeeks).toBe(8);
+      expect(streak.shieldBanked).toBe(1);
+      expect(computeWeeklyStreak(history.filter((entry) => entry.playedAt < mondayWeeksBefore(MONDAY, 1)), mondayWeeksBefore(MONDAY, 1)).shieldBanked).toBe(0);
+    });
+
+    it('banks again at 4 weeks after a reset', () => {
+      const history = [...streakWeeks(4, 1), ...streakWeeks(2, 7)];
+      const streak = computeWeeklyStreak(history, MONDAY);
+
+      expect(streak.streakWeeks).toBe(4);
+      expect(streak.shieldBanked).toBe(1);
+      expect(streak.shieldUsedWeekKeys).toEqual([]);
+    });
+
+    it('still reports risk when a shield is banked', () => {
+      expect(computeWeeklyStreak(streakWeeks(4), at(2026, 11, 15)).atRisk).toBe(true);
+    });
+
+    it('does not use the shield for the unfinished current week', () => {
+      const streak = computeWeeklyStreak(streakWeeks(4), at(2026, 11, 15, 23, 59));
+
+      expect(streak.streakWeeks).toBe(4);
+      expect(streak.shieldBanked).toBe(1);
+      expect(streak.shieldUsedWeekKeys).toEqual([]);
+    });
+
+    it('lets a shielded streak go on to Relentless Silver, with the covered week not counted', () => {
+      const history = [
+        ...streakWeeks(2, 1),
+        ...activeWeek(mondayWeeksBefore(MONDAY, 3), [0]),
+        ...streakWeeks(4, 4),
+      ];
+
+      expect(computeWeeklyStreak(history, MONDAY).streakWeeks).toBe(6);
+      expect(evaluateNewAchievements(history, null, MONDAY).map((award) => award.weekKey)).toEqual(['2026-W41', '2026-W45']);
+    });
+  });
+
+  describe('atRisk', () => {
+    const lastWeek = () => activeWeek(mondayWeeksBefore(MONDAY, 1));
+
+    it('is false before Friday, even with no active days', () => {
+      expect(computeWeeklyStreak(lastWeek(), at(2026, 11, 12)).atRisk).toBe(false);
+    });
+
+    it('is false on Friday with one active day and three days left', () => {
+      expect(computeWeeklyStreak([...lastWeek(), ...activeWeek(MONDAY, [0])], at(2026, 11, 13)).atRisk).toBe(false);
+    });
+
+    it('is true on Saturday when both remaining days are needed', () => {
+      expect(computeWeeklyStreak([...lastWeek(), ...activeWeek(MONDAY, [0])], at(2026, 11, 14)).atRisk).toBe(true);
+    });
+
+    it('is true when the week can no longer reach 3 days', () => {
+      expect(computeWeeklyStreak(lastWeek(), at(2026, 11, 15)).atRisk).toBe(true);
+    });
+
+    it('counts today only while it is not active yet', () => {
+      const history = [...lastWeek(), ...activeWeek(MONDAY, [0, 6])];
+
+      expect(computeWeeklyStreak(history, at(2026, 11, 15, 18)).atRisk).toBe(true);
+      expect(computeWeeklyStreak([...lastWeek(), ...activeWeek(MONDAY, [0, 1])], at(2026, 11, 15)).atRisk).toBe(true);
+      expect(computeWeeklyStreak([...lastWeek(), ...activeWeek(MONDAY, [0, 1, 6])], at(2026, 11, 15, 18)).atRisk).toBe(false);
+    });
+
+    it('is false when there is no streak to lose', () => {
+      expect(computeWeeklyStreak([], at(2026, 11, 15)).atRisk).toBe(false);
     });
   });
 
