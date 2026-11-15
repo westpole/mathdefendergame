@@ -41,14 +41,8 @@ test.describe('Visual Regression Tests', () => {
     const selector = page.getByTestId('profile-selector-screen');
     await expect(selector).toBeVisible();
     await expect(selector.locator('#profile-selector-username')).toContainText('CommanderRex');
-    await page.evaluate(() => document.fonts.ready);
 
-    // toHaveScreenshot retries until two consecutive captures match, so no fixed sleep is needed.
-    await expect(page).toHaveScreenshot('select-profile-screen.png', {
-      animations: 'disabled',
-      caret: 'hide',
-      maxDiffPixelRatio: 0.01,
-    });
+    await expectStableScreenshot(page, 'select-profile-screen.png');
   });
 
   test('profile screen should match snapshot', async ({ page }) => {
@@ -127,12 +121,9 @@ test.describe('Visual Regression Tests', () => {
       });
     });
 
-    await page.waitForSelector('[data-testid="profile-overlay"]');
-    await page.waitForTimeout(1500);
+    await expect(page.getByTestId('profile-overlay')).toBeVisible();
 
-    await expect(page).toHaveScreenshot('profile-screen.png', {
-      maxDiffPixelRatio: 0.01,
-    });
+    await expectStableScreenshot(page, 'profile-screen.png');
   });
 
   test('performance screen should match snapshot', async ({ page }) => {
@@ -262,23 +253,13 @@ test.describe('Visual Regression Tests', () => {
   });
 
   test('weekly report screen should match snapshot', async ({ page }) => {
-    // The overlay reads Date.now() once on mount for the week window, so pin it before mounting.
-    const fixedNow = Date.UTC(2026, 0, 15, 12);
-    await page.evaluate((now) => {
-      const original = Date.now;
-      (window as unknown as { __e2eRestoreNow?: () => void }).__e2eRestoreNow = () => {
-        Date.now = original;
-      };
-      Date.now = () => now;
-    }, fixedNow);
+    // The overlay reads Date.now() once on mount for the week window, so seed with the clock pinned.
+    await seedStartScreen(page, 'weekly-report', { pinClock: true });
 
-    await seedStartScreen(page, 'weekly-report', fixedNow);
-
-    await expect(page.getByTestId('weekly-report-overlay')).toBeVisible();
+    const report = page.getByTestId('weekly-report-overlay');
+    await expect(report).toBeVisible();
+    await expect(report).toContainText('Jan 9 - Jan 15');
     await expect(page.getByTestId('home-weekly-empty-state')).toHaveCount(0);
-
-    // The window label is captured in component state, so the real clock can be restored now.
-    await page.evaluate(() => (window as unknown as { __e2eRestoreNow?: () => void }).__e2eRestoreNow?.());
 
     await expectStableScreenshot(page, 'weekly-report-screen.png');
   });
@@ -286,96 +267,113 @@ test.describe('Visual Regression Tests', () => {
 
 type StartScreenView = 'home' | 'settings' | 'rules' | 'weekly-report';
 
+/** Fixed reference time (2026-01-15 12:00 UTC) for seeded run history and the pinned clock. */
+const REFERENCE_NOW = Date.UTC(2026, 0, 15, 12);
+
 /**
  * Seeds a logged-in profile with fixed data and opens the given start-phase screen view.
  *
  * @param page - Electron renderer page.
  * @param screenView - Start-phase view to open.
- * @param now - Reference timestamp for seeded run history (defaults to a fixed date).
+ * @param options.pinClock - Pins `Date.now()` to `REFERENCE_NOW` while the view mounts, then restores it.
  */
-async function seedStartScreen(page: Page, screenView: StartScreenView, now = Date.UTC(2026, 0, 15, 12)) {
+async function seedStartScreen(page: Page, screenView: StartScreenView, { pinClock = false } = {}) {
   await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().bootReady === true, {
     timeout: 5000,
   });
 
   await page.evaluate(
-    ({ view, referenceNow }) => {
+    async ({ view, referenceNow, shouldPinClock }) => {
       const e2e = (window as E2EWindow).__e2e!;
       const createdAt = Date.UTC(2026, 0, 1);
       const dayMs = 24 * 60 * 60 * 1000;
+      const realNow = Date.now;
 
-      e2e.setStoreState({
-        bootReady: true,
-        phase: 'start',
-        screenView: view,
-        activeUsername: 'CommanderRex',
-        grade: 'commander',
-        gradeNotice: null,
-        profiles: {
-          CommanderRex: {
-            username: 'CommanderRex',
-            password: 'enc:v1:e2e',
-            bestScore: 12250,
-            highestStage: 3,
-            preferredGrade: 'cadet',
-            avatarId: 'avatar-3',
-            createdAt,
-            updatedAt: createdAt,
+      if (shouldPinClock) {
+        Date.now = () => referenceNow;
+      }
+
+      try {
+        e2e.setStoreState({
+          bootReady: true,
+          phase: 'start',
+          screenView: view,
+          activeUsername: 'CommanderRex',
+          grade: 'commander',
+          gradeNotice: null,
+          profiles: {
+            CommanderRex: {
+              username: 'CommanderRex',
+              password: 'enc:v1:e2e',
+              bestScore: 12250,
+              highestStage: 3,
+              preferredGrade: 'cadet',
+              avatarId: 'avatar-3',
+              createdAt,
+              updatedAt: createdAt,
+            },
           },
-        },
-        gameHistoryByProfile: {
-          CommanderRex: [
-            {
-              key: 'weekly-run-1',
-              playedAt: referenceNow - 3 * dayMs,
-              finalScore: 8600,
-              finalPerfScore: 79,
-              gradeAtFinish: 'commander',
-              correctAnswers: 23,
-              incorrectAnswers: 7,
-              averageAnswerTimeMs: 3900,
-              mostProblematicOperation: '/',
-              operationStats: {
-                '+': { attempts: 11, incorrect: 1, avgTimeMs: 2200 },
-                '-': { attempts: 8, incorrect: 1, avgTimeMs: 2400 },
-                '*': { attempts: 8, incorrect: 2, avgTimeMs: 2800 },
-                '/': { attempts: 9, incorrect: 3, avgTimeMs: 3600 },
+          gameHistoryByProfile: {
+            CommanderRex: [
+              {
+                key: 'weekly-run-1',
+                playedAt: referenceNow - 3 * dayMs,
+                finalScore: 8600,
+                finalPerfScore: 79,
+                gradeAtFinish: 'commander',
+                correctAnswers: 23,
+                incorrectAnswers: 7,
+                averageAnswerTimeMs: 3900,
+                mostProblematicOperation: '/',
+                operationStats: {
+                  '+': { attempts: 11, incorrect: 1, avgTimeMs: 2200 },
+                  '-': { attempts: 8, incorrect: 1, avgTimeMs: 2400 },
+                  '*': { attempts: 8, incorrect: 2, avgTimeMs: 2800 },
+                  '/': { attempts: 9, incorrect: 3, avgTimeMs: 3600 },
+                },
               },
-            },
-            {
-              key: 'weekly-run-2',
-              playedAt: referenceNow - dayMs,
-              finalScore: 11800,
-              finalPerfScore: 86,
-              gradeAtFinish: 'commander',
-              correctAnswers: 31,
-              incorrectAnswers: 10,
-              averageAnswerTimeMs: 3600,
-              mostProblematicOperation: '/',
-              operationStats: {
-                '+': { attempts: 13, incorrect: 1, avgTimeMs: 1900 },
-                '-': { attempts: 11, incorrect: 2, avgTimeMs: 2200 },
-                '*': { attempts: 10, incorrect: 3, avgTimeMs: 2500 },
-                '/': { attempts: 11, incorrect: 4, avgTimeMs: 3300 },
+              {
+                key: 'weekly-run-2',
+                playedAt: referenceNow - dayMs,
+                finalScore: 11800,
+                finalPerfScore: 86,
+                gradeAtFinish: 'commander',
+                correctAnswers: 31,
+                incorrectAnswers: 10,
+                averageAnswerTimeMs: 3600,
+                mostProblematicOperation: '/',
+                operationStats: {
+                  '+': { attempts: 13, incorrect: 1, avgTimeMs: 1900 },
+                  '-': { attempts: 11, incorrect: 2, avgTimeMs: 2200 },
+                  '*': { attempts: 10, incorrect: 3, avgTimeMs: 2500 },
+                  '/': { attempts: 11, incorrect: 4, avgTimeMs: 3300 },
+                },
               },
-            },
-          ],
-        },
-      });
+            ],
+          },
+        });
+
+        if (shouldPinClock) {
+          // Two frames let React commit the mount that reads Date.now() before the real clock returns.
+          await new Promise<void>((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+        }
+      } finally {
+        Date.now = realNow;
+      }
     },
-    { view: screenView, referenceNow: now },
+    { view: screenView, referenceNow: REFERENCE_NOW, shouldPinClock: pinClock },
   );
 }
 
 /**
  * Waits for fonts, then captures a full-page snapshot with animations and caret disabled.
  * `toHaveScreenshot` retries until two consecutive captures match, so no fixed sleep is needed.
+ * The diff tolerance comes from the `electron-visual` project config.
  */
 async function expectStableScreenshot(page: Page, name: string) {
   await page.evaluate(() => document.fonts.ready);
   await expect(page).toHaveScreenshot(name, {
     animations: 'disabled',
     caret: 'hide',
-    maxDiffPixelRatio: 0.01,
   });
 }

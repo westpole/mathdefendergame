@@ -19,7 +19,8 @@ export const test = base.extend<Fixtures>({
     // ELECTRON_RUN_AS_NODE is set by VS Code terminals; it makes electron.exe run as plain Node and reject Chromium flags.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { ELECTRON_RUN_AS_NODE, ...inheritedEnv } = process.env;
-    const env = { ...inheritedEnv, E2E: 'true', PLAYWRIGHT_ELECTRON_RUN: '1' }; // flags app is under Playwright E2E test
+    // E2E flags the app is under Playwright; TZ=UTC keeps locale-formatted dates in snapshots host-independent.
+    const env = { ...inheritedEnv, E2E: 'true', PLAYWRIGHT_ELECTRON_RUN: '1', TZ: 'UTC' };
     // Docker (docker/e2e/Dockerfile): npm-installed Electron has no SUID chrome-sandbox, and Xvfb has no GPU.
     const containerArgs = process.env.E2E_DOCKER === '1' ? ['--no-sandbox', '--disable-gpu'] : [];
 
