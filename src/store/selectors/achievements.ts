@@ -1,10 +1,12 @@
-import { WEEKLY_ACHIEVEMENT_IDS } from '@shared/constants';
-import type { AchievementId, EarnedAchievement, GameHistoryEntry } from '@shared/types';
+import { MATH_OPERATIONS, WEEKLY_ACHIEVEMENT_IDS } from '@shared/constants';
+import type { AchievementId, EarnedAchievement, GameHistoryEntry, MathOperation } from '@shared/types';
 import {
   ACTIVE_DAY_MIN_CORRECT,
   BASELINE_MIN_WEEKS,
   BASELINE_WEEKS,
   DAY_MS,
+  FOCUS_PRACTICE_RUNS_REQUIRED,
+  FOCUS_WINDOW_WEEKS,
   GOAL_DAILY_CAP_RATIO,
   GOAL_MIN_ACCURACY,
   GOAL_MIN_ANSWERS,
@@ -842,9 +844,211 @@ const evaluatePersonalBest: AchievementEvaluator = ({ history, now, profile }) =
   });
 };
 
+/**
+ * Returns the operation a practice run trained. History doesn't store it, so this is the
+ * operation with the most attempts (ties go to the first in `+ - * /` order). Practice runs
+ * drill a single operation, so this is exact for them; it is a best guess for anything else.
+ *
+ * @param entry - A saved run.
+ * @returns The operation for a practice run with attempts, otherwise null.
+ */
+export function getPracticeRunOperation(entry: GameHistoryEntry): MathOperation | null {
+  if (entry.mode !== 'practice') {
+    return null;
+  }
+
+  let best: MathOperation | null = null;
+
+  for (const operation of MATH_OPERATIONS) {
+    const attempts = entry.operationStats[operation]?.attempts ?? 0;
+
+    if (attempts > 0 && (best === null || attempts > entry.operationStats[best].attempts)) {
+      best = operation;
+    }
+  }
+
+  return best;
+}
+
+/** Running per-operation attempt totals. */
+type OperationTotals = Record<MathOperation, { attempts: number; incorrect: number }>;
+
+/**
+ * Creates zeroed per-operation totals.
+ *
+ * @returns Totals for every operation.
+ */
+function createOperationTotals(): OperationTotals {
+  return {
+    '+': { attempts: 0, incorrect: 0 },
+    '-': { attempts: 0, incorrect: 0 },
+    '*': { attempts: 0, incorrect: 0 },
+    '/': { attempts: 0, incorrect: 0 },
+  };
+}
+
+/**
+ * Adds runs' per-operation stats to running totals.
+ *
+ * @param totals - Totals to update in place.
+ * @param runs - Runs to add.
+ */
+function addOperationTotals(totals: OperationTotals, runs: GameHistoryEntry[]): void {
+  for (const entry of runs) {
+    for (const operation of MATH_OPERATIONS) {
+      totals[operation].attempts += entry.operationStats[operation]?.attempts ?? 0;
+      totals[operation].incorrect += entry.operationStats[operation]?.incorrect ?? 0;
+    }
+  }
+}
+
+/**
+ * Accuracy for one operation from totals.
+ *
+ * @param totals - Per-operation totals.
+ * @param operation - Operation to measure.
+ * @returns Accuracy from 0 to 1; 1 when there are no attempts (not a weak spot).
+ */
+function totalsAccuracy(totals: OperationTotals, operation: MathOperation): number {
+  const { attempts, incorrect } = totals[operation];
+  return attempts > 0 ? (attempts - incorrect) / attempts : 1;
+}
+
+/**
+ * Picks the most frequent `mostProblematicOperation` among runs. Ties go to the lower
+ * accuracy in `totalsBefore`, then to `+ - * /` order.
+ *
+ * @param windowRuns - Runs in the focus window.
+ * @param totalsBefore - Lifetime totals before the week being picked for.
+ * @returns The focus operation, or null when no run flagged one.
+ */
+function pickFocusOperation(windowRuns: GameHistoryEntry[], totalsBefore: OperationTotals): MathOperation | null {
+  const counts = new Map<MathOperation, number>();
+
+  for (const entry of windowRuns) {
+    if (entry.mostProblematicOperation) {
+      counts.set(entry.mostProblematicOperation, (counts.get(entry.mostProblematicOperation) ?? 0) + 1);
+    }
+  }
+
+  if (counts.size === 0) {
+    return null;
+  }
+
+  const candidates = MATH_OPERATIONS.filter((operation) => counts.has(operation));
+  const topCount = Math.max(...candidates.map((operation) => counts.get(operation) ?? 0));
+
+  return candidates
+    .filter((operation) => counts.get(operation) === topCount)
+    .reduce((best, operation) => (
+      totalsAccuracy(totalsBefore, operation) < totalsAccuracy(totalsBefore, best) ? operation : best
+    ));
+}
+
+/**
+ * Counts qualifying practice runs in one operation, earliest first.
+ *
+ * @param weekRuns - Runs in the week, up to the reference time.
+ * @param operation - Focus operation.
+ * @returns Run count and when the required run was played.
+ */
+function countFocusRuns(weekRuns: GameHistoryEntry[], operation: MathOperation): { practiceRuns: number; completedAt: number | null } {
+  const focusRuns = weekRuns
+    .filter((entry) => isQualifyingRun(entry) && getPracticeRunOperation(entry) === operation)
+    .sort((left, right) => left.playedAt - right.playedAt);
+
+  return {
+    practiceRuns: focusRuns.length,
+    completedAt: focusRuns[FOCUS_PRACTICE_RUNS_REQUIRED - 1]?.playedAt ?? null,
+  };
+}
+
+/**
+ * Picks the focus operation for the week containing `now`: the most frequent
+ * `mostProblematicOperation` over the `FOCUS_WINDOW_WEEKS` weeks before the week starts,
+ * so it stays fixed all week. Ties go to the lower lifetime accuracy (before the week),
+ * then to `+ - * /` order.
+ *
+ * @param history - Runs in any order.
+ * @param now - Reference time.
+ * @returns The focus operation, or null when no run in the window flagged one.
+ * @example
+ * selectFocusOperation(history, Date.now()); // '*'
+ */
+export function selectFocusOperation(history: GameHistoryEntry[], now: number): MathOperation | null {
+  const weekStart = startOfLocalWeek(now);
+  const windowStart = startOfLocalWeek(addLocalDays(weekStart, -7 * FOCUS_WINDOW_WEEKS));
+  const before = history.filter((entry) => entry.playedAt < weekStart);
+  const totalsBefore = createOperationTotals();
+  addOperationTotals(totalsBefore, before);
+
+  return pickFocusOperation(before.filter((entry) => entry.playedAt >= windowStart), totalsBefore);
+}
+
+/** Progress toward Focus of the Week for one week. */
+export interface FocusProgress {
+  operation: MathOperation | null;
+  /** Qualifying practice runs in the focus operation so far this week. */
+  practiceRuns: number;
+  required: number;
+  /** When the required run was played, or null. */
+  completedAt: number | null;
+}
+
+/**
+ * Counts this week's qualifying practice runs in the focus operation.
+ *
+ * @param history - Runs in any order.
+ * @param now - Reference time; the week containing it is checked, up to `now`.
+ * @returns The focus operation and progress toward `FOCUS_PRACTICE_RUNS_REQUIRED`.
+ */
+export function computeFocusProgress(history: GameHistoryEntry[], now: number): FocusProgress {
+  const operation = selectFocusOperation(history, now);
+  const { practiceRuns, completedAt } = operation === null
+    ? { practiceRuns: 0, completedAt: null }
+    : countFocusRuns(selectWeekRuns(history, now), operation);
+
+  return { operation, practiceRuns, required: FOCUS_PRACTICE_RUNS_REQUIRED, completedAt };
+}
+
+/**
+ * Focus of the Week: enough qualifying practice runs in the week's focus operation.
+ * Every week with runs is checked (runs grouped once, lifetime totals kept as a running
+ * sum), so past weeks are backfilled.
+ *
+ * @param context - Evaluation inputs.
+ * @returns One award per week that completed its focus.
+ */
+const evaluateFocusOfTheWeek: AchievementEvaluator = ({ history, now }) => {
+  const { runsByWeek, weekStarts } = groupRunsByWeek(history, now);
+  const totalsBefore = createOperationTotals();
+  const awards: EarnedAchievement[] = [];
+
+  weekStarts.forEach((weekStart, index) => {
+    const weekRuns = runsByWeek.get(weekStart);
+
+    if (weekRuns) {
+      const windowRuns = weekStarts
+        .slice(Math.max(0, index - FOCUS_WINDOW_WEEKS), index)
+        .flatMap((priorWeekStart) => runsByWeek.get(priorWeekStart) ?? []);
+      const operation = pickFocusOperation(windowRuns, totalsBefore);
+      const completedAt = operation ? countFocusRuns(weekRuns, operation).completedAt : null;
+
+      if (operation && completedAt !== null) {
+        awards.push({ id: 'focus-of-the-week', earnedAt: completedAt, weekKey: toWeekKey(weekStart), operation });
+      }
+
+      addOperationTotals(totalsBefore, weekRuns);
+    }
+  });
+
+  return awards;
+};
+
 /** Badge evaluators, in the order their awards are announced. Later badges add one here. */
 const ACHIEVEMENT_EVALUATORS: AchievementEvaluator[] = [
   evaluateStreakMedals,
   evaluateGoalMet,
   evaluatePersonalBest,
+  evaluateFocusOfTheWeek,
 ];

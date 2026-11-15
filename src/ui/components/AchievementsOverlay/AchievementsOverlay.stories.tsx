@@ -14,6 +14,8 @@ import badgesInProgressMock from './__mocks__/badgesInProgress.json';
 import atRiskWithShieldMock from './__mocks__/atRiskWithShield.json';
 import bronzeEarnedMock from './__mocks__/bronzeEarned.json';
 import emptyMock from './__mocks__/empty.json';
+import focusEarnedMock from './__mocks__/focusEarned.json';
+import focusInProgressMock from './__mocks__/focusInProgress.json';
 import goalCappedTodayMock from './__mocks__/goalCappedToday.json';
 import goalMetMock from './__mocks__/goalMet.json';
 import goalPartialMock from './__mocks__/goalPartial.json';
@@ -213,4 +215,24 @@ export const BadgesEarned: Story = {
 export const MobileBadgesEarned: Story = {
   name: 'Mobile badges earned (Goal Met ×3, Personal Best)',
   args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: badgesEarnedMock as Partial<GameStoreState> },
+};
+
+export const FocusInProgress: Story = {
+  name: 'Focus of the Week 1 of 3',
+  args: { now: STORY_NOW, initialState: focusInProgressMock as Partial<GameStoreState> },
+};
+
+export const MobileFocusInProgress: Story = {
+  name: 'Mobile focus of the Week 1 of 3',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: focusInProgressMock as Partial<GameStoreState> },
+};
+
+export const FocusEarned: Story = {
+  name: 'Focus of the Week earned',
+  args: { now: STORY_NOW, initialState: focusEarnedMock as Partial<GameStoreState> },
+};
+
+export const MobileFocusEarned: Story = {
+  name: 'Mobile focus of the Week earned',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: focusEarnedMock as Partial<GameStoreState> },
 };

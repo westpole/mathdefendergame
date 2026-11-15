@@ -1,0 +1,106 @@
+{
+  "AcePilot": [
+    {
+      "key": "story-run-1",
+      "playedAt": 1793188800000,
+      "correctAnswers": 12,
+      "incorrectAnswers": 1,
+      "averageAnswerTimeMs": 2400,
+      "mostProblematicOperation": "*",
+      "operationStats": {
+        "+": {
+          "attempts": 13,
+          "incorrect": 1,
+          "avgTimeMs": 2400
+        },
+        "-": {
+          "attempts": 0,
+          "incorrect": 0,
+          "avgTimeMs": 0
+        },
+        "*": {
+          "attempts": 0,
+          "incorrect": 0,
+          "avgTimeMs": 0
+        },
+        "/": {
+          "attempts": 0,
+          "incorrect": 0,
+          "avgTimeMs": 0
+        }
+      },
+      "gradeAtFinish": "trainee",
+      "finalScore": 180,
+      "finalPerfScore": 92.31,
+      "mode": "regular"
+    },
+    {
+      "key": "story-run-2",
+      "playedAt": 1793707200000,
+      "correctAnswers": 12,
+      "incorrectAnswers": 1,
+      "averageAnswerTimeMs": 2400,
+      "mostProblematicOperation": "*",
+      "operationStats": {
+        "+": {
+          "attempts": 13,
+          "incorrect": 1,
+          "avgTimeMs": 2400
+        },
+        "-": {
+          "attempts": 0,
+          "incorrect": 0,
+          "avgTimeMs": 0
+        },
+        "*": {
+          "attempts": 0,
+          "incorrect": 0,
+          "avgTimeMs": 0
+        },
+        "/": {
+          "attempts": 0,
+          "incorrect": 0,
+          "avgTimeMs": 0
+        }
+      },
+      "gradeAtFinish": "trainee",
+      "finalScore": 180,
+      "finalPerfScore": 92.31,
+      "mode": "regular"
+    },
+    {
+      "key": "story-run-3",
+      "playedAt": 1793793600000,
+      "correctAnswers": 12,
+      "incorrectAnswers": 1,
+      "averageAnswerTimeMs": 2400,
+      "mostProblematicOperation": "*",
+      "operationStats": {
+        "+": {
+          "attempts": 13,
+          "incorrect": 1,
+          "avgTimeMs": 2400
+        },
+        "-": {
+          "attempts": 0,
+          "incorrect": 0,
+          "avgTimeMs": 0
+        },
+        "*": {
+          "attempts": 0,
+          "incorrect": 0,
+          "avgTimeMs": 0
+        },
+        "/": {
+          "attempts": 0,
+          "incorrect": 0,
+          "avgTimeMs": 0
+        }
+      },
+      "gradeAtFinish": "trainee",
+      "finalScore": 180,
+      "finalPerfScore": 92.31,
+      "mode": "regular"
+    }
+  ]
+}

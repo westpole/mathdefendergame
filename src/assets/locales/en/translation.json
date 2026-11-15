@@ -308,6 +308,15 @@
         "earnedOn": "Last earned {{date}}",
         "earned": "Personal Best Week!",
         "rule": "You beat your usual week"
+      },
+      "focus": {
+        "name": "Focus of the Week",
+        "none": "Play a few runs to get your focus",
+        "progress": "Focus: {{operation}}, {{done}} / {{required}} practice runs",
+        "done": "Done this week: {{operation}}",
+        "earned": "Focus of the Week!",
+        "rule": "3 accurate practice runs: {{operation}}",
+        "tag": "Focus"
       }
     }
   }

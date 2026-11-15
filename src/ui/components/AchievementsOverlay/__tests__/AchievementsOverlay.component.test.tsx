@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { activeWeek, at, makeRun, mondayWeeksBefore } from '@store/selectors/__tests__/achievementTestUtils';
+import { activeWeek, at, makeRun, mondayWeeksBefore, statsFor } from '@store/selectors/__tests__/achievementTestUtils';
 import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/types';
 import type { EarnedAchievement, GameHistoryEntry } from '@shared/types';
@@ -312,6 +312,37 @@ describe('AchievementsOverlay', () => {
       render(<AchievementsOverlay now={NOW} />);
 
       expect(screen.getByTestId('achievements-badge-personal-best')).toHaveTextContent('Beat 400 this week (150 so far)');
+    });
+
+    const focusPractice = (day: number) => makeRun(at(2026, 11, day), {
+      mode: 'practice',
+      correctAnswers: 18,
+      incorrectAnswers: 2,
+      operationStats: statsFor('*', 20, 2, 3000),
+    });
+
+    it('asks for a few runs when there is no focus', () => {
+      seed([]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-badge-focus')).toHaveTextContent('Play a few runs to get your focus');
+      expect(screen.queryByTestId('achievements-focus-steps')).not.toBeInTheDocument();
+    });
+
+    it('shows the focus operation with 1 / 3 practice runs', () => {
+      seed([makeRun(at(2026, 11, 3), { mostProblematicOperation: '*' }), focusPractice(9)]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-badge-focus')).toHaveTextContent('Focus: Multiplication (*), 1 / 3 practice runs');
+      expect(screen.getByTestId('achievements-focus-steps').querySelectorAll('.achievements-steps__step--done')).toHaveLength(1);
+    });
+
+    it('marks the focus done once earned this week', () => {
+      seed([], { achievements: [{ id: 'focus-of-the-week', earnedAt: at(2026, 11, 11), weekKey: '2026-W46', operation: '/' }] });
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-badge-focus')).toHaveTextContent('Done this week: Division (/)');
+      expect(screen.getByTestId('achievements-badge-focus')).not.toHaveClass('achievements-badge--locked');
     });
 
     it('renders badge names in Ukrainian', async () => {

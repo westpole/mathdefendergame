@@ -3,16 +3,19 @@ import { useTranslation } from 'react-i18next';
 
 import { selectActiveProfileHistory } from '@store/selectors/performance';
 import {
+  computeFocusProgress,
   computePersonalBestStatus,
   computeWeeklyGoalProgress,
   computeWeeklyStreak,
   evaluateNewAchievements,
+  toWeekKey,
 } from '@store/selectors/achievements';
 import { useGameStore } from '@store/useGameStore';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
 import { toGradeTitle } from '@ui/utilities/format';
 
 import { BadgeGrid } from './BadgeGrid';
+import { FocusTile } from './FocusTile';
 import { GoalCard } from './GoalCard';
 import { MedalShelf } from './MedalShelf';
 import { StreakCard } from './StreakCard';
@@ -49,6 +52,8 @@ export function AchievementsOverlay({ now: nowOverride }: AchievementsOverlayPro
     () => computePersonalBestStatus(history, weeklyScoreGoal, now),
     [history, weeklyScoreGoal, now],
   );
+  const focus = useMemo(() => computeFocusProgress(history, now), [history, now]);
+  const focusEarnedThisWeek = earned.find((award) => award.id === 'focus-of-the-week' && award.weekKey === toWeekKey(now));
   const gradeLabel = t(`grades.${grade}`, { defaultValue: toGradeTitle(grade) });
 
   return (
@@ -72,7 +77,9 @@ export function AchievementsOverlay({ now: nowOverride }: AchievementsOverlayPro
         <StreakCard now={now} streak={streak} />
         <MedalShelf earned={earned} />
         <GoalCard isGuest={!activeProfile} progress={goalProgress} />
-        <BadgeGrid earned={earned} personalBest={personalBest} />
+        <BadgeGrid earned={earned} personalBest={personalBest}>
+          <FocusTile earnedThisWeek={focusEarnedThisWeek} focus={focus} />
+        </BadgeGrid>
       </div>
     </div>
   );

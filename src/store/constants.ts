@@ -89,3 +89,7 @@ export const GOAL_SUGGESTION_ROUND_TO = 50;
 export const BASELINE_WEEKS = 4;
 /** Complete weeks of history needed before a baseline exists. */
 export const BASELINE_MIN_WEEKS = 2;
+/** Weeks before the current one used to pick the focus operation. */
+export const FOCUS_WINDOW_WEEKS = 2;
+/** Qualifying practice runs in the focus operation that earn Focus of the Week. */
+export const FOCUS_PRACTICE_RUNS_REQUIRED = 3;

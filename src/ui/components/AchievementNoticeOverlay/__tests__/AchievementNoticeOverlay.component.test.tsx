@@ -139,8 +139,9 @@ describe('AchievementNoticeOverlay', () => {
   it.each([
     ['weekly-goal-met' as const, '🎯', 'Goal Met!', 'Weekly goal reached'],
     ['personal-best-week' as const, '📈', 'Personal Best Week!', 'You beat your usual week'],
+    ['focus-of-the-week' as const, '🔍', 'Focus of the Week!', '3 accurate practice runs: Multiplication (*)'],
   ])('shows %s with its icon, title and rule', (id, icon, title, rule) => {
-    seed({ achievementNotice: [{ id, earnedAt: 1, weekKey: '2026-W46' }] });
+    seed({ achievementNotice: [{ id, earnedAt: 1, weekKey: '2026-W46', operation: '*' }] });
     render(<AchievementNoticeOverlay />);
 
     expect(screen.getByTestId(`achievement-notice-${id}`)).toHaveTextContent(`${icon}${title}${rule}`);

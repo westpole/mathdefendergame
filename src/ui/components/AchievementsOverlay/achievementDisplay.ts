@@ -2,6 +2,7 @@ import type { TFunction } from 'i18next';
 
 import type { AchievementId, EarnedAchievement } from '@shared/types';
 import { STREAK_TIER_IDS } from '@store/selectors/achievements';
+import { OPERATION_I18N_KEYS } from '@ui/constants';
 
 import { RELENTLESS_TIER_NAMES } from './constants';
 
@@ -11,12 +12,14 @@ const ACHIEVEMENT_ICONS: Partial<Record<AchievementId, string>> = {
   'weekly-streak-gold': '🥇',
   'weekly-goal-met': '🎯',
   'personal-best-week': '📈',
+  'focus-of-the-week': '🔍',
 };
 
 /** i18n keys for badges whose title and rule don't depend on the award's details. */
 const BADGE_TEXT_KEYS: Partial<Record<AchievementId, { earned: string; rule: string }>> = {
   'weekly-goal-met': { earned: 'achievements.badges.goalMet.earned', rule: 'achievements.badges.goalMet.rule' },
   'personal-best-week': { earned: 'achievements.badges.personalBest.earned', rule: 'achievements.badges.personalBest.rule' },
+  'focus-of-the-week': { earned: 'achievements.badges.focus.earned', rule: 'achievements.badges.focus.rule' },
 };
 
 /**
@@ -62,5 +65,6 @@ export function getAchievementRule(t: TFunction, achievement: EarnedAchievement)
   }
 
   const keys = BADGE_TEXT_KEYS[achievement.id];
-  return keys ? t(keys.rule) : null;
+  const operation = achievement.operation ? t(OPERATION_I18N_KEYS[achievement.operation]) : '';
+  return keys ? t(keys.rule, { operation }) : null;
 }

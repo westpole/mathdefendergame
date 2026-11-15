@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useEffect } from 'react';
+import { useEffect, type ComponentProps } from 'react';
 
 import type { PracticeOperation } from '@shared/types';
 import { useGameStore } from '@store/useGameStore';
@@ -13,12 +13,18 @@ import {
   type StoryFrame,
 } from '@ui/components/__mocks__/storyFrames';
 
+import focusHistoryMock from './__mocks__/focusHistory.json';
 import { PracticeOperationOverlay } from '.';
+
+/** Thursday 12 Nov 2026, 12:00 UTC. The focus fixture flags × in the two weeks before. */
+const STORY_NOW = 1794484800000;
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
   frame?: StoryFrame;
 }
+
+type StoryProps = ComponentProps<typeof PracticeOperationOverlay> & StoryArgs;
 
 /** Builds the active story profile; omit the operation for a profile that has never practiced. */
 function buildProfiles(lastPracticeOperation?: PracticeOperation): Record<string, PlayerProfile> {
@@ -45,7 +51,7 @@ const meta = {
   },
   decorators: [
     (Story, context) => {
-      const { initialState, frame } = context.args as StoryArgs;
+      const { initialState, frame } = context.args;
 
       useEffect(() => {
         useGameStore.setState({
@@ -64,7 +70,7 @@ const meta = {
       );
     },
   ],
-} satisfies Meta<typeof PracticeOperationOverlay>;
+} satisfies Meta<StoryProps>;
 
 export default meta;
 
@@ -105,5 +111,29 @@ export const MobileMinimum: Story = {
   args: {
     frame: minimumMobileStoryFrame,
     initialState: { profiles: buildProfiles(), isMobileDevice: true },
+  },
+};
+
+export const FocusTag: Story = {
+  name: 'Focus of the Week tag on ×',
+  args: {
+    now: STORY_NOW,
+    initialState: {
+      profiles: buildProfiles('+'),
+      gameHistoryByProfile: focusHistoryMock as GameStoreState['gameHistoryByProfile'],
+    },
+  },
+};
+
+export const MobileFocusTag: Story = {
+  name: 'Mobile Focus of the Week tag on ×',
+  args: {
+    now: STORY_NOW,
+    frame: popularMobileStoryFrame,
+    initialState: {
+      profiles: buildProfiles('+'),
+      gameHistoryByProfile: focusHistoryMock as GameStoreState['gameHistoryByProfile'],
+      isMobileDevice: true,
+    },
   },
 };

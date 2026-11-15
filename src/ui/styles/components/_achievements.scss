@@ -435,3 +435,26 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+// Focus of the Week
+.achievements-steps {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.achievements-steps__step {
+  width: 14px;
+  height: 6px;
+  border-radius: $radius-full;
+  background: $border-dark;
+}
+
+.achievements-steps__step--done {
+  background: $text-link;
+}
+
+.practice-select-option__badge--focus {
+  color: $text-link;
+}
