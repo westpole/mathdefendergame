@@ -29,3 +29,14 @@ export interface WeeklyProgressReport {
   runsCompleted: number;
   scoreEarned: number;
 }
+
+export interface WeeklyStreakSummary {
+  /** Streak weeks in a row. The current week counts once it has enough active days. */
+  streakWeeks: number;
+  /** Active days so far in the current calendar week. */
+  thisWeekActiveDays: number;
+  /** Day keys (`YYYY-MM-DD`) of this week's active days. */
+  thisWeekActiveDayKeys: string[];
+  /** Active days still needed this week to make it a streak week (0 when reached). */
+  daysNeeded: number;
+}

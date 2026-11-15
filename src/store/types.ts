@@ -17,7 +17,8 @@ export type ScreenView =
   | 'performance'
   | 'rules'
   | 'weekly-report'
-  | 'settings';
+  | 'settings'
+  | 'achievements';
 export type HistoryByProfile = Record<string, GameHistoryEntry[]>;
 export type PauseOverlayReason = 'escape' | 'window-close' | 'background';
 

@@ -86,7 +86,8 @@
     "accuracyPercent": "Accuracy (%)",
     "avgSpeedSeconds": "Avg Speed (sec)",
     "masteryRating": "Mastery Rating",
-    "completeRunForPerformanceInsights": "Complete a run to unlock operator performance insights."
+    "completeRunForPerformanceInsights": "Complete a run to unlock operator performance insights.",
+    "achievements": "Achievements"
   },
   "rules": {
     "regularPlay": {
@@ -193,5 +194,59 @@
   },
   "errors": {
     "profileUnavailable": "Profile is unavailable."
+  },
+  "achievements": {
+    "title": "Achievements",
+    "guestHint": "Awards are saved only for named profiles. Create a profile to keep them.",
+    "relentless": {
+      "title": "Relentless",
+      "subtitle": "Practise at least 3 days a week, 3 weeks in a row",
+      "tier": {
+        "bronze": "Relentless Bronze",
+        "silver": "Relentless Silver",
+        "gold": "Relentless Gold"
+      },
+      "tierWord": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold"
+      }
+    },
+    "streak": {
+      "cardLabel": "Weekly streak",
+      "weeksInARow_one": "{{count}} week in a row",
+      "weeksInARow_other": "{{count}} weeks in a row",
+      "next_one": "Next: Relentless {{tier}} ({{count}} weeks)",
+      "next_other": "Next: Relentless {{tier}} ({{count}} weeks)",
+      "allTiersReached": "Every Relentless tier reached. Keep it going!",
+      "daysNeeded_one": "{{count}} more day needed this week",
+      "daysNeeded_other": "{{count}} more days needed this week",
+      "weekComplete": "This week counts toward your streak!",
+      "dayDotsLabel": "Active days this week",
+      "dayActive": "{{day}}, active",
+      "dayInactive": "{{day}}, not active",
+      "today": "today",
+      "activeDayRule": "A day counts when your runs that day total at least 10 correct answers."
+    },
+    "weekday": {
+      "short": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "long": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
+    }
   }
 }

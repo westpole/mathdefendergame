@@ -58,3 +58,12 @@ export const OPERATION_LABELS: Record<MathOperation, string> = {
 };
 
 export const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+export const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Correct answers a local day needs, summed over its saved runs, to count as an active day. */
+export const ACTIVE_DAY_MIN_CORRECT = 10;
+/** Active days a calendar week needs to count as a streak week. */
+export const STREAK_MIN_DAYS_PER_WEEK = 3;
+/** Streak weeks in a row needed for the Relentless Bronze, Silver and Gold medals. */
+export const STREAK_TIERS = [3, 6, 12] as const;

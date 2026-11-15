@@ -86,7 +86,8 @@
     "accuracyPercent": "Точність (%)",
     "avgSpeedSeconds": "Сер. швидкість (с)",
     "masteryRating": "Рівень володіння",
-    "completeRunForPerformanceInsights": "Завершіть забіг, щоб відкрити аналітику за операціями."
+    "completeRunForPerformanceInsights": "Завершіть забіг, щоб відкрити аналітику за операціями.",
+    "achievements": "Досягнення"
   },
   "rules": {
     "regularPlay": {
@@ -193,5 +194,65 @@
   },
   "errors": {
     "profileUnavailable": "Профіль недоступний."
+  },
+  "achievements": {
+    "title": "Досягнення",
+    "guestHint": "Нагороди зберігаються лише для іменних профілів. Створи профіль, щоб їх зберегти.",
+    "relentless": {
+      "title": "Незламний",
+      "subtitle": "Тренуйся щонайменше 3 дні на тиждень, 3 тижні поспіль",
+      "tier": {
+        "bronze": "Незламний: бронза",
+        "silver": "Незламний: срібло",
+        "gold": "Незламний: золото"
+      },
+      "tierWord": {
+        "bronze": "бронза",
+        "silver": "срібло",
+        "gold": "золото"
+      }
+    },
+    "streak": {
+      "cardLabel": "Тижнева серія",
+      "weeksInARow_one": "{{count}} тиждень поспіль",
+      "weeksInARow_few": "{{count}} тижні поспіль",
+      "weeksInARow_many": "{{count}} тижнів поспіль",
+      "weeksInARow_other": "{{count}} тижнів поспіль",
+      "next_one": "Далі — Незламний: {{tier}} ({{count}} тиждень)",
+      "next_few": "Далі — Незламний: {{tier}} ({{count}} тижні)",
+      "next_many": "Далі — Незламний: {{tier}} ({{count}} тижнів)",
+      "next_other": "Далі — Незламний: {{tier}} ({{count}} тижнів)",
+      "allTiersReached": "Усі рівні «Незламного» здобуто. Так тримати!",
+      "daysNeeded_one": "Потрібно ще {{count}} день цього тижня",
+      "daysNeeded_few": "Потрібно ще {{count}} дні цього тижня",
+      "daysNeeded_many": "Потрібно ще {{count}} днів цього тижня",
+      "daysNeeded_other": "Потрібно ще {{count}} днів цього тижня",
+      "weekComplete": "Цей тиждень зараховано до серії!",
+      "dayDotsLabel": "Активні дні цього тижня",
+      "dayActive": "{{day}}, активний",
+      "dayInactive": "{{day}}, неактивний",
+      "today": "сьогодні",
+      "activeDayRule": "День зараховується, коли твої забіги за день дають щонайменше 10 правильних відповідей."
+    },
+    "weekday": {
+      "short": {
+        "mon": "Пн",
+        "tue": "Вт",
+        "wed": "Ср",
+        "thu": "Чт",
+        "fri": "Пт",
+        "sat": "Сб",
+        "sun": "Нд"
+      },
+      "long": {
+        "mon": "Понеділок",
+        "tue": "Вівторок",
+        "wed": "Середа",
+        "thu": "Четвер",
+        "fri": "П’ятниця",
+        "sat": "Субота",
+        "sun": "Неділя"
+      }
+    }
   }
 }

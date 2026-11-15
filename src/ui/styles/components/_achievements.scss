@@ -1,0 +1,109 @@
+@use '../variables' as *;
+
+// Achievements screen
+.achievements-panel {
+  overflow-y: auto;
+}
+
+.achievements-guest-hint {
+  padding: $spacing-sm $spacing-md;
+  border: 1px dashed $border-panel-light;
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-size: 0.82rem;
+}
+
+.achievements-card {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-lg;
+  background: rgba(15, 23, 42, 0.28);
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-lg;
+
+  h2 {
+    color: $text-primary;
+    font-size: 1.1rem;
+  }
+}
+
+.achievements-streak-count {
+  color: $text-primary;
+  font-size: 1.6rem;
+}
+
+.achievements-streak-next {
+  color: $color-primary-yellow;
+  font-weight: 600;
+}
+
+.achievements-rule {
+  color: $text-secondary;
+  font-size: 0.85rem;
+}
+
+.achievements-rule__name {
+  color: $text-primary;
+  font-weight: 600;
+}
+
+.achievements-note {
+  color: $text-muted;
+  font-size: 0.75rem;
+}
+
+.achievements-day-dots {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: $spacing-xs;
+  margin: $spacing-xs 0;
+  padding: 0;
+  list-style: none;
+}
+
+.achievements-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.achievements-day__dot {
+  width: 28px;
+  height: 28px;
+  border: 2px solid $border-dark;
+  border-radius: $radius-full;
+  background: transparent;
+}
+
+.achievements-day__dot--active {
+  border-color: $color-success-green;
+  background: $color-success-green;
+}
+
+.achievements-day__dot--today {
+  outline: 2px solid $color-primary-yellow;
+  outline-offset: 2px;
+}
+
+.achievements-day__label {
+  color: $text-muted;
+  font-size: 0.72rem;
+}
+
+.achievements-streak-status {
+  color: $text-primary;
+  font-size: 0.9rem;
+}
+
+@container (max-width: #{$breakpoint-mobile}) {
+  .achievements-card {
+    padding: $spacing-md;
+  }
+
+  .achievements-day__dot {
+    width: 22px;
+    height: 22px;
+  }
+}

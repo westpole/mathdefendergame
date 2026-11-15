@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next';
 
 import { selectActiveProfileHistory } from '@store/selectors/performance';
 import { buildGradeProgressSummary, buildWeeklyProgressReport } from '@store/selectors/progress';
+import { DAY_MS } from '@store/constants';
 import { useGameStore } from '@store/useGameStore';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
 import { GradeRequirementsList } from '@ui/components/GradeRequirementsList';
 import { toGradeTitle } from '@ui/utilities/format';
 
 import { formatShortDate, formatScore, formatAccuracy } from './utilities';
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Dedicated weekly report view for the active profile.
