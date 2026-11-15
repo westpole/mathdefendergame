@@ -218,8 +218,8 @@ npm run test:e2e -- e2e/game
 # Interactive UI mode
 npm run test:e2e:ui
 
-# Update visual snapshots
-npm run test:e2e:update-snapshots
+# Update visual snapshots (Linux baselines, in Docker)
+npm run test:e2e:docker:update-snapshots
 ```
 
 ## Debugging
