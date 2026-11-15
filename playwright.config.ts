@@ -53,7 +53,7 @@ export default defineConfig({
       name: 'electron-visual',
       testDir: './e2e/visual',
       ignoreSnapshots: !isDockerRun,
-      expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.01 } },
+      expect: { toHaveScreenshot: { maxDiffPixelRatio: 0.0001 } },
     },
   ],
   reporter: process.env.CI ? [['html', htmlReporterOptions], ['github']] : 'list',
