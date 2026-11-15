@@ -8,6 +8,7 @@ import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import profileMenuStore from '../__mocks__/profile-menu-store.json';
+import goalSetMock from './__mocks__/goalSet.json';
 import { SettingsOverlay } from '.';
 
 interface StoryArgs {
@@ -67,5 +68,20 @@ export const MobileSettings: Story = {
       screenView: 'settings',
       phase: 'start',
     },
+  },
+};
+
+export const WeeklyGoalSet: Story = {
+  name: 'Weekly goal set to 1,000',
+  args: {
+    initialState: { ...(structuredClone(goalSetMock) as Partial<GameStoreState>), phase: 'start' },
+  },
+};
+
+export const MobileWeeklyGoalSet: Story = {
+  name: 'Mobile weekly goal set to 1,000',
+  args: {
+    frame: popularMobileStoryFrame,
+    initialState: { ...(structuredClone(goalSetMock) as Partial<GameStoreState>), phase: 'start' },
   },
 };

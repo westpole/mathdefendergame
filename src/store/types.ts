@@ -34,6 +34,8 @@ export interface PlayerProfile {
   lastPracticeOperation?: PracticeOperation;
   /** Awards saved when earned. They stay earned even if the rules or goal change later. */
   achievements?: EarnedAchievement[];
+  /** Weekly score goal counting only qualifying runs. Unset means the goal is off. */
+  weeklyScoreGoal?: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -126,6 +128,8 @@ export interface GameStoreState {
   createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;
   createAndLoginSimpleProfile: (username: string) => LoginResult;
   updateActiveProfileAvatar: (avatarId: string) => LoginResult;
+  /** Sets the active profile's weekly goal; null turns it off. Guests can't set one. */
+  setWeeklyScoreGoal: (goal: number | null) => LoginResult;
   getActiveProfile: () => PlayerProfile | null;
   addGameHistory: (entry: GameHistoryEntry) => void;
   getGameHistory: (username?: string | null, limit?: number) => GameHistoryEntry[];

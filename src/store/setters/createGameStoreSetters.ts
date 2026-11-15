@@ -5,6 +5,7 @@ import type {
 } from '../types';
 import {
   buildGradeUpdate,
+  isValidWeeklyScoreGoal,
   resolveActiveProfile,
   resolveLifetimeGrade,
   resolveProfileHistoryKey,
@@ -98,6 +99,7 @@ export function createGameStoreSetters(
   | 'createAndLoginProfile'
   | 'createAndLoginSimpleProfile'
   | 'updateActiveProfileAvatar'
+  | 'setWeeklyScoreGoal'
   | 'getActiveProfile'
   | 'addGameHistory'
   | 'getGameHistory'
@@ -491,6 +493,39 @@ export function createGameStoreSetters(
           [activeProfile.username]: {
             ...activeProfile,
             avatarId,
+            updatedAt: Date.now(),
+          },
+        },
+      });
+
+      return { success: true };
+    },
+    setWeeklyScoreGoal: (goal): LoginResult => {
+      if (goal !== null && !isValidWeeklyScoreGoal(goal)) {
+        return {
+          success: false,
+          error: 'Weekly goal must be a positive whole number.',
+        };
+      }
+
+      const state = get();
+      const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
+
+      if (!activeProfile) {
+        return {
+          success: false,
+          error: 'Active profile is unavailable.',
+        };
+      }
+
+      const { weeklyScoreGoal: _previousGoal, ...profileWithoutGoal } = activeProfile;
+
+      set({
+        profiles: {
+          ...state.profiles,
+          [activeProfile.username]: {
+            ...profileWithoutGoal,
+            ...(goal !== null && { weeklyScoreGoal: goal }),
             updatedAt: Date.now(),
           },
         },

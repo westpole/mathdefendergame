@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
@@ -8,16 +8,25 @@ import {
   resolveAvatarId,
   type AvatarId,
 } from '@shared/avatarCatalog';
+import { isFeatureEnabled } from '@shared/featureFlags';
+import { WEEKLY_GOAL_PRESETS } from '@store/constants';
 import { useGameStore } from '@store/useGameStore';
+import { Select, type SelectOption } from '@ui/components/Select';
+
+const GOAL_OFF_VALUE = 'off';
 
 /**
- * Settings overlay that allows the active player to update profile avatar.
+ * Settings overlay where the active player updates their avatar and weekly goal.
+ * Both use one Save button. The goal section is hidden when the `achievements` flag is off.
  */
 export function SettingsOverlay() {
   const { t } = useTranslation();
   const activeUsername = useGameStore((state) => state.activeUsername);
   const profiles = useGameStore((state) => state.profiles);
   const updateActiveProfileAvatar = useGameStore((state) => state.updateActiveProfileAvatar);
+  const setWeeklyScoreGoal = useGameStore((state) => state.setWeeklyScoreGoal);
+  const isGoalEnabled = isFeatureEnabled('achievements');
+  const goalLabelId = useId();
   const activeProfile = activeUsername ? profiles[activeUsername] : null;
   const persistedAvatarId = resolveAvatarId(activeProfile?.avatarId);
   const [pendingAvatarId, setPendingAvatarId] = useState<AvatarId | null>(null);
@@ -25,7 +34,21 @@ export function SettingsOverlay() {
   const [isSaveAnimating, setIsSaveAnimating] = useState(false);
   const saveAnimationTimeoutRef = useRef<number | null>(null);
   const draftAvatarId = pendingAvatarId ?? persistedAvatarId;
-  const hasUnsavedChanges = pendingAvatarId !== null && pendingAvatarId !== persistedAvatarId;
+  const persistedGoalValue = activeProfile?.weeklyScoreGoal ? String(activeProfile.weeklyScoreGoal) : GOAL_OFF_VALUE;
+  const [pendingGoalValue, setPendingGoalValue] = useState<string | null>(null);
+  const draftGoalValue = pendingGoalValue ?? persistedGoalValue;
+  const hasAvatarChange = pendingAvatarId !== null && pendingAvatarId !== persistedAvatarId;
+  const hasGoalChange = pendingGoalValue !== null && pendingGoalValue !== persistedGoalValue;
+  const hasUnsavedChanges = hasAvatarChange || hasGoalChange;
+  const goalOptions: SelectOption[] = [
+    { value: GOAL_OFF_VALUE, label: t('achievements.goal.off') },
+    ...WEEKLY_GOAL_PRESETS.map((goal) => ({ value: String(goal), label: goal.toLocaleString() })),
+  ];
+
+  // Keep a saved goal visible even when it isn't one of the presets.
+  if (!goalOptions.some((option) => option.value === persistedGoalValue)) {
+    goalOptions.push({ value: persistedGoalValue, label: Number(persistedGoalValue).toLocaleString() });
+  }
 
   const avatarOptions = avatarIds.map((avatarId) => ({ avatarId, src: avatarImageById[avatarId] }));
 
@@ -50,14 +73,28 @@ export function SettingsOverlay() {
   };
 
   const handleSave = () => {
-    const result = updateActiveProfileAvatar(draftAvatarId);
+    if (hasAvatarChange) {
+      const result = updateActiveProfileAvatar(draftAvatarId);
 
-    if (!result.success) {
-      setErrorMessage(result.error ?? t('ui.settingsAvatarSaveError'));
-      return;
+      if (!result.success) {
+        setErrorMessage(result.error ?? t('ui.settingsAvatarSaveError'));
+        return;
+      }
+
+      setPendingAvatarId(null);
     }
 
-    setPendingAvatarId(null);
+    if (hasGoalChange) {
+      const result = setWeeklyScoreGoal(draftGoalValue === GOAL_OFF_VALUE ? null : Number(draftGoalValue));
+
+      if (!result.success) {
+        setErrorMessage(result.error ?? t('achievements.goal.saveError'));
+        return;
+      }
+
+      setPendingGoalValue(null);
+    }
+
     setErrorMessage(null);
     triggerSaveAnimation();
   };
@@ -96,6 +133,28 @@ export function SettingsOverlay() {
             })}
           </div>
         </section>
+
+        {isGoalEnabled && (
+          <section aria-labelledby={goalLabelId} className="settings-goal-section" data-testid="settings-goal-section">
+            <h2 className="settings-avatar-section__title" id={goalLabelId}>{t('achievements.goal.title')}</h2>
+            {activeProfile ? (
+              <>
+                <Select
+                  id={`${goalLabelId}-select`}
+                  labelId={goalLabelId}
+                  onChange={setPendingGoalValue}
+                  options={goalOptions}
+                  value={draftGoalValue}
+                />
+                <p className="settings-goal-section__hint">{t('achievements.goal.helper')}</p>
+              </>
+            ) : (
+              <p className="settings-goal-section__hint" data-testid="settings-goal-guest-hint">
+                {t('achievements.goal.guestHint')}
+              </p>
+            )}
+          </section>
+        )}
 
         {errorMessage && (
           <div className="form-error-block" role="alert">

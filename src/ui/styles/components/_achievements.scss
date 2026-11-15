@@ -295,3 +295,92 @@
   background: rgba(147, 197, 253, 0.12);
   color: $text-link;
 }
+
+// Weekly goal
+.goal-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.goal-progress__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $spacing-sm;
+}
+
+.goal-progress__value {
+  color: $text-primary;
+  font-size: 1.1rem;
+}
+
+.goal-progress__percent {
+  color: $text-secondary;
+  font-size: 0.85rem;
+}
+
+.goal-progress__fill {
+  background: $text-link;
+}
+
+.goal-progress__fill--met {
+  background: $color-success-green;
+}
+
+.goal-progress__today,
+.goal-progress__note {
+  color: $text-secondary;
+  font-size: 0.8rem;
+}
+
+.goal-progress__met {
+  color: $color-success-green;
+  font-weight: 600;
+}
+
+.achievements-goal-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $spacing-xs;
+
+  strong {
+    color: $text-primary;
+  }
+}
+
+.settings-panel {
+  overflow-y: auto;
+}
+
+.settings-goal-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.settings-goal-section__hint {
+  color: $text-muted;
+  font-size: 0.8rem;
+}
+
+.gameover-goal {
+  margin: $spacing-sm 0 0;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-md;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.gameover-goal--counted {
+  border: 1px solid $border-success;
+  color: $color-success-green;
+}
+
+.gameover-goal--capped,
+.gameover-goal--low-accuracy,
+.gameover-goal--too-short {
+  border: 1px solid $color-warning-yellow;
+  color: $color-primary-yellow;
+}

@@ -151,6 +151,22 @@ describe('migrateProfiles', () => {
     expect(migrated.notAnArray?.achievements).toEqual([]);
   });
 
+  it('keeps a positive whole weeklyScoreGoal and drops anything else', () => {
+    const migrated = migrateProfiles({
+      valid: { weeklyScoreGoal: 2500 },
+      zero: { weeklyScoreGoal: 0 },
+      negative: { weeklyScoreGoal: -100 },
+      fraction: { weeklyScoreGoal: 99.5 },
+      text: { weeklyScoreGoal: '1000' },
+      missing: {},
+    });
+
+    expect(migrated.valid?.weeklyScoreGoal).toBe(2500);
+    for (const name of ['zero', 'negative', 'fraction', 'text', 'missing']) {
+      expect(migrated[name]).not.toHaveProperty('weeklyScoreGoal');
+    }
+  });
+
   it('does not read legacy preferredDifficulty in canonical migrations', () => {
     const migrated = migrateProfiles({
       alpha: {

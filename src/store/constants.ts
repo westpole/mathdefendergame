@@ -73,3 +73,11 @@ export const STREAK_TIERS = [3, 6, 12] as const;
 export const SHIELD_EVERY_N_WEEKS = 4;
 /** Most streak shields a player can hold at once. */
 export const SHIELD_MAX_BANKED = 1;
+/** Lowest run accuracy (0–1) that counts toward the weekly goal. */
+export const GOAL_MIN_ACCURACY = 0.85;
+/** Fewest answers a run needs to count toward the weekly goal. */
+export const GOAL_MIN_ANSWERS = 10;
+/** Share of the weekly goal that can be credited on one day. */
+export const GOAL_DAILY_CAP_RATIO = 0.4;
+/** Weekly goal options offered in Settings. */
+export const WEEKLY_GOAL_PRESETS = [500, 1000, 2500, 5000] as const;

@@ -4,7 +4,11 @@ import {
   addLocalDays,
   buildActiveDaysByWeek,
   buildWeekDays,
+  computeWeeklyGoalProgress,
   computeWeeklyStreak,
+  describeRunGoalResult,
+  getRunAccuracy,
+  isQualifyingRun,
   evaluateNewAchievements,
   STREAK_TIER_IDS,
   getAchievementKey,
@@ -384,6 +388,121 @@ describe('achievement selectors', () => {
       expect(getAchievementKey({ id: 'weekly-goal-met', weekKey: '2026-W46' })).toBe('weekly-goal-met|2026-W46');
       expect(getAchievementKey({ id: 'weekly-streak-gold', weekKey: '2026-W46' })).toBe('weekly-streak-gold');
       expect(getAchievementKey({ id: 'mastery-add' })).toBe('mastery-add');
+    });
+  });
+
+  describe('weekly goal', () => {
+    const run = (playedAt: number, finalScore: number, correctAnswers = 17, incorrectAnswers = 3) => (
+      makeRun(playedAt, { finalScore, correctAnswers, incorrectAnswers })
+    );
+
+    it('qualifies runs at 85.0% accuracy but not 84.9%', () => {
+      expect(isQualifyingRun({ correctAnswers: 17, incorrectAnswers: 3 })).toBe(true);
+      expect(isQualifyingRun({ correctAnswers: 849, incorrectAnswers: 151 })).toBe(false);
+      expect(isQualifyingRun({ correctAnswers: 850, incorrectAnswers: 150 })).toBe(true);
+    });
+
+    it('requires at least 10 answers whatever the accuracy', () => {
+      expect(isQualifyingRun({ correctAnswers: 9, incorrectAnswers: 0 })).toBe(false);
+      expect(isQualifyingRun({ correctAnswers: 10, incorrectAnswers: 0 })).toBe(true);
+      expect(getRunAccuracy({ correctAnswers: 0, incorrectAnswers: 0 })).toBe(0);
+    });
+
+    it('adds qualifying runs across days: 200 Mon + 300 Tue = 500 / 1000', () => {
+      const progress = computeWeeklyGoalProgress([run(at(2026, 11, 9), 200), run(at(2026, 11, 10), 300)], 1000, at(2026, 11, 10, 18));
+
+      expect(progress).toEqual({
+        creditedScore: 500,
+        goal: 1000,
+        percent: 50,
+        met: false,
+        todayCredited: 300,
+        todayCap: 400,
+        nonQualifyingRuns: 0,
+      });
+    });
+
+    it('caps one day at 40% of the goal across several runs', () => {
+      const history = [run(at(2026, 11, 9, 9), 300), run(at(2026, 11, 9, 12), 250), run(at(2026, 11, 9, 15), 150)];
+      const progress = computeWeeklyGoalProgress(history, 1000, at(2026, 11, 9, 20));
+
+      expect(progress.creditedScore).toBe(400);
+      expect(progress.todayCredited).toBe(400);
+    });
+
+    it('skips runs that do not qualify and counts them', () => {
+      const history = [
+        run(at(2026, 11, 9), 500, 849, 151),
+        run(at(2026, 11, 9, 13), 500, 9, 0),
+        run(at(2026, 11, 10), 200),
+      ];
+      const progress = computeWeeklyGoalProgress(history, 1000, at(2026, 11, 11));
+
+      expect(progress.creditedScore).toBe(200);
+      expect(progress.nonQualifyingRuns).toBe(2);
+      expect(progress.todayCredited).toBe(0);
+    });
+
+    it('counts only the calendar week of now, from Monday 00:00', () => {
+      const history = [run(at(2026, 11, 8, 23, 59), 300), run(at(2026, 11, 9, 0, 0), 100), run(at(2026, 11, 16, 0, 0), 300)];
+
+      expect(computeWeeklyGoalProgress(history, 1000, at(2026, 11, 15, 23, 59)).creditedScore).toBe(100);
+    });
+
+    it('marks the goal met and caps percent at 100', () => {
+      const history = [0, 1, 2].map((day) => run(at(2026, 11, 9 + day), 400));
+      const progress = computeWeeklyGoalProgress(history, 1000, at(2026, 11, 12));
+
+      expect(progress.creditedScore).toBe(1200);
+      expect(progress.met).toBe(true);
+      expect(progress.percent).toBe(100);
+    });
+
+    describe('describeRunGoalResult', () => {
+      it('reports the credit and new percent for a qualifying run', () => {
+        const first = run(at(2026, 11, 9), 200);
+        const latest = run(at(2026, 11, 10), 320);
+
+        expect(describeRunGoalResult([latest, first], latest, 1000)).toEqual({ kind: 'counted', credited: 320, percent: 52 });
+      });
+
+      it('reports partial credit when the run hits the daily cap', () => {
+        const first = run(at(2026, 11, 9, 9), 300);
+        const latest = run(at(2026, 11, 9, 12), 300);
+
+        expect(describeRunGoalResult([latest, first], latest, 1000)).toEqual({ kind: 'counted', credited: 100, percent: 40 });
+      });
+
+      it('reports the cap once today is full', () => {
+        const first = run(at(2026, 11, 9, 9), 500);
+        const latest = run(at(2026, 11, 9, 12), 300);
+
+        expect(describeRunGoalResult([latest, first], latest, 1000)).toEqual({ kind: 'capped' });
+      });
+
+      it('reports low accuracy with one decimal, rounded down', () => {
+        const latest = run(at(2026, 11, 9), 300, 849, 151);
+
+        expect(describeRunGoalResult([latest], latest, 1000)).toEqual({ kind: 'low-accuracy', accuracyPercent: 84.9 });
+      });
+
+      it('computes low accuracy from whole numbers, avoiding float drift', () => {
+        const latest = run(at(2026, 11, 9), 300, 29, 71);
+
+        expect(describeRunGoalResult([latest], latest, 1000)).toEqual({ kind: 'low-accuracy', accuracyPercent: 29 });
+      });
+
+      it('keeps at least 1 point of daily credit for tiny goals', () => {
+        const latest = run(at(2026, 11, 9), 300);
+
+        expect(computeWeeklyGoalProgress([latest], 1, at(2026, 11, 9, 18))).toMatchObject({ creditedScore: 1, met: true, todayCap: 1 });
+      });
+
+      it('reports runs with fewer than 10 answers', () => {
+        const latest = run(at(2026, 11, 9), 300, 9, 0);
+
+        expect(describeRunGoalResult([latest], latest, 1000)).toEqual({ kind: 'too-short' });
+      });
     });
   });
 });

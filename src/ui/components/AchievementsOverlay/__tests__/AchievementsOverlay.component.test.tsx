@@ -1,7 +1,7 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { activeWeek, at, mondayWeeksBefore } from '@store/selectors/__tests__/achievementTestUtils';
+import { activeWeek, at, makeRun, mondayWeeksBefore } from '@store/selectors/__tests__/achievementTestUtils';
 import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/types';
 import type { EarnedAchievement, GameHistoryEntry } from '@shared/types';
@@ -26,14 +26,18 @@ const profile = {
 
 function seed(
   history: GameHistoryEntry[],
-  { guest = false, achievements }: { guest?: boolean; achievements?: EarnedAchievement[] } = {},
+  {
+    guest = false,
+    achievements,
+    weeklyScoreGoal,
+  }: { guest?: boolean; achievements?: EarnedAchievement[]; weeklyScoreGoal?: number } = {},
 ) {
   useGameStore.setState({
     ...(structuredClone(baseStoreState) as Partial<GameStoreState>),
     phase: 'start',
     screenView: 'achievements',
     activeUsername: guest ? null : 'AcePilot',
-    profiles: guest ? {} : { AcePilot: { ...profile, ...(achievements && { achievements }) } },
+    profiles: guest ? {} : { AcePilot: { ...profile, ...(achievements && { achievements }), ...(weeklyScoreGoal && { weeklyScoreGoal }) } },
     gameHistoryByProfile: { [guest ? '__guest__' : 'AcePilot']: history },
   });
 }
@@ -197,6 +201,77 @@ describe('AchievementsOverlay', () => {
 
     expect(screen.getByRole('img', { name: 'Щит серії: Один пропущений тиждень не зламає серію' })).toBeInTheDocument();
     expect(screen.getByTestId('achievements-streak-risk')).toHaveTextContent('Щит збереже твою серію');
+  });
+
+  describe('goal card', () => {
+    const goalRun = (playedAt: number, finalScore: number, correctAnswers = 17, incorrectAnswers = 3) => (
+      makeRun(playedAt, { finalScore, correctAnswers, incorrectAnswers })
+    );
+
+    it('prompts to set a goal with a link to Settings when the goal is off', () => {
+      seed([]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-goal-empty')).toHaveTextContent('Set a weekly goal');
+      fireEvent.click(screen.getByTestId('achievements-goal-open-settings'));
+
+      expect(useGameStore.getState().screenView).toBe('settings');
+    });
+
+    it('shows a guest hint instead of the Settings link', () => {
+      seed([], { guest: true });
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-goal-empty')).toHaveTextContent('Create a profile to set a goal');
+      expect(screen.queryByTestId('achievements-goal-open-settings')).not.toBeInTheDocument();
+    });
+
+    it('starts at 0%', () => {
+      seed([], { weeklyScoreGoal: 1000 });
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByRole('progressbar', { name: 'Weekly goal progress' })).toHaveAttribute('aria-valuenow', '0');
+      expect(screen.getByTestId('goal-progress-value')).toHaveTextContent('0 / 1,000');
+    });
+
+    it('shows partial progress from qualifying runs and ignores the rest', () => {
+      seed([
+        goalRun(at(2026, 11, 9), 200),
+        goalRun(at(2026, 11, 10), 300),
+        goalRun(at(2026, 11, 11), 900, 849, 151),
+      ], { weeklyScoreGoal: 1000 });
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
+      expect(screen.getByTestId('goal-progress-value')).toHaveTextContent('500 / 1,000');
+      expect(screen.getByTestId('goal-progress-non-qualifying')).toHaveTextContent('1 run this week did not count');
+    });
+
+    it('shows today capped at 40% of the goal', () => {
+      seed([goalRun(at(2026, 11, 12, 9), 700)], { weeklyScoreGoal: 1000 });
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('goal-progress-value')).toHaveTextContent('400 / 1,000');
+      expect(screen.getByTestId('goal-progress-today')).toHaveTextContent('+400 today (max 400)');
+    });
+
+    it('celebrates a met goal', () => {
+      seed([0, 1, 2].map((day) => goalRun(at(2026, 11, 9 + day), 200)), { weeklyScoreGoal: 500 });
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100');
+      expect(screen.getByTestId('goal-progress-met')).toHaveTextContent('Weekly goal reached!');
+    });
+
+    it('renders the goal card in Ukrainian', async () => {
+      await i18n.changeLanguage('uk');
+      seed([goalRun(at(2026, 11, 12, 9), 200), goalRun(at(2026, 11, 12, 10), 200, 5, 5)], { weeklyScoreGoal: 1000 });
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByRole('heading', { name: 'Тижнева ціль' })).toBeInTheDocument();
+      expect(screen.getByTestId('goal-progress-today')).toHaveTextContent('+200 сьогодні (макс. 400)');
+      expect(screen.getByTestId('goal-progress-non-qualifying')).toHaveTextContent('1 забіг цього тижня не зараховано');
+    });
   });
 
   it('falls back to the time the screen opened when no reference time is given', () => {

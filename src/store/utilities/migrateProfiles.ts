@@ -1,5 +1,5 @@
 import type { PlayerProfile } from '@store/types';
-import { normalizeGrade } from '@store/utilities/general';
+import { isValidWeeklyScoreGoal, normalizeGrade } from '@store/utilities/general';
 import { resolveAvatarId } from '@shared/avatarCatalog';
 import { ACHIEVEMENT_IDS, MATH_OPERATIONS, WEEKLY_ACHIEVEMENT_IDS } from '@shared/constants';
 import { getAchievementKey } from '@store/selectors/achievements';
@@ -101,6 +101,7 @@ export function migrateProfiles(rawProfiles: unknown): Record<string, PlayerProf
       preferredGrade,
       ...(lastPracticeOperation && { lastPracticeOperation }),
       achievements: resolveAchievements(profileRecord.achievements),
+      ...(isValidWeeklyScoreGoal(profileRecord.weeklyScoreGoal) && { weeklyScoreGoal: profileRecord.weeklyScoreGoal }),
       createdAt: typeof profileRecord.createdAt === 'number' ? profileRecord.createdAt : Date.now(),
       updatedAt: typeof profileRecord.updatedAt === 'number' ? profileRecord.updatedAt : Date.now(),
     };

@@ -211,6 +211,31 @@ describe('achievements in the store', () => {
     });
   });
 
+  describe('setWeeklyScoreGoal', () => {
+    it('saves a goal on the active profile and clears it with null', () => {
+      seed([]);
+
+      expect(useGameStore.getState().setWeeklyScoreGoal(1000)).toEqual({ success: true });
+      expect(useGameStore.getState().profiles.PilotOne.weeklyScoreGoal).toBe(1000);
+
+      expect(useGameStore.getState().setWeeklyScoreGoal(null)).toEqual({ success: true });
+      expect(useGameStore.getState().profiles.PilotOne).not.toHaveProperty('weeklyScoreGoal');
+    });
+
+    it.each([0, -500, 12.5, Number.NaN])('rejects %s', (goal) => {
+      seed([]);
+
+      expect(useGameStore.getState().setWeeklyScoreGoal(goal).success).toBe(false);
+      expect(useGameStore.getState().profiles.PilotOne.weeklyScoreGoal).toBeUndefined();
+    });
+
+    it('fails for guests', () => {
+      seed([], {}, null);
+
+      expect(useGameStore.getState().setWeeklyScoreGoal(500)).toEqual({ success: false, error: 'Active profile is unavailable.' });
+    });
+  });
+
   describe('v5 → v6 migration', () => {
     it('sets achievements to an empty list and keeps existing fields', () => {
       const migrate = useGameStore.persist.getOptions().migrate;

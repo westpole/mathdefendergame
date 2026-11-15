@@ -3,13 +3,16 @@ import type { AchievementId, EarnedAchievement, GameHistoryEntry } from '@shared
 import {
   ACTIVE_DAY_MIN_CORRECT,
   DAY_MS,
+  GOAL_DAILY_CAP_RATIO,
+  GOAL_MIN_ACCURACY,
+  GOAL_MIN_ANSWERS,
   SHIELD_EVERY_N_WEEKS,
   SHIELD_MAX_BANKED,
   STREAK_MIN_DAYS_PER_WEEK,
   STREAK_TIERS,
 } from '@store/constants';
 import type { PlayerProfile } from '@store/types';
-import type { WeeklyStreakSummary } from './types';
+import type { RunGoalResult, WeeklyGoalProgress, WeeklyStreakSummary } from './types';
 
 /**
  * Pads a number to two digits for date keys.
@@ -418,4 +421,145 @@ export function evaluateNewAchievements(
   }
 
   return newAchievements;
+}
+
+/**
+ * Returns a run's accuracy as a share of its answers.
+ *
+ * @param entry - A saved run.
+ * @returns Accuracy from 0 to 1 (0 when the run has no answers).
+ */
+export function getRunAccuracy(entry: Pick<GameHistoryEntry, 'correctAnswers' | 'incorrectAnswers'>): number {
+  const answers = entry.correctAnswers + entry.incorrectAnswers;
+  return answers > 0 ? entry.correctAnswers / answers : 0;
+}
+
+/**
+ * Checks whether a run counts toward the weekly goal: at least `GOAL_MIN_ANSWERS`
+ * answers and `GOAL_MIN_ACCURACY` accuracy.
+ *
+ * @param entry - A saved run.
+ * @returns True when the run qualifies.
+ */
+export function isQualifyingRun(entry: Pick<GameHistoryEntry, 'correctAnswers' | 'incorrectAnswers'>): boolean {
+  return entry.correctAnswers + entry.incorrectAnswers >= GOAL_MIN_ANSWERS
+    && getRunAccuracy(entry) >= GOAL_MIN_ACCURACY;
+}
+
+/**
+ * Returns the most score one day can add toward a weekly goal.
+ *
+ * @param goal - Weekly goal.
+ * @returns The daily cap, rounded to a whole number and at least 1.
+ */
+export function getDailyGoalCap(goal: number): number {
+  return Math.max(1, Math.round(goal * GOAL_DAILY_CAP_RATIO));
+}
+
+/**
+ * Credits qualifying runs in play order, capping each day's total at `dailyCap`.
+ *
+ * @param entries - Runs to credit (any order; non-qualifying runs are skipped).
+ * @param dailyCap - Most score one day can add, or Infinity for no cap.
+ * @returns Credited score per run key, and per day key.
+ */
+export function creditQualifyingRuns(
+  entries: GameHistoryEntry[],
+  dailyCap: number,
+): { byRun: Map<string, number>; byDay: Map<string, number> } {
+  const byRun = new Map<string, number>();
+  const byDay = new Map<string, number>();
+
+  for (const entry of [...entries].sort((left, right) => left.playedAt - right.playedAt)) {
+    if (!isQualifyingRun(entry)) {
+      continue;
+    }
+
+    const dayKey = toDayKey(entry.playedAt);
+    const creditedToday = byDay.get(dayKey) ?? 0;
+    const credited = Math.max(0, Math.min(entry.finalScore, dailyCap - creditedToday));
+    byRun.set(entry.key, credited);
+    byDay.set(dayKey, creditedToday + credited);
+  }
+
+  return { byRun, byDay };
+}
+
+/**
+ * Returns the runs played in the calendar week of `now`, up to `now`.
+ *
+ * @param history - Runs in any order.
+ * @param now - Reference time.
+ * @returns This week's runs.
+ */
+function selectWeekRuns(history: GameHistoryEntry[], now: number): GameHistoryEntry[] {
+  const weekStart = startOfLocalWeek(now);
+  return history.filter((entry) => entry.playedAt >= weekStart && entry.playedAt <= now);
+}
+
+/**
+ * Works out progress toward a weekly goal for the calendar week of `now`. Only
+ * qualifying runs count, and at most `GOAL_DAILY_CAP_RATIO` of the goal per day,
+ * credited in play order.
+ *
+ * @param history - Runs in any order.
+ * @param goal - Weekly goal (positive).
+ * @param now - Reference time.
+ * @returns Credited score, percent, today's credit and cap, and runs that didn't count.
+ * @example
+ * computeWeeklyGoalProgress(history, 1000, Date.now()); // { creditedScore: 500, percent: 50, ... }
+ */
+export function computeWeeklyGoalProgress(
+  history: GameHistoryEntry[],
+  goal: number,
+  now: number,
+): WeeklyGoalProgress {
+  const weekRuns = selectWeekRuns(history, now);
+  const todayCap = getDailyGoalCap(goal);
+  const { byDay } = creditQualifyingRuns(weekRuns, todayCap);
+  const creditedScore = [...byDay.values()].reduce((sum, value) => sum + value, 0);
+
+  return {
+    creditedScore,
+    goal,
+    percent: Math.min(100, (creditedScore / goal) * 100),
+    met: creditedScore >= goal,
+    todayCredited: byDay.get(toDayKey(now)) ?? 0,
+    todayCap,
+    nonQualifyingRuns: weekRuns.filter((entry) => !isQualifyingRun(entry)).length,
+  };
+}
+
+/**
+ * Describes how one saved run counted toward the weekly goal, for the Game Over screen.
+ *
+ * @param history - Runs in any order, including `entry`.
+ * @param entry - The run to describe.
+ * @param goal - Weekly goal (positive).
+ * @returns Counted (with credit and new percent), capped, low accuracy, or too short.
+ */
+export function describeRunGoalResult(
+  history: GameHistoryEntry[],
+  entry: GameHistoryEntry,
+  goal: number,
+): RunGoalResult {
+  const answers = entry.correctAnswers + entry.incorrectAnswers;
+
+  if (answers < GOAL_MIN_ANSWERS) {
+    return { kind: 'too-short' };
+  }
+
+  if (!isQualifyingRun(entry)) {
+    // Integer maths, floored to one decimal, so 84.96% never reads as 85%.
+    return { kind: 'low-accuracy', accuracyPercent: Math.floor((entry.correctAnswers * 1000) / answers) / 10 };
+  }
+
+  const { byRun } = creditQualifyingRuns(selectWeekRuns(history, entry.playedAt), getDailyGoalCap(goal));
+  const credited = byRun.get(entry.key) ?? 0;
+
+  if (credited === 0) {
+    return { kind: 'capped' };
+  }
+
+  return { kind: 'counted', credited, percent: computeWeeklyGoalProgress(history, goal, entry.playedAt).percent };
 }

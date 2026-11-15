@@ -2,11 +2,16 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { selectActiveProfileHistory } from '@store/selectors/performance';
-import { computeWeeklyStreak, evaluateNewAchievements } from '@store/selectors/achievements';
+import {
+  computeWeeklyGoalProgress,
+  computeWeeklyStreak,
+  evaluateNewAchievements,
+} from '@store/selectors/achievements';
 import { useGameStore } from '@store/useGameStore';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
 import { toGradeTitle } from '@ui/utilities/format';
 
+import { GoalCard } from './GoalCard';
 import { MedalShelf } from './MedalShelf';
 import { StreakCard } from './StreakCard';
 
@@ -33,6 +38,11 @@ export function AchievementsOverlay({ now: nowOverride }: AchievementsOverlayPro
     () => (activeProfile ? activeProfile.achievements ?? [] : evaluateNewAchievements(history, null, now)),
     [activeProfile, history, now],
   );
+  const weeklyScoreGoal = activeProfile?.weeklyScoreGoal;
+  const goalProgress = useMemo(
+    () => (weeklyScoreGoal ? computeWeeklyGoalProgress(history, weeklyScoreGoal, now) : null),
+    [history, weeklyScoreGoal, now],
+  );
   const gradeLabel = t(`grades.${grade}`, { defaultValue: toGradeTitle(grade) });
 
   return (
@@ -55,6 +65,7 @@ export function AchievementsOverlay({ now: nowOverride }: AchievementsOverlayPro
 
         <StreakCard now={now} streak={streak} />
         <MedalShelf earned={earned} />
+        <GoalCard isGuest={!activeProfile} progress={goalProgress} />
       </div>
     </div>
   );

@@ -12,6 +12,10 @@ import atRiskMock from './__mocks__/atRisk.json';
 import atRiskWithShieldMock from './__mocks__/atRiskWithShield.json';
 import bronzeEarnedMock from './__mocks__/bronzeEarned.json';
 import emptyMock from './__mocks__/empty.json';
+import goalCappedTodayMock from './__mocks__/goalCappedToday.json';
+import goalMetMock from './__mocks__/goalMet.json';
+import goalPartialMock from './__mocks__/goalPartial.json';
+import goalZeroMock from './__mocks__/goalZero.json';
 import midWeekMock from './__mocks__/midWeek.json';
 import shieldBankedMock from './__mocks__/shieldBanked.json';
 import twoWeekStreakMock from './__mocks__/twoWeekStreak.json';
@@ -147,4 +151,44 @@ export const MobileAtRisk: Story = {
 export const MobileAtRiskWithShield: Story = {
   name: 'Mobile at risk, shield will protect',
   args: { now: STORY_SATURDAY, frame: popularMobileStoryFrame, initialState: atRiskWithShieldMock as Partial<GameStoreState> },
+};
+
+export const GoalZero: Story = {
+  name: 'Weekly goal at 0%',
+  args: { now: STORY_NOW, initialState: goalZeroMock as Partial<GameStoreState> },
+};
+
+export const MobileGoalZero: Story = {
+  name: 'Mobile weekly goal at 0%',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: goalZeroMock as Partial<GameStoreState> },
+};
+
+export const GoalPartial: Story = {
+  name: 'Weekly goal partly reached',
+  args: { now: STORY_NOW, initialState: goalPartialMock as Partial<GameStoreState> },
+};
+
+export const MobileGoalPartial: Story = {
+  name: 'Mobile weekly goal partly reached',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: goalPartialMock as Partial<GameStoreState> },
+};
+
+export const GoalCappedToday: Story = {
+  name: 'Weekly goal capped today',
+  args: { now: STORY_NOW, initialState: goalCappedTodayMock as Partial<GameStoreState> },
+};
+
+export const MobileGoalCappedToday: Story = {
+  name: 'Mobile weekly goal capped today',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: goalCappedTodayMock as Partial<GameStoreState> },
+};
+
+export const GoalMet: Story = {
+  name: 'Weekly goal met',
+  args: { now: STORY_NOW, initialState: goalMetMock as Partial<GameStoreState> },
+};
+
+export const MobileGoalMet: Story = {
+  name: 'Mobile weekly goal met',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: goalMetMock as Partial<GameStoreState> },
 };

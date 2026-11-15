@@ -267,6 +267,29 @@
       "willProtect": "Your shield will protect your streak",
       "weekShielded": "Week protected by shield",
       "lastWeekShielded": "Last week: {{status}}"
+    },
+    "goal": {
+      "title": "Weekly goal",
+      "off": "Off",
+      "helper": "Only runs with 85% accuracy or higher count. Up to 40% of the goal counts each day.",
+      "guestHint": "Create a profile to set a goal",
+      "progress": "{{credited}} / {{goal}}",
+      "progressLabel": "Weekly goal progress",
+      "today": "+{{credited}} today (max {{cap}})",
+      "met": "Weekly goal reached!",
+      "notSet": "Set a weekly goal",
+      "notSetHint": "Pick a goal in Settings. Only accurate runs count toward it.",
+      "openSettings": "Open Settings",
+      "thisWeek": "This week (Mon to Sun)",
+      "nonQualifying_one": "{{count}} run this week did not count (below 85% accuracy or under 10 answers)",
+      "nonQualifying_other": "{{count}} runs this week did not count (below 85% accuracy or under 10 answers)",
+      "saveError": "Could not save the weekly goal.",
+      "gameOver": {
+        "counted": "✓ Counts toward weekly goal: +{{credited}} ({{percent}}%)",
+        "lowAccuracy": "{{accuracy}}% accuracy, reach 85% for it to count",
+        "tooShort": "Runs need at least 10 answers to count toward the weekly goal",
+        "capped": "Daily goal limit reached, come back tomorrow!"
+      }
     }
   }
 }

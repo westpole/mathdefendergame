@@ -1,6 +1,8 @@
 import { startGame } from '@game/scenes/UIScene';
 import { useGameStore } from '@store/useGameStore';
 
+import { GoalResultLine } from './GoalResultLine';
+
 /**
  * Renders the post-run summary shown when the player loses all lives.
  *
@@ -36,6 +38,8 @@ export function GameOverOverlay() {
             <span>Accuracy</span>
             <strong>{finalPerfScore.toFixed(2)}%</strong>
           </div>
+
+          <GoalResultLine />
 
           <div className="action-row center-content">
             <button className="primary-button" onClick={handleStartNewGame} type="button">
