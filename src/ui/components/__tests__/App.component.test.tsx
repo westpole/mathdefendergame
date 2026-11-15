@@ -365,6 +365,43 @@ describe('App start menu controls', () => {
     expect(screen.getByTestId('achievements-overlay')).toBeVisible();
   });
 
+  it('shows the achievement notice on the game-over screen after the grade notice', () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        phase: 'gameover',
+        gradeNotice: { kind: 'promoted', fromGrade: 'trainee', toGrade: 'cadet', operations: [] },
+        achievementNotice: [{ id: 'weekly-streak-bronze', earnedAt: 1, weekKey: '2026-W46' }],
+      });
+    });
+
+    render(<App />);
+
+    expect(screen.getByTestId('grade-notice-overlay')).toBeVisible();
+    expect(screen.queryByTestId('achievement-notice-overlay')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('grade-notice-dismiss'));
+
+    expect(screen.getByTestId('achievement-notice-overlay')).toBeVisible();
+  });
+
+  it('hides the achievement notice when the achievements flag is off', () => {
+    featureFlagMocks.overrides = { achievements: false };
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        phase: 'gameover',
+        achievementNotice: [{ id: 'weekly-streak-bronze', earnedAt: 1, weekKey: '2026-W46' }],
+      });
+    });
+
+    render(<App />);
+
+    expect(screen.queryByTestId('achievement-notice-overlay')).not.toBeInTheDocument();
+  });
+
   it('hides the Achievements menu entry and page when the achievements flag is off', () => {
     featureFlagMocks.overrides = { achievements: false };
     act(() => {

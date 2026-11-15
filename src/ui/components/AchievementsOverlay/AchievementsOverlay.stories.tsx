@@ -7,6 +7,8 @@ import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
+import allMedalsMock from './__mocks__/allMedals.json';
+import bronzeEarnedMock from './__mocks__/bronzeEarned.json';
 import emptyMock from './__mocks__/empty.json';
 import midWeekMock from './__mocks__/midWeek.json';
 import twoWeekStreakMock from './__mocks__/twoWeekStreak.json';
@@ -84,4 +86,30 @@ export const MobileMidWeekPartial: Story = {
 export const MobileTwoWeekStreak: Story = {
   name: 'Mobile two-week streak',
   args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: twoWeekStreakMock as Partial<GameStoreState> },
+};
+
+export const BronzeEarned: Story = {
+  name: 'Relentless Bronze earned',
+  args: { now: STORY_NOW, initialState: bronzeEarnedMock as Partial<GameStoreState> },
+};
+
+export const AllMedals: Story = {
+  name: 'All Relentless medals earned',
+  args: { now: STORY_NOW, initialState: allMedalsMock as Partial<GameStoreState> },
+};
+
+export const AllMedalsUkrainian: Story = {
+  name: 'All Relentless medals earned (uk)',
+  globals: { locale: 'uk' },
+  args: { now: STORY_NOW, initialState: allMedalsMock as Partial<GameStoreState> },
+};
+
+export const MobileBronzeEarned: Story = {
+  name: 'Mobile Relentless Bronze earned',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: bronzeEarnedMock as Partial<GameStoreState> },
+};
+
+export const MobileAllMedals: Story = {
+  name: 'Mobile all Relentless medals earned',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: allMedalsMock as Partial<GameStoreState> },
 };

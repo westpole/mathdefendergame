@@ -107,3 +107,151 @@
     height: 22px;
   }
 }
+
+// Relentless medal shelf
+.achievements-medals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $spacing-sm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.achievements-medal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: $spacing-md $spacing-xs;
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-md;
+  text-align: center;
+}
+
+.achievements-medal__icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.achievements-medal__name {
+  color: $text-primary;
+  font-size: 0.85rem;
+}
+
+.achievements-medal__status {
+  color: $text-secondary;
+  font-size: 0.75rem;
+}
+
+.achievements-medal--bronze:not(.achievements-medal--locked) {
+  border-color: #b45309;
+}
+
+.achievements-medal--silver:not(.achievements-medal--locked) {
+  border-color: #cbd5e1;
+}
+
+.achievements-medal--gold:not(.achievements-medal--locked) {
+  border-color: $color-primary-yellow;
+}
+
+.achievements-medal--locked {
+  opacity: 0.6;
+  filter: grayscale(1);
+}
+
+// After-run achievement notice
+.achievement-notice-screen {
+  z-index: $z-menu-overlay + 2;
+  overflow: hidden;
+}
+
+.achievement-notice-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  border-color: $border-success;
+  text-align: center;
+
+  .overlay-header {
+    justify-content: center;
+    margin-bottom: 0;
+  }
+}
+
+.achievement-notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.achievement-notice-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-md;
+  text-align: left;
+}
+
+.achievement-notice-item__icon {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.achievement-notice-item__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    color: $text-primary;
+    font-size: $font-size-md;
+  }
+}
+
+.achievement-notice-item__rule {
+  color: $text-secondary;
+  font-size: 0.8rem;
+}
+
+.achievement-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.achievement-confetti__piece {
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  animation: achievement-confetti-fall 2.4s ease-in forwards;
+}
+
+.achievement-confetti__piece--0 { background: $color-primary-yellow; }
+.achievement-confetti__piece--1 { background: $color-success-green; }
+.achievement-confetti__piece--2 { background: $color-primary-purple; }
+.achievement-confetti__piece--3 { background: $color-danger-red; }
+.achievement-confetti__piece--4 { background: $text-link; }
+.achievement-confetti__piece--5 { background: $text-primary; }
+
+@keyframes achievement-confetti-fall {
+  to {
+    transform: translateY(110vh) rotate(540deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-confetti {
+    display: none;
+  }
+}

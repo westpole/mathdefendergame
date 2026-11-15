@@ -2,6 +2,7 @@ import { GAME_CONFIG } from '@game/config';
 import type {
   DDAMathTier,
   DDAHeatState,
+  EarnedAchievement,
   Grade,
   GradeNotice,
   MathOperation,
@@ -42,6 +43,7 @@ export const initialState = {
   streakRewardMessage: null,
   pauseOverlay: null,
   gradeNotice: null as GradeNotice | null,
+  achievementNotice: null as EarnedAchievement[] | null,
   gameHistoryByProfile: {},
 };
 

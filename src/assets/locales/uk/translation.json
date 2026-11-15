@@ -210,7 +210,15 @@
         "bronze": "бронза",
         "silver": "срібло",
         "gold": "золото"
-      }
+      },
+      "earned": "Незламний: {{tier}}!",
+      "requirement_few": "{{count}} тижні поспіль",
+      "requirement_many": "{{count}} тижнів поспіль",
+      "requirement_other": "{{count}} тижнів поспіль",
+      "earnedOn": "Здобуто {{date}}",
+      "locked": "Заблоковано",
+      "shelfLabel": "Медалі «Незламний»",
+      "requirement_one": "{{count}} тиждень поспіль"
     },
     "streak": {
       "cardLabel": "Тижнева серія",
@@ -253,6 +261,14 @@
         "sat": "Субота",
         "sun": "Неділя"
       }
+    },
+    "notice": {
+      "title_one": "Нове досягнення!",
+      "title_few": "Нові досягнення!",
+      "title_many": "Нові досягнення!",
+      "title_other": "Нові досягнення!",
+      "body": "Твої регулярні тренування дають результат. Так тримати!",
+      "dismiss": "Продовжити"
     }
   }
 }

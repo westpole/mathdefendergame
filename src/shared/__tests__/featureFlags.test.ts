@@ -9,6 +9,7 @@ describe('feature flags', () => {
         stage_confetti: true,
         streak_reward: true,
         simple_login: true,
+        achievements: true,
       });
       expect(flags).not.toBe(getFeatureFlags());
     });
@@ -19,6 +20,7 @@ describe('feature flags', () => {
       expect(isFeatureEnabled('stage_confetti')).toBe(true);
       expect(isFeatureEnabled('streak_reward')).toBe(true);
       expect(isFeatureEnabled('simple_login')).toBe(true);
+      expect(isFeatureEnabled('achievements')).toBe(true);
     });
 
     it('returns false for flags that are missing', () => {

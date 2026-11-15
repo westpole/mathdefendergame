@@ -210,7 +210,13 @@
         "bronze": "Bronze",
         "silver": "Silver",
         "gold": "Gold"
-      }
+      },
+      "earned": "Relentless {{tier}}!",
+      "requirement_one": "{{count}} weeks in a row",
+      "requirement_other": "{{count}} weeks in a row",
+      "earnedOn": "Earned {{date}}",
+      "locked": "Locked",
+      "shelfLabel": "Relentless medals"
     },
     "streak": {
       "cardLabel": "Weekly streak",
@@ -247,6 +253,12 @@
         "sat": "Saturday",
         "sun": "Sunday"
       }
+    },
+    "notice": {
+      "title_one": "New achievement!",
+      "title_other": "New achievements!",
+      "body": "Your regular practice is paying off. Keep it up!",
+      "dismiss": "Continue"
     }
   }
 }

@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { activeWeek, at, mondayWeeksBefore } from '@store/selectors/__tests__/achievementTestUtils';
 import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/types';
-import type { GameHistoryEntry } from '@shared/types';
+import type { EarnedAchievement, GameHistoryEntry } from '@shared/types';
 
 import i18n from '../../../../i18n/config';
 import baseStoreState from '../../__mocks__/base-store-state.json';
@@ -24,13 +24,16 @@ const profile = {
   updatedAt: 1,
 };
 
-function seed(history: GameHistoryEntry[], { guest = false }: { guest?: boolean } = {}) {
+function seed(
+  history: GameHistoryEntry[],
+  { guest = false, achievements }: { guest?: boolean; achievements?: EarnedAchievement[] } = {},
+) {
   useGameStore.setState({
     ...(structuredClone(baseStoreState) as Partial<GameStoreState>),
     phase: 'start',
     screenView: 'achievements',
     activeUsername: guest ? null : 'AcePilot',
-    profiles: guest ? {} : { AcePilot: profile },
+    profiles: guest ? {} : { AcePilot: { ...profile, ...(achievements && { achievements }) } },
     gameHistoryByProfile: { [guest ? '__guest__' : 'AcePilot']: history },
   });
 }
@@ -47,7 +50,7 @@ describe('AchievementsOverlay', () => {
     expect(screen.getByTestId('achievements-streak-weeks')).toHaveTextContent('0 weeks in a row');
     expect(screen.getByTestId('achievements-streak-next')).toHaveTextContent('Next: Relentless Bronze (3 weeks)');
     expect(screen.getByTestId('achievements-streak-status')).toHaveTextContent('3 more days needed this week');
-    expect(screen.getByText('Practise at least 3 days a week, 3 weeks in a row')).toBeInTheDocument();
+    expect(within(screen.getByTestId('achievements-streak-card')).getByText('Practise at least 3 days a week, 3 weeks in a row')).toBeInTheDocument();
     expect(screen.queryByTestId('achievements-guest-hint')).not.toBeInTheDocument();
   });
 
@@ -105,7 +108,49 @@ describe('AchievementsOverlay', () => {
 
     expect(screen.getByTestId('achievements-streak-weeks')).toHaveTextContent('1 тиждень поспіль');
     expect(screen.getByTestId('achievements-streak-next')).toHaveTextContent('Далі — Незламний: бронза (3 тижні)');
-    expect(screen.getByText('Тренуйся щонайменше 3 дні на тиждень, 3 тижні поспіль')).toBeInTheDocument();
+    expect(within(screen.getByTestId('achievements-streak-card')).getByText('Тренуйся щонайменше 3 дні на тиждень, 3 тижні поспіль')).toBeInTheDocument();
+  });
+
+  it('shows three locked Relentless medals with their requirements', () => {
+    seed([]);
+    render(<AchievementsOverlay now={NOW} />);
+
+    expect(screen.getByRole('heading', { name: 'Relentless' })).toBeInTheDocument();
+    expect(screen.getByTestId('achievements-medal-bronze')).toHaveTextContent('Relentless Bronze');
+    expect(screen.getByTestId('achievements-medal-bronze')).toHaveTextContent('Locked: 3 weeks in a row');
+    expect(screen.getByTestId('achievements-medal-silver')).toHaveTextContent('6 weeks in a row');
+    expect(screen.getByTestId('achievements-medal-gold')).toHaveTextContent('12 weeks in a row');
+    expect(screen.getByTestId('achievements-medal-gold')).toHaveClass('achievements-medal--locked');
+  });
+
+  it('unlocks a saved medal with its earned date', () => {
+    const earnedAt = at(2026, 10, 14);
+    seed([], { achievements: [{ id: 'weekly-streak-bronze', earnedAt, weekKey: '2026-W42' }] });
+    render(<AchievementsOverlay now={NOW} />);
+
+    const expectedDate = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(earnedAt);
+    expect(screen.getByTestId('achievements-medal-bronze')).not.toHaveClass('achievements-medal--locked');
+    expect(screen.getByTestId('achievements-medal-bronze')).toHaveTextContent(`Earned ${expectedDate}`);
+    expect(screen.getByTestId('achievements-medal-silver')).toHaveClass('achievements-medal--locked');
+  });
+
+  it('shows medals a guest history earns without saving them', () => {
+    seed(Array.from({ length: 3 }, (_, index) => activeWeek(mondayWeeksBefore(MONDAY, index + 1))).flat(), { guest: true });
+    render(<AchievementsOverlay now={NOW} />);
+
+    expect(screen.getByTestId('achievements-medal-bronze')).not.toHaveClass('achievements-medal--locked');
+    expect(useGameStore.getState().profiles).toEqual({});
+  });
+
+  it('shows Ukrainian medal names and requirements', async () => {
+    await i18n.changeLanguage('uk');
+    seed([]);
+    render(<AchievementsOverlay now={NOW} />);
+
+    expect(screen.getByTestId('achievements-medal-bronze')).toHaveTextContent('Незламний: бронза');
+    expect(screen.getByTestId('achievements-medal-bronze')).toHaveTextContent('3 тижні поспіль');
+    expect(screen.getByTestId('achievements-medal-silver')).toHaveTextContent('6 тижнів поспіль');
+    expect(screen.getByTestId('achievements-medal-gold')).toHaveTextContent('Незламний: золото');
   });
 
   it('falls back to the time the screen opened when no reference time is given', () => {
@@ -141,6 +186,26 @@ describe('achievement plurals', () => {
   ])('%s next %i', async (language, count, tier, expected) => {
     await i18n.changeLanguage(language);
     expect(i18n.t('achievements.streak.next', { count, tier: i18n.t(`achievements.relentless.tierWord.${tier}`) })).toBe(expected);
+  });
+
+  it.each([
+    ['en', 3, '3 weeks in a row'],
+    ['en', 6, '6 weeks in a row'],
+    ['en', 12, '12 weeks in a row'],
+    ['uk', 3, '3 тижні поспіль'],
+    ['uk', 6, '6 тижнів поспіль'],
+    ['uk', 12, '12 тижнів поспіль'],
+  ])('%s relentless.requirement %i', async (language, count, expected) => {
+    await i18n.changeLanguage(language);
+    expect(i18n.t('achievements.relentless.requirement', { count })).toBe(expected);
+  });
+
+  it.each([
+    ['en', 'bronze', 'Relentless Bronze!'],
+    ['uk', 'gold', 'Незламний: золото!'],
+  ])('%s relentless.earned %s', async (language, tier, expected) => {
+    await i18n.changeLanguage(language);
+    expect(i18n.t('achievements.relentless.earned', { tier: i18n.t(`achievements.relentless.tierWord.${tier}`) })).toBe(expected);
   });
 
   it.each([

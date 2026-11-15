@@ -1,9 +1,12 @@
-import type { GameHistoryEntry } from '@shared/types';
+import { WEEKLY_ACHIEVEMENT_IDS } from '@shared/constants';
+import type { AchievementId, EarnedAchievement, GameHistoryEntry } from '@shared/types';
 import {
   ACTIVE_DAY_MIN_CORRECT,
   DAY_MS,
   STREAK_MIN_DAYS_PER_WEEK,
+  STREAK_TIERS,
 } from '@store/constants';
+import type { PlayerProfile } from '@store/types';
 import type { WeeklyStreakSummary } from './types';
 
 /**
@@ -14,18 +17,6 @@ import type { WeeklyStreakSummary } from './types';
  */
 function pad2(value: number): string {
   return String(value).padStart(2, '0');
-}
-
-/**
- * Returns local midnight of the day that contains a timestamp.
- * Built from local date parts, so DST changes never shift the day.
- *
- * @param ts - Timestamp in milliseconds.
- * @returns Local midnight as a timestamp.
- */
-export function startOfLocalDay(ts: number): number {
-  const date = new Date(ts);
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
 }
 
 /**
@@ -102,20 +93,48 @@ export function toWeekKey(ts: number): string {
 }
 
 /**
- * Sums correct answers per local day.
+ * Finds when each local day became active: the time of the run that took the day's
+ * total correct answers to `ACTIVE_DAY_MIN_CORRECT`. Days that never got there are left out.
  *
  * @param history - Runs in any order.
- * @returns Correct answers keyed by day key.
+ * @returns Activation timestamp keyed by day key.
  */
-function sumCorrectByDay(history: GameHistoryEntry[]): Map<string, number> {
+function buildActiveDayReachedAt(history: GameHistoryEntry[]): Map<string, number> {
   const correctByDay = new Map<string, number>();
+  const reachedAtByDay = new Map<string, number>();
 
-  for (const entry of history) {
+  for (const entry of [...history].sort((left, right) => left.playedAt - right.playedAt)) {
     const dayKey = toDayKey(entry.playedAt);
-    correctByDay.set(dayKey, (correctByDay.get(dayKey) ?? 0) + entry.correctAnswers);
+    const total = (correctByDay.get(dayKey) ?? 0) + entry.correctAnswers;
+    correctByDay.set(dayKey, total);
+
+    if (total >= ACTIVE_DAY_MIN_CORRECT && !reachedAtByDay.has(dayKey)) {
+      reachedAtByDay.set(dayKey, entry.playedAt);
+    }
   }
 
-  return correctByDay;
+  return reachedAtByDay;
+}
+
+/**
+ * Groups active-day activation times by calendar week, earliest first.
+ *
+ * @param history - Runs in any order.
+ * @returns Sorted activation timestamps keyed by week key.
+ */
+function buildActiveDayTimesByWeek(history: GameHistoryEntry[]): Map<string, number[]> {
+  const timesByWeek = new Map<string, number[]>();
+
+  for (const reachedAt of buildActiveDayReachedAt(history).values()) {
+    const weekKey = toWeekKey(reachedAt);
+    timesByWeek.set(weekKey, [...(timesByWeek.get(weekKey) ?? []), reachedAt]);
+  }
+
+  for (const times of timesByWeek.values()) {
+    times.sort((left, right) => left - right);
+  }
+
+  return timesByWeek;
 }
 
 /**
@@ -128,34 +147,27 @@ function sumCorrectByDay(history: GameHistoryEntry[]): Map<string, number> {
  * buildActiveDaysByWeek(history).get('2026-W46')?.size; // 2
  */
 export function buildActiveDaysByWeek(history: GameHistoryEntry[]): Map<string, Set<string>> {
-  const correctByDay = sumCorrectByDay(history);
-  const dayStartByKey = new Map<string, number>();
-
-  for (const entry of history) {
-    dayStartByKey.set(toDayKey(entry.playedAt), startOfLocalDay(entry.playedAt));
-  }
-
   const activeDaysByWeek = new Map<string, Set<string>>();
 
-  for (const [dayKey, correct] of correctByDay) {
-    if (correct < ACTIVE_DAY_MIN_CORRECT) {
-      continue;
-    }
-
-    const weekKey = toWeekKey(dayStartByKey.get(dayKey) ?? 0);
-    const days = activeDaysByWeek.get(weekKey) ?? new Set<string>();
-    days.add(dayKey);
-    activeDaysByWeek.set(weekKey, days);
+  for (const [weekKey, times] of buildActiveDayTimesByWeek(history)) {
+    activeDaysByWeek.set(weekKey, new Set(times.map(toDayKey)));
   }
 
   return activeDaysByWeek;
 }
 
+/** The week at which the streak first reached a given length. */
+interface StreakMilestone {
+  weekKey: string;
+  /** When that week became a streak week (the run that made its last required active day). */
+  reachedAt: number;
+}
+
 /** Result of walking the calendar weeks from the oldest run to the current week. */
 interface StreakWalk {
   streakWeeks: number;
-  /** First week key at which the streak reached each length. */
-  firstWeekKeyByLength: Map<number, string>;
+  /** First time the streak reached each length. */
+  firstReachedByLength: Map<number, StreakMilestone>;
 }
 
 /**
@@ -163,21 +175,21 @@ interface StreakWalk {
  * streak weeks in a row. Completed short weeks break the streak; the current week only
  * adds to it once it reaches the minimum and never breaks it.
  *
- * @param activeDaysByWeek - Output of `buildActiveDaysByWeek`.
+ * @param timesByWeek - Output of `buildActiveDayTimesByWeek`.
  * @param oldestPlayedAt - Timestamp of the oldest run, or null with no history.
  * @param now - Reference time.
- * @returns The streak length now and the week each length was first reached.
+ * @returns The streak length now and when each length was first reached.
  */
 function walkStreakWeeks(
-  activeDaysByWeek: Map<string, Set<string>>,
+  timesByWeek: Map<string, number[]>,
   oldestPlayedAt: number | null,
   now: number,
 ): StreakWalk {
-  const firstWeekKeyByLength = new Map<number, string>();
+  const firstReachedByLength = new Map<number, StreakMilestone>();
   let streakWeeks = 0;
 
   if (oldestPlayedAt === null) {
-    return { streakWeeks, firstWeekKeyByLength };
+    return { streakWeeks, firstReachedByLength };
   }
 
   const currentWeekStart = startOfLocalWeek(now);
@@ -188,20 +200,23 @@ function walkStreakWeeks(
     weekStart = addLocalDays(weekStart, 7)
   ) {
     const weekKey = toWeekKey(weekStart);
-    const isStreakWeek = (activeDaysByWeek.get(weekKey)?.size ?? 0) >= STREAK_MIN_DAYS_PER_WEEK;
+    const activeDayTimes = timesByWeek.get(weekKey) ?? [];
 
-    if (isStreakWeek) {
+    if (activeDayTimes.length >= STREAK_MIN_DAYS_PER_WEEK) {
       streakWeeks += 1;
 
-      if (!firstWeekKeyByLength.has(streakWeeks)) {
-        firstWeekKeyByLength.set(streakWeeks, weekKey);
+      if (!firstReachedByLength.has(streakWeeks)) {
+        firstReachedByLength.set(streakWeeks, {
+          weekKey,
+          reachedAt: activeDayTimes[STREAK_MIN_DAYS_PER_WEEK - 1],
+        });
       }
     } else if (weekStart < currentWeekStart) {
       streakWeeks = 0;
     }
   }
 
-  return { streakWeeks, firstWeekKeyByLength };
+  return { streakWeeks, firstReachedByLength };
 }
 
 /**
@@ -209,19 +224,19 @@ function walkStreakWeeks(
  *
  * @param history - Runs in any order.
  * @param now - Reference time.
- * @returns Active days by week and the streak walk.
+ * @returns Active-day times by week and the streak walk.
  */
 function buildStreakWalk(
   history: GameHistoryEntry[],
   now: number,
-): { activeDaysByWeek: Map<string, Set<string>>; walk: StreakWalk } {
+): { timesByWeek: Map<string, number[]>; walk: StreakWalk } {
   const pastEntries = history.filter((entry) => entry.playedAt <= now);
-  const activeDaysByWeek = buildActiveDaysByWeek(pastEntries);
+  const timesByWeek = buildActiveDayTimesByWeek(pastEntries);
   const oldestPlayedAt = pastEntries.length > 0
     ? pastEntries.reduce((oldest, entry) => Math.min(oldest, entry.playedAt), Infinity)
     : null;
 
-  return { activeDaysByWeek, walk: walkStreakWeeks(activeDaysByWeek, oldestPlayedAt, now) };
+  return { timesByWeek, walk: walkStreakWeeks(timesByWeek, oldestPlayedAt, now) };
 }
 
 /**
@@ -235,8 +250,8 @@ function buildStreakWalk(
  * // { streakWeeks: 2, thisWeekActiveDays: 1, thisWeekActiveDayKeys: ['2026-11-09'], daysNeeded: 2 }
  */
 export function computeWeeklyStreak(history: GameHistoryEntry[], now: number): WeeklyStreakSummary {
-  const { activeDaysByWeek, walk } = buildStreakWalk(history, now);
-  const thisWeekActiveDayKeys = [...(activeDaysByWeek.get(toWeekKey(now)) ?? [])].sort();
+  const { timesByWeek, walk } = buildStreakWalk(history, now);
+  const thisWeekActiveDayKeys = (timesByWeek.get(toWeekKey(now)) ?? []).map(toDayKey);
   const thisWeekActiveDays = thisWeekActiveDayKeys.length;
 
   return {
@@ -275,4 +290,92 @@ export function findNextStreakTier(
 ): { index: number; weeks: number } | null {
   const index = tiers.findIndex((weeks) => weeks > streakWeeks);
   return index === -1 ? null : { index, weeks: tiers[index] };
+}
+
+/** Relentless medal ids in `STREAK_TIERS` order. */
+export const STREAK_TIER_IDS = [
+  'weekly-streak-bronze',
+  'weekly-streak-silver',
+  'weekly-streak-gold',
+] as const satisfies readonly AchievementId[];
+
+/** Inputs shared by every award evaluator. */
+export interface AchievementEvaluationContext {
+  history: GameHistoryEntry[];
+  now: number;
+  /** Profile fields the evaluators read. Null for guests. */
+  profile: Pick<PlayerProfile, 'achievements'> | null;
+  /** False for the silent check on login, so awards that must not be backfilled are skipped. */
+  isAfterRun: boolean;
+}
+
+/** Returns every award the history currently earns for one badge type (saved or not). */
+type AchievementEvaluator = (context: AchievementEvaluationContext) => EarnedAchievement[];
+
+/**
+ * Relentless medals: each tier is earned the first time the streak reaches its length.
+ *
+ * @param context - Evaluation inputs.
+ * @returns One award per tier reached, dated when that week qualified.
+ */
+const evaluateStreakMedals: AchievementEvaluator = ({ history, now }) => {
+  const { walk } = buildStreakWalk(history, now);
+
+  return STREAK_TIERS.flatMap((weeks, index) => {
+    const milestone = walk.firstReachedByLength.get(weeks);
+    return milestone
+      ? [{ id: STREAK_TIER_IDS[index], earnedAt: milestone.reachedAt, weekKey: milestone.weekKey }]
+      : [];
+  });
+};
+
+/** Badge evaluators, in the order their awards are announced. Later badges add one here. */
+const ACHIEVEMENT_EVALUATORS: AchievementEvaluator[] = [evaluateStreakMedals];
+
+/**
+ * Builds the key that makes an award unique: id and week for weekly awards, the id alone
+ * for one-time awards (streak tiers, per-operation mastery).
+ *
+ * @param achievement - Award to key.
+ * @returns The deduplication key.
+ */
+export function getAchievementKey(achievement: Pick<EarnedAchievement, 'id' | 'weekKey'>): string {
+  return WEEKLY_ACHIEVEMENT_IDS.includes(achievement.id)
+    ? `${achievement.id}|${achievement.weekKey ?? ''}`
+    : achievement.id;
+}
+
+/**
+ * Returns only the awards the history earns that the profile has not saved yet.
+ *
+ * @param history - Runs in any order for the profile (or guest).
+ * @param profile - Profile with its saved awards, or null to get every earned award (guests).
+ * @param now - Reference time.
+ * @param options - `isAfterRun: false` for the silent check on login (default true).
+ * @returns New awards, deduplicated, in evaluator order.
+ * @example
+ * const newAwards = evaluateNewAchievements(history, profile, Date.now());
+ */
+export function evaluateNewAchievements(
+  history: GameHistoryEntry[],
+  profile: Pick<PlayerProfile, 'achievements'> | null,
+  now: number,
+  { isAfterRun = true }: { isAfterRun?: boolean } = {},
+): EarnedAchievement[] {
+  const seenKeys = new Set((profile?.achievements ?? []).map(getAchievementKey));
+  const context: AchievementEvaluationContext = { history, now, profile, isAfterRun };
+  const newAchievements: EarnedAchievement[] = [];
+
+  for (const evaluate of ACHIEVEMENT_EVALUATORS) {
+    for (const achievement of evaluate(context)) {
+      const key = getAchievementKey(achievement);
+
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        newAchievements.push(achievement);
+      }
+    }
+  }
+
+  return newAchievements;
 }

@@ -1,6 +1,7 @@
 import type {
   GameStoreState,
   LoginResult,
+  PlayerProfile,
 } from '../types';
 import {
   buildGradeUpdate,
@@ -24,6 +25,10 @@ import {
   buildProgressedProfile,
 } from '../transformers/history';
 import {
+  buildProfileWithNewAchievements,
+  mergeAchievementNotice,
+} from '../transformers/achievements';
+import {
   buildHidePauseOverlayState,
   buildPauseOverlayState,
   buildSavingBeforeCloseState,
@@ -37,6 +42,10 @@ import type {
   GameStoreSetState,
 } from './types';
 import { isAvatarId } from '@shared/avatarCatalog';
+import { isFeatureEnabled } from '@shared/featureFlags';
+import type { GameHistoryEntry } from '@shared/types';
+
+const ACHIEVEMENTS_FLAG = 'achievements';
 
 /**
  * Builds a synthetic password seed for simple profile mode and guest-like account flows.
@@ -79,6 +88,7 @@ export function createGameStoreSetters(
   | 'showGameOver'
   | 'persistPrematureGameEnd'
   | 'dismissGradeNotice'
+  | 'dismissAchievementNotice'
   | 'startPlaying'
   | 'openMenu'
   | 'openScreenView'
@@ -92,6 +102,61 @@ export function createGameStoreSetters(
   | 'addGameHistory'
   | 'getGameHistory'
 > {
+  /**
+   * Silent award check when a profile becomes active: saves awards its history already
+   * earns, without a notice. Awards that must not be backfilled are skipped.
+   *
+   * @param username - Profile that just became active.
+   */
+  const reconcileAchievementsOnLogin = (username: string) => {
+    if (!isFeatureEnabled(ACHIEVEMENTS_FLAG)) {
+      return;
+    }
+
+    const state = get();
+    const profile = state.profiles[username];
+
+    if (!profile) {
+      return;
+    }
+
+    const { profile: nextProfile, newAchievements } = buildProfileWithNewAchievements(
+      profile,
+      state.gameHistoryByProfile[resolveProfileHistoryKey(username)] ?? [],
+      Date.now(),
+      false,
+    );
+
+    if (newAchievements.length > 0) {
+      set({ profiles: { ...state.profiles, [username]: nextProfile } });
+    }
+  };
+
+  /**
+   * Award check after a run is saved. Guests get nothing saved and no notice.
+   *
+   * @param state - Store state before the run is saved.
+   * @param profile - Active profile, or null for guests.
+   * @param history - The profile's history including the new run.
+   * @returns The profile with new awards and the notice to show.
+   */
+  const checkAchievementsAfterRun = (
+    state: GameStoreState,
+    profile: PlayerProfile | null,
+    history: GameHistoryEntry[],
+  ): { profile: PlayerProfile | null; achievementNotice: GameStoreState['achievementNotice'] } => {
+    if (!profile || !isFeatureEnabled(ACHIEVEMENTS_FLAG)) {
+      return { profile, achievementNotice: state.achievementNotice };
+    }
+
+    const result = buildProfileWithNewAchievements(profile, history, Date.now(), true);
+
+    return {
+      profile: result.profile,
+      achievementNotice: mergeAchievementNotice(state.achievementNotice, result.newAchievements),
+    };
+  };
+
   return {
     startRegularPlay: () => set({ runMode: 'regular' }),
     setMobileDevice: (isMobileDevice) => set({ isMobileDevice }),
@@ -128,6 +193,7 @@ export function createGameStoreSetters(
           phase: 'start',
           screenView: 'home',
         });
+        reconcileAchievementsOnLogin(rememberedUsername);
 
         return;
       }
@@ -197,23 +263,32 @@ export function createGameStoreSetters(
           payload.historyEntry,
         );
 
+        const historyKey = resolveProfileHistoryKey(state.activeUsername);
+        const gameHistoryByProfile = buildHistoryByProfileWithEntry(
+          state.gameHistoryByProfile,
+          historyKey,
+          payload.historyEntry,
+        );
+        const { profile: awardedProfile, achievementNotice } = checkAchievementsAfterRun(
+          state,
+          activeProfile,
+          gameHistoryByProfile[historyKey],
+        );
+
         const nextState: Partial<GameStoreState> = {
           score: payload.score,
           grade: resolvedGrade,
           stage: payload.stage,
-          gameHistoryByProfile: buildHistoryByProfileWithEntry(
-            state.gameHistoryByProfile,
-            resolveProfileHistoryKey(state.activeUsername),
-            payload.historyEntry,
-          ),
+          gameHistoryByProfile,
           gradeNotice,
+          achievementNotice,
         };
 
-        if (activeProfile) {
+        if (awardedProfile) {
           nextState.profiles = {
             ...state.profiles,
-            [activeProfile.username]: buildProgressedProfile(
-              activeProfile,
+            [awardedProfile.username]: buildProgressedProfile(
+              awardedProfile,
               payload.score,
               payload.stage,
               resolvedGrade,
@@ -225,12 +300,14 @@ export function createGameStoreSetters(
       });
     },
     dismissGradeNotice: () => set({ gradeNotice: null }),
+    dismissAchievementNotice: () => set({ achievementNotice: null }),
     startPlaying: () => set({
       phase: 'playing',
       stageMessage: null,
       streakRewardMessage: null,
       pauseOverlay: null,
       gradeNotice: null,
+      achievementNotice: null,
     }),
     openMenu: () => set((state) => buildMenuSnapshot(state, 'home')),
     openScreenView: (screenView) => set((state) => buildMenuSnapshot(state, screenView)),
@@ -283,6 +360,7 @@ export function createGameStoreSetters(
 
         return nextState;
       });
+      reconcileAchievementsOnLogin(normalizedUsername);
 
       return { success: true };
     },
@@ -311,6 +389,7 @@ export function createGameStoreSetters(
         phase: 'start',
         screenView: 'home',
       });
+      reconcileAchievementsOnLogin(normalizedUsername);
 
       return { success: true };
     },
@@ -348,6 +427,7 @@ export function createGameStoreSetters(
         phase: 'start',
         screenView: 'home',
       }));
+      reconcileAchievementsOnLogin(normalizedUsername);
 
       return { success: true };
     },
@@ -383,6 +463,7 @@ export function createGameStoreSetters(
         phase: 'start',
         screenView: 'home',
       }));
+      reconcileAchievementsOnLogin(normalizedUsername);
 
       return { success: true };
     },
@@ -422,14 +503,25 @@ export function createGameStoreSetters(
       return resolveActiveProfile(state.activeUsername, state.profiles);
     },
     addGameHistory: (entry) => {
-      set((state) => ({
-        ...buildGradeUpdate(state.activeUsername, state.gameHistoryByProfile, entry),
-        gameHistoryByProfile: buildHistoryByProfileWithEntry(
-          state.gameHistoryByProfile,
-          resolveProfileHistoryKey(state.activeUsername),
-          entry,
-        ),
-      }));
+      set((state) => {
+        const historyKey = resolveProfileHistoryKey(state.activeUsername);
+        const gameHistoryByProfile = buildHistoryByProfileWithEntry(state.gameHistoryByProfile, historyKey, entry);
+        const activeProfile = resolveActiveProfile(state.activeUsername, state.profiles);
+        const { profile: awardedProfile, achievementNotice } = checkAchievementsAfterRun(
+          state,
+          activeProfile,
+          gameHistoryByProfile[historyKey],
+        );
+
+        return {
+          ...buildGradeUpdate(state.activeUsername, state.gameHistoryByProfile, entry),
+          gameHistoryByProfile,
+          achievementNotice,
+          ...(awardedProfile && awardedProfile !== activeProfile && {
+            profiles: { ...state.profiles, [awardedProfile.username]: awardedProfile },
+          }),
+        };
+      });
     },
     getGameHistory: (username = null, limit = 20) => {
       const state = get();

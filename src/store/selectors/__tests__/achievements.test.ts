@@ -5,6 +5,9 @@ import {
   buildActiveDaysByWeek,
   buildWeekDays,
   computeWeeklyStreak,
+  evaluateNewAchievements,
+  STREAK_TIER_IDS,
+  getAchievementKey,
   findNextStreakTier,
   startOfLocalWeek,
   toDayKey,
@@ -213,6 +216,55 @@ describe('achievement selectors', () => {
 
       expect(toWeekKey(at(2025, 12, 22))).toBe('2025-W52');
       expect(computeWeeklyStreak(history, at(2026, 1, 8, 15)).streakWeeks).toBe(3);
+    });
+  });
+
+  describe('evaluateNewAchievements', () => {
+    const weeks = (count: number) => Array.from({ length: count }, (_, index) => activeWeek(mondayWeeksBefore(MONDAY, index + 1))).flat();
+
+    it('returns nothing below three streak weeks', () => {
+      expect(evaluateNewAchievements(weeks(2), { achievements: [] }, MONDAY)).toEqual([]);
+    });
+
+    it('awards each tier reached, dated by the run that completed the week', () => {
+      const awards = evaluateNewAchievements(weeks(6), null, MONDAY);
+
+      expect(awards).toEqual([
+        { id: 'weekly-streak-bronze', earnedAt: at(2026, 10, 14), weekKey: '2026-W42' },
+        { id: 'weekly-streak-silver', earnedAt: at(2026, 11, 4), weekKey: '2026-W45' },
+      ]);
+    });
+
+    it('skips tiers already saved, even with a different week', () => {
+      const awards = evaluateNewAchievements(weeks(6), {
+        achievements: [{ id: 'weekly-streak-bronze', earnedAt: 1, weekKey: '2025-W01' }],
+      }, MONDAY);
+
+      expect(awards.map((award) => award.id)).toEqual(['weekly-streak-silver']);
+    });
+
+    it('keeps a tier earned before a broken streak and does not re-award it', () => {
+      const history = [
+        ...activeWeek(mondayWeeksBefore(MONDAY, 8)),
+        ...activeWeek(mondayWeeksBefore(MONDAY, 7)),
+        ...activeWeek(mondayWeeksBefore(MONDAY, 6)),
+        ...weeks(3),
+      ];
+      const awards = evaluateNewAchievements(history, null, MONDAY);
+
+      expect(awards).toHaveLength(1);
+      expect(awards[0].weekKey).toBe('2026-W40');
+      expect(evaluateNewAchievements(history, { achievements: awards }, MONDAY)).toEqual([]);
+    });
+
+    it('has one medal id per streak tier', () => {
+      expect(STREAK_TIER_IDS).toHaveLength(STREAK_TIERS.length);
+    });
+
+    it('keys weekly awards by week and one-time awards by id', () => {
+      expect(getAchievementKey({ id: 'weekly-goal-met', weekKey: '2026-W46' })).toBe('weekly-goal-met|2026-W46');
+      expect(getAchievementKey({ id: 'weekly-streak-gold', weekKey: '2026-W46' })).toBe('weekly-streak-gold');
+      expect(getAchievementKey({ id: 'mastery-add' })).toBe('mastery-add');
     });
   });
 });

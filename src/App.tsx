@@ -29,6 +29,7 @@ import { MenuControls } from '@ui/components/MenuControls';
 import { ProfileSelector } from '@ui/components/ProfileSelector';
 import { WeeklyReportOverlay } from '@ui/components/WeeklyReportOverlay';
 import { AchievementsOverlay } from '@ui/components/AchievementsOverlay';
+import { AchievementNoticeOverlay } from '@ui/components/AchievementNoticeOverlay';
 import { isFeatureEnabled } from '@shared/featureFlags';
 
 export function App() {
@@ -93,6 +94,7 @@ export function App() {
         {bootReady && phase === 'stage-message' && <StageMessageOverlay />}
         {bootReady && phase === 'gameover' && <GameOverOverlay />}
         {(isStartPhase || (bootReady && phase === 'gameover')) && <GradeNoticeOverlay />}
+        {isAchievementsEnabled && (isStartPhase || (bootReady && phase === 'gameover')) && <AchievementNoticeOverlay />}
       </div>
     </div>
   );

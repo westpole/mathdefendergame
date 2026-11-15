@@ -85,7 +85,7 @@
 | Ticket | Title | Type | Priority | Size | Status | Blocked by |
 | --- | --- | --- | --- | --- | --- | --- |
 | [#151](./151-achievements-page-weekly-streak.md) | Achievements page with live weekly streak progress | Feature | P1 | M | Done | — |
-| [#152](./152-earn-weekly-streak-medals.md) | Earn and keep the Relentless medal | Feature | P1 | M | Ready for Dev | 151 |
+| [#152](./152-earn-weekly-streak-medals.md) | Earn and keep the Relentless medal | Feature | P1 | M | Done | 151 |
 | [#153](./153-streak-shield.md) | Streak shield protects one missed week | Feature | P2 | S | Ready for Dev | 152 |
 | [#154](./154-weekly-accuracy-goal.md) | Weekly accuracy goal: set in Settings, track progress | Feature | P1 | L | Ready for Dev | 151, 152 |
 | [#155](./155-goal-met-personal-best-badges.md) | Goal Met and Personal Best Week badges, plus suggested goal | Feature | P2 | M | Ready for Dev | 152, 154 |

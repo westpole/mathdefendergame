@@ -1,4 +1,5 @@
 import type {
+  EarnedAchievement,
   GameHistoryEntry,
   Grade,
   DDAMathTier,
@@ -31,6 +32,8 @@ export interface PlayerProfile {
   preferredGrade: Grade;
   /** Operation picked for this profile's most recent practice run; unset until one is started. */
   lastPracticeOperation?: PracticeOperation;
+  /** Awards saved when earned. They stay earned even if the rules or goal change later. */
+  achievements?: EarnedAchievement[];
   createdAt: number;
   updatedAt: number;
 }
@@ -94,6 +97,8 @@ export interface GameStoreState {
   pauseOverlay: PauseOverlayState | null;
   /** After-game promotion/demotion message. Transient: not persisted. */
   gradeNotice: GradeNotice | null;
+  /** Awards earned by the last saved run, shown after the grade notice. Transient: not persisted. */
+  achievementNotice: EarnedAchievement[] | null;
   gameHistoryByProfile: HistoryByProfile;
   markBootReady: () => void;
   setMobileDevice: (isMobileDevice: boolean) => void;
@@ -111,6 +116,7 @@ export interface GameStoreState {
   showGameOver: (payload: Pick<GameStoreState, 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   persistPrematureGameEnd: (payload: PrematureGameEndPayload) => void;
   dismissGradeNotice: () => void;
+  dismissAchievementNotice: () => void;
   startPlaying: () => void;
   openMenu: () => void;
   openScreenView: (screenView: ScreenView) => void;

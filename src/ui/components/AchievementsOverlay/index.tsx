@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { selectActiveProfileHistory } from '@store/selectors/performance';
-import { computeWeeklyStreak } from '@store/selectors/achievements';
+import { computeWeeklyStreak, evaluateNewAchievements } from '@store/selectors/achievements';
 import { useGameStore } from '@store/useGameStore';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
 import { toGradeTitle } from '@ui/utilities/format';
 
+import { MedalShelf } from './MedalShelf';
 import { StreakCard } from './StreakCard';
 
 interface AchievementsOverlayProps {
@@ -16,7 +17,8 @@ interface AchievementsOverlayProps {
 
 /**
  * Achievements screen for the active profile (or guest). Shows the weekly streak toward
- * the Relentless medal, worked out live from saved history.
+ * the Relentless medal, worked out live from saved history, and the medal shelf. Named
+ * profiles show their saved awards; guests see what their history earns, unsaved.
  */
 export function AchievementsOverlay({ now: nowOverride }: AchievementsOverlayProps) {
   const { t } = useTranslation();
@@ -27,6 +29,10 @@ export function AchievementsOverlay({ now: nowOverride }: AchievementsOverlayPro
   const [openedAt] = useState(() => Date.now());
   const now = nowOverride ?? openedAt;
   const streak = useMemo(() => computeWeeklyStreak(history, now), [history, now]);
+  const earned = useMemo(
+    () => (activeProfile ? activeProfile.achievements ?? [] : evaluateNewAchievements(history, null, now)),
+    [activeProfile, history, now],
+  );
   const gradeLabel = t(`grades.${grade}`, { defaultValue: toGradeTitle(grade) });
 
   return (
@@ -48,6 +54,7 @@ export function AchievementsOverlay({ now: nowOverride }: AchievementsOverlayPro
         )}
 
         <StreakCard now={now} streak={streak} />
+        <MedalShelf earned={earned} />
       </div>
     </div>
   );
