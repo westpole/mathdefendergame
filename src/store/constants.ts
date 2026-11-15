@@ -81,3 +81,11 @@ export const GOAL_MIN_ANSWERS = 10;
 export const GOAL_DAILY_CAP_RATIO = 0.4;
 /** Weekly goal options offered in Settings. */
 export const WEEKLY_GOAL_PRESETS = [500, 1000, 2500, 5000] as const;
+/** Suggested goal = 4-week baseline × this multiplier. */
+export const GOAL_SUGGESTION_MULTIPLIER = 1.1;
+/** Suggested goals are rounded to the nearest multiple of this. */
+export const GOAL_SUGGESTION_ROUND_TO = 50;
+/** Complete weeks the baseline averages over, at most. */
+export const BASELINE_WEEKS = 4;
+/** Complete weeks of history needed before a baseline exists. */
+export const BASELINE_MIN_WEEKS = 2;

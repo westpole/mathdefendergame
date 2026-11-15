@@ -384,3 +384,54 @@
   border: 1px solid $color-warning-yellow;
   color: $color-primary-yellow;
 }
+
+// Badge grid
+.achievements-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: $spacing-sm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.achievements-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: $spacing-md $spacing-sm;
+  border: 1px solid $border-success;
+  border-radius: $radius-md;
+  text-align: center;
+}
+
+.achievements-badge__icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.achievements-badge__name {
+  color: $text-primary;
+  font-size: 0.85rem;
+}
+
+.achievements-badge__status {
+  color: $text-secondary;
+  font-size: 0.75rem;
+}
+
+.achievements-badge--locked {
+  border-color: $border-panel-light;
+
+  .achievements-badge__icon {
+    opacity: 0.5;
+    filter: grayscale(1);
+  }
+}
+
+@container (max-width: #{$breakpoint-mobile}) {
+  .achievements-badge-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

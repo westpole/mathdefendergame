@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import clsx from 'clsx';
 
@@ -10,16 +10,34 @@ import {
 } from '@shared/avatarCatalog';
 import { isFeatureEnabled } from '@shared/featureFlags';
 import { WEEKLY_GOAL_PRESETS } from '@store/constants';
+import { computeSuggestedGoal } from '@store/selectors/achievements';
+import { selectActiveProfileHistory } from '@store/selectors/performance';
 import { useGameStore } from '@store/useGameStore';
 import { Select, type SelectOption } from '@ui/components/Select';
 
 const GOAL_OFF_VALUE = 'off';
+const GOAL_SUGGESTED_PREFIX = 'suggested:';
+
+/**
+ * Turns a goal select value into the goal to save.
+ *
+ * @param value - `off`, a number, or `suggested:<number>`.
+ * @returns The goal, or null for Off.
+ */
+function parseGoalValue(value: string): number | null {
+  return value === GOAL_OFF_VALUE ? null : Number(value.replace(GOAL_SUGGESTED_PREFIX, ''));
+}
+
+interface SettingsOverlayProps {
+  /** Reference time for the suggested goal. Defaults to when the screen opened; stories pin it. */
+  now?: number;
+}
 
 /**
  * Settings overlay where the active player updates their avatar and weekly goal.
  * Both use one Save button. The goal section is hidden when the `achievements` flag is off.
  */
-export function SettingsOverlay() {
+export function SettingsOverlay({ now: nowOverride }: SettingsOverlayProps = {}) {
   const { t } = useTranslation();
   const activeUsername = useGameStore((state) => state.activeUsername);
   const profiles = useGameStore((state) => state.profiles);
@@ -27,6 +45,10 @@ export function SettingsOverlay() {
   const setWeeklyScoreGoal = useGameStore((state) => state.setWeeklyScoreGoal);
   const isGoalEnabled = isFeatureEnabled('achievements');
   const goalLabelId = useId();
+  const history = useGameStore(selectActiveProfileHistory);
+  const [openedAt] = useState(() => Date.now());
+  const now = nowOverride ?? openedAt;
+  const suggestedGoal = useMemo(() => computeSuggestedGoal(history, now), [history, now]);
   const activeProfile = activeUsername ? profiles[activeUsername] : null;
   const persistedAvatarId = resolveAvatarId(activeProfile?.avatarId);
   const [pendingAvatarId, setPendingAvatarId] = useState<AvatarId | null>(null);
@@ -38,10 +60,16 @@ export function SettingsOverlay() {
   const [pendingGoalValue, setPendingGoalValue] = useState<string | null>(null);
   const draftGoalValue = pendingGoalValue ?? persistedGoalValue;
   const hasAvatarChange = pendingAvatarId !== null && pendingAvatarId !== persistedAvatarId;
-  const hasGoalChange = pendingGoalValue !== null && pendingGoalValue !== persistedGoalValue;
+  const hasGoalChange = pendingGoalValue !== null
+    && parseGoalValue(pendingGoalValue) !== (activeProfile?.weeklyScoreGoal ?? null);
   const hasUnsavedChanges = hasAvatarChange || hasGoalChange;
   const goalOptions: SelectOption[] = [
     { value: GOAL_OFF_VALUE, label: t('achievements.goal.off') },
+    // Saved as a plain number: the goal doesn't follow later suggestions.
+    ...(suggestedGoal && suggestedGoal !== activeProfile?.weeklyScoreGoal ? [{
+      value: `${GOAL_SUGGESTED_PREFIX}${suggestedGoal}`,
+      label: t('achievements.goal.suggested', { value: suggestedGoal.toLocaleString() }),
+    }] : []),
     ...WEEKLY_GOAL_PRESETS.map((goal) => ({ value: String(goal), label: goal.toLocaleString() })),
   ];
 
@@ -85,7 +113,7 @@ export function SettingsOverlay() {
     }
 
     if (hasGoalChange) {
-      const result = setWeeklyScoreGoal(draftGoalValue === GOAL_OFF_VALUE ? null : Number(draftGoalValue));
+      const result = setWeeklyScoreGoal(parseGoalValue(draftGoalValue));
 
       if (!result.success) {
         setErrorMessage(result.error ?? t('achievements.goal.saveError'));

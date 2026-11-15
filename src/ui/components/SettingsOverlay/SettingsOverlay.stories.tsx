@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useEffect } from 'react';
+import { useEffect, type ComponentProps } from 'react';
 
 import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/types';
@@ -9,12 +9,18 @@ import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks
 
 import profileMenuStore from '../__mocks__/profile-menu-store.json';
 import goalSetMock from './__mocks__/goalSet.json';
+import suggestedGoalMock from './__mocks__/suggestedGoal.json';
 import { SettingsOverlay } from '.';
 
 interface StoryArgs {
   initialState: Partial<GameStoreState>;
   frame?: StoryFrame;
 }
+
+type StoryProps = ComponentProps<typeof SettingsOverlay> & StoryArgs;
+
+/** Thursday 12 Nov 2026, 12:00 UTC. The suggested-goal fixture is built around this week. */
+const STORY_NOW = 1794484800000;
 
 const meta = {
   title: 'Screens/SettingsOverlay',
@@ -25,7 +31,7 @@ const meta = {
   },
   decorators: [
     (Story, context) => {
-      const { initialState, frame } = context.args as StoryArgs;
+      const { initialState, frame } = context.args;
 
       useEffect(() => {
         useGameStore.setState({
@@ -43,7 +49,7 @@ const meta = {
       );
     },
   ],
-} satisfies Meta<typeof SettingsOverlay>;
+} satisfies Meta<StoryProps>;
 
 export default meta;
 
@@ -83,5 +89,22 @@ export const MobileWeeklyGoalSet: Story = {
   args: {
     frame: popularMobileStoryFrame,
     initialState: { ...(structuredClone(goalSetMock) as Partial<GameStoreState>), phase: 'start' },
+  },
+};
+
+export const SuggestedGoal: Story = {
+  name: 'Weekly goal with Suggested (900)',
+  args: {
+    now: STORY_NOW,
+    initialState: { ...(structuredClone(suggestedGoalMock) as Partial<GameStoreState>), phase: 'start' },
+  },
+};
+
+export const MobileSuggestedGoal: Story = {
+  name: 'Mobile weekly goal with Suggested (900)',
+  args: {
+    now: STORY_NOW,
+    frame: popularMobileStoryFrame,
+    initialState: { ...(structuredClone(suggestedGoalMock) as Partial<GameStoreState>), phase: 'start' },
   },
 };

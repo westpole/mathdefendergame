@@ -9,6 +9,14 @@ const ACHIEVEMENT_ICONS: Partial<Record<AchievementId, string>> = {
   'weekly-streak-bronze': '🥉',
   'weekly-streak-silver': '🥈',
   'weekly-streak-gold': '🥇',
+  'weekly-goal-met': '🎯',
+  'personal-best-week': '📈',
+};
+
+/** i18n keys for badges whose title and rule don't depend on the award's details. */
+const BADGE_TEXT_KEYS: Partial<Record<AchievementId, { earned: string; rule: string }>> = {
+  'weekly-goal-met': { earned: 'achievements.badges.goalMet.earned', rule: 'achievements.badges.goalMet.rule' },
+  'personal-best-week': { earned: 'achievements.badges.personalBest.earned', rule: 'achievements.badges.personalBest.rule' },
 };
 
 /**
@@ -37,7 +45,8 @@ export function getAchievementEarnedTitle(t: TFunction, achievement: EarnedAchie
     });
   }
 
-  return achievement.id;
+  const keys = BADGE_TEXT_KEYS[achievement.id];
+  return keys ? t(keys.earned) : achievement.id;
 }
 
 /**
@@ -52,5 +61,6 @@ export function getAchievementRule(t: TFunction, achievement: EarnedAchievement)
     return t('achievements.relentless.subtitle');
   }
 
-  return null;
+  const keys = BADGE_TEXT_KEYS[achievement.id];
+  return keys ? t(keys.rule) : null;
 }

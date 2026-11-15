@@ -274,6 +274,56 @@ describe('AchievementsOverlay', () => {
     });
   });
 
+  describe('badge grid', () => {
+    const scored = (playedAt: number, finalScore: number) => makeRun(playedAt, { finalScore, correctAnswers: 17, incorrectAnswers: 3 });
+
+    it('shows locked Goal Met and the Personal Best unlock hint with little history', () => {
+      seed([]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-badge-goal-met')).toHaveClass('achievements-badge--locked');
+      expect(screen.getByTestId('achievements-badge-goal-met')).toHaveTextContent('Reach your weekly goal to earn it');
+      expect(screen.getByTestId('achievements-badge-personal-best')).toHaveTextContent('Play 2 weeks to unlock');
+    });
+
+    it('counts Goal Met weeks and shows the last Personal Best date', () => {
+      const lastBest = at(2026, 11, 4);
+      seed([], {
+        achievements: [
+          { id: 'weekly-goal-met', earnedAt: 1, weekKey: '2026-W40' },
+          { id: 'weekly-goal-met', earnedAt: 2, weekKey: '2026-W42' },
+          { id: 'weekly-goal-met', earnedAt: 3, weekKey: '2026-W45' },
+          { id: 'personal-best-week', earnedAt: at(2026, 10, 20), weekKey: '2026-W43' },
+          { id: 'personal-best-week', earnedAt: lastBest, weekKey: '2026-W45' },
+        ],
+      });
+      render(<AchievementsOverlay now={NOW} />);
+
+      const expectedDate = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric' }).format(lastBest);
+      expect(screen.getByTestId('achievements-badge-goal-met')).toHaveTextContent('×3');
+      expect(screen.getByTestId('achievements-badge-goal-met')).not.toHaveClass('achievements-badge--locked');
+      expect(screen.getByTestId('achievements-badge-personal-best')).toHaveTextContent(`Last earned ${expectedDate}`);
+    });
+
+    it('shows the baseline to beat once there are 2 complete weeks', () => {
+      seed([scored(mondayWeeksBefore(MONDAY, 2), 400), scored(mondayWeeksBefore(MONDAY, 1), 400), scored(at(2026, 11, 10), 150)], {
+        weeklyScoreGoal: 1000,
+      });
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByTestId('achievements-badge-personal-best')).toHaveTextContent('Beat 400 this week (150 so far)');
+    });
+
+    it('renders badge names in Ukrainian', async () => {
+      await i18n.changeLanguage('uk');
+      seed([]);
+      render(<AchievementsOverlay now={NOW} />);
+
+      expect(screen.getByRole('heading', { name: 'Значки' })).toBeInTheDocument();
+      expect(screen.getByTestId('achievements-badge-personal-best')).toHaveTextContent('Рекордний тиждень');
+    });
+  });
+
   it('falls back to the time the screen opened when no reference time is given', () => {
     seed([]);
     render(<AchievementsOverlay />);

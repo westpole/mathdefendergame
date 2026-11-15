@@ -88,7 +88,7 @@
 | [#152](./152-earn-weekly-streak-medals.md) | Earn and keep the Relentless medal | Feature | P1 | M | Done | 151 |
 | [#153](./153-streak-shield.md) | Streak shield protects one missed week | Feature | P2 | S | Done | 152 |
 | [#154](./154-weekly-accuracy-goal.md) | Weekly accuracy goal: set in Settings, track progress | Feature | P1 | L | Done | 151, 152 |
-| [#155](./155-goal-met-personal-best-badges.md) | Goal Met and Personal Best Week badges, plus suggested goal | Feature | P2 | M | Ready for Dev | 152, 154 |
+| [#155](./155-goal-met-personal-best-badges.md) | Goal Met and Personal Best Week badges, plus suggested goal | Feature | P2 | M | Done | 152, 154 |
 | [#156](./156-focus-of-the-week-badge.md) | Focus of the Week badge for the weakest operation | Feature | P2 | M | Ready for Dev | 152, 155 |
 | [#157](./157-operation-mastery-badges.md) | Operation mastery badges (accuracy and speed) | Feature | P2 | M | Ready for Dev | 152, 155 |
 

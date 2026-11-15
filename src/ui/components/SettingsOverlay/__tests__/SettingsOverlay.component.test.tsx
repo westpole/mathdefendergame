@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { DEFAULT_AVATAR_ID } from '@shared/avatarCatalog';
+import { at, makeRun, mondayWeeksBefore } from '@store/selectors/__tests__/achievementTestUtils';
 import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState, PlayerProfile } from '@store/types';
 
@@ -24,9 +25,13 @@ vi.mock('@shared/featureFlags', async (importOriginal) => {
   };
 });
 
+// Some tests swap in a failing action; every reset restores the real one.
+const { setWeeklyScoreGoal: realSetWeeklyScoreGoal } = useGameStore.getState();
+
 function setMockStoreState(partialState: Partial<GameStoreState> = {}) {
   useGameStore.setState({
     ...(structuredClone(profileMenuStore) as Partial<GameStoreState>),
+    setWeeklyScoreGoal: realSetWeeklyScoreGoal,
     ...partialState,
   });
 }
@@ -154,6 +159,47 @@ describe('SettingsOverlay', () => {
       expect(screen.getByRole('alert')).toHaveTextContent('Nope.');
       expect(screen.getByRole('button', { name: /weekly goal/i })).toHaveTextContent('500');
       expect(screen.getByTestId('settings-save-avatar-button')).toBeEnabled();
+    });
+
+    describe('suggested goal', () => {
+      beforeEach(() => {
+        vi.useFakeTimers({ toFake: ['Date'] });
+        vi.setSystemTime(at(2026, 11, 12));
+      });
+
+      afterEach(() => {
+        vi.useRealTimers();
+      });
+
+      const historyWithBaseline = (score: number) => [1, 2, 3, 4].map((weeksBack) => makeRun(
+        mondayWeeksBefore(at(2026, 11, 9), weeksBack),
+        { finalScore: score, correctAnswers: 17, incorrectAnswers: 3 },
+      ));
+
+      it('offers Suggested (900) for a baseline of 800 and saves the number', () => {
+        setMockStoreState({ gameHistoryByProfile: { AcePilot: historyWithBaseline(800) } });
+        render(<SettingsOverlay />);
+
+        chooseGoal('Suggested (900)');
+        fireEvent.click(screen.getByTestId('settings-save-avatar-button'));
+
+        expect(useGameStore.getState().profiles.AcePilot.weeklyScoreGoal).toBe(900);
+      });
+
+      it('hides Suggested with fewer than 2 complete weeks', () => {
+        setMockStoreState({ gameHistoryByProfile: { AcePilot: historyWithBaseline(800).slice(0, 1).map((entry) => ({ ...entry, playedAt: mondayWeeksBefore(at(2026, 11, 9), 1) })) } });
+        render(<SettingsOverlay />);
+
+        expect(screen.queryByRole('option', { name: /suggested/i, hidden: true })).not.toBeInTheDocument();
+      });
+
+      it('hides Suggested when it equals the saved goal', () => {
+        setMockStoreState({ ...withProfile({ weeklyScoreGoal: 900 }), gameHistoryByProfile: { AcePilot: historyWithBaseline(800) } });
+        render(<SettingsOverlay />);
+
+        expect(screen.getByRole('button', { name: /weekly goal/i })).toHaveTextContent('900');
+        expect(screen.queryByRole('option', { name: /suggested/i, hidden: true })).not.toBeInTheDocument();
+      });
     });
 
     it('shows a hint instead of the goal select for guests', () => {

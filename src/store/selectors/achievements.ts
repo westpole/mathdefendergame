@@ -2,10 +2,14 @@ import { WEEKLY_ACHIEVEMENT_IDS } from '@shared/constants';
 import type { AchievementId, EarnedAchievement, GameHistoryEntry } from '@shared/types';
 import {
   ACTIVE_DAY_MIN_CORRECT,
+  BASELINE_MIN_WEEKS,
+  BASELINE_WEEKS,
   DAY_MS,
   GOAL_DAILY_CAP_RATIO,
   GOAL_MIN_ACCURACY,
   GOAL_MIN_ANSWERS,
+  GOAL_SUGGESTION_MULTIPLIER,
+  GOAL_SUGGESTION_ROUND_TO,
   SHIELD_EVERY_N_WEEKS,
   SHIELD_MAX_BANKED,
   STREAK_MIN_DAYS_PER_WEEK,
@@ -66,6 +70,17 @@ export function addLocalDays(ts: number, days: number): number {
     date.getSeconds(),
     date.getMilliseconds(),
   ).getTime();
+}
+
+/**
+ * Returns the start of the following calendar week. Re-derived with `startOfLocalWeek`
+ * so every week key comes from one function, even where local midnight is skipped by DST.
+ *
+ * @param weekStart - A week start from `startOfLocalWeek`.
+ * @returns The next week's start.
+ */
+export function nextWeekStart(weekStart: number): number {
+  return startOfLocalWeek(addLocalDays(weekStart, 7));
 }
 
 /**
@@ -211,7 +226,7 @@ function walkStreakWeeks(
   for (
     let weekStart = startOfLocalWeek(oldestPlayedAt);
     weekStart <= currentWeekStart;
-    weekStart = addLocalDays(weekStart, 7)
+    weekStart = nextWeekStart(weekStart)
   ) {
     const weekKey = toWeekKey(weekStart);
     const activeDayTimes = timesByWeek.get(weekKey) ?? [];
@@ -342,12 +357,15 @@ export const STREAK_TIER_IDS = [
   'weekly-streak-gold',
 ] as const satisfies readonly AchievementId[];
 
+/** Profile fields the award evaluators read. */
+export type AchievementProfile = Pick<PlayerProfile, 'achievements' | 'weeklyScoreGoal'>;
+
 /** Inputs shared by every award evaluator. */
 export interface AchievementEvaluationContext {
   history: GameHistoryEntry[];
   now: number;
   /** Profile fields the evaluators read. Null for guests. */
-  profile: Pick<PlayerProfile, 'achievements'> | null;
+  profile: AchievementProfile | null;
   /** False for the silent check on login, so awards that must not be backfilled are skipped. */
   isAfterRun: boolean;
 }
@@ -371,9 +389,6 @@ const evaluateStreakMedals: AchievementEvaluator = ({ history, now }) => {
       : [];
   });
 };
-
-/** Badge evaluators, in the order their awards are announced. Later badges add one here. */
-const ACHIEVEMENT_EVALUATORS: AchievementEvaluator[] = [evaluateStreakMedals];
 
 /**
  * Builds the key that makes an award unique: id and week for weekly awards, the id alone
@@ -401,7 +416,7 @@ export function getAchievementKey(achievement: Pick<EarnedAchievement, 'id' | 'w
  */
 export function evaluateNewAchievements(
   history: GameHistoryEntry[],
-  profile: Pick<PlayerProfile, 'achievements'> | null,
+  profile: AchievementProfile | null,
   now: number,
   { isAfterRun = true }: { isAfterRun?: boolean } = {},
 ): EarnedAchievement[] {
@@ -563,3 +578,273 @@ export function describeRunGoalResult(
 
   return { kind: 'counted', credited, percent: computeWeeklyGoalProgress(history, goal, entry.playedAt).percent };
 }
+
+/**
+ * Groups runs up to `now` by the local Monday 00:00 of their week, and lists every week
+ * start from the oldest run's week to the week of `now` (empty weeks included).
+ *
+ * @param history - Runs in any order.
+ * @param now - Reference time.
+ * @returns Runs keyed by week start, and all week starts oldest first (the last one is
+ * the week of `now`).
+ */
+function groupRunsByWeek(
+  history: GameHistoryEntry[],
+  now: number,
+): { runsByWeek: Map<number, GameHistoryEntry[]>; weekStarts: number[] } {
+  const runsByWeek = new Map<number, GameHistoryEntry[]>();
+  let oldest = Infinity;
+
+  for (const entry of history) {
+    if (entry.playedAt > now) {
+      continue;
+    }
+
+    const weekStart = startOfLocalWeek(entry.playedAt);
+    const bucket = runsByWeek.get(weekStart);
+
+    if (bucket) {
+      bucket.push(entry);
+    } else {
+      runsByWeek.set(weekStart, [entry]);
+    }
+
+    oldest = Math.min(oldest, entry.playedAt);
+  }
+
+  const weekStarts: number[] = [];
+
+  if (oldest !== Infinity) {
+    const currentWeekStart = startOfLocalWeek(now);
+
+    for (let weekStart = startOfLocalWeek(oldest); weekStart <= currentWeekStart; weekStart = nextWeekStart(weekStart)) {
+      weekStarts.push(weekStart);
+    }
+  }
+
+  return { runsByWeek, weekStarts };
+}
+
+/**
+ * Sums credited score for a set of runs.
+ *
+ * @param runs - Runs in any order.
+ * @param dailyCap - Most score one day can add, or Infinity.
+ * @returns Total credited score.
+ */
+function sumCredit(runs: GameHistoryEntry[], dailyCap: number): number {
+  return [...creditQualifyingRuns(runs, dailyCap).byDay.values()].reduce((sum, value) => sum + value, 0);
+}
+
+/** Credited score per `weekStart|dailyCap`, shared within one evaluation pass. */
+type WeekCreditCache = Map<string, number>;
+
+/**
+ * Averages credited score over the given complete weeks.
+ *
+ * @param runsByWeek - Runs keyed by week start.
+ * @param priorWeekStarts - Complete weeks to average (at most `BASELINE_WEEKS`).
+ * @param dailyCap - Most score one day can add, or Infinity.
+ * @param cache - Optional per-pass cache of week credit.
+ * @returns The average, or null with fewer than `BASELINE_MIN_WEEKS` weeks.
+ */
+function averageWeeklyCredit(
+  runsByWeek: Map<number, GameHistoryEntry[]>,
+  priorWeekStarts: number[],
+  dailyCap: number,
+  cache: WeekCreditCache = new Map(),
+): number | null {
+  if (priorWeekStarts.length < BASELINE_MIN_WEEKS) {
+    return null;
+  }
+
+  const total = priorWeekStarts.reduce((sum, weekStart) => {
+    const key = `${weekStart}|${dailyCap}`;
+    let credit = cache.get(key);
+
+    if (credit === undefined) {
+      credit = sumCredit(runsByWeek.get(weekStart) ?? [], dailyCap);
+      cache.set(key, credit);
+    }
+
+    return sum + credit;
+  }, 0);
+  return total / priorWeekStarts.length;
+}
+
+/**
+ * Turns an uncapped baseline into a suggested goal.
+ *
+ * @param baseline - Uncapped baseline, or null.
+ * @returns Baseline × `GOAL_SUGGESTION_MULTIPLIER` rounded to `GOAL_SUGGESTION_ROUND_TO`, or null when not positive.
+ */
+function suggestFromBaseline(baseline: number | null): number | null {
+  if (baseline === null) {
+    return null;
+  }
+
+  const suggestion = Math.round((baseline * GOAL_SUGGESTION_MULTIPLIER) / GOAL_SUGGESTION_ROUND_TO) * GOAL_SUGGESTION_ROUND_TO;
+  return suggestion > 0 ? suggestion : null;
+}
+
+/**
+ * Returns the complete weeks (at most `BASELINE_WEEKS`) right before the week at `index`.
+ *
+ * @param weekStarts - All week starts, oldest first.
+ * @param index - Position of the week being checked.
+ * @returns The prior week starts.
+ */
+function priorWeeksOf(weekStarts: number[], index: number): number[] {
+  return weekStarts.slice(Math.max(0, index - BASELINE_WEEKS), index);
+}
+
+/**
+ * Averages credited score over the last `BASELINE_WEEKS` complete weeks before the week
+ * of `now`, including weeks with no credit. Needs `BASELINE_MIN_WEEKS` complete weeks
+ * since the first run.
+ *
+ * @param history - Runs in any order.
+ * @param now - Reference time.
+ * @param goal - Weekly goal whose daily cap applies; uncapped when omitted.
+ * @returns The baseline, or null with too little history.
+ * @example
+ * computeFourWeekBaseline(history, Date.now(), 1000); // 800
+ */
+export function computeFourWeekBaseline(history: GameHistoryEntry[], now: number, goal?: number): number | null {
+  const { runsByWeek, weekStarts } = groupRunsByWeek(history, now);
+  return averageWeeklyCredit(runsByWeek, priorWeeksOf(weekStarts, weekStarts.length - 1), goal ? getDailyGoalCap(goal) : Infinity);
+}
+
+/**
+ * Suggests a weekly goal: the uncapped 4-week baseline × `GOAL_SUGGESTION_MULTIPLIER`,
+ * rounded to the nearest `GOAL_SUGGESTION_ROUND_TO`.
+ *
+ * @param history - Runs in any order.
+ * @param now - Reference time.
+ * @returns The suggestion, or null with too little history or a zero baseline.
+ * @example
+ * computeSuggestedGoal(history, Date.now()); // baseline 800 → 900
+ */
+export function computeSuggestedGoal(history: GameHistoryEntry[], now: number): number | null {
+  return suggestFromBaseline(computeFourWeekBaseline(history, now));
+}
+
+/** Personal-best status for one week. */
+export interface PersonalBestStatus {
+  /** Baseline to beat, or null with fewer than `BASELINE_MIN_WEEKS` complete weeks before it. */
+  baseline: number | null;
+  /** Credited score for the week so far. */
+  creditedScore: number;
+  /** When the week's credit first passed the baseline, or null if it hasn't. */
+  beatenAt: number | null;
+}
+
+/**
+ * Personal-best status for one week from pre-grouped runs. Credit uses the goal's daily
+ * cap; with no goal, the cap of the suggested goal (uncapped if there is none). The
+ * current goal is used for past weeks too (goals aren't stored per week), so changing the
+ * goal can let the login check backfill a past week; saved awards are never removed.
+ *
+ * @param runsByWeek - Runs keyed by week start.
+ * @param weekStarts - All week starts, oldest first.
+ * @param index - Position of the week being checked.
+ * @param goal - The profile's weekly goal, if any.
+ * @param cache - Optional per-pass cache of week credit.
+ * @returns The baseline, the week's credit, and when it beat the baseline.
+ */
+function personalBestForWeek(
+  runsByWeek: Map<number, GameHistoryEntry[]>,
+  weekStarts: number[],
+  index: number,
+  goal: number | undefined,
+  cache: WeekCreditCache = new Map(),
+): PersonalBestStatus {
+  const priorWeeks = priorWeeksOf(weekStarts, index);
+  const effectiveGoal = goal ?? suggestFromBaseline(averageWeeklyCredit(runsByWeek, priorWeeks, Infinity, cache)) ?? undefined;
+  const dailyCap = effectiveGoal ? getDailyGoalCap(effectiveGoal) : Infinity;
+  const baseline = averageWeeklyCredit(runsByWeek, priorWeeks, dailyCap, cache);
+  const weekRuns = [...(runsByWeek.get(weekStarts[index]) ?? [])].sort((left, right) => left.playedAt - right.playedAt);
+  const { byRun } = creditQualifyingRuns(weekRuns, dailyCap);
+  let creditedScore = 0;
+  let beatenAt: number | null = null;
+
+  for (const entry of weekRuns) {
+    creditedScore += byRun.get(entry.key) ?? 0;
+
+    if (beatenAt === null && baseline !== null && creditedScore > baseline) {
+      beatenAt = entry.playedAt;
+    }
+  }
+
+  return { baseline, creditedScore, beatenAt };
+}
+
+/**
+ * Works out whether the week of `now` beats the player's own baseline (complete weeks
+ * before it), counting runs up to `now`.
+ *
+ * @param history - Runs in any order.
+ * @param goal - The profile's weekly goal, if any.
+ * @param now - Reference time.
+ * @returns The baseline, the week's credit, and when it beat the baseline.
+ */
+export function computePersonalBestStatus(
+  history: GameHistoryEntry[],
+  goal: number | undefined,
+  now: number,
+): PersonalBestStatus {
+  const { runsByWeek, weekStarts } = groupRunsByWeek(history, now);
+
+  if (weekStarts.length === 0) {
+    return { baseline: null, creditedScore: 0, beatenAt: null };
+  }
+
+  return personalBestForWeek(runsByWeek, weekStarts, weekStarts.length - 1, goal);
+}
+
+/**
+ * Goal Met: the profile's weekly goal is reached this week. Checked only after a run,
+ * so it is never backfilled (the goal didn't exist for past weeks).
+ *
+ * @param context - Evaluation inputs.
+ * @returns The award for the current week, or nothing.
+ */
+const evaluateGoalMet: AchievementEvaluator = ({ history, now, profile, isAfterRun }) => {
+  const goal = profile?.weeklyScoreGoal;
+
+  if (!isAfterRun || !goal || !computeWeeklyGoalProgress(history, goal, now).met) {
+    return [];
+  }
+
+  return [{ id: 'weekly-goal-met', earnedAt: now, weekKey: toWeekKey(now) }];
+};
+
+/**
+ * Personal Best Week: a week's credit beats the player's baseline. Every week since
+ * the first run is checked (runs are grouped once), so past weeks are backfilled.
+ *
+ * @param context - Evaluation inputs.
+ * @returns One award per week that beat its baseline.
+ */
+const evaluatePersonalBest: AchievementEvaluator = ({ history, now, profile }) => {
+  const { runsByWeek, weekStarts } = groupRunsByWeek(history, now);
+  const cache: WeekCreditCache = new Map();
+
+  return weekStarts.flatMap((weekStart, index) => {
+    if (!runsByWeek.has(weekStart)) {
+      return [];
+    }
+
+    const { beatenAt } = personalBestForWeek(runsByWeek, weekStarts, index, profile?.weeklyScoreGoal, cache);
+    return beatenAt === null
+      ? []
+      : [{ id: 'personal-best-week' as const, earnedAt: beatenAt, weekKey: toWeekKey(weekStart) }];
+  });
+};
+
+/** Badge evaluators, in the order their awards are announced. Later badges add one here. */
+const ACHIEVEMENT_EVALUATORS: AchievementEvaluator[] = [
+  evaluateStreakMedals,
+  evaluateGoalMet,
+  evaluatePersonalBest,
+];

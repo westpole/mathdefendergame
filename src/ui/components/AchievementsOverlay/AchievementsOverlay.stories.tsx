@@ -9,6 +9,8 @@ import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks
 
 import allMedalsMock from './__mocks__/allMedals.json';
 import atRiskMock from './__mocks__/atRisk.json';
+import badgesEarnedMock from './__mocks__/badgesEarned.json';
+import badgesInProgressMock from './__mocks__/badgesInProgress.json';
 import atRiskWithShieldMock from './__mocks__/atRiskWithShield.json';
 import bronzeEarnedMock from './__mocks__/bronzeEarned.json';
 import emptyMock from './__mocks__/empty.json';
@@ -191,4 +193,24 @@ export const GoalMet: Story = {
 export const MobileGoalMet: Story = {
   name: 'Mobile weekly goal met',
   args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: goalMetMock as Partial<GameStoreState> },
+};
+
+export const BadgesInProgress: Story = {
+  name: 'Badges in progress (baseline to beat)',
+  args: { now: STORY_NOW, initialState: badgesInProgressMock as Partial<GameStoreState> },
+};
+
+export const MobileBadgesInProgress: Story = {
+  name: 'Mobile badges in progress (baseline to beat)',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: badgesInProgressMock as Partial<GameStoreState> },
+};
+
+export const BadgesEarned: Story = {
+  name: 'Badges earned (Goal Met ×3, Personal Best)',
+  args: { now: STORY_NOW, initialState: badgesEarnedMock as Partial<GameStoreState> },
+};
+
+export const MobileBadgesEarned: Story = {
+  name: 'Mobile badges earned (Goal Met ×3, Personal Best)',
+  args: { now: STORY_NOW, frame: popularMobileStoryFrame, initialState: badgesEarnedMock as Partial<GameStoreState> },
 };

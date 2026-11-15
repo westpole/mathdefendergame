@@ -136,6 +136,16 @@ describe('AchievementNoticeOverlay', () => {
     expect(screen.getByTestId('achievement-notice-weekly-streak-bronze')).toHaveTextContent('Незламний: бронза!');
   });
 
+  it.each([
+    ['weekly-goal-met' as const, '🎯', 'Goal Met!', 'Weekly goal reached'],
+    ['personal-best-week' as const, '📈', 'Personal Best Week!', 'You beat your usual week'],
+  ])('shows %s with its icon, title and rule', (id, icon, title, rule) => {
+    seed({ achievementNotice: [{ id, earnedAt: 1, weekKey: '2026-W46' }] });
+    render(<AchievementNoticeOverlay />);
+
+    expect(screen.getByTestId(`achievement-notice-${id}`)).toHaveTextContent(`${icon}${title}${rule}`);
+  });
+
   it('falls back to the raw id and a generic icon for awards without display text yet', () => {
     seed({ achievementNotice: [{ id: 'mastery-add', earnedAt: 1, operation: '+' }] });
     render(<AchievementNoticeOverlay />);

@@ -289,6 +289,25 @@
         "lowAccuracy": "{{accuracy}}% accuracy, reach 85% for it to count",
         "tooShort": "Runs need at least 10 answers to count toward the weekly goal",
         "capped": "Daily goal limit reached, come back tomorrow!"
+      },
+      "suggested": "Suggested ({{value}})"
+    },
+    "badges": {
+      "title": "Badges",
+      "goalMet": {
+        "name": "Goal Met",
+        "count": "×{{count}}",
+        "locked": "Reach your weekly goal to earn it",
+        "earned": "Goal Met!",
+        "rule": "Weekly goal reached"
+      },
+      "personalBest": {
+        "name": "Personal Best Week",
+        "locked": "Play 2 weeks to unlock",
+        "target": "Beat {{baseline}} this week ({{credited}} so far)",
+        "earnedOn": "Last earned {{date}}",
+        "earned": "Personal Best Week!",
+        "rule": "You beat your usual week"
       }
     }
   }

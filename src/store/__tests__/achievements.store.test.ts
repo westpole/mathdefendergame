@@ -211,6 +211,29 @@ describe('achievements in the store', () => {
     });
   });
 
+  describe('Goal Met', () => {
+    const goalRun = (day: number, finalScore: number) => makeRun(at(2026, 11, day, 9), { finalScore, correctAnswers: 17, incorrectAnswers: 3 });
+
+    it('saves Goal Met with a notice when a run reaches the goal', () => {
+      seed([goalRun(9, 400), goalRun(10, 400)], { weeklyScoreGoal: 1000 });
+
+      useGameStore.getState().addGameHistory(goalRun(11, 300));
+
+      expect(useGameStore.getState().profiles.PilotOne.achievements).toEqual([
+        { id: 'weekly-goal-met', earnedAt: NOW, weekKey: '2026-W46' },
+      ]);
+      expect(useGameStore.getState().achievementNotice?.map((award) => award.id)).toEqual(['weekly-goal-met']);
+    });
+
+    it('never backfills Goal Met on login', () => {
+      seed([goalRun(9, 400), goalRun(10, 400), goalRun(11, 300)], { weeklyScoreGoal: 1000 }, null);
+
+      useGameStore.getState().selectProfileByUsername('PilotOne');
+
+      expect(useGameStore.getState().profiles.PilotOne.achievements).toBeUndefined();
+    });
+  });
+
   describe('setWeeklyScoreGoal', () => {
     it('saves a goal on the active profile and clears it with null', () => {
       seed([]);

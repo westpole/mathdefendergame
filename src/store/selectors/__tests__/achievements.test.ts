@@ -1,9 +1,13 @@
-import { STREAK_TIERS } from '@store/constants';
+import type { EarnedAchievement } from '@shared/types';
+import { DAY_MS, STREAK_TIERS } from '@store/constants';
 
 import {
   addLocalDays,
   buildActiveDaysByWeek,
   buildWeekDays,
+  computeFourWeekBaseline,
+  computePersonalBestStatus,
+  computeSuggestedGoal,
   computeWeeklyGoalProgress,
   computeWeeklyStreak,
   describeRunGoalResult,
@@ -19,6 +23,8 @@ import {
   toWeekKey,
 } from '../achievements';
 import { activeWeek, at, makeRun, mondayWeeksBefore } from './achievementTestUtils';
+
+const streakOnly = (awards: EarnedAchievement[]) => awards.filter((award) => award.id.startsWith('weekly-streak'));
 
 // Monday 9 Nov 2026 is the start of ISO week 2026-W46.
 const MONDAY = at(2026, 11, 9);
@@ -306,7 +312,7 @@ describe('achievement selectors', () => {
       ];
 
       expect(computeWeeklyStreak(history, MONDAY).streakWeeks).toBe(6);
-      expect(evaluateNewAchievements(history, null, MONDAY).map((award) => award.weekKey)).toEqual(['2026-W41', '2026-W45']);
+      expect(streakOnly(evaluateNewAchievements(history, null, MONDAY)).map((award) => award.weekKey)).toEqual(['2026-W41', '2026-W45']);
     });
   });
 
@@ -373,11 +379,11 @@ describe('achievement selectors', () => {
         ...activeWeek(mondayWeeksBefore(MONDAY, 6)),
         ...weeks(3),
       ];
-      const awards = evaluateNewAchievements(history, null, MONDAY);
+      const awards = streakOnly(evaluateNewAchievements(history, null, MONDAY));
 
       expect(awards).toHaveLength(1);
       expect(awards[0].weekKey).toBe('2026-W40');
-      expect(evaluateNewAchievements(history, { achievements: awards }, MONDAY)).toEqual([]);
+      expect(streakOnly(evaluateNewAchievements(history, { achievements: awards }, MONDAY))).toEqual([]);
     });
 
     it('has one medal id per streak tier', () => {
@@ -502,6 +508,101 @@ describe('achievement selectors', () => {
         const latest = run(at(2026, 11, 9), 300, 9, 0);
 
         expect(describeRunGoalResult([latest], latest, 1000)).toEqual({ kind: 'too-short' });
+      });
+    });
+  });
+
+  describe('baseline, suggested goal and personal best', () => {
+    // One qualifying run per listed week, scored as given (no daily cap reached when uncapped).
+    const scoredWeeks = (scores: number[]) => scores.map((score, index) => makeRun(
+      mondayWeeksBefore(MONDAY, scores.length - index),
+      { finalScore: score, correctAnswers: 17, incorrectAnswers: 3 },
+    ));
+    const thisWeek = (day: number, score: number, hour = 12) => makeRun(at(2026, 11, 9 + day, hour), { finalScore: score, correctAnswers: 17, incorrectAnswers: 3 });
+
+    it('has no baseline with 0 or 1 complete weeks', () => {
+      expect(computeFourWeekBaseline([], MONDAY)).toBeNull();
+      expect(computeFourWeekBaseline([thisWeek(0, 500)], at(2026, 11, 12))).toBeNull();
+      expect(computeFourWeekBaseline(scoredWeeks([500]), at(2026, 11, 12))).toBeNull();
+    });
+
+    it('averages 2 complete weeks, and only the last 4 when there are more', () => {
+      expect(computeFourWeekBaseline(scoredWeeks([600, 400]), at(2026, 11, 12))).toBe(500);
+      expect(computeFourWeekBaseline(scoredWeeks([9000, 9000, 800, 800, 800, 800]), at(2026, 11, 12))).toBe(800);
+    });
+
+    it('includes weeks with no credit, which lowers the baseline after time away', () => {
+      const history = [makeRun(mondayWeeksBefore(MONDAY, 4), { finalScore: 1200, correctAnswers: 17, incorrectAnswers: 3 })];
+
+      expect(computeFourWeekBaseline(history, at(2026, 11, 12))).toBe(300);
+    });
+
+    it('applies the goal daily cap when a goal is given', () => {
+      expect(computeFourWeekBaseline(scoredWeeks([900, 900]), at(2026, 11, 12), 1000)).toBe(400);
+    });
+
+    it('suggests baseline × 1.1 rounded to the nearest 50, or nothing', () => {
+      expect(computeSuggestedGoal(scoredWeeks([800, 800, 800, 800]), at(2026, 11, 12))).toBe(900);
+      expect(computeSuggestedGoal(scoredWeeks([600, 400]), at(2026, 11, 12))).toBe(550);
+      expect(computeSuggestedGoal(scoredWeeks([500]), at(2026, 11, 12))).toBeNull();
+      expect(computeSuggestedGoal([makeRun(mondayWeeksBefore(MONDAY, 2), { correctAnswers: 1, incorrectAnswers: 9 })], at(2026, 11, 12))).toBeNull();
+    });
+
+    it('reports when this week passes the baseline', () => {
+      const history = [...scoredWeeks([400, 400]), thisWeek(0, 300, 9), thisWeek(1, 300, 9)];
+      const status = computePersonalBestStatus(history, 1000, at(2026, 11, 12));
+
+      expect(status).toEqual({ baseline: 400, creditedScore: 600, beatenAt: at(2026, 11, 10, 9) });
+    });
+
+    it('uses the suggested goal cap when no goal is set', () => {
+      // Baseline 400 → suggested 450 → daily cap 180.
+      const history = [...scoredWeeks([400, 400]), thisWeek(0, 1000)];
+
+      expect(computePersonalBestStatus(history, undefined, at(2026, 11, 12))).toMatchObject({ creditedScore: 180, beatenAt: null });
+    });
+
+    describe('evaluators', () => {
+      const ids = (awards: EarnedAchievement[]) => awards.map((award) => `${award.id}@${award.weekKey}`);
+
+      it('awards Goal Met once per week after a run, never on the silent check', () => {
+        const history = [thisWeek(0, 400), thisWeek(1, 400), thisWeek(2, 300)];
+        const profile = { achievements: [], weeklyScoreGoal: 1000 };
+
+        expect(ids(evaluateNewAchievements(history, profile, at(2026, 11, 12)))).toEqual(['weekly-goal-met@2026-W46']);
+        expect(evaluateNewAchievements(history, profile, at(2026, 11, 12), { isAfterRun: false })).toEqual([]);
+        expect(evaluateNewAchievements(history, {
+          ...profile,
+          achievements: [{ id: 'weekly-goal-met', earnedAt: 1, weekKey: '2026-W46' }],
+        }, at(2026, 11, 12))).toEqual([]);
+      });
+
+      it('does not award Goal Met below the goal or without one', () => {
+        const history = [thisWeek(0, 400), thisWeek(1, 400)];
+
+        expect(evaluateNewAchievements(history, { weeklyScoreGoal: 1000 }, at(2026, 11, 12))).toEqual([]);
+        expect(evaluateNewAchievements(history, {}, at(2026, 11, 12))).toEqual([]);
+      });
+
+      it('backfills Personal Best Week for past weeks and the current week', () => {
+        // No goal: credit is capped at 40% of the suggested goal per day, so wins need several days.
+        const w44 = mondayWeeksBefore(MONDAY, 2);
+        const history = [
+          ...scoredWeeks([200, 200]).map((entry) => ({ ...entry, playedAt: entry.playedAt - (2 * 7 * DAY_MS) })),
+          ...[0, 1, 2].map((offset) => makeRun(w44 + (offset * DAY_MS), { finalScore: 100, correctAnswers: 17, incorrectAnswers: 3 })),
+          makeRun(mondayWeeksBefore(MONDAY, 1), { finalScore: 100, correctAnswers: 17, incorrectAnswers: 3 }),
+          thisWeek(0, 300),
+          thisWeek(1, 300),
+        ];
+
+        expect(ids(evaluateNewAchievements(history, null, at(2026, 11, 12), { isAfterRun: false }))).toEqual([
+          'personal-best-week@2026-W44',
+          'personal-best-week@2026-W46',
+        ]);
+      });
+
+      it('does not award Personal Best with fewer than 2 complete weeks', () => {
+        expect(evaluateNewAchievements([...scoredWeeks([100]), thisWeek(0, 900)], null, at(2026, 11, 12))).toEqual([]);
       });
     });
   });
