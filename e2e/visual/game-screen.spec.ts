@@ -3,6 +3,52 @@ import { test, expect } from '../fixtures/electron-app';
 import type { E2EWindow } from '../types';
 
 test.describe('Visual Regression Tests', () => {
+  test('select profile screen should match snapshot', async ({ page }) => {
+    await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().bootReady === true, {
+      timeout: 5000,
+    });
+
+    // Seed fixed profiles; the remembered one is preselected so the dropdown shows a stable value.
+    await page.evaluate(() => {
+      const createdAt = Date.UTC(2026, 0, 1);
+      const profile = (username: string, bestScore: number) => ({
+        username,
+        password: 'enc:v1:e2e',
+        bestScore,
+        highestStage: 3,
+        preferredGrade: 'cadet' as const,
+        createdAt,
+        updatedAt: createdAt,
+      });
+
+      const e2e = (window as E2EWindow).__e2e!;
+      // Unmount the selector first: it reads rememberedUsername only on mount (remember-me checkbox).
+      e2e.setStoreState({ bootReady: false });
+      e2e.setStoreState({
+        bootReady: true,
+        phase: 'login',
+        activeUsername: null,
+        rememberedUsername: 'CommanderRex',
+        profiles: {
+          AcePilot: profile('AcePilot', 340),
+          CommanderRex: profile('CommanderRex', 12250),
+        },
+      });
+    });
+
+    const selector = page.getByTestId('profile-selector-screen');
+    await expect(selector).toBeVisible();
+    await expect(selector.locator('#profile-selector-username')).toContainText('CommanderRex');
+    await page.evaluate(() => document.fonts.ready);
+
+    // toHaveScreenshot retries until two consecutive captures match, so no fixed sleep is needed.
+    await expect(page).toHaveScreenshot('select-profile-screen.png', {
+      animations: 'disabled',
+      caret: 'hide',
+      maxDiffPixelRatio: 0.01,
+    });
+  });
+
   test('profile screen should match snapshot', async ({ page }) => {
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
 
