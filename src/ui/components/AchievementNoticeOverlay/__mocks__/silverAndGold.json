@@ -1,0 +1,18 @@
+{
+  "phase": "gameover",
+  "bootReady": true,
+  "activeUsername": "AcePilot",
+  "gradeNotice": null,
+  "achievementNotice": [
+    {
+      "id": "weekly-streak-silver",
+      "earnedAt": 1794398400000,
+      "weekKey": "2026-W46"
+    },
+    {
+      "id": "weekly-streak-gold",
+      "earnedAt": 1794398400000,
+      "weekKey": "2026-W46"
+    }
+  ]
+}

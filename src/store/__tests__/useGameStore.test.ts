@@ -38,6 +38,7 @@ describe('useGameStore', () => {
       streakRewardMessage: null,
       pauseOverlay: null,
       gradeNotice: null,
+      achievementNotice: null,
       gameHistoryByProfile: {},
     });
   });

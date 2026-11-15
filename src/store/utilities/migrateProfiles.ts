@@ -1,8 +1,9 @@
 import type { PlayerProfile } from '@store/types';
-import { normalizeGrade } from '@store/utilities/general';
+import { isValidWeeklyScoreGoal, normalizeGrade } from '@store/utilities/general';
 import { resolveAvatarId } from '@shared/avatarCatalog';
-import { MATH_OPERATIONS } from '@shared/constants';
-import type { PracticeOperation } from '@shared/types';
+import { ACHIEVEMENT_IDS, MATH_OPERATIONS, WEEKLY_ACHIEVEMENT_IDS } from '@shared/constants';
+import { getAchievementKey } from '@store/selectors/achievements';
+import type { EarnedAchievement, PracticeOperation } from '@shared/types';
 
 /**
  * Keeps a persisted practice operation only when it is one of the supported operations.
@@ -12,6 +13,56 @@ import type { PracticeOperation } from '@shared/types';
  */
 function resolvePracticeOperation(value: unknown): PracticeOperation | undefined {
   return MATH_OPERATIONS.find((operation) => operation === value);
+}
+
+/**
+ * Keeps only well-formed saved awards. Unknown ids, malformed entries, weekly awards
+ * without a week key, and duplicates (first one wins) are dropped.
+ *
+ * @param value - Raw persisted value.
+ * @returns A clean award list; empty when missing or malformed.
+ */
+function resolveAchievements(value: unknown): EarnedAchievement[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  const seenKeys = new Set<string>();
+
+  return value.flatMap((item): EarnedAchievement[] => {
+    if (!item || typeof item !== 'object') {
+      return [];
+    }
+
+    const record = item as Record<string, unknown>;
+    const id = ACHIEVEMENT_IDS.find((achievementId) => achievementId === record.id);
+
+    if (!id || typeof record.earnedAt !== 'number' || !Number.isFinite(record.earnedAt)) {
+      return [];
+    }
+
+    const weekKey = typeof record.weekKey === 'string' ? record.weekKey : undefined;
+
+    if (WEEKLY_ACHIEVEMENT_IDS.includes(id) && !weekKey) {
+      return [];
+    }
+
+    const key = getAchievementKey({ id, weekKey });
+
+    if (seenKeys.has(key)) {
+      return [];
+    }
+
+    seenKeys.add(key);
+    const operation = resolvePracticeOperation(record.operation);
+
+    return [{
+      id,
+      earnedAt: record.earnedAt,
+      ...(weekKey && { weekKey }),
+      ...(operation && { operation }),
+    }];
+  });
 }
 
 /**
@@ -49,6 +100,8 @@ export function migrateProfiles(rawProfiles: unknown): Record<string, PlayerProf
       highestStage: typeof profileRecord.highestStage === 'number' ? profileRecord.highestStage : 1,
       preferredGrade,
       ...(lastPracticeOperation && { lastPracticeOperation }),
+      achievements: resolveAchievements(profileRecord.achievements),
+      ...(isValidWeeklyScoreGoal(profileRecord.weeklyScoreGoal) && { weeklyScoreGoal: profileRecord.weeklyScoreGoal }),
       createdAt: typeof profileRecord.createdAt === 'number' ? profileRecord.createdAt : Date.now(),
       updatedAt: typeof profileRecord.updatedAt === 'number' ? profileRecord.updatedAt : Date.now(),
     };

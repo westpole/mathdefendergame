@@ -110,13 +110,16 @@
   inset: 0;
   z-index: $z-menu-overlay;
   display: flex;
-  align-items: center;
   justify-content: center;
   padding: $spacing-lg;
+  overflow-y: auto;
   @include glassmorphism-panel;
 }
 
+// Vertical auto margins center the panel but fall back to top alignment when it is taller
+// than the viewport (e.g. mobile landscape), keeping every option reachable by scrolling.
 .menu-panel {
+  margin-block: auto;
   width: min(100%, 460px);
   display: flex;
   flex-direction: column;

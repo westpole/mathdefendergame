@@ -1,0 +1,95 @@
+{
+  "phase": "gameover",
+  "bootReady": true,
+  "activeUsername": "AcePilot",
+  "screenView": "home",
+  "profiles": {
+    "AcePilot": {
+      "username": "AcePilot",
+      "password": "story",
+      "avatarId": "avatar-2",
+      "bestScore": 900,
+      "highestStage": 4,
+      "preferredGrade": "trainee",
+      "createdAt": 1788264000000,
+      "updatedAt": 1794484800000,
+      "weeklyScoreGoal": 1000
+    }
+  },
+  "gameHistoryByProfile": {
+    "AcePilot": [
+      {
+        "key": "story-run-15",
+        "playedAt": 1794312000000,
+        "correctAnswers": 18,
+        "incorrectAnswers": 2,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 20,
+            "incorrect": 2,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 280,
+        "finalPerfScore": 90,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-14",
+        "playedAt": 1794301200000,
+        "correctAnswers": 18,
+        "incorrectAnswers": 2,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 20,
+            "incorrect": 2,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 450,
+        "finalPerfScore": 90,
+        "mode": "regular"
+      }
+    ]
+  },
+  "score": 280,
+  "correctCount": 18,
+  "incorrectCount": 2,
+  "finalPerfScore": 90
+}

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { userEvent, within } from 'storybook/test';
 
 import GameCanvas from '@ui/components/__mocks__/GameCanvas';
 import {
@@ -9,6 +10,11 @@ import {
 } from '@ui/components/__mocks__/storyFrames';
 
 import { MenuControls } from '.';
+
+const mobileLandscapeStoryFrame: StoryFrame = {
+  width: popularMobileStoryFrame.height,
+  height: popularMobileStoryFrame.width,
+};
 
 interface StoryArgs {
   frame?: StoryFrame;
@@ -57,5 +63,15 @@ export const MobileMinimum: Story = {
   name: 'Minimum mobile menu with title',
   args: {
     frame: minimumMobileStoryFrame,
+  },
+};
+
+export const MobileLandscapeOpen: Story = {
+  name: 'Mobile menu open (landscape, scrollable)',
+  args: {
+    frame: mobileLandscapeStoryFrame,
+  },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByTestId('menu-toggle-button'));
   },
 };

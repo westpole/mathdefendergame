@@ -39,6 +39,7 @@ describe('migrateProfiles', () => {
       bestScore: 900,
       highestStage: 12,
       preferredGrade: 'commander',
+      achievements: [],
       createdAt: 1_000,
       updatedAt: 2_000,
     });
@@ -50,6 +51,7 @@ describe('migrateProfiles', () => {
       bestScore: 250,
       highestStage: 6,
       preferredGrade: 'major-general',
+      achievements: [],
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
     });
@@ -61,6 +63,7 @@ describe('migrateProfiles', () => {
       bestScore: 30,
       highestStage: 3,
       preferredGrade: 'trainee',
+      achievements: [],
       createdAt: expect.any(Number),
       updatedAt: expect.any(Number),
     });
@@ -89,6 +92,7 @@ describe('migrateProfiles', () => {
         bestScore: 0,
         highestStage: 4,
         preferredGrade: 'cadet',
+        achievements: [],
         createdAt: expect.any(Number),
         updatedAt: expect.any(Number),
       },
@@ -99,6 +103,7 @@ describe('migrateProfiles', () => {
         bestScore: 0,
         highestStage: 1,
         preferredGrade: 'trainee',
+        achievements: [],
         createdAt: expect.any(Number),
         updatedAt: expect.any(Number),
       },
@@ -115,6 +120,51 @@ describe('migrateProfiles', () => {
     expect(migrated.valid?.lastPracticeOperation).toBe('/');
     expect(migrated.malformed).not.toHaveProperty('lastPracticeOperation');
     expect(migrated.missing).not.toHaveProperty('lastPracticeOperation');
+  });
+
+  it('keeps well-formed saved awards and drops malformed ones', () => {
+    const migrated = migrateProfiles({
+      pilot: {
+        achievements: [
+          { id: 'weekly-streak-bronze', earnedAt: 100, weekKey: '2026-W46' },
+          { id: 'mastery-mul', earnedAt: 200, operation: '*' },
+          { id: 'focus-of-the-week', earnedAt: 300, weekKey: '2026-W47', operation: 'x' },
+          { id: 'unknown-award', earnedAt: 1 },
+          { id: 'weekly-goal-met', earnedAt: 'yesterday' },
+          { id: 'weekly-goal-met', earnedAt: Number.NaN },
+          { id: 'weekly-goal-met', earnedAt: 400 },
+          { id: 'weekly-streak-bronze', earnedAt: 500, weekKey: '2026-W50' },
+          { id: 'focus-of-the-week', earnedAt: 600, weekKey: '2026-W48' },
+          null,
+          'bad',
+        ],
+      },
+      notAnArray: { achievements: { id: 'weekly-streak-bronze' } },
+    });
+
+    expect(migrated.pilot?.achievements).toEqual([
+      { id: 'weekly-streak-bronze', earnedAt: 100, weekKey: '2026-W46' },
+      { id: 'mastery-mul', earnedAt: 200, operation: '*' },
+      { id: 'focus-of-the-week', earnedAt: 300, weekKey: '2026-W47' },
+      { id: 'focus-of-the-week', earnedAt: 600, weekKey: '2026-W48' },
+    ]);
+    expect(migrated.notAnArray?.achievements).toEqual([]);
+  });
+
+  it('keeps a positive whole weeklyScoreGoal and drops anything else', () => {
+    const migrated = migrateProfiles({
+      valid: { weeklyScoreGoal: 2500 },
+      zero: { weeklyScoreGoal: 0 },
+      negative: { weeklyScoreGoal: -100 },
+      fraction: { weeklyScoreGoal: 99.5 },
+      text: { weeklyScoreGoal: '1000' },
+      missing: {},
+    });
+
+    expect(migrated.valid?.weeklyScoreGoal).toBe(2500);
+    for (const name of ['zero', 'negative', 'fraction', 'text', 'missing']) {
+      expect(migrated[name]).not.toHaveProperty('weeklyScoreGoal');
+    }
   });
 
   it('does not read legacy preferredDifficulty in canonical migrations', () => {

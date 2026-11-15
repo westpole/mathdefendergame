@@ -1,4 +1,5 @@
 import type {
+  EarnedAchievement,
   GameHistoryEntry,
   Grade,
   DDAMathTier,
@@ -17,7 +18,8 @@ export type ScreenView =
   | 'performance'
   | 'rules'
   | 'weekly-report'
-  | 'settings';
+  | 'settings'
+  | 'achievements';
 export type HistoryByProfile = Record<string, GameHistoryEntry[]>;
 export type PauseOverlayReason = 'escape' | 'window-close' | 'background';
 
@@ -30,6 +32,10 @@ export interface PlayerProfile {
   preferredGrade: Grade;
   /** Operation picked for this profile's most recent practice run; unset until one is started. */
   lastPracticeOperation?: PracticeOperation;
+  /** Awards saved when earned. They stay earned even if the rules or goal change later. */
+  achievements?: EarnedAchievement[];
+  /** Weekly score goal counting only qualifying runs. Unset means the goal is off. */
+  weeklyScoreGoal?: number;
   createdAt: number;
   updatedAt: number;
 }
@@ -93,6 +99,8 @@ export interface GameStoreState {
   pauseOverlay: PauseOverlayState | null;
   /** After-game promotion/demotion message. Transient: not persisted. */
   gradeNotice: GradeNotice | null;
+  /** Awards earned by the last saved run, shown after the grade notice. Transient: not persisted. */
+  achievementNotice: EarnedAchievement[] | null;
   gameHistoryByProfile: HistoryByProfile;
   markBootReady: () => void;
   setMobileDevice: (isMobileDevice: boolean) => void;
@@ -110,6 +118,7 @@ export interface GameStoreState {
   showGameOver: (payload: Pick<GameStoreState, 'score' | 'correctCount' | 'incorrectCount' | 'finalPerfScore'>) => void;
   persistPrematureGameEnd: (payload: PrematureGameEndPayload) => void;
   dismissGradeNotice: () => void;
+  dismissAchievementNotice: () => void;
   startPlaying: () => void;
   openMenu: () => void;
   openScreenView: (screenView: ScreenView) => void;
@@ -119,6 +128,8 @@ export interface GameStoreState {
   createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;
   createAndLoginSimpleProfile: (username: string) => LoginResult;
   updateActiveProfileAvatar: (avatarId: string) => LoginResult;
+  /** Sets the active profile's weekly goal; null turns it off. Guests can't set one. */
+  setWeeklyScoreGoal: (goal: number | null) => LoginResult;
   getActiveProfile: () => PlayerProfile | null;
   addGameHistory: (entry: GameHistoryEntry) => void;
   getGameHistory: (username?: string | null, limit?: number) => GameHistoryEntry[];

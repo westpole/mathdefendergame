@@ -87,6 +87,16 @@ export function normalizeGrade(value: unknown): Grade {
 }
 
 /**
+ * Checks whether a value can be saved as a weekly score goal.
+ *
+ * @param value - The candidate goal.
+ * @returns True for a positive whole number.
+ */
+export function isValidWeeklyScoreGoal(value: unknown): value is number {
+  return typeof value === 'number' && Number.isInteger(value) && value > 0;
+}
+
+/**
  * Resolves the currently active profile from the username and profile map.
  *
  * @param activeUsername - The username of the active player or null when no profile is selected.

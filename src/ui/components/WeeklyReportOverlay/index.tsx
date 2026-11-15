@@ -3,14 +3,15 @@ import { useTranslation } from 'react-i18next';
 
 import { selectActiveProfileHistory } from '@store/selectors/performance';
 import { buildGradeProgressSummary, buildWeeklyProgressReport } from '@store/selectors/progress';
+import { isFeatureEnabled } from '@shared/featureFlags';
+import { DAY_MS } from '@store/constants';
 import { useGameStore } from '@store/useGameStore';
 import { ProfileIcon } from '@ui/components/ProfileIcon';
 import { GradeRequirementsList } from '@ui/components/GradeRequirementsList';
 import { toGradeTitle } from '@ui/utilities/format';
 
+import { CalendarWeekSection } from './CalendarWeekSection';
 import { formatShortDate, formatScore, formatAccuracy } from './utilities';
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Dedicated weekly report view for the active profile.
@@ -32,6 +33,7 @@ export function WeeklyReportOverlay() {
     : null;
   const weekWindowLabel = `${formatShortDate(now - (6 * DAY_MS))} - ${formatShortDate(now)}`;
   const hasWeeklyProgress = weeklyReport.runsCompleted > 0;
+  const isAchievementsEnabled = isFeatureEnabled('achievements');
 
   return (
     <div className="overlay-screen overlay-screen--interactive" data-testid="weekly-report-overlay">
@@ -67,6 +69,15 @@ export function WeeklyReportOverlay() {
             {t('ui.noCompletedRunsLast7Days')}
           </div>
         )}
+
+        {isAchievementsEnabled ? (
+          <CalendarWeekSection
+            history={history}
+            isGuest={!activeProfile}
+            now={now}
+            weeklyScoreGoal={activeProfile?.weeklyScoreGoal}
+          />
+        ) : null}
 
         <section className="home-report-progress-section" aria-label={t('ui.gradeProgressAriaLabel')}>
           <div className="home-report-progress-header">

@@ -1,0 +1,1263 @@
+{
+  "phase": "start",
+  "screenView": "achievements",
+  "bootReady": true,
+  "activeUsername": "AcePilot",
+  "profiles": {
+    "AcePilot": {
+      "username": "AcePilot",
+      "password": "story",
+      "avatarId": "avatar-2",
+      "bestScore": 900,
+      "highestStage": 4,
+      "preferredGrade": "trainee",
+      "createdAt": 1788264000000,
+      "updatedAt": 1794484800000,
+      "achievements": [
+        {
+          "id": "weekly-streak-bronze",
+          "earnedAt": 1788955200000,
+          "weekKey": "2026-W37"
+        },
+        {
+          "id": "weekly-streak-silver",
+          "earnedAt": 1790769600000,
+          "weekKey": "2026-W40"
+        },
+        {
+          "id": "weekly-streak-gold",
+          "earnedAt": 1794398400000,
+          "weekKey": "2026-W46"
+        }
+      ]
+    }
+  },
+  "gameHistoryByProfile": {
+    "AcePilot": [
+      {
+        "key": "story-run-46",
+        "playedAt": 1794398400000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-45",
+        "playedAt": 1794312000000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-44",
+        "playedAt": 1794225600000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-43",
+        "playedAt": 1793793600000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-42",
+        "playedAt": 1793707200000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-41",
+        "playedAt": 1793620800000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-40",
+        "playedAt": 1793188800000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-39",
+        "playedAt": 1793102400000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-38",
+        "playedAt": 1793016000000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-37",
+        "playedAt": 1792584000000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-36",
+        "playedAt": 1792497600000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-35",
+        "playedAt": 1792411200000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-34",
+        "playedAt": 1791979200000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-33",
+        "playedAt": 1791892800000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-32",
+        "playedAt": 1791806400000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-31",
+        "playedAt": 1791374400000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-30",
+        "playedAt": 1791288000000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-29",
+        "playedAt": 1791201600000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-28",
+        "playedAt": 1790769600000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-27",
+        "playedAt": 1790683200000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-26",
+        "playedAt": 1790596800000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-25",
+        "playedAt": 1790164800000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-24",
+        "playedAt": 1790078400000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-23",
+        "playedAt": 1789992000000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-22",
+        "playedAt": 1789560000000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-21",
+        "playedAt": 1789473600000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-20",
+        "playedAt": 1789387200000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-19",
+        "playedAt": 1788955200000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-18",
+        "playedAt": 1788868800000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-17",
+        "playedAt": 1788782400000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-16",
+        "playedAt": 1788350400000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-15",
+        "playedAt": 1788264000000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-14",
+        "playedAt": 1788177600000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-13",
+        "playedAt": 1787745600000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-12",
+        "playedAt": 1787659200000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      },
+      {
+        "key": "story-run-11",
+        "playedAt": 1787572800000,
+        "correctAnswers": 12,
+        "incorrectAnswers": 1,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 13,
+            "incorrect": 1,
+            "avgTimeMs": 2400
+          },
+          "-": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "*": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          },
+          "/": {
+            "attempts": 0,
+            "incorrect": 0,
+            "avgTimeMs": 0
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 92.31,
+        "mode": "regular"
+      }
+    ]
+  }
+}

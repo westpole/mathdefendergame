@@ -1,0 +1,22 @@
+{
+  "phase": "start",
+  "screenView": "achievements",
+  "bootReady": true,
+  "activeUsername": "AcePilot",
+  "profiles": {
+    "AcePilot": {
+      "username": "AcePilot",
+      "password": "story",
+      "avatarId": "avatar-2",
+      "bestScore": 900,
+      "highestStage": 4,
+      "preferredGrade": "trainee",
+      "createdAt": 1788264000000,
+      "updatedAt": 1794484800000,
+      "weeklyScoreGoal": 1000
+    }
+  },
+  "gameHistoryByProfile": {
+    "AcePilot": []
+  }
+}

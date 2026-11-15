@@ -13,6 +13,9 @@ import baseStoreState from '@ui/components/__mocks__/baseStoreState';
 import { popularMobileStoryFrame, type StoryFrame } from '@ui/components/__mocks__/storyFrames';
 
 import { GameOverOverlay } from '.';
+import goalCappedMock from './__mocks__/goalCapped.json';
+import goalCountedMock from './__mocks__/goalCounted.json';
+import goalLowAccuracyMock from './__mocks__/goalLowAccuracy.json';
 import result from './__mocks__/result.json';
 
 const reusableInitialState: Partial<GameStoreState> = {
@@ -86,4 +89,34 @@ export const MobileGameOverResults: Story = {
       ...result,
     },
   },
+};
+
+export const GoalCounted: Story = {
+  name: 'Weekly goal: run counted',
+  args: { initialState: goalCountedMock as Partial<GameStoreState> },
+};
+
+export const GoalLowAccuracy: Story = {
+  name: 'Weekly goal: accuracy too low',
+  args: { initialState: goalLowAccuracyMock as Partial<GameStoreState> },
+};
+
+export const GoalCapped: Story = {
+  name: 'Weekly goal: daily cap reached',
+  args: { initialState: goalCappedMock as Partial<GameStoreState> },
+};
+
+export const MobileGoalCounted: Story = {
+  name: 'Mobile weekly goal: run counted',
+  args: { frame: popularMobileStoryFrame, initialState: goalCountedMock as Partial<GameStoreState> },
+};
+
+export const MobileGoalLowAccuracy: Story = {
+  name: 'Mobile weekly goal: accuracy too low',
+  args: { frame: popularMobileStoryFrame, initialState: goalLowAccuracyMock as Partial<GameStoreState> },
+};
+
+export const MobileGoalCapped: Story = {
+  name: 'Mobile weekly goal: daily cap reached',
+  args: { frame: popularMobileStoryFrame, initialState: goalCappedMock as Partial<GameStoreState> },
 };

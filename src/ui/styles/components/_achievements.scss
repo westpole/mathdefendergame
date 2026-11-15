@@ -1,0 +1,470 @@
+@use '../variables' as *;
+
+// Achievements screen
+.achievements-panel {
+  overflow-y: auto;
+}
+
+.achievements-guest-hint {
+  padding: $spacing-sm $spacing-md;
+  border: 1px dashed $border-panel-light;
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-size: 0.82rem;
+}
+
+.achievements-card {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-lg;
+  background: rgba(15, 23, 42, 0.28);
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-lg;
+
+  h2 {
+    color: $text-primary;
+    font-size: 1.1rem;
+  }
+}
+
+.achievements-streak-count {
+  color: $text-primary;
+  font-size: 1.6rem;
+}
+
+.achievements-streak-next {
+  color: $color-primary-yellow;
+  font-weight: 600;
+}
+
+.achievements-rule {
+  color: $text-secondary;
+  font-size: 0.85rem;
+}
+
+.achievements-rule__name {
+  color: $text-primary;
+  font-weight: 600;
+}
+
+.achievements-note {
+  color: $text-muted;
+  font-size: 0.75rem;
+}
+
+.achievements-day-dots {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: $spacing-xs;
+  margin: $spacing-xs 0;
+  padding: 0;
+  list-style: none;
+}
+
+.achievements-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.achievements-day__dot {
+  width: 28px;
+  height: 28px;
+  border: 2px solid $border-dark;
+  border-radius: $radius-full;
+  background: transparent;
+}
+
+.achievements-day__dot--active {
+  border-color: $color-success-green;
+  background: $color-success-green;
+}
+
+.achievements-day__dot--today {
+  outline: 2px solid $color-primary-yellow;
+  outline-offset: 2px;
+}
+
+.achievements-day__label {
+  color: $text-muted;
+  font-size: 0.72rem;
+}
+
+.achievements-streak-status {
+  color: $text-primary;
+  font-size: 0.9rem;
+}
+
+@container (max-width: #{$breakpoint-mobile}) {
+  .achievements-card {
+    padding: $spacing-md;
+  }
+
+  .achievements-day__dot {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+// Relentless medal shelf
+.achievements-medals {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: $spacing-sm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.achievements-medal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: $spacing-md $spacing-xs;
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-md;
+  text-align: center;
+}
+
+.achievements-medal__icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.achievements-medal__name {
+  color: $text-primary;
+  font-size: 0.85rem;
+}
+
+.achievements-medal__status {
+  color: $text-secondary;
+  font-size: 0.75rem;
+}
+
+.achievements-medal--bronze:not(.achievements-medal--locked) {
+  border-color: #b45309;
+}
+
+.achievements-medal--silver:not(.achievements-medal--locked) {
+  border-color: #cbd5e1;
+}
+
+.achievements-medal--gold:not(.achievements-medal--locked) {
+  border-color: $color-primary-yellow;
+}
+
+.achievements-medal--locked {
+  opacity: 0.6;
+  filter: grayscale(1);
+}
+
+// After-run achievement notice
+.achievement-notice-screen {
+  z-index: $z-menu-overlay + 2;
+  overflow: hidden;
+}
+
+.achievement-notice-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  border-color: $border-success;
+  text-align: center;
+
+  .overlay-header {
+    justify-content: center;
+    margin-bottom: 0;
+  }
+}
+
+.achievement-notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.achievement-notice-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-sm $spacing-md;
+  border: 1px solid $border-panel-light;
+  border-radius: $radius-md;
+  text-align: left;
+}
+
+.achievement-notice-item__icon {
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.achievement-notice-item__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    color: $text-primary;
+    font-size: $font-size-md;
+  }
+}
+
+.achievement-notice-item__rule {
+  color: $text-secondary;
+  font-size: 0.8rem;
+}
+
+.achievement-confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.achievement-confetti__piece {
+  position: absolute;
+  top: -12px;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  animation: achievement-confetti-fall 2.4s ease-in forwards;
+}
+
+.achievement-confetti__piece--0 { background: $color-primary-yellow; }
+.achievement-confetti__piece--1 { background: $color-success-green; }
+.achievement-confetti__piece--2 { background: $color-primary-purple; }
+.achievement-confetti__piece--3 { background: $color-danger-red; }
+.achievement-confetti__piece--4 { background: $text-link; }
+.achievement-confetti__piece--5 { background: $text-primary; }
+
+@keyframes achievement-confetti-fall {
+  to {
+    transform: translateY(110vh) rotate(540deg);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-confetti {
+    display: none;
+  }
+}
+
+// Streak shield and at-risk warning
+.achievements-streak-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+
+  .home-report-eyebrow {
+    margin: 0;
+  }
+}
+
+.achievements-shield {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px $spacing-sm;
+  border: 1px solid $text-link;
+  border-radius: $radius-full;
+  color: $text-link;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.achievements-risk {
+  padding: $spacing-xs $spacing-sm;
+  border: 1px solid $color-warning-yellow;
+  border-radius: $radius-md;
+  background: rgba(234, 179, 8, 0.12);
+  color: $color-primary-yellow;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.achievements-risk--shielded {
+  border-color: $text-link;
+  background: rgba(147, 197, 253, 0.12);
+  color: $text-link;
+}
+
+// Weekly goal
+.goal-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.goal-progress__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: $spacing-sm;
+}
+
+.goal-progress__value {
+  color: $text-primary;
+  font-size: 1.1rem;
+}
+
+.goal-progress__percent {
+  color: $text-secondary;
+  font-size: 0.85rem;
+}
+
+.goal-progress__fill {
+  background: $text-link;
+}
+
+.goal-progress__fill--met {
+  background: $color-success-green;
+}
+
+.goal-progress__today,
+.goal-progress__note {
+  color: $text-secondary;
+  font-size: 0.8rem;
+}
+
+.goal-progress__met {
+  color: $color-success-green;
+  font-weight: 600;
+}
+
+.achievements-goal-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $spacing-xs;
+
+  strong {
+    color: $text-primary;
+  }
+}
+
+.settings-panel {
+  overflow-y: auto;
+}
+
+.settings-goal-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.settings-goal-section__hint {
+  color: $text-muted;
+  font-size: 0.8rem;
+}
+
+.gameover-goal {
+  margin: $spacing-sm 0 0;
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-md;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.gameover-goal--counted {
+  border: 1px solid $border-success;
+  color: $color-success-green;
+}
+
+.gameover-goal--capped,
+.gameover-goal--low-accuracy,
+.gameover-goal--too-short {
+  border: 1px solid $color-warning-yellow;
+  color: $color-primary-yellow;
+}
+
+// Badge grid
+.achievements-badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: $spacing-sm;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.achievements-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: $spacing-md $spacing-sm;
+  border: 1px solid $border-success;
+  border-radius: $radius-md;
+  text-align: center;
+}
+
+.achievements-badge__icon {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.achievements-badge__name {
+  color: $text-primary;
+  font-size: 0.85rem;
+}
+
+.achievements-badge__status {
+  color: $text-secondary;
+  font-size: 0.75rem;
+}
+
+.achievements-badge--locked {
+  border-color: $border-panel-light;
+
+  .achievements-badge__icon {
+    opacity: 0.5;
+    filter: grayscale(1);
+  }
+}
+
+@container (max-width: #{$breakpoint-mobile}) {
+  .achievements-badge-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+// Focus of the Week
+.achievements-steps {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.achievements-steps__step {
+  width: 14px;
+  height: 6px;
+  border-radius: $radius-full;
+  background: $border-dark;
+}
+
+.achievements-steps__step--done {
+  background: $text-link;
+}
+
+.practice-select-option__badge--focus {
+  color: $text-link;
+}
+
+// Mastery tiles
+.achievements-mastery__value {
+  color: $color-success-green;
+  font-weight: 600;
+}
+
+.achievements-mastery__value--unmet {
+  color: $color-primary-yellow;
+}

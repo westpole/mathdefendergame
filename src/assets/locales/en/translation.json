@@ -86,7 +86,8 @@
     "accuracyPercent": "Accuracy (%)",
     "avgSpeedSeconds": "Avg Speed (sec)",
     "masteryRating": "Mastery Rating",
-    "completeRunForPerformanceInsights": "Complete a run to unlock operator performance insights."
+    "completeRunForPerformanceInsights": "Complete a run to unlock operator performance insights.",
+    "achievements": "Achievements"
   },
   "rules": {
     "regularPlay": {
@@ -193,5 +194,140 @@
   },
   "errors": {
     "profileUnavailable": "Profile is unavailable."
+  },
+  "achievements": {
+    "title": "Achievements",
+    "guestHint": "Awards are saved only for named profiles. Create a profile to keep them.",
+    "relentless": {
+      "title": "Relentless",
+      "subtitle": "Practise at least 3 days a week, 3 weeks in a row",
+      "tier": {
+        "bronze": "Relentless Bronze",
+        "silver": "Relentless Silver",
+        "gold": "Relentless Gold"
+      },
+      "tierWord": {
+        "bronze": "Bronze",
+        "silver": "Silver",
+        "gold": "Gold"
+      },
+      "earned": "Relentless {{tier}}!",
+      "requirement_one": "{{count}} weeks in a row",
+      "requirement_other": "{{count}} weeks in a row",
+      "earnedOn": "Earned {{date}}",
+      "locked": "Locked",
+      "shelfLabel": "Relentless medals"
+    },
+    "streak": {
+      "cardLabel": "Weekly streak",
+      "weeksInARow_one": "{{count}} week in a row",
+      "weeksInARow_other": "{{count}} weeks in a row",
+      "next_one": "Next: Relentless {{tier}} ({{count}} weeks)",
+      "next_other": "Next: Relentless {{tier}} ({{count}} weeks)",
+      "allTiersReached": "Every Relentless tier reached. Keep it going!",
+      "daysNeeded_one": "{{count}} more day needed this week",
+      "daysNeeded_other": "{{count}} more days needed this week",
+      "weekComplete": "This week counts toward your streak!",
+      "dayDotsLabel": "Active days this week",
+      "dayActive": "{{day}}, active",
+      "dayInactive": "{{day}}, not active",
+      "today": "today",
+      "activeDayRule": "A day counts when your runs that day total at least 10 correct answers.",
+      "atRisk": "Streak at risk"
+    },
+    "weekday": {
+      "short": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "long": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
+    },
+    "notice": {
+      "title_one": "New achievement!",
+      "title_other": "New achievements!",
+      "body": "Your regular practice is paying off. Keep it up!",
+      "dismiss": "Continue"
+    },
+    "shield": {
+      "title": "Streak Shield",
+      "tooltip": "One missed week will be forgiven",
+      "willProtect": "Your shield will protect your streak",
+      "weekShielded": "Week protected by shield",
+      "lastWeekShielded": "Last week: {{status}}"
+    },
+    "goal": {
+      "title": "Weekly goal",
+      "off": "Off",
+      "helper": "Only runs with 85% accuracy or higher count. Up to 40% of the goal counts each day.",
+      "guestHint": "Create a profile to set a goal",
+      "progress": "{{credited}} / {{goal}}",
+      "progressLabel": "Weekly goal progress",
+      "today": "+{{credited}} today (max {{cap}})",
+      "met": "Weekly goal reached!",
+      "notSet": "Set a weekly goal",
+      "notSetHint": "Pick a goal in Settings. Only accurate runs count toward it.",
+      "openSettings": "Open Settings",
+      "thisWeek": "This week (Mon to Sun)",
+      "nonQualifying_one": "{{count}} run this week did not count (below 85% accuracy or under 10 answers)",
+      "nonQualifying_other": "{{count}} runs this week did not count (below 85% accuracy or under 10 answers)",
+      "saveError": "Could not save the weekly goal.",
+      "gameOver": {
+        "counted": "✓ Counts toward weekly goal: +{{credited}} ({{percent}}%)",
+        "lowAccuracy": "{{accuracy}}% accuracy, reach 85% for it to count",
+        "tooShort": "Runs need at least 10 answers to count toward the weekly goal",
+        "capped": "Daily goal limit reached, come back tomorrow!"
+      },
+      "suggested": "Suggested ({{value}})"
+    },
+    "badges": {
+      "title": "Badges",
+      "goalMet": {
+        "name": "Goal Met",
+        "count": "×{{count}}",
+        "locked": "Reach your weekly goal to earn it",
+        "earned": "Goal Met!",
+        "rule": "Weekly goal reached"
+      },
+      "personalBest": {
+        "name": "Personal Best Week",
+        "locked": "Play 2 weeks to unlock",
+        "target": "Beat {{baseline}} this week ({{credited}} so far)",
+        "earnedOn": "Last earned {{date}}",
+        "earned": "Personal Best Week!",
+        "rule": "You beat your usual week"
+      },
+      "focus": {
+        "name": "Focus of the Week",
+        "none": "Play a few runs to get your focus",
+        "progress": "Focus: {{operation}}, {{done}} / {{required}} practice runs",
+        "done": "Done this week: {{operation}}",
+        "earned": "Focus of the Week!",
+        "rule": "3 accurate practice runs: {{operation}}",
+        "tag": "Focus"
+      },
+      "mastery": {
+        "name": "Mastery {{symbol}}",
+        "attempts": "{{attempts}} / {{window}} attempts",
+        "needs": "needs {{accuracy}} / {{time}}",
+        "seconds": "{{value}}s",
+        "earnedOn": "Earned {{date}}",
+        "earned": "Mastery: {{operation}}!",
+        "rule": "90% accuracy and quick answers over your last 50 tries",
+        "statusLabel": "Accuracy {{accuracy}}, average time {{time}}; needs {{minAccuracy}} and {{maxTime}}"
+      }
+    }
   }
 }

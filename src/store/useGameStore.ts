@@ -19,7 +19,7 @@ export const useGameStore = create<GameStoreState>()(
     }),
     {
       name: leaderboardStorageKey,
-      version: 5,
+      version: 6,
       storage: createJSONStorage(() => localStorage),
       migrate: (persistedState) => {
         const rawState = (persistedState ?? {}) as Record<string, unknown>;

@@ -1,0 +1,78 @@
+{
+  "phase": "start",
+  "screenView": "achievements",
+  "bootReady": true,
+  "activeUsername": "AcePilot",
+  "profiles": {
+    "AcePilot": {
+      "username": "AcePilot",
+      "password": "story",
+      "avatarId": "avatar-2",
+      "bestScore": 900,
+      "highestStage": 4,
+      "preferredGrade": "trainee",
+      "createdAt": 1788264000000,
+      "updatedAt": 1794484800000,
+      "achievements": [
+        {
+          "id": "mastery-add",
+          "earnedAt": 1792497600000,
+          "operation": "+"
+        },
+        {
+          "id": "mastery-sub",
+          "earnedAt": 1793102400000,
+          "operation": "-"
+        },
+        {
+          "id": "mastery-mul",
+          "earnedAt": 1793707200000,
+          "operation": "*"
+        },
+        {
+          "id": "mastery-div",
+          "earnedAt": 1794225600000,
+          "operation": "/"
+        }
+      ]
+    }
+  },
+  "gameHistoryByProfile": {
+    "AcePilot": [
+      {
+        "key": "story-run-3",
+        "playedAt": 1794225600000,
+        "correctAnswers": 210,
+        "incorrectAnswers": 10,
+        "averageAnswerTimeMs": 2400,
+        "mostProblematicOperation": null,
+        "operationStats": {
+          "+": {
+            "attempts": 55,
+            "incorrect": 2,
+            "avgTimeMs": 2500
+          },
+          "-": {
+            "attempts": 55,
+            "incorrect": 2,
+            "avgTimeMs": 2700
+          },
+          "*": {
+            "attempts": 55,
+            "incorrect": 3,
+            "avgTimeMs": 3600
+          },
+          "/": {
+            "attempts": 55,
+            "incorrect": 3,
+            "avgTimeMs": 3800
+          }
+        },
+        "gradeAtFinish": "trainee",
+        "finalScore": 180,
+        "finalPerfScore": 95.45,
+        "mode": "regular"
+      }
+    ]
+  }
+}

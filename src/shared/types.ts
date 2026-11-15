@@ -82,3 +82,27 @@ export type DDAMathTier = 1 | 2 | 3 | 4;
 export type GameState = 'start' | 'playing' | 'paused' | 'message' | 'gameover';
 
 export type GameOverReason = 'victory' | 'lives-depleted';
+
+/** Stable ids for saved awards. The id describes the rule; players see the translated name. */
+export type AchievementId =
+  | 'weekly-streak-bronze'
+  | 'weekly-streak-silver'
+  | 'weekly-streak-gold'
+  | 'weekly-goal-met'
+  | 'personal-best-week'
+  | 'focus-of-the-week'
+  | 'mastery-add'
+  | 'mastery-sub'
+  | 'mastery-mul'
+  | 'mastery-div';
+
+/** An award saved on a profile when it is earned. */
+export interface EarnedAchievement {
+  id: AchievementId;
+  /** When the award was earned (the run that qualified it). */
+  earnedAt: number;
+  /** ISO week key (`2026-W46`) the award belongs to, for weekly awards and streak tiers. */
+  weekKey?: string;
+  /** Operation the award belongs to, for per-operation awards. */
+  operation?: MathOperation;
+}

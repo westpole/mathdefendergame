@@ -236,7 +236,8 @@ test.describe('Visual Regression Tests', () => {
   });
 
   test('settings screen should match snapshot', async ({ page }) => {
-    await seedStartScreen(page, 'settings');
+    // The weekly goal's Suggested option depends on the current week, so pin the clock.
+    await seedStartScreen(page, 'settings', { pinClock: true });
 
     await expect(page.getByTestId('settings-overlay')).toBeVisible();
     await expect(page.getByTestId('settings-avatar-option-avatar-3')).toBeVisible();
@@ -263,9 +264,20 @@ test.describe('Visual Regression Tests', () => {
 
     await expectStableScreenshot(page, 'weekly-report-screen.png');
   });
+
+  test('achievements screen should match snapshot', async ({ page }) => {
+    // Streak, goal and badges are worked out from the week of Date.now(), read once on mount.
+    await seedStartScreen(page, 'achievements', { pinClock: true });
+
+    await expect(page.getByTestId('achievements-overlay')).toBeVisible();
+    await expect(page.getByTestId('achievements-streak-card')).toBeVisible();
+    await expect(page.getByTestId('achievements-badges')).toBeVisible();
+
+    await expectStableScreenshot(page, 'achievements-screen.png');
+  });
 });
 
-type StartScreenView = 'home' | 'settings' | 'rules' | 'weekly-report';
+type StartScreenView = 'home' | 'settings' | 'rules' | 'weekly-report' | 'achievements';
 
 /** Fixed reference time (2026-01-15 12:00 UTC) for seeded run history and the pinned clock. */
 const REFERENCE_NOW = Date.UTC(2026, 0, 15, 12);

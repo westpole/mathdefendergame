@@ -37,7 +37,7 @@ flowchart TD
 | Key | Type | Description |
 | --- | --- | --- |
 | `phase` | `OverlayPhase` | Current overlay lifecycle: booting, login, start, playing, paused, stage-message, gameover. |
-| `screenView` | `ScreenView` | Active React screen: home, practice-select (practice operation picker shown before a practice run), profile, settings, performance, rules, or weekly-report. |
+| `screenView` | `ScreenView` | Active React screen: home, practice-select (practice operation picker shown before a practice run), profile, settings, performance, rules, weekly-report, or achievements. |
 | `bootReady` | `boolean` | Set once the boot sequence finishes and the app can render the main menu flow. |
 | `activeUsername` | `string \| null` | Logged-in profile currently active for the session. |
 | `rememberedUsername` | `string \| null` | Persisted username used to restore a session after reload. |
@@ -60,6 +60,8 @@ flowchart TD
 | `stageMessage` | `StageMessageState \| null` | Stage transition message and summary metrics. |
 | `streakRewardMessage` | `StreakRewardMessageState \| null` | Reward text shown after successful streak milestones. |
 | `pauseOverlay` | `PauseOverlayState \| null` | Pause state triggered by escape/break or window close handling. |
+| `gradeNotice` | `GradeNotice \| null` | After-run promotion or demotion message. Transient. |
+| `achievementNotice` | `EarnedAchievement[] \| null` | Awards earned by the last saved run. Shown after `gradeNotice` is dismissed. Transient. |
 | `gameHistoryByProfile` | `Record<string, GameHistoryEntry[]>` | Per-profile session history used for lifetime grade and profile analytics. |
 
 ### Store actions and helper methods
@@ -76,7 +78,8 @@ flowchart TD
 | `hidePauseOverlay` | Restores the previous phase after unpausing. |
 | `showSavingBeforeClose` | Shows a save-before-close state for shutdown flows. |
 | `showGameOver` | Finalizes a run, updates best/highest profile metrics, and transitions to gameover. |
-| `persistPrematureGameEnd` | Saves partial game history when the game exits unexpectedly. |
+| `persistPrematureGameEnd` | Saves partial game history when the game exits unexpectedly. Checks awards like `addGameHistory`. |
+| `dismissAchievementNotice` | Clears the after-run achievement notice. |
 | `startPlaying` | Begins active gameplay and clears overlay state. |
 | `openMenu` | Returns to the menu while preserving session data. |
 | `openScreenView` | Opens a specific screen while keeping the game session intact. |
@@ -85,7 +88,7 @@ flowchart TD
 | `createAndLoginProfile` | Validates and creates a new player profile, then logs them in. |
 | `updateActiveProfileAvatar` | Updates the active profile avatar selection from the supported avatar catalog. |
 | `getActiveProfile` | Resolves the profile object for the current user. |
-| `addGameHistory` | Appends a new gameplay record for the active profile or guest bucket. |
+| `addGameHistory` | Appends a new gameplay record for the active profile or guest bucket, then checks for new awards. |
 | `getGameHistory` | Retrieves recent game history for a profile or the active player. |
 
 ### Persistence rules
@@ -99,6 +102,20 @@ The Zustand persist middleware stores only the durable data needed across sessio
 The live run state such as score, stage, lives, shield, input buffer, and overlay messages is intentionally not persisted. This keeps reloads predictable while preserving profile history continuity.
 
 Profile persistence uses a normalized migration step. Persisted profile payloads are converted into the canonical `PlayerProfile` shape, malformed profile entries are dropped, and only the canonical keys are written back.
+
+### Achievements contract
+
+Awards live in `src/store/selectors/achievements.ts` (pure, `now` passed in) and are saved on the profile as `PlayerProfile.achievements: EarnedAchievement[]`. Everything is behind the `achievements` feature flag.
+
+- **Week and day keys** use local time: `toDayKey` gives `YYYY-MM-DD`, `toWeekKey` gives the ISO week (`2026-W46`, Monday start). Keys are built from local date parts, never by dividing by `DAY_MS`, so DST changes are safe.
+- **Active day:** a local day whose runs total at least `ACTIVE_DAY_MIN_CORRECT` correct answers. **Streak week:** at least `STREAK_MIN_DAYS_PER_WEEK` active days. `computeWeeklyStreak` walks the weeks from the oldest run; the current week adds to the streak once it qualifies and never breaks it.
+- **Saved when earned:** `evaluateNewAchievements(history, profile, now, { isAfterRun })` returns only awards the profile has not saved. Weekly awards are unique per `id + weekKey`; one-time awards (Relentless tiers, mastery) per `id`. Saved awards are never removed, even if rules or goals change.
+- **When awards are checked:**
+  - after every saved run (`addGameHistory`, `persistPrematureGameEnd`): new awards are appended to the profile and to `achievementNotice`;
+  - silently when a profile becomes active (`loginProfile`, `selectProfileByUsername`, the create-and-login setters, and restoring a remembered profile in `markBootReady`): history is backfilled with no notice, and awards that must not be backfilled are skipped (`isAfterRun: false`).
+- **Guests** see progress worked out live, but nothing is saved and no notice is shown.
+- **New badges** add an evaluator to `ACHIEVEMENT_EVALUATORS`; the login check then backfills them automatically.
+- **Persistence:** persist version 6. `migrateProfiles` sets `achievements` to a validated list (`[]` when missing) and drops unknown ids or malformed entries.
 
 ### Additional info useful to AI assistants
 
