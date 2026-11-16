@@ -6,7 +6,6 @@ describe('feature flags', () => {
       const flags = getFeatureFlags();
 
       expect(flags).toEqual({
-        stage_confetti: true,
         achievements: true,
       });
       expect(flags).not.toBe(getFeatureFlags());
@@ -20,19 +19,18 @@ describe('feature flags', () => {
     });
 
     it('ignores and removes a stale E2E override so bundled flags apply', async () => {
-      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ stage_confetti: false }));
+      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ achievements: false }));
       vi.resetModules();
 
       const flagsModule = await import('../featureFlags');
 
-      expect(flagsModule.isFeatureEnabled('stage_confetti')).toBe(true);
+      expect(flagsModule.isFeatureEnabled('achievements')).toBe(true);
       expect(localStorage.getItem(flagsModule.E2E_FLAGS_STORAGE_KEY)).toBeNull();
     });
   });
 
   describe('isFeatureEnabled', () => {
     it('returns true for flags that are enabled', () => {
-      expect(isFeatureEnabled('stage_confetti')).toBe(true);
       expect(isFeatureEnabled('achievements')).toBe(true);
     });
 

@@ -21,7 +21,6 @@ import type {
   PracticeOperation,
 } from '@shared/types';
 import { MATH_OPERATIONS } from '@shared/constants';
-import { isFeatureEnabled } from '@shared/featureFlags';
 
 import { GAME_CONFIG, getDangerZoneOffset, getMeteorSpawnPadding } from './config';
 import { DDAController, type DDAConfiguration } from './utilities/DDAController';
@@ -52,7 +51,6 @@ type RoundOperationTelemetry = Record<MathOperation, {
 }>;
 
 const MAX_ANSWER_INPUT_LENGTH = 5;
-const STAGE_CONFETTI_FLAG = 'stage_confetti';
 
 function createEmptyRoundOperationTelemetry(): RoundOperationTelemetry {
   return {
@@ -398,9 +396,7 @@ export class Game {
     this.lastStageSuccess = success;
 
     if (success) {
-      if (isFeatureEnabled(STAGE_CONFETTI_FLAG)) {
-        this.createConfetti();
-      }
+      this.createConfetti();
 
       if (this.stageIncorrect === 0) {
         this.score += GAME_CONFIG.grades[this.grade].cleanStageBonusPoints;
