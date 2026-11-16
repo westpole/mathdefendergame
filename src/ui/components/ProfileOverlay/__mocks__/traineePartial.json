@@ -7,7 +7,6 @@
   "profiles": {
     "PilotMira": {
       "username": "PilotMira",
-      "password": "Abc12345",
       "bestScore": 120,
       "highestStage": 12,
       "preferredGrade": "trainee",

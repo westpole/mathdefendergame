@@ -6,7 +6,6 @@
   "profiles": {
     "AcePilot": {
       "username": "AcePilot",
-      "password": "Pass1234",
       "bestScore": 120,
       "highestStage": 3,
       "preferredGrade": "cadet",

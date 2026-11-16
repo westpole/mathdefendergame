@@ -34,7 +34,6 @@ describe('migrateProfiles', () => {
 
     expect(migrated.alice).toEqual({
       username: 'alice',
-      password: 'StrongPass1!',
       avatarId: DEFAULT_AVATAR_ID,
       bestScore: 900,
       highestStage: 12,
@@ -46,7 +45,6 @@ describe('migrateProfiles', () => {
 
     expect(migrated.bob).toEqual({
       username: 'bob',
-      password: '',
       avatarId: DEFAULT_AVATAR_ID,
       bestScore: 250,
       highestStage: 6,
@@ -58,7 +56,6 @@ describe('migrateProfiles', () => {
 
     expect(migrated.carol).toEqual({
       username: 'carol',
-      password: 'weak',
       avatarId: DEFAULT_AVATAR_ID,
       bestScore: 30,
       highestStage: 3,
@@ -87,7 +84,6 @@ describe('migrateProfiles', () => {
     })).toEqual({
       dave: {
         username: 'dave',
-        password: '',
         avatarId: DEFAULT_AVATAR_ID,
         bestScore: 0,
         highestStage: 4,
@@ -98,7 +94,6 @@ describe('migrateProfiles', () => {
       },
       erin: {
         username: 'erin',
-        password: '',
         avatarId: DEFAULT_AVATAR_ID,
         bestScore: 0,
         highestStage: 1,

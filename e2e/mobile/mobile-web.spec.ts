@@ -1,15 +1,13 @@
 import type { Page } from '@playwright/test';
 
-import { test, expect } from '../fixtures/browser-app-login';
+import { test, expect } from '../fixtures/browser-app';
 
 import type { E2EWindow } from '../types';
 
 async function loginToStartMenu(page: Page, username: string) {
-  await expect(page.getByTestId('login-screen')).toBeVisible();
+  await expect(page.getByTestId('profile-selector-screen')).toBeVisible();
   await page.getByRole('button', { name: 'Create Profile' }).click();
   await page.getByLabel('Username').fill(username);
-  await page.getByLabel('Password', { exact: true }).fill('Abc12345');
-  await page.getByLabel('Verify password').fill('Abc12345');
   await page.getByRole('button', { name: 'Create' }).click();
   await expect(page.getByTestId('main-menu')).toBeVisible();
 }

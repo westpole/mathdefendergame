@@ -24,7 +24,6 @@ describe('ProfileSelector', () => {
       profiles: {
         AcePilot: {
           username: 'AcePilot',
-          password: 'enc:v1:test',
           bestScore: 100,
           highestStage: 3,
           preferredGrade: 'trainee',
@@ -70,7 +69,6 @@ describe('ProfileSelector', () => {
       profiles: {
         AcePilot: {
           username: 'AcePilot',
-          password: 'enc:v1:test',
           bestScore: 100,
           highestStage: 3,
           preferredGrade: 'trainee',
@@ -93,7 +91,6 @@ describe('ProfileSelector', () => {
       profiles: {
         Alpha: {
           username: 'Alpha',
-          password: 'enc:v1:test',
           bestScore: 50,
           highestStage: 2,
           preferredGrade: 'trainee',
@@ -102,7 +99,6 @@ describe('ProfileSelector', () => {
         },
         Bravo: {
           username: 'Bravo',
-          password: 'enc:v1:test',
           bestScore: 70,
           highestStage: 3,
           preferredGrade: 'trainee',
@@ -111,7 +107,6 @@ describe('ProfileSelector', () => {
         },
         Charlie: {
           username: 'Charlie',
-          password: 'enc:v1:test',
           bestScore: 90,
           highestStage: 4,
           preferredGrade: 'trainee',
@@ -169,8 +164,6 @@ describe('ProfileSelector', () => {
     fireEvent.click(screen.getByRole('button', { name: /create profile/i }));
 
     expect(screen.getByRole('button', { name: /^create$/i })).toBeInTheDocument();
-    expect(screen.queryByLabelText(/^password$/i)).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/verify password/i)).not.toBeInTheDocument();
   });
 
   it('shows empty state and disables login when no profiles exist', () => {
@@ -194,7 +187,6 @@ describe('ProfileSelector', () => {
       profiles: {
         Alpha: {
           username: 'Alpha',
-          password: 'enc:v1:test',
           bestScore: 50,
           highestStage: 2,
           preferredGrade: 'trainee',
@@ -203,7 +195,6 @@ describe('ProfileSelector', () => {
         },
         Bravo: {
           username: 'Bravo',
-          password: 'enc:v1:test',
           bestScore: 70,
           highestStage: 3,
           preferredGrade: 'trainee',

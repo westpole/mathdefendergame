@@ -42,7 +42,6 @@ function seed(history: GameHistoryEntry[], { goal = 1000, guest = false } = {}) 
     profiles: guest ? {} : {
       AcePilot: {
         username: 'AcePilot',
-        password: 'x',
         bestScore: 0,
         highestStage: 1,
         preferredGrade: 'trainee',

@@ -8,7 +8,6 @@ describe('feature flags', () => {
       expect(flags).toEqual({
         stage_confetti: true,
         streak_reward: true,
-        simple_login: true,
         achievements: true,
       });
       expect(flags).not.toBe(getFeatureFlags());
@@ -22,12 +21,12 @@ describe('feature flags', () => {
     });
 
     it('ignores and removes a stale E2E override so bundled flags apply', async () => {
-      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: false }));
+      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ stage_confetti: false }));
       vi.resetModules();
 
       const flagsModule = await import('../featureFlags');
 
-      expect(flagsModule.isFeatureEnabled('simple_login')).toBe(true);
+      expect(flagsModule.isFeatureEnabled('stage_confetti')).toBe(true);
       expect(localStorage.getItem(flagsModule.E2E_FLAGS_STORAGE_KEY)).toBeNull();
     });
   });
@@ -36,7 +35,6 @@ describe('feature flags', () => {
     it('returns true for flags that are enabled', () => {
       expect(isFeatureEnabled('stage_confetti')).toBe(true);
       expect(isFeatureEnabled('streak_reward')).toBe(true);
-      expect(isFeatureEnabled('simple_login')).toBe(true);
       expect(isFeatureEnabled('achievements')).toBe(true);
     });
 

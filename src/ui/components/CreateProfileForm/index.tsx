@@ -4,30 +4,23 @@ import { useTranslation } from 'react-i18next';
 import { useGameStore } from '@store/useGameStore';
 
 interface CreateProfileFormProps {
-  simpleMode: boolean;
   onCancel?: () => void;
 }
 
 /**
- * Renders the create-account form used during login flow startup.
+ * Renders the create-profile form used during login flow startup.
  *
- * In full mode, the user must provide a username, password, and password confirmation;
- * in simple mode, only a username is required and a lightweight profile is created.
- * Successful submissions call the matching store action to create and immediately log in
- * the profile. Validation errors are surfaced inline in the form.
+ * Only a username is required. A successful submission creates the profile and
+ * immediately logs it in through the store. Validation errors are surfaced inline.
  *
  * @param props - The form configuration and optional cancel callback.
- * @param props.simpleMode - When true, skip password fields and use the simplified profile flow.
  * @param props.onCancel - Optional callback invoked when the user cancels the form.
  * @returns The profile creation form UI.
  */
-export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormProps) {
+export function CreateProfileForm({ onCancel }: CreateProfileFormProps) {
   const { t } = useTranslation();
-  const createAndLoginProfile = useGameStore((state) => state.createAndLoginProfile);
   const createAndLoginSimpleProfile = useGameStore((state) => state.createAndLoginSimpleProfile);
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [verifyPassword, setVerifyPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const usernameInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -38,21 +31,7 @@ export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormPro
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!simpleMode) {
-      if (!verifyPassword.trim()) {
-        setErrorMessage(t('auth.pleaseVerifyPassword'));
-        return;
-      }
-
-      if (password !== verifyPassword) {
-        setErrorMessage(t('auth.passwordMismatch'));
-        return;
-      }
-    }
-
-    const result = simpleMode
-      ? createAndLoginSimpleProfile(username)
-      : createAndLoginProfile(username, password, false);
+    const result = createAndLoginSimpleProfile(username);
 
     if (!result.success) {
       setErrorMessage(result.error ?? t('auth.profileCreationFailed'));
@@ -75,32 +54,6 @@ export function CreateProfileForm({ simpleMode, onCancel }: CreateProfileFormPro
         ref={usernameInputRef}
         value={username}
       />
-
-      {!simpleMode && (
-        <>
-          <label className="field-label" htmlFor="create-profile-password">{t('ui.password')}</label>
-          <input
-            id="create-profile-password"
-            className="text-input"
-            maxLength={8}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder={t('ui.passwordHint')}
-            type="password"
-            value={password}
-          />
-
-          <label className="field-label" htmlFor="create-profile-verify-password">{t('ui.verifyPassword')}</label>
-          <input
-            id="create-profile-verify-password"
-            className="text-input"
-            maxLength={8}
-            onChange={(event) => setVerifyPassword(event.target.value)}
-            placeholder={t('ui.reenterPassword')}
-            type="password"
-            value={verifyPassword}
-          />
-        </>
-      )}
 
       {errorMessage && (
         <div className="form-error-block" role="alert">

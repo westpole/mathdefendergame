@@ -7,7 +7,6 @@
   "profiles": {
     "GeneralVoss": {
       "username": "GeneralVoss",
-      "password": "Abc12345",
       "bestScore": 120,
       "highestStage": 12,
       "preferredGrade": "major-general",

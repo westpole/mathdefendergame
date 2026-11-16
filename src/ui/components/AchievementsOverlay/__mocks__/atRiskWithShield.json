@@ -6,7 +6,6 @@
   "profiles": {
     "AcePilot": {
       "username": "AcePilot",
-      "password": "story",
       "avatarId": "avatar-2",
       "bestScore": 900,
       "highestStage": 4,

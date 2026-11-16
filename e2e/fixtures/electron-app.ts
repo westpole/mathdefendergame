@@ -27,6 +27,8 @@ export const test = base.extend<Fixtures>({
     const app = await electron.launch({
       args: [...containerArgs, appRoot, `--user-data-dir=${userDataDir}`],
       env,
+      // Intl formatters use the OS locale (e.g. en-GB renders "9 Jan"); pin en-US so date text matches snapshots.
+      locale: 'en-US',
     });
     await use(app);
     await app.close();
@@ -35,9 +37,8 @@ export const test = base.extend<Fixtures>({
   page: async ({ electronApp }, use) => {
     const page = await electronApp.firstWindow();
 
-    // Set feature flags and pin English (i18n otherwise falls back to the OS locale) via localStorage BEFORE app loads
+    // Pin English (i18n otherwise falls back to the OS locale) via localStorage BEFORE app loads
     await page.addInitScript(() => {
-      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: true }));
       localStorage.setItem('math-defender-language', 'en');
     });
 

@@ -39,7 +39,7 @@ function seed(withFocus: boolean) {
     phase: 'start',
     screenView: 'practice-select',
     profiles: {
-      AcePilot: { username: 'AcePilot', password: '', bestScore: 0, highestStage: 1, preferredGrade: 'cadet', createdAt: 1, updatedAt: 1 },
+      AcePilot: { username: 'AcePilot', bestScore: 0, highestStage: 1, preferredGrade: 'cadet', createdAt: 1, updatedAt: 1 },
     },
     gameHistoryByProfile: {
       AcePilot: withFocus ? [makeRun(at(2026, 11, 3), { mostProblematicOperation: '*' })] : [],

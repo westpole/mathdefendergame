@@ -24,7 +24,6 @@ import { ProfileOverlay } from '@ui/components/ProfileOverlay';
 import { RulesOverlay } from '@ui/components/Rules';
 import { SettingsOverlay } from '@ui/components/SettingsOverlay';
 import { GameBgLayout } from '@ui/components/GameBgLayout';
-import { LoginOverlay } from '@ui/components/LoginOverlay';
 import { MenuControls } from '@ui/components/MenuControls';
 import { ProfileSelector } from '@ui/components/ProfileSelector';
 import { WeeklyReportOverlay } from '@ui/components/WeeklyReportOverlay';
@@ -37,7 +36,6 @@ export function App() {
   const bootReady = useGameStore((state) => state.bootReady);
   const screenView = useGameStore((state) => state.screenView);
   const setMobileDevice = useGameStore((state) => state.setMobileDevice);
-  const isSimpleLoginEnabled = isFeatureEnabled('simple_login');
   const isAchievementsEnabled = isFeatureEnabled('achievements');
   const isStartPhase = bootReady && phase === 'start';
   const handleVisibilityChange = useEffectEvent(() => {
@@ -79,7 +77,7 @@ export function App() {
       <GameBgLayout />
       <div id="ui-overlay">
         {!bootReady && <Loading />}
-        {bootReady && phase === 'login' && (isSimpleLoginEnabled ? <ProfileSelector /> : <LoginOverlay />)}
+        {bootReady && phase === 'login' && <ProfileSelector />}
         {isStartPhase && screenView === 'home' && <HomeOverlay />}
         {isStartPhase && screenView === 'practice-select' && <PracticeOperationOverlay />}
         {isStartPhase && screenView === 'profile' && <ProfileOverlay />}

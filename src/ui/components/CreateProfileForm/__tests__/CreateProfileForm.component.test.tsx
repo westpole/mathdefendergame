@@ -27,109 +27,49 @@ describe('CreateProfileForm', () => {
     });
   });
 
-  it('renders username and password fields in full mode and focuses the username input', () => {
-    render(<CreateProfileForm simpleMode={false} />);
-
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/verify password/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/username/i)).toHaveFocus();
-  });
-
-  it('renders the simplified form and calls cancel when provided', () => {
+  it('renders only the username field, focuses it, and calls cancel when provided', () => {
     const onCancel = vi.fn();
 
-    render(<CreateProfileForm onCancel={onCancel} simpleMode />);
+    render(<CreateProfileForm onCancel={onCancel} />);
 
-    expect(screen.getByLabelText(/username/i)).toBeInTheDocument();
-    expect(screen.queryByLabelText(/^password$/i)).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/verify password/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/username/i)).toHaveFocus();
 
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
 
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
 
-  it('requires verify password before submitting in full mode', () => {
-    const createProfileSpy = vi.fn<GameStoreState['createAndLoginProfile']>().mockReturnValue({ success: true });
-
-    useGameStore.setState({ createAndLoginProfile: createProfileSpy });
-
-    render(<CreateProfileForm simpleMode={false} />);
-
-    fireEvent.change(screen.getByLabelText(/username/i), {
-      target: { value: 'AcePilot' },
-    });
-    fireEvent.change(screen.getByLabelText(/^password$/i), {
-      target: { value: 'Abc12345' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /^create$/i }));
-
-    expect(screen.getByRole('alert')).toHaveTextContent(/please verify your password/i);
-    expect(createProfileSpy).not.toHaveBeenCalled();
-  });
-
-  it('shows a mismatch error when password confirmation does not match', () => {
-    const createProfileSpy = vi.fn<GameStoreState['createAndLoginProfile']>().mockReturnValue({ success: true });
-
-    useGameStore.setState({ createAndLoginProfile: createProfileSpy });
-
-    render(<CreateProfileForm simpleMode={false} />);
-
-    fireEvent.change(screen.getByLabelText(/username/i), {
-      target: { value: 'AcePilot' },
-    });
-    fireEvent.change(screen.getByLabelText(/^password$/i), {
-      target: { value: 'Abc12345' },
-    });
-    fireEvent.change(screen.getByLabelText(/verify password/i), {
-      target: { value: 'Abc12344' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /^create$/i }));
-
-    expect(screen.getByRole('alert')).toHaveTextContent(/must match/i);
-    expect(createProfileSpy).not.toHaveBeenCalled();
-  });
-
   it('surfaces store errors and clears them after a successful retry', () => {
-    const createProfileSpy = vi.fn<GameStoreState['createAndLoginProfile']>()
+    const createProfileSpy = vi.fn<GameStoreState['createAndLoginSimpleProfile']>()
       .mockReturnValueOnce({
         success: false,
         error: 'Username already exists. Pick a different username.',
       })
       .mockReturnValueOnce({ success: true });
 
-    useGameStore.setState({ createAndLoginProfile: createProfileSpy });
+    useGameStore.setState({ createAndLoginSimpleProfile: createProfileSpy });
 
-    render(<CreateProfileForm simpleMode={false} />);
+    render(<CreateProfileForm />);
 
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: 'AcePilot' },
     });
-    fireEvent.change(screen.getByLabelText(/^password$/i), {
-      target: { value: 'Abc12345' },
-    });
-    fireEvent.change(screen.getByLabelText(/verify password/i), {
-      target: { value: 'Abc12345' },
-    });
-
     fireEvent.click(screen.getByRole('button', { name: /^create$/i }));
 
     expect(screen.getByRole('alert')).toHaveTextContent(/username already exists/i);
-    expect(createProfileSpy).toHaveBeenNthCalledWith(1, 'AcePilot', 'Abc12345', false);
 
     fireEvent.click(screen.getByRole('button', { name: /^create$/i }));
 
-    expect(createProfileSpy).toHaveBeenNthCalledWith(2, 'AcePilot', 'Abc12345', false);
+    expect(createProfileSpy).toHaveBeenNthCalledWith(2, 'AcePilot');
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('creates a simple profile without password fields', () => {
+  it('creates a profile from the username', () => {
     const createSimpleProfileSpy = vi.fn<GameStoreState['createAndLoginSimpleProfile']>().mockReturnValue({ success: true });
 
     useGameStore.setState({ createAndLoginSimpleProfile: createSimpleProfileSpy });
 
-    render(<CreateProfileForm simpleMode />);
+    render(<CreateProfileForm />);
 
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: 'GuestPilot' },
@@ -147,7 +87,7 @@ describe('CreateProfileForm', () => {
 
     useGameStore.setState({ createAndLoginSimpleProfile: createSimpleProfileSpy });
 
-    render(<CreateProfileForm simpleMode />);
+    render(<CreateProfileForm />);
 
     fireEvent.change(screen.getByLabelText(/username/i), {
       target: { value: 'GuestPilot' },

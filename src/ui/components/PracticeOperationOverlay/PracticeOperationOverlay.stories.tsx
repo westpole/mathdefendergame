@@ -31,7 +31,6 @@ function buildProfiles(lastPracticeOperation?: PracticeOperation): Record<string
   return {
     AcePilot: {
       username: 'AcePilot',
-      password: '',
       bestScore: 120,
       highestStage: 6,
       preferredGrade: 'cadet',

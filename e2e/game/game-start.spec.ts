@@ -3,16 +3,13 @@ import type { E2EWindow } from '../types';
 
 test.describe('Game Start Flow', () => {
   test.beforeEach(async ({ page }) => {
-    // Override simple_login to false to test LoginOverlay component
-    await page.addInitScript(() => {
-      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: false }));
-    });
     await page.reload();
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
     await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().bootReady === true, { timeout: 5000 });
   });
 
-  test('should launch with login screen visible', async ({ page }) => {
+  test('should launch with profile selector visible', async ({ page }) => {
+    await expect(page.getByTestId('profile-selector-screen')).toBeVisible();
 
     // Get initial store state
     const state = await page.evaluate(() => (window as E2EWindow).__e2e!.getStoreState());

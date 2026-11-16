@@ -5,7 +5,6 @@
 
 import { useGameStore } from '../useGameStore';
 import type { GameHistoryEntry } from '@shared/types';
-import { isEncryptedPassword } from '../utilities/passwordEncryption';
 import { DEFAULT_AVATAR_ID } from '@shared/avatarCatalog';
 
 describe('useGameStore', () => {
@@ -60,7 +59,6 @@ describe('useGameStore', () => {
         profiles: {
           PilotOne: {
             username: 'PilotOne',
-            password: 'Abc12345',
             bestScore: 100,
             highestStage: 3,
             preferredGrade: 'trainee',
@@ -98,7 +96,6 @@ describe('useGameStore', () => {
         profiles: {
           PilotOne: {
             username: 'PilotOne',
-            password: 'Abc12345',
             bestScore: 220,
             highestStage: 6,
             preferredGrade: 'cadet',
@@ -210,7 +207,6 @@ describe('useGameStore', () => {
   describe('practice run setup', () => {
     const profile = {
       username: 'AcePilot',
-      password: '',
       bestScore: 0,
       highestStage: 1,
       preferredGrade: 'cadet' as const,
@@ -287,7 +283,6 @@ describe('useGameStore', () => {
         profiles: {
           PilotOne: {
             username: 'PilotOne',
-            password: 'Abc12345',
             bestScore: 180,
             highestStage: 4,
             preferredGrade: 'cadet',
@@ -323,44 +318,8 @@ describe('useGameStore', () => {
   });
 
   describe('profile login', () => {
-    it('creates and loads profile when credentials are valid', () => {
-      useGameStore.getState().markBootReady();
-
-      const result = useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
-
-      expect(result.success).toBe(true);
-      expect(useGameStore.getState().activeUsername).toBe('PilotOne');
-      expect(useGameStore.getState().phase).toBe('start');
-      expect(useGameStore.getState().profiles.PilotOne).toBeTruthy();
-      expect(isEncryptedPassword(useGameStore.getState().profiles.PilotOne.password)).toBe(true);
-    });
-
-    it('encrypts a legacy plaintext password after successful login', () => {
-      useGameStore.setState({
-        phase: 'login',
-        activeUsername: null,
-        profiles: {
-          PilotOne: {
-            username: 'PilotOne',
-            password: 'Abc12345',
-            bestScore: 0,
-            highestStage: 1,
-            preferredGrade: 'trainee',
-            createdAt: 1,
-            updatedAt: 2,
-          },
-        },
-      });
-
-      const result = useGameStore.getState().loginProfile('PilotOne', 'Abc12345', false);
-
-      expect(result.success).toBe(true);
-      expect(useGameStore.getState().profiles.PilotOne.password).not.toBe('Abc12345');
-      expect(isEncryptedPassword(useGameStore.getState().profiles.PilotOne.password)).toBe(true);
-    });
-
-    it('trims usernames when creating and logging into a profile', () => {
-      const created = useGameStore.getState().createAndLoginProfile('  PilotOne  ', 'Abc12345');
+    it('trims usernames when creating and selecting a profile', () => {
+      const created = useGameStore.getState().createAndLoginSimpleProfile('  PilotOne  ');
 
       expect(created.success).toBe(true);
       expect(useGameStore.getState().profiles.PilotOne).toBeTruthy();
@@ -368,53 +327,23 @@ describe('useGameStore', () => {
 
       useGameStore.setState({ phase: 'login', activeUsername: null });
 
-      const loggedIn = useGameStore.getState().loginProfile('  PilotOne  ', 'Abc12345', false);
+      const loggedIn = useGameStore.getState().selectProfileByUsername('  PilotOne  ');
 
       expect(loggedIn.success).toBe(true);
       expect(useGameStore.getState().activeUsername).toBe('PilotOne');
     });
 
     it('rejects duplicate usernames', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+      useGameStore.getState().createAndLoginSimpleProfile('PilotOne');
 
-      const duplicate = useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+      const duplicate = useGameStore.getState().createAndLoginSimpleProfile('PilotOne');
 
       expect(duplicate.success).toBe(false);
       expect(duplicate.error).toMatch(/already exists/i);
     });
 
-    it('rejects invalid passwords', () => {
-      const result = useGameStore.getState().createAndLoginProfile('PilotTwo', 'password');
-
-      expect(result.success).toBe(false);
-      expect(result.error).toMatch(/must be exactly 8 characters/i);
-      expect(useGameStore.getState().profiles.PilotTwo).toBeUndefined();
-    });
-
-    it('logs in existing profile when credentials match', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
-      useGameStore.setState({ phase: 'login', activeUsername: null });
-
-      const result = useGameStore.getState().loginProfile('PilotOne', 'Abc12345', false);
-
-      expect(result.success).toBe(true);
-      expect(useGameStore.getState().activeUsername).toBe('PilotOne');
-      expect(useGameStore.getState().phase).toBe('start');
-      expect(useGameStore.getState().rememberedUsername).toBeNull();
-    });
-
-    it('remembers successful login when keep me logged in is selected', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
-      useGameStore.setState({ phase: 'login', activeUsername: null, rememberedUsername: null });
-
-      const result = useGameStore.getState().loginProfile('PilotOne', 'Abc12345', true);
-
-      expect(result.success).toBe(true);
-      expect(useGameStore.getState().rememberedUsername).toBe('PilotOne');
-    });
-
-    it('selects an existing profile by username in simple login mode', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+    it('selects an existing profile by username', () => {
+      useGameStore.getState().createAndLoginSimpleProfile('PilotOne');
       useGameStore.setState({ phase: 'login', activeUsername: null, rememberedUsername: 'PilotOne' });
 
       const result = useGameStore.getState().selectProfileByUsername('PilotOne');
@@ -426,8 +355,8 @@ describe('useGameStore', () => {
       expect(useGameStore.getState().rememberedUsername).toBeNull();
     });
 
-    it('remembers selected profile in simple login mode when remember me is enabled', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+    it('remembers selected profile when remember me is enabled', () => {
+      useGameStore.getState().createAndLoginSimpleProfile('PilotOne');
       useGameStore.setState({ phase: 'login', activeUsername: null, rememberedUsername: null });
 
       const result = useGameStore.getState().selectProfileByUsername('PilotOne', true);
@@ -444,7 +373,7 @@ describe('useGameStore', () => {
       expect(result.error).toMatch(/username not found/i);
     });
 
-    it('creates and logs in a simple profile without password input processing', () => {
+    it('creates and logs in a profile from a username', () => {
       const result = useGameStore.getState().createAndLoginSimpleProfile('PilotOne');
 
       expect(result.success).toBe(true);
@@ -452,12 +381,12 @@ describe('useGameStore', () => {
       expect(useGameStore.getState().phase).toBe('start');
       expect(useGameStore.getState().screenView).toBe('home');
       expect(useGameStore.getState().rememberedUsername).toBeNull();
-      expect(isEncryptedPassword(useGameStore.getState().profiles.PilotOne.password)).toBe(true);
       expect(useGameStore.getState().profiles.PilotOne.avatarId).toBe(DEFAULT_AVATAR_ID);
     });
 
     it('logs off by clearing active and remembered login credentials', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345', true);
+      useGameStore.getState().createAndLoginSimpleProfile('PilotOne');
+      useGameStore.setState({ rememberedUsername: 'PilotOne' });
 
       useGameStore.getState().logOff();
 
@@ -468,7 +397,7 @@ describe('useGameStore', () => {
     });
 
     it('returns the active profile when one is selected', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+      useGameStore.getState().createAndLoginSimpleProfile('PilotOne');
 
       const profile = useGameStore.getState().getActiveProfile();
 
@@ -481,7 +410,7 @@ describe('useGameStore', () => {
     });
 
     it('updates the active profile avatar', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+      useGameStore.getState().createAndLoginSimpleProfile('PilotOne');
 
       const result = useGameStore.getState().updateActiveProfileAvatar('avatar-4');
 
@@ -490,7 +419,7 @@ describe('useGameStore', () => {
     });
 
     it('rejects invalid avatar updates', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
+      useGameStore.getState().createAndLoginSimpleProfile('PilotOne');
 
       const result = useGameStore.getState().updateActiveProfileAvatar('avatar-99');
 
@@ -506,7 +435,6 @@ describe('useGameStore', () => {
         profiles: {
           PilotOne: {
             username: 'PilotOne',
-            password: 'Abc12345',
             bestScore: 200,
             highestStage: 4,
             preferredGrade: 'trainee',
@@ -537,31 +465,12 @@ describe('useGameStore', () => {
         },
       });
 
-      const result = useGameStore.getState().loginProfile('PilotOne', 'Abc12345', false);
+      const result = useGameStore.getState().selectProfileByUsername('PilotOne');
 
       expect(result.success).toBe(true);
       expect(useGameStore.getState().grade).toBe('commander');
     });
 
-    it('shows create profile suggestion when username is not found', () => {
-      const result = useGameStore.getState().loginProfile('GhostPilot', 'Abc12345', false);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toMatch(/username not found/i);
-      expect(result.error).toMatch(/create profile/i);
-    });
-
-    it('rejects login when password does not match', () => {
-      useGameStore.getState().createAndLoginProfile('PilotOne', 'Abc12345');
-      useGameStore.setState({ phase: 'login', activeUsername: null });
-
-      const result = useGameStore.getState().loginProfile('PilotOne', 'Abc12344', false);
-
-      expect(result.success).toBe(false);
-      expect(result.error).toMatch(/incorrect password/i);
-      expect(useGameStore.getState().activeUsername).toBeNull();
-      expect(useGameStore.getState().phase).toBe('login');
-    });
   });
 
   describe('stage message', () => {
@@ -717,7 +626,6 @@ describe('useGameStore', () => {
         profiles: {
           PilotOne: {
             username: 'PilotOne',
-            password: 'Abc12345',
             bestScore: 100,
             highestStage: 2,
             preferredGrade: 'trainee',
@@ -800,7 +708,6 @@ describe('useGameStore', () => {
         profiles: {
           PilotOne: {
             username: 'PilotOne',
-            password: 'Abc12345',
             bestScore: 100,
             highestStage: 2,
             preferredGrade: 'trainee',

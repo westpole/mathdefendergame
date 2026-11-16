@@ -41,7 +41,7 @@ flowchart TD
 | `bootReady` | `boolean` | Set once the boot sequence finishes and the app can render the main menu flow. |
 | `activeUsername` | `string \| null` | Logged-in profile currently active for the session. |
 | `rememberedUsername` | `string \| null` | Persisted username used to restore a session after reload. |
-| `profiles` | `Record<string, PlayerProfile>` | Registered player profiles, including password, avatar, best score, highest reached stage, and timestamps. |
+| `profiles` | `Record<string, PlayerProfile>` | Registered player profiles, including avatar, best score, highest reached stage, and timestamps. |
 | `grade` | `Grade` | Current player grade, used for progression filtering. |
 | `score` | `number` | Current in-run score. |
 | `lives` | `number` | Remaining player lives. |
@@ -84,8 +84,8 @@ flowchart TD
 | `openMenu` | Returns to the menu while preserving session data. |
 | `openScreenView` | Opens a specific screen while keeping the game session intact. |
 | `logOff` | Logs the current user out and returns to login. |
-| `loginProfile` | Authenticates a known player profile. |
-| `createAndLoginProfile` | Validates and creates a new player profile, then logs them in. |
+| `selectProfileByUsername` | Logs in an existing profile by username, optionally remembering it. |
+| `createAndLoginSimpleProfile` | Creates a new profile from a username, then logs it in. |
 | `updateActiveProfileAvatar` | Updates the active profile avatar selection from the supported avatar catalog. |
 | `getActiveProfile` | Resolves the profile object for the current user. |
 | `addGameHistory` | Appends a new gameplay record for the active profile or guest bucket, then checks for new awards. |
@@ -112,10 +112,10 @@ Awards live in `src/store/selectors/achievements.ts` (pure, `now` passed in) and
 - **Saved when earned:** `evaluateNewAchievements(history, profile, now, { isAfterRun })` returns only awards the profile has not saved. Weekly awards are unique per `id + weekKey`; one-time awards (Relentless tiers, mastery) per `id`. Saved awards are never removed, even if rules or goals change.
 - **When awards are checked:**
   - after every saved run (`addGameHistory`, `persistPrematureGameEnd`): new awards are appended to the profile and to `achievementNotice`;
-  - silently when a profile becomes active (`loginProfile`, `selectProfileByUsername`, the create-and-login setters, and restoring a remembered profile in `markBootReady`): history is backfilled with no notice, and awards that must not be backfilled are skipped (`isAfterRun: false`).
+  - silently when a profile becomes active (`selectProfileByUsername`, `createAndLoginSimpleProfile`, and restoring a remembered profile in `markBootReady`): history is backfilled with no notice, and awards that must not be backfilled are skipped (`isAfterRun: false`).
 - **Guests** see progress worked out live, but nothing is saved and no notice is shown.
 - **New badges** add an evaluator to `ACHIEVEMENT_EVALUATORS`; the login check then backfills them automatically.
-- **Persistence:** persist version 6. `migrateProfiles` sets `achievements` to a validated list (`[]` when missing) and drops unknown ids or malformed entries.
+- **Persistence:** persist version 7. `migrateProfiles` sets `achievements` to a validated list (`[]` when missing), drops unknown ids or malformed entries, and drops the legacy `password` field.
 
 ### Additional info useful to AI assistants
 

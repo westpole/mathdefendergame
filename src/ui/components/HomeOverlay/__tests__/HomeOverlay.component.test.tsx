@@ -122,7 +122,6 @@ describe('HomeOverlay', () => {
   describe('rules hint', () => {
     const aceProfile: PlayerProfile = {
       username: 'AcePilot',
-      password: '',
       bestScore: 0,
       highestStage: 1,
       preferredGrade: 'cadet',
