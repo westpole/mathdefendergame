@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
 import { GAME_CONFIG } from '@game/config';
-import { isFeatureEnabled } from '@shared/featureFlags';
 import { useGameStore } from '@store/useGameStore';
 
 import { RulesSection } from './RulesSection';
@@ -23,7 +22,6 @@ export function RulesOverlay() {
   const { t } = useTranslation();
   const isMobileDevice = useGameStore((state) => state.isMobileDevice);
   const device = isMobileDevice ? 'mobile' : 'desktop';
-  const isStreakRewardEnabled = isFeatureEnabled('streak_reward');
 
   return (
     <div className="overlay-screen overlay-screen--interactive" data-testid="rules-overlay" data-device={device}>
@@ -54,11 +52,9 @@ export function RulesOverlay() {
           <p>{t('rules.targetMeteor.body')}</p>
         </RulesSection>
 
-        {isStreakRewardEnabled && (
-          <RulesSection id="extra-life" title={t('rules.extraLife.title')}>
-            <p>{t('rules.extraLife.body', { streak: GAME_CONFIG.streakRewardThreshold })}</p>
-          </RulesSection>
-        )}
+        <RulesSection id="extra-life" title={t('rules.extraLife.title')}>
+          <p>{t('rules.extraLife.body', { streak: GAME_CONFIG.streakRewardThreshold })}</p>
+        </RulesSection>
 
         <RulesSection id="hud" title={t('rules.hud.title')}>
           <p>{t(`rules.hud.${device}`)}</p>

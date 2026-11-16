@@ -1,19 +1,11 @@
 import { render, screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
 
 import i18n from '../../../../i18n/config';
 
 import { RulesOverlay } from '..';
-
-const featureFlagMocks = vi.hoisted(() => ({
-  isFeatureEnabled: vi.fn<(flagName: string) => boolean>(),
-}));
-
-vi.mock('@shared/featureFlags', () => ({
-  isFeatureEnabled: featureFlagMocks.isFeatureEnabled,
-}));
 
 function renderRules(isMobileDevice = false) {
   useGameStore.setState({ isMobileDevice });
@@ -25,8 +17,6 @@ describe('RulesOverlay', () => {
     // Reset before rendering: an afterEach reset would run before RTL's cleanup unmounts,
     // re-rendering the subscribed component outside act().
     useGameStore.setState({ isMobileDevice: false });
-    featureFlagMocks.isFeatureEnabled.mockReset();
-    featureFlagMocks.isFeatureEnabled.mockReturnValue(true);
     await i18n.changeLanguage('en');
   });
 
@@ -76,14 +66,6 @@ describe('RulesOverlay', () => {
     expect(screen.getByText(/tap anywhere on the game area to pause/i)).toBeInTheDocument();
     expect(screen.queryByText(/type answers with the number keys/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/press esc to pause/i)).not.toBeInTheDocument();
-  });
-
-  it('hides the extra life section when the streak reward is disabled', () => {
-    featureFlagMocks.isFeatureEnabled.mockImplementation((flagName) => flagName !== 'streak_reward');
-
-    renderRules();
-
-    expect(screen.queryByTestId('rules-section-extra-life')).not.toBeInTheDocument();
   });
 
   it('renders translated rules in Ukrainian', async () => {

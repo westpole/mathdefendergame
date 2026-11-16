@@ -7,7 +7,6 @@ describe('feature flags', () => {
 
       expect(flags).toEqual({
         stage_confetti: true,
-        streak_reward: true,
         achievements: true,
       });
       expect(flags).not.toBe(getFeatureFlags());
@@ -34,7 +33,6 @@ describe('feature flags', () => {
   describe('isFeatureEnabled', () => {
     it('returns true for flags that are enabled', () => {
       expect(isFeatureEnabled('stage_confetti')).toBe(true);
-      expect(isFeatureEnabled('streak_reward')).toBe(true);
       expect(isFeatureEnabled('achievements')).toBe(true);
     });
 
