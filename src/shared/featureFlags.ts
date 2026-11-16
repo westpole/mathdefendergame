@@ -7,12 +7,29 @@ import rawFeatureFlags from './feature-flags.json';
  */
 export type FeatureFlags = Record<string, boolean>;
 
+/** localStorage key E2E tests use to pre-set flag overrides before the app initializes. */
+export const E2E_FLAGS_STORAGE_KEY = '__e2eFeatureFlags';
+
 /**
  * Runtime feature flag registry loaded from the JSON config.
- * E2E tests can pre-set overrides via localStorage before the app initializes.
+ * Only E2E builds (`vite build --mode e2e`) honor localStorage overrides. Production builds
+ * ignore them and delete any stale value, so leftovers from older builds cannot disable features.
  */
 const getInitialFlags = (): FeatureFlags => {
-  const stored = typeof window !== 'undefined' ? localStorage.getItem('__e2eFeatureFlags') : null;
+  if (typeof window === 'undefined') {
+    return rawFeatureFlags as FeatureFlags;
+  }
+
+  if (!__E2E__) {
+    try {
+      localStorage.removeItem(E2E_FLAGS_STORAGE_KEY);
+    } catch {
+      // Storage may be unavailable; bundled flags still apply.
+    }
+    return rawFeatureFlags as FeatureFlags;
+  }
+
+  const stored = localStorage.getItem(E2E_FLAGS_STORAGE_KEY);
   if (stored) {
     try {
       return { ...rawFeatureFlags, ...JSON.parse(stored) };

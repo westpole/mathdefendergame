@@ -15,6 +15,23 @@ describe('feature flags', () => {
     });
   });
 
+  describe('production localStorage overrides', () => {
+    afterEach(() => {
+      localStorage.clear();
+      vi.resetModules();
+    });
+
+    it('ignores and removes a stale E2E override so bundled flags apply', async () => {
+      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: false }));
+      vi.resetModules();
+
+      const flagsModule = await import('../featureFlags');
+
+      expect(flagsModule.isFeatureEnabled('simple_login')).toBe(true);
+      expect(localStorage.getItem(flagsModule.E2E_FLAGS_STORAGE_KEY)).toBeNull();
+    });
+  });
+
   describe('isFeatureEnabled', () => {
     it('returns true for flags that are enabled', () => {
       expect(isFeatureEnabled('stage_confetti')).toBe(true);
