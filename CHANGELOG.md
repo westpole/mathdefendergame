@@ -1,4 +1,32 @@
 
+## [1.7.0](https://github.com/westpole/mathdefendergame/compare/v1.6.0...v1.7.0) (2026-11-17)
+
+### Features
+
+* [#148](https://github.com/westpole/mathdefendergame/issues/148) add stop hook to review unreviewed changes before stopping ([26b8b17](https://github.com/westpole/mathdefendergame/commit/26b8b17f76acde8417e5ac5cc506d7ddec2d3720))
+* [#148](https://github.com/westpole/mathdefendergame/issues/148) add visual regression tests and snapshots for home, menu, settings, rules, and weekly report screens ([fa7340d](https://github.com/westpole/mathdefendergame/commit/fa7340dd27ff12d368f1b740366a39014f7c9afe))
+* [#148](https://github.com/westpole/mathdefendergame/issues/148) implement Select component with keyboard navigation and external label support ([654cbb6](https://github.com/westpole/mathdefendergame/commit/654cbb6cafb516037feff2f760f44feeb705af5e))
+* [#148](https://github.com/westpole/mathdefendergame/issues/148) update E2E testing environment variables and improve visual regression tests for stability ([814ec37](https://github.com/westpole/mathdefendergame/commit/814ec379be53d2b36a1381e308f5c71c57d9d7fc))
+* [#25](https://github.com/westpole/mathdefendergame/issues/25) add achievements page with weekly streak progress (ticket 151) ([596da16](https://github.com/westpole/mathdefendergame/commit/596da16455fd51c4c851d8ae7226218e35abf5ec))
+* [#25](https://github.com/westpole/mathdefendergame/issues/25) add Focus of the Week badge and practice focus tag (ticket 156) ([d2aa64c](https://github.com/westpole/mathdefendergame/commit/d2aa64c04b87973912b2b9f1d91a70a5ed7d8951))
+* [#25](https://github.com/westpole/mathdefendergame/issues/25) add Goal Met and Personal Best Week badges with suggested goal (ticket 155) ([4d23a0a](https://github.com/westpole/mathdefendergame/commit/4d23a0aed3786f4c9bc4aace557616db728cd3a1))
+* [#25](https://github.com/westpole/mathdefendergame/issues/25) add mobile landscape menu story and improve menu panel styling for better accessibility ([89c5bee](https://github.com/westpole/mathdefendergame/commit/89c5beefc363088931d811afcf679e5224e78c04))
+* [#25](https://github.com/westpole/mathdefendergame/issues/25) add operation mastery badges (ticket 157) ([8fe6b81](https://github.com/westpole/mathdefendergame/commit/8fe6b8197a4d910b2004b3bc67eaa5a3436ff137))
+* [#25](https://github.com/westpole/mathdefendergame/issues/25) add streak shield and at-risk warning (ticket 153) ([c1f7657](https://github.com/westpole/mathdefendergame/commit/c1f765725b2d2d5be20d7fc96f7ae19e9ab6efc4))
+* [#25](https://github.com/westpole/mathdefendergame/issues/25) add visual snapshots for achievements, menu, settings, and weekly report screens ([640f189](https://github.com/westpole/mathdefendergame/commit/640f189311e60a50e75fc5b339a6af8b1c9b178e))
+* [#25](https://github.com/westpole/mathdefendergame/issues/25) add weekly accuracy goal with settings, progress and game-over feedback (ticket 154) ([9cbe482](https://github.com/westpole/mathdefendergame/commit/9cbe482b06145e879c156b408bd5722945963942))
+* [#25](https://github.com/westpole/mathdefendergame/issues/25) save Relentless medals with notice and login backfill (ticket 152) ([acecda8](https://github.com/westpole/mathdefendergame/commit/acecda8229cff25550fa8d0bbeee477200e6cc6c))
+
+### Bug Fixes
+
+* [#148](https://github.com/westpole/mathdefendergame/issues/148) adjust maxDiffPixelRatio for visual snapshots to improve screenshot comparison accuracy ([d35f809](https://github.com/westpole/mathdefendergame/commit/d35f80902e639ea381e395c2926300ff5baf58d1))
+* [#151](https://github.com/westpole/mathdefendergame/issues/151) ensure production builds ignore stale localStorage feature flag overrides ([b930710](https://github.com/westpole/mathdefendergame/commit/b930710bbfe24e6baaa59e2bff2d3191520eea00))
+* [#151](https://github.com/westpole/mathdefendergame/issues/151) remove achievements feature flag and related logic from game components and tests ([7a08cc1](https://github.com/westpole/mathdefendergame/commit/7a08cc14bc131702be99033c70a1581d1edf60d8))
+* [#151](https://github.com/westpole/mathdefendergame/issues/151) remove stage confetti feature flag and related logic from game components ([4cb4f18](https://github.com/westpole/mathdefendergame/commit/4cb4f18fe7820b42e011911b75c368490bdeb1e2))
+* [#151](https://github.com/westpole/mathdefendergame/issues/151) remove streak reward feature flag and related logic from game rules ([41718e9](https://github.com/westpole/mathdefendergame/commit/41718e97a849c1a6093a20323e31f7eeb67aeb5e))
+* [#153](https://github.com/westpole/mathdefendergame/issues/153) adjust max-width for home report and rules panels ([95b8781](https://github.com/westpole/mathdefendergame/commit/95b8781f3fc70d71e31f4f6943ab0dc0f597c8d9))
+* [#153](https://github.com/westpole/mathdefendergame/issues/153) update visual snapshot for rules screen on Linux ([4c7387b](https://github.com/westpole/mathdefendergame/commit/4c7387bcec655adab017588c00e49fcc9c839059))
+
 ## [1.6.0](https://github.com/westpole/mathdefendergame/compare/v1.5.0...v1.6.0) (2026-11-11)
 
 ### Features
