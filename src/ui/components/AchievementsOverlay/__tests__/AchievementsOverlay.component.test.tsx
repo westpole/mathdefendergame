@@ -16,7 +16,6 @@ const MONDAY = at(2026, 11, 9);
 
 const profile = {
   username: 'AcePilot',
-  password: 'x',
   bestScore: 0,
   highestStage: 1,
   preferredGrade: 'trainee' as const,

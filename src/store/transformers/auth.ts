@@ -1,4 +1,3 @@
-import { encryptPassword } from '../utilities/passwordEncryption';
 import { DEFAULT_AVATAR_ID } from '@shared/avatarCatalog';
 import type {
   GameStoreState,
@@ -38,22 +37,19 @@ export function createMissingUsernameResult(): LoginResult {
  * Builds a persisted player profile object for a new account.
  *
  * @param username - Normalized username.
- * @param password - Plain text or synthetic password before encryption.
  * @param preferredGrade - Initial preferred grade for the profile.
  * @param now - Timestamp used for created and updated fields.
  * @returns New player profile record.
  * @example
- * const profile = buildNewProfile('PilotOne', 'Abc12345', 'trainee', Date.now());
+ * const profile = buildNewProfile('PilotOne', 'trainee', Date.now());
  */
 export function buildNewProfile(
   username: string,
-  password: string,
   preferredGrade: GameStoreState['grade'],
   now: number,
 ): PlayerProfile {
   return {
     username,
-    password: encryptPassword(password),
     avatarId: DEFAULT_AVATAR_ID,
     bestScore: 0,
     highestStage: 1,

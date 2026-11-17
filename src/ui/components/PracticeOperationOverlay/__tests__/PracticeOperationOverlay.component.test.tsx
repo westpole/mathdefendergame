@@ -21,7 +21,6 @@ vi.mock('@game/scenes/UIScene', () => ({
 function buildProfile(lastPracticeOperation?: PracticeOperation): PlayerProfile {
   return {
     username: 'AcePilot',
-    password: '',
     bestScore: 0,
     highestStage: 1,
     preferredGrade: 'cadet',

@@ -25,7 +25,6 @@ export type PauseOverlayReason = 'escape' | 'window-close' | 'background';
 
 export interface PlayerProfile {
   username: string;
-  password: string;
   avatarId?: AvatarId;
   bestScore: number;
   highestStage: number;
@@ -123,9 +122,7 @@ export interface GameStoreState {
   openMenu: () => void;
   openScreenView: (screenView: ScreenView) => void;
   logOff: () => void;
-  loginProfile: (username: string, password: string, keepLoggedIn: boolean) => LoginResult;
   selectProfileByUsername: (username: string, rememberProfile?: boolean) => LoginResult;
-  createAndLoginProfile: (username: string, password: string, keepLoggedIn?: boolean) => LoginResult;
   createAndLoginSimpleProfile: (username: string) => LoginResult;
   updateActiveProfileAvatar: (avatarId: string) => LoginResult;
   /** Sets the active profile's weekly goal; null turns it off. Guests can't set one. */

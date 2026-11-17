@@ -87,6 +87,10 @@ export default defineConfig({
   resolve: {
     alias: aliases,
   },
+  define: {
+    // Mirrors vite.config.ts: unit tests run as a production (non-E2E) build.
+    __E2E__: false,
+  },
   test: {
     globals: true,
     onConsoleLog(_log, type) {

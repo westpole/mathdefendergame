@@ -24,21 +24,17 @@ import { ProfileOverlay } from '@ui/components/ProfileOverlay';
 import { RulesOverlay } from '@ui/components/Rules';
 import { SettingsOverlay } from '@ui/components/SettingsOverlay';
 import { GameBgLayout } from '@ui/components/GameBgLayout';
-import { LoginOverlay } from '@ui/components/LoginOverlay';
 import { MenuControls } from '@ui/components/MenuControls';
 import { ProfileSelector } from '@ui/components/ProfileSelector';
 import { WeeklyReportOverlay } from '@ui/components/WeeklyReportOverlay';
 import { AchievementsOverlay } from '@ui/components/AchievementsOverlay';
 import { AchievementNoticeOverlay } from '@ui/components/AchievementNoticeOverlay';
-import { isFeatureEnabled } from '@shared/featureFlags';
 
 export function App() {
   const phase = useGameStore((state) => state.phase);
   const bootReady = useGameStore((state) => state.bootReady);
   const screenView = useGameStore((state) => state.screenView);
   const setMobileDevice = useGameStore((state) => state.setMobileDevice);
-  const isSimpleLoginEnabled = isFeatureEnabled('simple_login');
-  const isAchievementsEnabled = isFeatureEnabled('achievements');
   const isStartPhase = bootReady && phase === 'start';
   const handleVisibilityChange = useEffectEvent(() => {
     if (document.visibilityState !== 'hidden' || phase !== 'playing') {
@@ -79,7 +75,7 @@ export function App() {
       <GameBgLayout />
       <div id="ui-overlay">
         {!bootReady && <Loading />}
-        {bootReady && phase === 'login' && (isSimpleLoginEnabled ? <ProfileSelector /> : <LoginOverlay />)}
+        {bootReady && phase === 'login' && <ProfileSelector />}
         {isStartPhase && screenView === 'home' && <HomeOverlay />}
         {isStartPhase && screenView === 'practice-select' && <PracticeOperationOverlay />}
         {isStartPhase && screenView === 'profile' && <ProfileOverlay />}
@@ -87,14 +83,14 @@ export function App() {
         {isStartPhase && screenView === 'performance' && <PerformanceOverlay />}
         {isStartPhase && screenView === 'rules' && <RulesOverlay />}
         {isStartPhase && screenView === 'weekly-report' && <WeeklyReportOverlay />}
-        {isStartPhase && screenView === 'achievements' && isAchievementsEnabled && <AchievementsOverlay />}
+        {isStartPhase && screenView === 'achievements' && <AchievementsOverlay />}
         {isStartPhase && <MenuControls />}
         {bootReady && phase === 'playing' && <HUDOverlay />}
         {bootReady && phase === 'paused' && <PauseOverlay />}
         {bootReady && phase === 'stage-message' && <StageMessageOverlay />}
         {bootReady && phase === 'gameover' && <GameOverOverlay />}
         {(isStartPhase || (bootReady && phase === 'gameover')) && <GradeNoticeOverlay />}
-        {isAchievementsEnabled && (isStartPhase || (bootReady && phase === 'gameover')) && <AchievementNoticeOverlay />}
+        {(isStartPhase || (bootReady && phase === 'gameover')) && <AchievementNoticeOverlay />}
       </div>
     </div>
   );

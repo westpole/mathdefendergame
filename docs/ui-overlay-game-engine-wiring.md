@@ -13,7 +13,7 @@ flowchart TD
     S -->|bootReady false| L["Loading<br/>shown while boot is unresolved"]
 
     A -->|selects by phase + screenView| O["UI overlays"]
-    O --> I["LoginOverlay<br/>phase: login"]
+    O --> I["ProfileSelector<br/>phase: login"]
     O --> M["Start overlays<br/>phase: start"]
     O --> H["HUDOverlay + mobile keypad<br/>phase: playing"]
     O --> PA["PauseOverlay<br/>phase: paused"]
@@ -75,7 +75,7 @@ flowchart TD
 
     subgraph PhaseMap["Overlay phase map from store.phase"]
         PM1["!bootReady shows Loading<br/>initially phase: booting"]
-        PM2["login to LoginOverlay"]
+        PM2["login to ProfileSelector"]
         PM3["start plus screenView to home, profile, performance, rules overlays"]
         PM4["playing to HUDOverlay"]
         PM5["paused to PauseOverlay"]

@@ -14,21 +14,6 @@ vi.mock('@game/scenes/UIScene', () => ({
   startGame: vi.fn(),
 }));
 
-const featureFlagMocks = vi.hoisted(() => ({
-  overrides: {} as Record<string, boolean>,
-}));
-
-vi.mock('@shared/featureFlags', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@shared/featureFlags')>();
-
-  return {
-    ...actual,
-    isFeatureEnabled: (flagName: string, fallbackValue?: boolean) => (
-      featureFlagMocks.overrides[flagName] ?? actual.isFeatureEnabled(flagName, fallbackValue)
-    ),
-  };
-});
-
 const NOW = at(2026, 11, 12);
 
 function seed(withFocus: boolean) {
@@ -39,7 +24,7 @@ function seed(withFocus: boolean) {
     phase: 'start',
     screenView: 'practice-select',
     profiles: {
-      AcePilot: { username: 'AcePilot', password: '', bestScore: 0, highestStage: 1, preferredGrade: 'cadet', createdAt: 1, updatedAt: 1 },
+      AcePilot: { username: 'AcePilot', bestScore: 0, highestStage: 1, preferredGrade: 'cadet', createdAt: 1, updatedAt: 1 },
     },
     gameHistoryByProfile: {
       AcePilot: withFocus ? [makeRun(at(2026, 11, 3), { mostProblematicOperation: '*' })] : [],
@@ -49,7 +34,6 @@ function seed(withFocus: boolean) {
 
 describe('PracticeOperationOverlay focus tag', () => {
   beforeEach(async () => {
-    featureFlagMocks.overrides = {};
     await i18n.changeLanguage('en');
   });
 
@@ -63,14 +47,6 @@ describe('PracticeOperationOverlay focus tag', () => {
 
   it('shows no tag without a focus', () => {
     seed(false);
-    render(<PracticeOperationOverlay now={NOW} />);
-
-    expect(screen.queryByTestId('practice-operation-focus')).not.toBeInTheDocument();
-  });
-
-  it('shows no tag when the achievements flag is off', () => {
-    featureFlagMocks.overrides = { achievements: false };
-    seed(true);
     render(<PracticeOperationOverlay now={NOW} />);
 
     expect(screen.queryByTestId('practice-operation-focus')).not.toBeInTheDocument();

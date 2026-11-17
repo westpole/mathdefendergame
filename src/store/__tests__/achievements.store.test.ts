@@ -14,7 +14,6 @@ const NOW = at(2026, 11, 11, 18);
 
 const profile = (overrides: Partial<PlayerProfile> = {}): PlayerProfile => ({
   username: 'PilotOne',
-  password: 'Abc12345',
   bestScore: 0,
   highestStage: 1,
   preferredGrade: 'trainee',
@@ -174,7 +173,7 @@ describe('achievements in the store', () => {
     it('backfills earned medals without a notice on login, dated when the week qualified', () => {
       seed(threeWeeks(), {}, null);
 
-      expect(useGameStore.getState().loginProfile('PilotOne', 'Abc12345', false)).toEqual({ success: true });
+      expect(useGameStore.getState().selectProfileByUsername('PilotOne')).toEqual({ success: true });
 
       const [bronze] = useGameStore.getState().profiles.PilotOne.achievements ?? [];
       expect(bronze).toEqual({ id: 'weekly-streak-bronze', earnedAt: at(2026, 10, 14), weekKey: '2026-W42' });
@@ -206,7 +205,7 @@ describe('achievements in the store', () => {
       useGameStore.setState({ profiles: {}, gameHistoryByProfile: {}, activeUsername: null });
 
       expect(useGameStore.getState().createAndLoginSimpleProfile('Newbie')).toEqual({ success: true });
-      expect(useGameStore.getState().createAndLoginProfile('Second', 'Abc12345')).toEqual({ success: true });
+      expect(useGameStore.getState().createAndLoginSimpleProfile('Second')).toEqual({ success: true });
       expect(useGameStore.getState().profiles.Newbie.achievements).toBeUndefined();
     });
   });
@@ -259,14 +258,14 @@ describe('achievements in the store', () => {
     });
   });
 
-  describe('v5 → v6 migration', () => {
-    it('sets achievements to an empty list and keeps existing fields', () => {
+  describe('persisted state migration', () => {
+    it('sets achievements to an empty list, drops legacy passwords, and keeps other fields', () => {
       const migrate = useGameStore.persist.getOptions().migrate;
       const v5State = {
         profiles: {
           PilotOne: {
             username: 'PilotOne',
-            password: 'enc',
+            password: 'enc:v1:legacy',
             avatarId: 'avatar-2',
             bestScore: 900,
             highestStage: 7,
@@ -282,8 +281,11 @@ describe('achievements in the store', () => {
 
       const migrated = migrate?.(v5State, 5) as { profiles: Record<string, PlayerProfile>; rememberedUsername: string };
 
-      expect(useGameStore.persist.getOptions().version).toBe(6);
-      expect(migrated.profiles.PilotOne).toEqual({ ...v5State.profiles.PilotOne, achievements: [] });
+      const { password, ...legacyFields } = v5State.profiles.PilotOne;
+
+      expect(password).toBe('enc:v1:legacy');
+      expect(useGameStore.persist.getOptions().version).toBe(7);
+      expect(migrated.profiles.PilotOne).toEqual({ ...legacyFields, achievements: [] });
       expect(migrated.rememberedUsername).toBe('PilotOne');
     });
   });

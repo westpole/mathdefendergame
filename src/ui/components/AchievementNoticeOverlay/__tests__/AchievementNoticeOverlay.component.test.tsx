@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { useGameStore } from '@store/useGameStore';
 import type { GameStoreState } from '@store/types';
@@ -7,21 +7,6 @@ import type { GameStoreState } from '@store/types';
 import i18n from '../../../../i18n/config';
 import baseStoreState from '../../__mocks__/base-store-state.json';
 import { AchievementNoticeOverlay } from '..';
-
-const featureFlagMocks = vi.hoisted(() => ({
-  overrides: {} as Record<string, boolean>,
-}));
-
-vi.mock('@shared/featureFlags', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@shared/featureFlags')>();
-
-  return {
-    ...actual,
-    isFeatureEnabled: (flagName: string, fallbackValue?: boolean) => (
-      featureFlagMocks.overrides[flagName] ?? actual.isFeatureEnabled(flagName, fallbackValue)
-    ),
-  };
-});
 
 const bronze = { id: 'weekly-streak-bronze' as const, earnedAt: 1, weekKey: '2026-W46' };
 const silver = { id: 'weekly-streak-silver' as const, earnedAt: 2, weekKey: '2026-W49' };
@@ -37,7 +22,6 @@ function seed(partialState: Partial<GameStoreState>) {
 
 describe('AchievementNoticeOverlay', () => {
   beforeEach(async () => {
-    featureFlagMocks.overrides = {};
     await i18n.changeLanguage('en');
   });
 
@@ -65,14 +49,6 @@ describe('AchievementNoticeOverlay', () => {
 
     expect(screen.getByRole('heading', { name: 'New achievements!' })).toBeInTheDocument();
     expect(screen.getByTestId('achievement-notice-weekly-streak-silver')).toHaveTextContent('Relentless Silver!');
-  });
-
-  it('hides confetti when stage_confetti is off', () => {
-    featureFlagMocks.overrides = { stage_confetti: false };
-    seed({ achievementNotice: [bronze] });
-    render(<AchievementNoticeOverlay />);
-
-    expect(screen.queryByTestId('achievement-confetti')).not.toBeInTheDocument();
   });
 
   it('waits until the grade notice is dismissed', () => {

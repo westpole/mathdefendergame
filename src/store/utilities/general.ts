@@ -6,7 +6,7 @@ import type {
   Grade,
   GradeNotice,
 } from '@shared/types';
-import { passwordPolicy, GUEST_HISTORY_BUCKET } from '../constants';
+import { GUEST_HISTORY_BUCKET } from '../constants';
 import type { PlayerProfile, HistoryByProfile } from '@store/types';
 import {
   applyRunScores,
@@ -50,16 +50,6 @@ export function createEmptyOperationHistoryStats(): Record<MathOperation, Operat
     '*': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
     '/': { attempts: 0, incorrect: 0, avgTimeMs: 0 },
   };
-}
-
-/**
- * Validates whether a password satisfies the app's password rules.
- *
- * @param password - The candidate password string.
- * @returns True when the password matches the configured policy.
- */
-export function validatePassword(password: string): boolean {
-  return passwordPolicy.test(password);
 }
 
 /**

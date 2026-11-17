@@ -7,17 +7,14 @@ async function loginToStartMenu(page: Page) {
 
   await page.getByRole('button', { name: /create profile/i }).click();
   await page.getByLabel('Username').fill(username);
-  await page.getByLabel('Password', { exact: true }).fill('Abc12345');
-  await page.getByLabel('Verify password').fill('Abc12345');
   await page.getByRole('button', { name: /^create$/i }).click();
   await expect(page.getByTestId('main-menu')).toBeVisible();
 }
 
 test.describe('Menu Navigation', () => {
   test.beforeEach(async ({ page }) => {
-    // Override simple_login to false to test LoginOverlay component and reset language
+    // Pin English so label and role selectors match; reload so the init script applies.
     await page.addInitScript(() => {
-      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: false }));
       localStorage.setItem('math-defender-language', 'en');
     });
     await page.reload();
@@ -25,10 +22,10 @@ test.describe('Menu Navigation', () => {
     await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().bootReady === true, { timeout: 5000 });
   });
 
-  test('should show login screen on launch', async ({ page }) => {
-    const loginScreen = page.locator('[data-testid="login-screen"]');
+  test('should show profile selector on launch', async ({ page }) => {
+    const profileSelector = page.getByTestId('profile-selector-screen');
 
-    await expect(loginScreen).toBeVisible();
+    await expect(profileSelector).toBeVisible();
     await expect(page.getByTestId('menu-toggle-button')).toHaveCount(0);
   });
 

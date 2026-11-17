@@ -21,7 +21,6 @@ import type {
   PracticeOperation,
 } from '@shared/types';
 import { MATH_OPERATIONS } from '@shared/constants';
-import { isFeatureEnabled } from '@shared/featureFlags';
 
 import { GAME_CONFIG, getDangerZoneOffset, getMeteorSpawnPadding } from './config';
 import { DDAController, type DDAConfiguration } from './utilities/DDAController';
@@ -52,8 +51,6 @@ type RoundOperationTelemetry = Record<MathOperation, {
 }>;
 
 const MAX_ANSWER_INPUT_LENGTH = 5;
-const STAGE_CONFETTI_FLAG = 'stage_confetti';
-const STREAK_REWARD_FLAG = 'streak_reward';
 
 function createEmptyRoundOperationTelemetry(): RoundOperationTelemetry {
   return {
@@ -301,7 +298,7 @@ export class Game {
 
       let streakRewardTriggered = false;
 
-      if (this.mode !== 'practice' && isFeatureEnabled(STREAK_REWARD_FLAG) && this.streak >= GAME_CONFIG.streakRewardThreshold) {
+      if (this.mode !== 'practice' &&this.streak >= GAME_CONFIG.streakRewardThreshold) {
         this.lives += 1;
         this.streak = 0;
         streakRewardTriggered = true;
@@ -399,9 +396,7 @@ export class Game {
     this.lastStageSuccess = success;
 
     if (success) {
-      if (isFeatureEnabled(STAGE_CONFETTI_FLAG)) {
-        this.createConfetti();
-      }
+      this.createConfetti();
 
       if (this.stageIncorrect === 0) {
         this.score += GAME_CONFIG.grades[this.grade].cleanStageBonusPoints;

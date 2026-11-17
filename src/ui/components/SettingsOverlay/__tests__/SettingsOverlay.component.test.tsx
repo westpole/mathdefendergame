@@ -10,21 +10,6 @@ import i18n from '../../../../i18n/config';
 import { SettingsOverlay } from '..';
 import profileMenuStore from '../../__mocks__/profile-menu-store.json';
 
-const featureFlagMocks = vi.hoisted(() => ({
-  overrides: {} as Record<string, boolean>,
-}));
-
-vi.mock('@shared/featureFlags', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@shared/featureFlags')>();
-
-  return {
-    ...actual,
-    isFeatureEnabled: (flagName: string, fallbackValue?: boolean) => (
-      featureFlagMocks.overrides[flagName] ?? actual.isFeatureEnabled(flagName, fallbackValue)
-    ),
-  };
-});
-
 // Some tests swap in a failing action; every reset restores the real one.
 const { setWeeklyScoreGoal: realSetWeeklyScoreGoal } = useGameStore.getState();
 
@@ -48,7 +33,6 @@ function chooseGoal(label: string) {
 
 describe('SettingsOverlay', () => {
   beforeEach(async () => {
-    featureFlagMocks.overrides = {};
     await i18n.changeLanguage('en');
     setMockStoreState();
   });
@@ -209,13 +193,6 @@ describe('SettingsOverlay', () => {
       expect(screen.getByTestId('settings-goal-guest-hint')).toHaveTextContent('Create a profile to set a goal');
       expect(screen.queryByRole('button', { name: /weekly goal/i })).not.toBeInTheDocument();
       expect(screen.queryByText(/Only runs with 85% accuracy/)).not.toBeInTheDocument();
-    });
-
-    it('hides the goal section when the achievements flag is off', () => {
-      featureFlagMocks.overrides = { achievements: false };
-      render(<SettingsOverlay />);
-
-      expect(screen.queryByTestId('settings-goal-section')).not.toBeInTheDocument();
     });
 
     it('renders the goal section in Ukrainian', async () => {

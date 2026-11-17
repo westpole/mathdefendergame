@@ -4,24 +4,20 @@ import type { E2EWindow } from '../types';
 
 test.describe('Electron wrapper smoke', () => {
   test.beforeEach(async ({ page }) => {
-    // Override simple_login to false to test LoginOverlay component
-    await page.addInitScript(() => {
-      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ simple_login: false }));
-    });
     await page.reload();
     await page.waitForFunction(() => (window as E2EWindow).__e2e !== undefined, { timeout: 5000 });
     await page.waitForFunction(() => (window as E2EWindow).__e2e?.getStoreState().bootReady === true, { timeout: 5000 });
   });
 
   test('loads the built renderer and forwards close requests into the pause flow', async ({ electronApp, page }) => {
-    await expect(page.getByTestId('login-screen')).toBeVisible();
+    await expect(page.getByTestId('profile-selector-screen')).toBeVisible();
 
     await page.evaluate(() => {
       const e2e = (window as E2EWindow).__e2e!;
       const username = `electron-smoke-${Date.now()}`;
       const state = e2e.getStoreState();
 
-      state.createAndLoginProfile?.(username, 'Abc12345', false);
+      state.createAndLoginSimpleProfile(username);
       e2e.startGame();
     });
 

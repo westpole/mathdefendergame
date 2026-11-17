@@ -94,7 +94,6 @@ export function migrateProfiles(rawProfiles: unknown): Record<string, PlayerProf
 
     migrated[username] = {
       username: typeof profileRecord.username === 'string' ? profileRecord.username : username,
-      password: typeof profileRecord.password === 'string' ? profileRecord.password : '',
       avatarId: resolveAvatarId(profileRecord.avatarId),
       bestScore: typeof profileRecord.bestScore === 'number' ? profileRecord.bestScore : 0,
       highestStage: typeof profileRecord.highestStage === 'number' ? profileRecord.highestStage : 1,

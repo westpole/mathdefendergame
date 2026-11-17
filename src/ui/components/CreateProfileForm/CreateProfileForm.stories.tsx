@@ -23,7 +23,6 @@ const meta = {
     layout: 'fullscreen',
   },
   args: {
-    simpleMode: false,
     initialState: {
       profiles: {},
       gameHistoryByProfile: {},
@@ -64,10 +63,9 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const DesktopWithPassword: Story = {
-  name: 'Desktop create username with password',
+export const Desktop: Story = {
+  name: 'Desktop create username',
   args: {
-    simpleMode: false,
     initialState: {
       profiles: {},
       gameHistoryByProfile: {},
@@ -75,34 +73,10 @@ export const DesktopWithPassword: Story = {
   },
 };
 
-export const DesktopWithoutPassword: Story = {
-  name: 'Desktop create username without password',
-  args: {
-    simpleMode: true,
-    initialState: {
-      profiles: {},
-      gameHistoryByProfile: {},
-    },
-  },
-};
-
-export const MobileWithPassword: Story = {
-  name: 'Mobile create username with password',
+export const Mobile: Story = {
+  name: 'Mobile create username',
   args: {
     frame: popularMobileStoryFrame,
-    simpleMode: false,
-    initialState: {
-      profiles: {},
-      gameHistoryByProfile: {},
-    },
-  },
-};
-
-export const MobileWithoutPassword: Story = {
-  name: 'Mobile create username without password',
-  args: {
-    frame: popularMobileStoryFrame,
-    simpleMode: true,
     initialState: {
       profiles: {},
       gameHistoryByProfile: {},

@@ -8,7 +8,6 @@ import {
   resolveAvatarId,
   type AvatarId,
 } from '@shared/avatarCatalog';
-import { isFeatureEnabled } from '@shared/featureFlags';
 import { WEEKLY_GOAL_PRESETS } from '@store/constants';
 import { computeSuggestedGoal } from '@store/selectors/achievements';
 import { selectActiveProfileHistory } from '@store/selectors/performance';
@@ -35,7 +34,7 @@ interface SettingsOverlayProps {
 
 /**
  * Settings overlay where the active player updates their avatar and weekly goal.
- * Both use one Save button. The goal section is hidden when the `achievements` flag is off.
+ * Both use one Save button.
  */
 export function SettingsOverlay({ now: nowOverride }: SettingsOverlayProps = {}) {
   const { t } = useTranslation();
@@ -43,7 +42,6 @@ export function SettingsOverlay({ now: nowOverride }: SettingsOverlayProps = {})
   const profiles = useGameStore((state) => state.profiles);
   const updateActiveProfileAvatar = useGameStore((state) => state.updateActiveProfileAvatar);
   const setWeeklyScoreGoal = useGameStore((state) => state.setWeeklyScoreGoal);
-  const isGoalEnabled = isFeatureEnabled('achievements');
   const goalLabelId = useId();
   const history = useGameStore(selectActiveProfileHistory);
   const [openedAt] = useState(() => Date.now());
@@ -162,27 +160,25 @@ export function SettingsOverlay({ now: nowOverride }: SettingsOverlayProps = {})
           </div>
         </section>
 
-        {isGoalEnabled && (
-          <section aria-labelledby={goalLabelId} className="settings-goal-section" data-testid="settings-goal-section">
-            <h2 className="settings-avatar-section__title" id={goalLabelId}>{t('achievements.goal.title')}</h2>
-            {activeProfile ? (
-              <>
-                <Select
-                  id={`${goalLabelId}-select`}
-                  labelId={goalLabelId}
-                  onChange={setPendingGoalValue}
-                  options={goalOptions}
-                  value={draftGoalValue}
-                />
-                <p className="settings-goal-section__hint">{t('achievements.goal.helper')}</p>
-              </>
-            ) : (
-              <p className="settings-goal-section__hint" data-testid="settings-goal-guest-hint">
-                {t('achievements.goal.guestHint')}
-              </p>
-            )}
-          </section>
-        )}
+        <section aria-labelledby={goalLabelId} className="settings-goal-section" data-testid="settings-goal-section">
+          <h2 className="settings-avatar-section__title" id={goalLabelId}>{t('achievements.goal.title')}</h2>
+          {activeProfile ? (
+            <>
+              <Select
+                id={`${goalLabelId}-select`}
+                labelId={goalLabelId}
+                onChange={setPendingGoalValue}
+                options={goalOptions}
+                value={draftGoalValue}
+              />
+              <p className="settings-goal-section__hint">{t('achievements.goal.helper')}</p>
+            </>
+          ) : (
+            <p className="settings-goal-section__hint" data-testid="settings-goal-guest-hint">
+              {t('achievements.goal.guestHint')}
+            </p>
+          )}
+        </section>
 
         {errorMessage && (
           <div className="form-error-block" role="alert">

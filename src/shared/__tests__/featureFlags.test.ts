@@ -1,26 +1,41 @@
 import { getFeatureFlags, isFeatureEnabled } from '../featureFlags';
 
+vi.mock('../feature-flags.json', () => ({
+  default: { test_flag: true },
+}));
+
 describe('feature flags', () => {
   describe('getFeatureFlags', () => {
     it('returns the current feature flags as a copied object', () => {
       const flags = getFeatureFlags();
 
       expect(flags).toEqual({
-        stage_confetti: true,
-        streak_reward: true,
-        simple_login: true,
-        achievements: true,
+        test_flag: true,
       });
       expect(flags).not.toBe(getFeatureFlags());
     });
   });
 
+  describe('production localStorage overrides', () => {
+    afterEach(() => {
+      localStorage.clear();
+      vi.resetModules();
+    });
+
+    it('ignores and removes a stale E2E override so bundled flags apply', async () => {
+      localStorage.setItem('__e2eFeatureFlags', JSON.stringify({ test_flag: false }));
+      vi.resetModules();
+
+      const flagsModule = await import('../featureFlags');
+
+      expect(flagsModule.isFeatureEnabled('test_flag')).toBe(true);
+      expect(localStorage.getItem(flagsModule.E2E_FLAGS_STORAGE_KEY)).toBeNull();
+    });
+  });
+
   describe('isFeatureEnabled', () => {
     it('returns true for flags that are enabled', () => {
-      expect(isFeatureEnabled('stage_confetti')).toBe(true);
-      expect(isFeatureEnabled('streak_reward')).toBe(true);
-      expect(isFeatureEnabled('simple_login')).toBe(true);
-      expect(isFeatureEnabled('achievements')).toBe(true);
+      expect(isFeatureEnabled('test_flag')).toBe(true);
     });
 
     it('returns false for flags that are missing', () => {

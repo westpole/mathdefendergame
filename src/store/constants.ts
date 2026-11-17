@@ -50,7 +50,6 @@ export const initialState = {
 export const GUEST_HISTORY_BUCKET = '__guest__';
 export const gradeOrder: Grade[] = ['trainee', 'cadet', 'commander', 'major-general'];
 export const leaderboardStorageKey = 'math-defender-game-store';
-export const passwordPolicy = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8}$/;
 
 export const OPERATION_LABELS: Record<MathOperation, string> = {
   '+': 'Addition (+)',

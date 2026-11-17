@@ -6,7 +6,6 @@
   "profiles": {
     "CommanderRex": {
       "username": "CommanderRex",
-      "password": "Abc12345",
       "bestScore": 355,
       "highestStage": 18,
       "preferredGrade": "commander",

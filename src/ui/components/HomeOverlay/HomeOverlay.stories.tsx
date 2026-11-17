@@ -88,7 +88,6 @@ export const MobileLayout: Story = {
 
 const acePilotProfile: PlayerProfile = {
   username: 'AcePilot',
-  password: '',
   bestScore: 120,
   highestStage: 6,
   preferredGrade: 'cadet',

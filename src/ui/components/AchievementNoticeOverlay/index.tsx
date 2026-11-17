@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isFeatureEnabled } from '@shared/featureFlags';
 import { useGameStore } from '@store/useGameStore';
 import {
   getAchievementEarnedTitle,
@@ -15,7 +14,6 @@ const CONFETTI_PIECES = 24;
 /**
  * After-run celebration for newly earned awards. Waits until the grade notice is
  * dismissed, so the two never overlap. The button, Escape, or Enter dismisses it.
- * Confetti follows the `stage_confetti` flag.
  */
 export function AchievementNoticeOverlay() {
   const { t } = useTranslation();
@@ -48,17 +46,13 @@ export function AchievementNoticeOverlay() {
     return null;
   }
 
-  const showConfetti = isFeatureEnabled('stage_confetti');
-
   return (
     <div className="overlay-screen overlay-screen--interactive achievement-notice-screen" data-testid="achievement-notice-overlay">
-      {showConfetti ? (
-        <div aria-hidden="true" className="achievement-confetti" data-testid="achievement-confetti">
-          {Array.from({ length: CONFETTI_PIECES }, (_, index) => (
-            <span key={index} className={`achievement-confetti__piece achievement-confetti__piece--${index % 6}`} style={{ left: `${(index * 37) % 100}%`, animationDelay: `${(index % 8) * 0.12}s` }} />
-          ))}
-        </div>
-      ) : null}
+      <div aria-hidden="true" className="achievement-confetti" data-testid="achievement-confetti">
+        {Array.from({ length: CONFETTI_PIECES }, (_, index) => (
+          <span key={index} className={`achievement-confetti__piece achievement-confetti__piece--${index % 6}`} style={{ left: `${(index * 37) % 100}%`, animationDelay: `${(index % 8) * 0.12}s` }} />
+        ))}
+      </div>
 
       <section
         aria-describedby="achievement-notice-body"

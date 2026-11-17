@@ -9,13 +9,7 @@ import {
   resolveActiveProfile,
   resolveLifetimeGrade,
   resolveProfileHistoryKey,
-  validatePassword,
 } from '../utilities/general';
-import {
-  encryptPassword,
-  isEncryptedPassword,
-  verifyPassword,
-} from '../utilities/passwordEncryption';
 import {
   buildNewProfile,
   createMissingUsernameResult,
@@ -43,23 +37,7 @@ import type {
   GameStoreSetState,
 } from './types';
 import { isAvatarId } from '@shared/avatarCatalog';
-import { isFeatureEnabled } from '@shared/featureFlags';
 import type { GameHistoryEntry } from '@shared/types';
-
-const ACHIEVEMENTS_FLAG = 'achievements';
-
-/**
- * Builds a synthetic password seed for simple profile mode and guest-like account flows.
- *
- * @param username - Username used to namespace synthetic entropy.
- * @returns Synthetic password string that will be encrypted before persistence.
- * @example
- * const synthetic = createSyntheticPassword('PilotOne');
- */
-function createSyntheticPassword(username: string): string {
-  const entropy = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-  return `simple:${username}:${entropy}`;
-}
 
 /**
  * Creates all Zustand store action setters while keeping action logic modular.
@@ -94,9 +72,7 @@ export function createGameStoreSetters(
   | 'openMenu'
   | 'openScreenView'
   | 'logOff'
-  | 'loginProfile'
   | 'selectProfileByUsername'
-  | 'createAndLoginProfile'
   | 'createAndLoginSimpleProfile'
   | 'updateActiveProfileAvatar'
   | 'setWeeklyScoreGoal'
@@ -111,10 +87,6 @@ export function createGameStoreSetters(
    * @param username - Profile that just became active.
    */
   const reconcileAchievementsOnLogin = (username: string) => {
-    if (!isFeatureEnabled(ACHIEVEMENTS_FLAG)) {
-      return;
-    }
-
     const state = get();
     const profile = state.profiles[username];
 
@@ -147,7 +119,7 @@ export function createGameStoreSetters(
     profile: PlayerProfile | null,
     history: GameHistoryEntry[],
   ): { profile: PlayerProfile | null; achievementNotice: GameStoreState['achievementNotice'] } => {
-    if (!profile || !isFeatureEnabled(ACHIEVEMENTS_FLAG)) {
+    if (!profile) {
       return { profile, achievementNotice: state.achievementNotice };
     }
 
@@ -314,58 +286,6 @@ export function createGameStoreSetters(
     openMenu: () => set((state) => buildMenuSnapshot(state, 'home')),
     openScreenView: (screenView) => set((state) => buildMenuSnapshot(state, screenView)),
     logOff: () => set((state) => buildLogOffSnapshot(state)),
-    loginProfile: (username, password, keepLoggedIn): LoginResult => {
-      const normalizedUsername = normalizeUsername(username);
-
-      if (!normalizedUsername) {
-        return createMissingUsernameResult();
-      }
-
-      const profile = get().profiles[normalizedUsername];
-
-      if (!profile) {
-        return {
-          success: false,
-          error: 'Username not found. Switch to Create profile to register this commander.',
-        };
-      }
-
-      if (!verifyPassword(password, profile.password)) {
-        return {
-          success: false,
-          error: 'Incorrect password. Check your credentials or create a new profile if needed.',
-        };
-      }
-
-      const resolvedGrade = resolveLifetimeGrade(normalizedUsername, get().gameHistoryByProfile);
-      const shouldEncryptExistingPassword = !isEncryptedPassword(profile.password);
-
-      set((state) => {
-        const nextState: Partial<GameStoreState> = {
-          activeUsername: normalizedUsername,
-          rememberedUsername: keepLoggedIn ? normalizedUsername : null,
-          grade: resolvedGrade,
-          phase: 'start',
-          screenView: 'home',
-        };
-
-        if (shouldEncryptExistingPassword) {
-          nextState.profiles = {
-            ...state.profiles,
-            [normalizedUsername]: {
-              ...profile,
-              password: encryptPassword(profile.password),
-              updatedAt: Date.now(),
-            },
-          };
-        }
-
-        return nextState;
-      });
-      reconcileAchievementsOnLogin(normalizedUsername);
-
-      return { success: true };
-    },
     selectProfileByUsername: (username, rememberProfile = false): LoginResult => {
       const normalizedUsername = normalizeUsername(username);
 
@@ -395,44 +315,6 @@ export function createGameStoreSetters(
 
       return { success: true };
     },
-    createAndLoginProfile: (username, password, keepLoggedIn = false): LoginResult => {
-      const normalizedUsername = normalizeUsername(username);
-
-      if (!normalizedUsername) {
-        return createMissingUsernameResult();
-      }
-
-      if (get().profiles[normalizedUsername]) {
-        return {
-          success: false,
-          error: 'Username already exists. Pick a different username.',
-        };
-      }
-
-      if (!validatePassword(password)) {
-        return {
-          success: false,
-          error: 'Password must be exactly 8 characters and include uppercase, lowercase, and a number.',
-        };
-      }
-
-      const now = Date.now();
-      const profile = buildNewProfile(normalizedUsername, password, get().grade, now);
-
-      set((state) => ({
-        profiles: {
-          ...state.profiles,
-          [normalizedUsername]: profile,
-        },
-        activeUsername: normalizedUsername,
-        rememberedUsername: keepLoggedIn ? normalizedUsername : null,
-        phase: 'start',
-        screenView: 'home',
-      }));
-      reconcileAchievementsOnLogin(normalizedUsername);
-
-      return { success: true };
-    },
     createAndLoginSimpleProfile: (username): LoginResult => {
       const normalizedUsername = normalizeUsername(username);
 
@@ -448,12 +330,7 @@ export function createGameStoreSetters(
       }
 
       const now = Date.now();
-      const profile = buildNewProfile(
-        normalizedUsername,
-        createSyntheticPassword(normalizedUsername),
-        get().grade,
-        now,
-      );
+      const profile = buildNewProfile(normalizedUsername, get().grade, now);
 
       set((state) => ({
         profiles: {

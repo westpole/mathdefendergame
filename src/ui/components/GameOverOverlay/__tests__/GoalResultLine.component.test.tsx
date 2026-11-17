@@ -14,21 +14,6 @@ vi.mock('@game/scenes/UIScene', () => ({
   startGame: vi.fn(),
 }));
 
-const featureFlagMocks = vi.hoisted(() => ({
-  overrides: {} as Record<string, boolean>,
-}));
-
-vi.mock('@shared/featureFlags', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@shared/featureFlags')>();
-
-  return {
-    ...actual,
-    isFeatureEnabled: (flagName: string, fallbackValue?: boolean) => (
-      featureFlagMocks.overrides[flagName] ?? actual.isFeatureEnabled(flagName, fallbackValue)
-    ),
-  };
-});
-
 const run = (playedAt: number, finalScore: number, correctAnswers = 17, incorrectAnswers = 3) => (
   makeRun(playedAt, { finalScore, correctAnswers, incorrectAnswers })
 );
@@ -42,7 +27,6 @@ function seed(history: GameHistoryEntry[], { goal = 1000, guest = false } = {}) 
     profiles: guest ? {} : {
       AcePilot: {
         username: 'AcePilot',
-        password: 'x',
         bestScore: 0,
         highestStage: 1,
         preferredGrade: 'trainee',
@@ -57,7 +41,6 @@ function seed(history: GameHistoryEntry[], { goal = 1000, guest = false } = {}) 
 
 describe('GameOverOverlay weekly goal line', () => {
   beforeEach(async () => {
-    featureFlagMocks.overrides = {};
     await i18n.changeLanguage('en');
   });
 
@@ -121,14 +104,8 @@ describe('GameOverOverlay weekly goal line', () => {
     expect(screen.queryByTestId('gameover-goal-line')).not.toBeInTheDocument();
   });
 
-  it('shows nothing without history or when the achievements flag is off', () => {
+  it('shows nothing without history', () => {
     seed([]);
-    const { unmount } = render(<GameOverOverlay />);
-    expect(screen.queryByTestId('gameover-goal-line')).not.toBeInTheDocument();
-    unmount();
-
-    featureFlagMocks.overrides = { achievements: false };
-    seed([run(at(2026, 11, 10), 320)]);
     render(<GameOverOverlay />);
     expect(screen.queryByTestId('gameover-goal-line')).not.toBeInTheDocument();
   });

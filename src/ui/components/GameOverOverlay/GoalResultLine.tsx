@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isFeatureEnabled } from '@shared/featureFlags';
 import { describeRunGoalResult } from '@store/selectors/achievements';
 import { selectActiveProfileHistory } from '@store/selectors/performance';
 import { useGameStore } from '@store/useGameStore';
@@ -9,7 +8,7 @@ import { toDisplayGoalPercent } from '@ui/utilities/format';
 
 /**
  * Game Over line saying whether the run just saved counted toward the weekly goal.
- * Renders nothing when the goal is off, for guests, or when the `achievements` flag is off.
+ * Renders nothing when the goal is off or for guests.
  */
 export function GoalResultLine() {
   const { t, i18n } = useTranslation();
@@ -17,16 +16,15 @@ export function GoalResultLine() {
     state.activeUsername ? state.profiles[state.activeUsername]?.weeklyScoreGoal : undefined
   ));
   const history = useGameStore(selectActiveProfileHistory);
-  const isEnabled = isFeatureEnabled('achievements');
 
   const result = useMemo(() => {
-    if (!isEnabled || !weeklyScoreGoal || history.length === 0) {
+    if (!weeklyScoreGoal || history.length === 0) {
       return null;
     }
 
     const latestRun = history.reduce((latest, entry) => (entry.playedAt > latest.playedAt ? entry : latest));
     return describeRunGoalResult(history, latestRun, weeklyScoreGoal);
-  }, [history, isEnabled, weeklyScoreGoal]);
+  }, [history, weeklyScoreGoal]);
 
   if (!result) {
     return null;

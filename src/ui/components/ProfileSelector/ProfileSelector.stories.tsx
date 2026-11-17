@@ -56,7 +56,6 @@ export const Default: Story = {
       profiles: {
         AcePilot: {
           username: 'AcePilot',
-          password: 'enc:v1:test',
           bestScore: 340,
           highestStage: 9,
           preferredGrade: 'commander',
@@ -65,7 +64,6 @@ export const Default: Story = {
         },
         CadetNova: {
           username: 'CadetNova',
-          password: 'enc:v1:test',
           bestScore: 160,
           highestStage: 5,
           preferredGrade: 'cadet',
@@ -100,7 +98,6 @@ export const MobileSelector: Story = {
       profiles: {
         AcePilot: {
           username: 'AcePilot',
-          password: 'enc:v1:test',
           bestScore: 340,
           highestStage: 9,
           preferredGrade: 'commander',

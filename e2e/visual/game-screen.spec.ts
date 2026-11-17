@@ -15,7 +15,6 @@ test.describe('Visual Regression Tests', () => {
       const createdAt = Date.UTC(2026, 0, 1);
       const profile = (username: string, bestScore: number) => ({
         username,
-        password: 'enc:v1:e2e',
         bestScore,
         highestStage: 3,
         preferredGrade: 'cadet' as const,
@@ -316,7 +315,6 @@ async function seedStartScreen(page: Page, screenView: StartScreenView, { pinClo
           profiles: {
             CommanderRex: {
               username: 'CommanderRex',
-              password: 'enc:v1:e2e',
               bestScore: 12250,
               highestStage: 3,
               preferredGrade: 'cadet',

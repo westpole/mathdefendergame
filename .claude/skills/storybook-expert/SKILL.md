@@ -166,7 +166,7 @@ Store story fixtures in a `__mocks__/` folder alongside the component. Name file
 
 ### 8. Feature Flag & Variant Requirements
 
-- **simple_login**: Indicates that the simple login feature flag must be enabled for this story to be relevant. This flag should be set to `true` by default. It should be specified in a test scenario when it should be disabled.
+- Stories render with the bundled `src/shared/feature-flags.json` values. Override a flag only in a story that covers its disabled state.
 
 ## 9. Verification Checklist
 

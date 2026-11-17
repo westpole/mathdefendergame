@@ -135,7 +135,6 @@ export function ProfileSelector() {
               setErrorMessage(null);
               setSelectorMode('select');
             }}
-            simpleMode
           />
         )}
       </div>

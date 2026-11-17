@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import { MATH_OPERATIONS } from '@shared/constants';
 import type { MathOperation } from '@shared/types';
-import { isFeatureEnabled } from '@shared/featureFlags';
 import { selectFocusOperation } from '@store/selectors/achievements';
 import { selectActiveProfileHistory } from '@store/selectors/performance';
 import { useGameStore } from '@store/useGameStore';
@@ -21,8 +20,7 @@ interface PracticeOperationOverlayProps {
  *
  * - The active profile's `lastPracticeOperation` is marked "Last practiced" (nothing is marked
  *   for a profile that has never started a practice run).
- * - The week's focus operation (Focus of the Week) gets a "Focus" tag when the
- *   `achievements` flag is on.
+ * - The week's focus operation (Focus of the Week) gets a "Focus" tag.
  * - After the first pick every option is disabled, so repeat clicks cannot start a second run
  *   while `UIScene` is still loading.
  * - "Back to Home" returns to the home screen through `UIScene.openScreenView`.
@@ -37,11 +35,7 @@ export function PracticeOperationOverlay({ now: nowOverride }: PracticeOperation
   const history = useGameStore(selectActiveProfileHistory);
   const [openedAt] = useState(() => Date.now());
   const now = nowOverride ?? openedAt;
-  const isAchievementsEnabled = isFeatureEnabled('achievements');
-  const focusOperation = useMemo(
-    () => (isAchievementsEnabled ? selectFocusOperation(history, now) : null),
-    [history, isAchievementsEnabled, now],
-  );
+  const focusOperation = useMemo(() => selectFocusOperation(history, now), [history, now]);
 
   const handleSelectOperation = (operation: MathOperation) => {
     if (isStarting) {
