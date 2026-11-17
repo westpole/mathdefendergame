@@ -5,4 +5,4 @@
 Flags are located in the `feature-flags.json` file.
 
 List:
- - `achievements` (default: true): enable/disable achievements (medals, goals, and related UI)
+ - None. Add entries here when a new flag is introduced.

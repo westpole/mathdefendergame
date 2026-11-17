@@ -105,7 +105,7 @@ Profile persistence uses a normalized migration step. Persisted profile payloads
 
 ### Achievements contract
 
-Awards live in `src/store/selectors/achievements.ts` (pure, `now` passed in) and are saved on the profile as `PlayerProfile.achievements: EarnedAchievement[]`. Everything is behind the `achievements` feature flag.
+Awards live in `src/store/selectors/achievements.ts` (pure, `now` passed in) and are saved on the profile as `PlayerProfile.achievements: EarnedAchievement[]`.
 
 - **Week and day keys** use local time: `toDayKey` gives `YYYY-MM-DD`, `toWeekKey` gives the ISO week (`2026-W46`, Monday start). Keys are built from local date parts, never by dividing by `DAY_MS`, so DST changes are safe.
 - **Active day:** a local day whose runs total at least `ACTIVE_DAY_MIN_CORRECT` correct answers. **Streak week:** at least `STREAK_MIN_DAYS_PER_WEEK` active days. `computeWeeklyStreak` walks the weeks from the oldest run; the current week adds to the streak once it qualifies and never breaks it.

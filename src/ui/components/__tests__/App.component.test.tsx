@@ -32,21 +32,6 @@ const uiSceneMocks = vi.hoisted(() => ({
   submitAnswerInput: vi.fn(),
 }));
 
-const featureFlagMocks = vi.hoisted(() => ({
-  overrides: {} as Record<string, boolean>,
-}));
-
-vi.mock('@shared/featureFlags', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@shared/featureFlags')>();
-
-  return {
-    ...actual,
-    isFeatureEnabled: (flagName: string, fallbackValue?: boolean) => (
-      featureFlagMocks.overrides[flagName] ?? actual.isFeatureEnabled(flagName, fallbackValue)
-    ),
-  };
-});
-
 vi.mock('../../../platform/adapter', () => ({
   subscribeToAppCloseEvents: platformMocks.subscribeToAppCloseEvents,
   subscribeToMobileDeviceChanges: platformMocks.subscribeToMobileDeviceChanges,
@@ -88,7 +73,6 @@ function setVisibilityState(visibilityState: DocumentVisibilityState) {
 describe('App start menu controls', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    featureFlagMocks.overrides = {};
     platformMocks.subscribeToAppCloseEvents.mockReturnValue(vi.fn());
     platformMocks.subscribeToMobileDeviceChanges.mockReturnValue(vi.fn());
     setVisibilityState('visible');
@@ -330,7 +314,7 @@ describe('App start menu controls', () => {
     expect(screen.getByRole('heading', { name: 'SETTINGS' })).toBeInTheDocument();
   });
 
-  it('opens the Achievements page from the menu when the achievements flag is on', async () => {
+  it('opens the Achievements page from the menu', async () => {
     act(() => {
       setMockStoreState({
         activeUsername: 'AcePilot',
@@ -385,40 +369,6 @@ describe('App start menu controls', () => {
     expect(screen.getByTestId('achievement-notice-overlay')).toBeVisible();
   });
 
-  it('hides the achievement notice when the achievements flag is off', () => {
-    featureFlagMocks.overrides = { achievements: false };
-    act(() => {
-      setMockStoreState({
-        activeUsername: 'AcePilot',
-        bootReady: true,
-        phase: 'gameover',
-        achievementNotice: [{ id: 'weekly-streak-bronze', earnedAt: 1, weekKey: '2026-W46' }],
-      });
-    });
-
-    render(<App />);
-
-    expect(screen.queryByTestId('achievement-notice-overlay')).not.toBeInTheDocument();
-  });
-
-  it('hides the Achievements menu entry and page when the achievements flag is off', () => {
-    featureFlagMocks.overrides = { achievements: false };
-    act(() => {
-      setMockStoreState({
-        activeUsername: 'AcePilot',
-        bootReady: true,
-        screenView: 'achievements',
-        phase: 'start',
-      });
-    });
-
-    render(<App />);
-
-    expect(screen.queryByTestId('achievements-overlay')).not.toBeInTheDocument();
-    fireEvent.click(screen.getByTestId('menu-toggle-button'));
-    expect(screen.queryByTestId('menu-option-achievements')).not.toBeInTheDocument();
-    expect(screen.getByTestId('menu-option-weekly-report')).toBeVisible();
-  });
 
   it('forwards Electron close events to UIScene and destroys the Phaser game on unmount', () => {
     setMockStoreState({ bootReady: true, phase: 'login' });

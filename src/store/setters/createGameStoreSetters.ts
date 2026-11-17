@@ -37,10 +37,7 @@ import type {
   GameStoreSetState,
 } from './types';
 import { isAvatarId } from '@shared/avatarCatalog';
-import { isFeatureEnabled } from '@shared/featureFlags';
 import type { GameHistoryEntry } from '@shared/types';
-
-const ACHIEVEMENTS_FLAG = 'achievements';
 
 /**
  * Creates all Zustand store action setters while keeping action logic modular.
@@ -90,10 +87,6 @@ export function createGameStoreSetters(
    * @param username - Profile that just became active.
    */
   const reconcileAchievementsOnLogin = (username: string) => {
-    if (!isFeatureEnabled(ACHIEVEMENTS_FLAG)) {
-      return;
-    }
-
     const state = get();
     const profile = state.profiles[username];
 
@@ -126,7 +119,7 @@ export function createGameStoreSetters(
     profile: PlayerProfile | null,
     history: GameHistoryEntry[],
   ): { profile: PlayerProfile | null; achievementNotice: GameStoreState['achievementNotice'] } => {
-    if (!profile || !isFeatureEnabled(ACHIEVEMENTS_FLAG)) {
+    if (!profile) {
       return { profile, achievementNotice: state.achievementNotice };
     }
 

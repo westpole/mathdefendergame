@@ -1,7 +1,6 @@
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { isFeatureEnabled } from '@shared/featureFlags';
 import { useGameStore } from '@store/useGameStore';
 import { Select } from '@ui/components/Select';
 import { LANGUAGE_OPTIONS } from '@ui/constants';
@@ -23,9 +22,8 @@ export function MenuList({ setIsOpen }: MenuListProps) {
   const { t, i18n } = useTranslation();
   const activeView = useGameStore((state) => state.screenView);
   const languageLabelId = useId();
-  const isAchievementsEnabled = isFeatureEnabled('achievements');
 
-  const allMenuItems = [
+  const menuItems = [
     { id: 'home', label: t('ui.home'), type: 'view', view: 'home' },
     { id: 'play', label: t('ui.regularPlay'), type: 'start' },
     { id: 'practice', label: t('ui.practiceMode'), type: 'view', view: 'practice-select' },
@@ -37,9 +35,8 @@ export function MenuList({ setIsOpen }: MenuListProps) {
     { id: 'rules', label: t('ui.rules'), type: 'view', view: 'rules' },
     { id: 'logoff', label: t('ui.logOff'), type: 'logoff' },
   ] as const;
-  const menuItems = allMenuItems.filter((item) => item.id !== 'achievements' || isAchievementsEnabled);
 
-  const handleMenuSelect = (item: (typeof allMenuItems)[number]) => {
+  const handleMenuSelect = (item: (typeof menuItems)[number]) => {
     if (item.type === 'start') {
       void import('@game/scenes/UIScene').then(({ startGame }) => startGame({ mode: 'regular' }));
       setIsOpen(false);
