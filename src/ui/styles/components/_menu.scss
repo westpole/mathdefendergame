@@ -296,7 +296,8 @@
 }
 
 .home-report-panel {
-  width: min(100%, 760px);
+  max-width: 760px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
@@ -804,6 +805,7 @@ p.grade-notice-grade--major-general {
 
 // Rules
 .rules-panel {
+  max-width: 760px;
   width: 100%;
   display: flex;
   flex-direction: column;
