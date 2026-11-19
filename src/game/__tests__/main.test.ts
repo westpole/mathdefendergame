@@ -630,6 +630,97 @@ describe('Game', () => {
     });
   });
 
+  describe('practice mode', () => {
+    it('spawns meteors only for the configured practice operation', () => {
+      game.setRunConfig('practice', '*');
+
+      for (let i = 0; i < 10; i += 1) {
+        game.spawnMeteor();
+      }
+
+      expect(game.mode).toBe('practice');
+      expect(game.practiceOperation).toBe('*');
+      expect(game.meteors).toHaveLength(10);
+      expect(game.meteors.every((meteor) => meteor.op === '*')).toBe(true);
+    });
+
+    it('defaults the practice operation to addition when none is given', () => {
+      game.practiceOperation = '-';
+
+      game.setRunConfig('practice');
+
+      expect(game.practiceOperation).toBe('+');
+    });
+
+    it('restarts the practice run in place instead of ending it when the last life is lost', () => {
+      game.setRunConfig('practice', '-');
+      game.state = 'playing';
+      game.lives = 1;
+      game.shield = 0;
+      game.stage = 4;
+      game.score = 120;
+      game.stageScore = 30;
+      game.stageIncorrect = 2;
+      game.stageCorrect = 5;
+      game.streak = 3;
+      game.inputBuffer = '12';
+      game.spawnMeteor();
+      game.createExplosion(10, 10, '#fff');
+
+      game.failStage();
+
+      expect(game.state).toBe('playing');
+      expect(game.lives).toBe(GAME_CONFIG.initialLives);
+      expect(game.shield).toBe(GAME_CONFIG.stageShieldMax);
+      expect(game.stage).toBe(1);
+      expect(game.score).toBe(120);
+      expect(game.stageScore).toBe(0);
+      expect(game.stageIncorrect).toBe(0);
+      expect(game.stageCorrect).toBe(0);
+      expect(game.streak).toBe(0);
+      expect(game.meteors).toEqual([]);
+      expect(game.particles).toEqual([]);
+      expect(game.inputBuffer).toBe('');
+      expect(game.scoreAtStageStart).toBe(120);
+      expect(game.livesAtStageStart).toBe(GAME_CONFIG.initialLives);
+      expect(mockCallbacks.onFinishStage).not.toHaveBeenCalled();
+      expect(mockCallbacks.onGameOver).not.toHaveBeenCalled();
+    });
+
+    it('shows a failed stage message when a practice stage is lost with lives remaining', () => {
+      game.setRunConfig('practice', '+');
+      game.state = 'playing';
+      game.lives = 2;
+
+      game.failStage();
+
+      expect(game.lives).toBe(1);
+      expect(game.state).toBe('message');
+      expect(mockCallbacks.onFinishStage).toHaveBeenCalledWith(false);
+    });
+
+    it('never schedules a victory after the regular stage count in practice', () => {
+      game.setRunConfig('practice', '+');
+      game.state = 'playing';
+      game.stage = GAME_CONFIG.regularStageCount;
+      game.correctCount = 50;
+      game.incorrectCount = 10;
+
+      game.finishStage(true);
+
+      expect(game.stage).toBe(GAME_CONFIG.regularStageCount + 1);
+      expect(game.state).toBe('message');
+      expect(mockCallbacks.onFinishStage).toHaveBeenCalledWith(true);
+      expect(mockCallbacks.onGameOver).not.toHaveBeenCalled();
+
+      game.resumeFromMessage();
+
+      expect(game.state).toBe('playing');
+      expect(game.stage).toBe(GAME_CONFIG.regularStageCount + 1);
+      expect(mockCallbacks.onGameOver).not.toHaveBeenCalled();
+    });
+  });
+
   describe('finishStage', () => {
     beforeEach(() => {
       game.state = 'playing';

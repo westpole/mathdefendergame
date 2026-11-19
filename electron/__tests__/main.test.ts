@@ -3,7 +3,7 @@
  * Tests window creation and IPC communication
  */
 
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { BrowserWindow, app, Menu, dialog, ipcMain } from 'electron';
 import * as electronModule from 'electron';
 import * as mainProcess from '../main';
@@ -25,6 +25,10 @@ function setPackagedState(isPackaged: boolean) {
   });
 }
 
+/**
+ * Builds runtime options for main-process calls.
+ * Side effect: clears all mocks first, so queue `mockReturnValueOnce` values after calling it.
+ */
 function createRuntimeOptions(
   { argv = ['node', 'electron'], isPackaged = false, platform = 'win32' }: RuntimeOptionsInput = {},
 ) {
@@ -38,11 +42,27 @@ function createRuntimeOptions(
   };
 }
 
+/**
+ * Drains every pending microtask by waiting for the next macrotask, so close-flow
+ * assertions don't depend on how many awaits the flow contains.
+ */
 async function flushCloseFlow() {
-  await Promise.resolve();
-  await Promise.resolve();
-  await Promise.resolve();
-  await Promise.resolve();
+  await new Promise<void>((resolve) => {
+    setImmediate(resolve);
+  });
+}
+
+type ListenerRegistrar = { mock: { calls: unknown[][] } };
+
+/** Returns the listener registered for `eventName` on a mocked `on`/`once`, or throws. */
+function getRegisteredHandler(registrar: ListenerRegistrar, eventName: string, owner: string) {
+  const handler = registrar.mock.calls.find(([name]) => name === eventName)?.[1];
+
+  if (typeof handler !== 'function') {
+    throw new Error(`Expected ${owner} "${eventName}" handler to be registered, but none was found.`);
+  }
+
+  return handler as (...args: unknown[]) => void;
 }
 
 describe('Electron Main Process', () => {
@@ -327,11 +347,11 @@ describe('Electron Main Process', () => {
     it('should focus the existing window when a second instance is requested', () => {
       const existingWindow = {
         isMinimized: vi.fn().mockReturnValue(false),
+        restore: vi.fn(),
         focus: vi.fn(),
       } as unknown as BrowserWindow;
-      mockedBrowserWindow.getAllWindows.mockReturnValueOnce([existingWindow]);
-
       mainProcess.initializeApp(createRuntimeOptions());
+      mockedBrowserWindow.getAllWindows.mockReturnValueOnce([existingWindow]);
 
       const mockedAppOnCalls = vi.mocked(app.on).mock.calls as Array<[string, (...args: unknown[]) => void]>;
       const secondInstanceHandler = mockedAppOnCalls.find(([eventName]) => eventName === 'second-instance')?.[1];
@@ -342,7 +362,8 @@ describe('Electron Main Process', () => {
       }
       secondInstanceHandler();
 
-      expect(existingWindow.focus).toHaveBeenCalled();
+      expect(existingWindow.restore).not.toHaveBeenCalled();
+      expect(existingWindow.focus).toHaveBeenCalledTimes(1);
     });
 
     it('should abort close confirmation when the window is already destroyed', async () => {
@@ -467,6 +488,222 @@ describe('Electron Main Process', () => {
       expect(firstEvent.preventDefault).toHaveBeenCalledTimes(1);
       expect(secondEvent.preventDefault).not.toHaveBeenCalled();
       expect(win.close).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('Close flow failures', () => {
+    function triggerClose(win: BrowserWindow) {
+      const closeHandler = getRegisteredHandler(vi.mocked(win.on), 'close', 'BrowserWindow');
+      const event = { preventDefault: vi.fn() };
+      closeHandler(event);
+
+      return event;
+    }
+
+    it('should close without confirmation when the renderer close query fails', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      vi.mocked(win.webContents.executeJavaScript).mockRejectedValueOnce(new Error('renderer gone'));
+
+      const event = triggerClose(win);
+      await flushCloseFlow();
+
+      expect(event.preventDefault).toHaveBeenCalledTimes(1);
+      expect(win.webContents.executeJavaScript).toHaveBeenCalledTimes(1);
+      expect(win.close).toHaveBeenCalledTimes(1);
+    });
+
+    it('should keep the window open when waiting for the renderer decision fails', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      vi.mocked(win.webContents.executeJavaScript)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true)
+        .mockRejectedValueOnce(new Error('renderer gone'));
+
+      triggerClose(win);
+      await flushCloseFlow();
+
+      expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
+        expect.stringContaining('math-defender-close-ready'),
+      );
+      expect(win.close).not.toHaveBeenCalled();
+    });
+
+    it('should swallow a rejected renderer notification and still close when ready', async () => {
+      const unhandledRejections: unknown[] = [];
+      const onUnhandledRejection = (reason: unknown) => {
+        unhandledRejections.push(reason);
+      };
+      process.on('unhandledRejection', onUnhandledRejection);
+
+      try {
+        const win = mainProcess.createWindow(createRuntimeOptions());
+        vi.mocked(win.webContents.executeJavaScript)
+          .mockResolvedValueOnce(true)
+          .mockImplementationOnce(() => Promise.reject(new Error('dispatch failed')))
+          .mockResolvedValueOnce('ready');
+
+        triggerClose(win);
+        await flushCloseFlow();
+        await flushCloseFlow();
+
+        expect(win.webContents.executeJavaScript).toHaveBeenCalledWith(
+          expect.stringContaining('electron-close-requested'),
+        );
+        expect(win.close).toHaveBeenCalledTimes(1);
+        expect(unhandledRejections).toEqual([]);
+      } finally {
+        process.off('unhandledRejection', onUnhandledRejection);
+      }
+    });
+
+    it('should skip the renderer notification when the window is destroyed mid-flow', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      vi.mocked(win.isDestroyed)
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true)
+        .mockReturnValue(false);
+      vi.mocked(win.webContents.executeJavaScript)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce('cancelled');
+
+      triggerClose(win);
+      await flushCloseFlow();
+
+      expect(win.webContents.executeJavaScript).not.toHaveBeenCalledWith(
+        expect.stringContaining('electron-close-requested'),
+      );
+      expect(win.close).not.toHaveBeenCalled();
+    });
+
+    it('should cancel the close when the window is destroyed before awaiting the renderer decision', async () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      vi.mocked(win.isDestroyed)
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce(true)
+        .mockReturnValue(false);
+      vi.mocked(win.webContents.executeJavaScript)
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(true);
+
+      triggerClose(win);
+      await flushCloseFlow();
+
+      expect(win.webContents.executeJavaScript).toHaveBeenCalledTimes(2);
+      expect(win.webContents.executeJavaScript).not.toHaveBeenCalledWith(
+        expect.stringContaining('math-defender-close-ready'),
+      );
+      expect(win.close).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Window and instance lifecycle', () => {
+    it('should show the window once it is ready to show', () => {
+      const win = mainProcess.createWindow(createRuntimeOptions());
+      const readyHandler = getRegisteredHandler(vi.mocked(win.once), 'ready-to-show', 'BrowserWindow');
+
+      expect(win.show).not.toHaveBeenCalled();
+      readyHandler();
+      expect(win.show).toHaveBeenCalledTimes(1);
+    });
+
+    it('should read renderer args from process argv when no options are given', () => {
+      const originalArgv = process.argv;
+      process.argv = ['node', 'electron', '--renderer-url=http://localhost:4000'];
+
+      try {
+        const win = mainProcess.createWindow();
+
+        expect(win.loadURL).toHaveBeenCalledWith('http://localhost:4000');
+      } finally {
+        process.argv = originalArgv;
+      }
+    });
+
+    it('should use the host platform for window-all-closed when no options are given', () => {
+      vi.clearAllMocks();
+      mainProcess.initializeApp();
+
+      const allClosedHandler = getRegisteredHandler(vi.mocked(app.on), 'window-all-closed', 'app');
+      allClosedHandler();
+
+      if (process.platform === 'darwin') {
+        expect(app.quit).not.toHaveBeenCalled();
+      } else {
+        expect(app.quit).toHaveBeenCalledTimes(1);
+      }
+    });
+
+    it('should quit without registering listeners when another instance holds the lock', () => {
+      const options = createRuntimeOptions();
+      vi.mocked(app.requestSingleInstanceLock).mockReturnValueOnce(false);
+
+      mainProcess.initializeApp(options);
+
+      expect(app.quit).toHaveBeenCalledTimes(1);
+      expect(app.whenReady).not.toHaveBeenCalled();
+      expect(app.on).not.toHaveBeenCalled();
+    });
+
+    it('should restore a minimized window before focusing it on second instance', () => {
+      const existingWindow = {
+        isMinimized: vi.fn().mockReturnValue(true),
+        restore: vi.fn(),
+        focus: vi.fn(),
+      } as unknown as BrowserWindow;
+      mainProcess.initializeApp(createRuntimeOptions());
+      mockedBrowserWindow.getAllWindows.mockReturnValueOnce([existingWindow]);
+
+      getRegisteredHandler(vi.mocked(app.on), 'second-instance', 'app')();
+
+      expect(existingWindow.restore).toHaveBeenCalledTimes(1);
+      expect(existingWindow.focus).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not create or quit anything on second instance when no window exists', () => {
+      mainProcess.initializeApp(createRuntimeOptions());
+      mockedBrowserWindow.getAllWindows.mockReturnValueOnce([]);
+
+      getRegisteredHandler(vi.mocked(app.on), 'second-instance', 'app')();
+
+      expect(mockedBrowserWindow.getAllWindows).toHaveBeenCalledTimes(1);
+      expect(mockedBrowserWindow).not.toHaveBeenCalled();
+      expect(app.quit).not.toHaveBeenCalled();
+    });
+
+    describe('auto-initialization on import', () => {
+      async function importFreshMain() {
+        vi.resetModules();
+        // vi.mock factories re-run after resetModules, so this is the instance the fresh main imports.
+        const freshElectron = await import('electron');
+        vi.mocked(freshElectron.app.whenReady).mockClear();
+        vi.mocked(freshElectron.app.requestSingleInstanceLock).mockClear();
+        await import('../main');
+
+        return freshElectron;
+      }
+
+      afterEach(() => {
+        vi.unstubAllEnvs();
+      });
+
+      it('should auto-initialize for Playwright runs without taking the instance lock', async () => {
+        vi.stubEnv('PLAYWRIGHT_ELECTRON_RUN', '1');
+
+        const freshElectron = await importFreshMain();
+
+        expect(freshElectron.app.whenReady).toHaveBeenCalledTimes(1);
+        expect(freshElectron.app.requestSingleInstanceLock).not.toHaveBeenCalled();
+      });
+
+      it('should not auto-initialize outside the Electron main process or Playwright', async () => {
+        vi.stubEnv('PLAYWRIGHT_ELECTRON_RUN', '');
+
+        const freshElectron = await importFreshMain();
+
+        expect(process.type).not.toBe('browser');
+        expect(freshElectron.app.whenReady).not.toHaveBeenCalled();
+      });
     });
   });
 });
