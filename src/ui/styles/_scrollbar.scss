@@ -1,0 +1,52 @@
+@use 'variables' as *;
+
+// Custom scrollbars for desktop (mouse/trackpad) only.
+// Touch devices keep native overlay scrollbars.
+//
+// Chromium (Electron, Chrome, Edge) ignores ::-webkit-scrollbar rules on an
+// element once `scrollbar-width` or `scrollbar-color` applies to it, so the
+// standard properties are limited to browsers without the pseudo-elements
+// (Firefox).
+@media (hover: hover) and (pointer: fine) {
+  ::-webkit-scrollbar {
+    width: $scrollbar-size; // vertical scrollbar
+    height: $scrollbar-size; // horizontal scrollbar
+  }
+
+  ::-webkit-scrollbar-track {
+    background: $scrollbar-track;
+    border-radius: $radius-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: $scrollbar-thumb;
+    border-radius: $radius-full;
+    // A transparent border plus padding-box clip makes the thumb look
+    // thinner than the track.
+    border: 2px solid transparent;
+    background-clip: padding-box;
+
+    &:hover {
+      background-color: $scrollbar-thumb-hover;
+    }
+
+    &:active {
+      background-color: $scrollbar-thumb-active;
+    }
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: $scrollbar-thumb $scrollbar-track;
+    }
+  }
+}

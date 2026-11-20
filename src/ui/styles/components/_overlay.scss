@@ -30,8 +30,10 @@
   max-height: 100%;
   padding: $spacing-xl;
   border: 1px solid $border-panel;
-  border-radius: $radius-xl;
+  border-radius: $radius-sm;
   @include glassmorphism-panel;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   h1,
   h2,
@@ -54,7 +56,6 @@
 
   @container (max-width: #{$breakpoint-mobile}) {
     padding: $spacing-lg;
-    border-radius: $radius-lg;
   }
 }
 
