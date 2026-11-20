@@ -6,6 +6,30 @@
   --app-shell-inline-padding: clamp(12px, 4vw, 24px);
   --app-shell-block-padding: clamp(12px, 3vh, 28px);
   --app-font-size-base: clamp(0.9375rem, 0.9rem + 0.2vw, 1rem);
+
+  // Menu section colors: Game (primary), Reports (secondary), Tools (neutral).
+  --menu-game-bg: #f5b82e;
+  --menu-game-bg-hover: #ffc94d;
+  --menu-game-bg-active: #e0a31c;
+  --menu-game-text: #14181f;
+  --menu-game-accent: var(--menu-game-bg);
+  --menu-game-section-bg: #1a1f2b;
+
+  --menu-reports-bg: #1f3a5f;
+  --menu-reports-bg-hover: #27497a;
+  --menu-reports-bg-active: #1a3150;
+  --menu-reports-border: #2f5486;
+  --menu-reports-text: #e3ecfa;
+  --menu-reports-label: #7fa8f5;
+  --menu-reports-accent: #5b8def;
+
+  --menu-tools-label: #9aa3b5;
+  --menu-tools-accent: #6b7385;
+
+  // Hover for default menu buttons (Home, Tools, Log off).
+  --menu-default-bg-hover: #4b5563;
+
+  --menu-focus-ring: #ffe08a;
 }
 
 :root[data-app-orientation='landscape'] {

@@ -141,7 +141,101 @@
     width: 100%;
     text-align: left;
     justify-content: flex-start;
+
+    // Default hover; Game and Reports sections override it with their own colors.
+    &:hover {
+      background: var(--menu-default-bg-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--menu-focus-ring);
+      outline-offset: 2px;
+    }
   }
+}
+
+// Titled group of related menu options (Game, Reports, Tools).
+.menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md $spacing-md;
+  border: 1px solid $border-panel-light;
+  border-left: 3px solid rgba($color-primary-yellow, 0.6);
+  border-radius: $radius-md;
+  background: rgba(15, 23, 42, 0.28);
+
+  &__title {
+    color: $color-primary-yellow;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  // Game: highest visual priority.
+  &[data-section='game'] {
+    border-left-color: var(--menu-game-accent);
+    background: var(--menu-game-section-bg);
+
+    .menu-section__title {
+      color: var(--menu-game-accent);
+    }
+
+    .menu-option {
+      background: var(--menu-game-bg);
+      color: var(--menu-game-text);
+
+      &:hover {
+        background: var(--menu-game-bg-hover);
+      }
+
+      &:active,
+      &[aria-current='page'] {
+        background: var(--menu-game-bg-active);
+      }
+    }
+  }
+
+  // Reports: secondary. The 1px border is an inset shadow so button height matches other sections.
+  &[data-section='reports'] {
+    border-left-color: var(--menu-reports-accent);
+
+    .menu-section__title {
+      color: var(--menu-reports-label);
+    }
+
+    .menu-option {
+      background: var(--menu-reports-bg);
+      color: var(--menu-reports-text);
+      box-shadow: inset 0 0 0 1px var(--menu-reports-border);
+
+      &:hover {
+        background: var(--menu-reports-bg-hover);
+      }
+
+      &:active,
+      &[aria-current='page'] {
+        background: var(--menu-reports-bg-active);
+      }
+    }
+  }
+
+  // Tools: neutral label and accent only; buttons keep the default secondary style.
+  &[data-section='tools'] {
+    border-left-color: var(--menu-tools-accent);
+
+    .menu-section__title {
+      color: var(--menu-tools-label);
+    }
+  }
+}
+
+// Log off sits apart from the navigation sections.
+.menu-options--footer {
+  margin-top: $spacing-xs;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-panel-light;
 }
 
 .menu-actions {
