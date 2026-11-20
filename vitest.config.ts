@@ -18,6 +18,39 @@ const aliases = {
 const isElectronOnlyRun = process.argv.some((arg, index, argv) => {
   return arg === '--project=electron' || (arg === '--project' && argv[index + 1] === 'electron');
 });
+
+/** Projects named on the CLI (`--project=x` or `--project x`); empty when every project runs. */
+const selectedProjects = process.argv.flatMap((arg, index, argv) => {
+  if (arg.startsWith('--project=')) return [arg.slice('--project='.length)];
+  if (arg === '--project' && argv[index + 1]) return [argv[index + 1]];
+  return [];
+});
+
+/**
+ * Source globs each unit-test project owns. A lane run (e.g. `test:react`) measures only its own
+ * layers, so source files its tests merely import (such as `src/game/config.ts` from UI tests)
+ * do not fail another layer's thresholds.
+ *
+ * Scoping only applies when projects are passed as `--project` (as the package.json lane scripts
+ * do); other forms such as `-p` fall back to measuring every loaded file.
+ * Keep keys in sync with the `name:` of each project in `test.projects` below: a selected project
+ * missing from this map (e.g. `storybook`) disables scoping for the whole run.
+ */
+const projectCoverageInclude: Record<string, string[]> = {
+  react: ['src/ui/**/*.{ts,tsx}', 'src/App.tsx'],
+  phaser: ['src/game/**/*.ts'],
+  platform: ['src/platform/**/*.ts'],
+  store: ['src/store/**/*.ts'],
+  // Measures nothing (src/shared/** is in coverage.exclude); kept so `--project=shared` stays scoped.
+  shared: ['src/shared/**/*.ts'],
+  electron: ['electron/**/*.ts'],
+};
+
+/** Undefined (measure every loaded file) for full runs or when a project has no mapping. */
+const laneCoverageInclude =
+  selectedProjects.length > 0 && selectedProjects.every((name) => name in projectCoverageInclude)
+    ? selectedProjects.flatMap((name) => projectCoverageInclude[name])
+    : undefined;
 const shouldPrintStdout = ['1', 'true', 'yes', 'on'].includes(
   (process.env.VITEST_PRINT_STDOUT || '').toLowerCase(),
 );
@@ -110,6 +143,7 @@ export default defineConfig({
       provider: 'v8',
       enabled: false,
       reportsDirectory: './reports/unit-tests/coverage',
+      ...(laneCoverageInclude && { include: laneCoverageInclude }),
       reporter: [
         'text',             // Prints a compact table directly to the console
         'json',             // Outputs data for CI tools (SonarQube, etc.)

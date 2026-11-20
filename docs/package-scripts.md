@@ -19,11 +19,13 @@ This document describes each script defined in `package.json` and when to use it
 | --- | --- | --- |
 | `npm run test:ui` | Opens the Vitest UI for interactive test runs. | Use when exploring failures, rerunning tests interactively, or watching test state in the browser UI. |
 | `npm run test:watch` | Starts Vitest in watch mode using the shared config. | Use during active development when you want tests to rerun after file changes. |
-| `npm run test:all` | Runs all Vitest projects once. | Use before commits or whenever you want the standard unit and integration test pass. |
-| `npm run test:all:coverage` | Runs all Vitest projects and collects coverage. | Use when validating coverage-sensitive changes or before broader quality checks. |
-| `npm run test:electron` | Runs only the Electron Vitest project. | Use when changes are limited to the desktop shell or Electron-specific behavior. |
-| `npm run test:phaser` | Runs only the Phaser Vitest project. | Use when changing gameplay, scenes, rendering, or other Phaser-owned code. |
-| `npm run test:react` | Runs only the React Vitest project. | Use when changing overlays, components, or Zustand-connected UI behavior. |
+| `npm run test:all` | Runs all Vitest projects once with coverage and enforces every coverage threshold. | Use before commits or whenever you want the standard unit and integration test pass. |
+| `npm run test:all:coverage` | Same command as `test:all` (kept for existing references). | Same as `test:all`. |
+| `npm run test:electron` | Runs only the Electron Vitest project, with coverage of `electron/**`. | Use when changes are limited to the desktop shell or Electron-specific behavior. |
+| `npm run test:phaser` | Runs the Phaser, platform, and store Vitest projects, with coverage of those layers. | Use when changing gameplay, scenes, rendering, or other Phaser-owned code. |
+| `npm run test:platform` | Runs only the platform Vitest project, with coverage of `src/platform/**`. | Use when changes are limited to platform adapters under `src/platform/**`. |
+| `npm run test:store` | Runs only the store Vitest project, with coverage of `src/store/**`. | Use when changing the Zustand store, persistence, or migrations. |
+| `npm run test:react` | Runs the React, platform, and store Vitest projects, with coverage of those layers. | Use when changing overlays, components, or Zustand-connected UI behavior. |
 | `npm run test:storybook` | Runs the Storybook-related Vitest project. | Use when validating Storybook stories or story-driven component coverage. |
 | `npm run test:e2e` | Runs the full Playwright end-to-end suite. | Use before releases or when a change may affect complete user flows across targets. |
 | `npm run test:e2e:web` | Runs the mobile web Playwright projects only. | Use when validating browser behavior and responsive mobile flows. |
