@@ -163,6 +163,9 @@ describe('App start menu controls', () => {
     expect(screen.getByRole('group', { name: 'Game' })).toBe(screen.getByTestId('menu-section-game'));
     expect(screen.getByRole('group', { name: 'Reports' })).toBe(screen.getByTestId('menu-section-reports'));
     expect(screen.getByRole('group', { name: 'Tools' })).toBe(screen.getByTestId('menu-section-tools'));
+    for (const sectionId of ['game', 'reports', 'tools']) {
+      expect(screen.getByTestId(`menu-section-${sectionId}`)).toHaveAttribute('data-section', sectionId);
+    }
     expect(sectionItems('game')).toEqual(['menu-option-play', 'menu-option-practice']);
     expect(sectionItems('reports')).toEqual([
       'menu-option-achievements',
@@ -175,7 +178,7 @@ describe('App start menu controls', () => {
 
     const menuItemIds = screen.getAllByRole('menuitem').map((item) => item.getAttribute('data-testid'));
     expect(menuItemIds[0]).toBe('menu-option-home');
-    expect(menuItemIds.at(-1)).toBe('menu-option-logoff');
+    expect(menuItemIds[menuItemIds.length - 1]).toBe('menu-option-logoff');
   });
 
   it('closes the start menu with the dedicated close action', () => {

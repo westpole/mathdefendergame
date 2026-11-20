@@ -162,6 +162,7 @@ export function MenuList({ setIsOpen }: MenuListProps) {
               key={section.id}
               aria-labelledby={titleId}
               className="menu-section"
+              data-section={section.id}
               data-testid={`menu-section-${section.id}`}
               role="group"
             >
