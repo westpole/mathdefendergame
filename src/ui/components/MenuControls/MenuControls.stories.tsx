@@ -66,6 +66,26 @@ export const MobileMinimum: Story = {
   },
 };
 
+export const DesktopOpen: Story = {
+  name: 'Desktop menu open (sections)',
+  args: {
+    frame: minimumDesktopStoryFrame,
+  },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByTestId('menu-toggle-button'));
+  },
+};
+
+export const MobileOpen: Story = {
+  name: 'Mobile menu open (sections)',
+  args: {
+    frame: popularMobileStoryFrame,
+  },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByTestId('menu-toggle-button'));
+  },
+};
+
 export const MobileLandscapeOpen: Story = {
   name: 'Mobile menu open (landscape, scrollable)',
   args: {

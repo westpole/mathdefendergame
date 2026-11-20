@@ -143,6 +143,41 @@ describe('App start menu controls', () => {
     expect(screen.queryByTestId('menu-options')).not.toBeInTheDocument();
   });
 
+  it('groups menu options into titled sections between untitled top and bottom blocks', () => {
+    act(() => {
+      setMockStoreState({
+        activeUsername: 'AcePilot',
+        bootReady: true,
+        phase: 'start',
+      });
+    });
+
+    render(<App />);
+
+    fireEvent.click(screen.getByTestId('menu-toggle-button'));
+
+    const sectionItems = (sectionId: string) =>
+      Array.from(screen.getByTestId(`menu-section-${sectionId}`).querySelectorAll('[role="menuitem"]')).map(
+        (item) => item.getAttribute('data-testid'),
+      );
+    expect(screen.getByRole('group', { name: 'Game' })).toBe(screen.getByTestId('menu-section-game'));
+    expect(screen.getByRole('group', { name: 'Reports' })).toBe(screen.getByTestId('menu-section-reports'));
+    expect(screen.getByRole('group', { name: 'Tools' })).toBe(screen.getByTestId('menu-section-tools'));
+    expect(sectionItems('game')).toEqual(['menu-option-play', 'menu-option-practice']);
+    expect(sectionItems('reports')).toEqual([
+      'menu-option-achievements',
+      'menu-option-weekly-report',
+      'menu-option-performance',
+    ]);
+    expect(sectionItems('tools')).toEqual(['menu-option-profile', 'menu-option-settings', 'menu-option-rules']);
+    expect(screen.getByTestId('menu-option-home').closest('[role="group"]')).toBeNull();
+    expect(screen.getByTestId('menu-option-logoff').closest('[role="group"]')).toBeNull();
+
+    const menuItemIds = screen.getAllByRole('menuitem').map((item) => item.getAttribute('data-testid'));
+    expect(menuItemIds[0]).toBe('menu-option-home');
+    expect(menuItemIds.at(-1)).toBe('menu-option-logoff');
+  });
+
   it('closes the start menu with the dedicated close action', () => {
     act(() => {
       setMockStoreState({
