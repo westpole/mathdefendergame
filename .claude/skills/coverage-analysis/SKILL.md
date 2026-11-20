@@ -60,12 +60,14 @@ cmd //c "cd /d E:\Dev\personal\mathDefenderGame && npm run test:all:coverage"
 
 This runs every project, including the Storybook browser tests (needs Playwright Chromium), so it is slow. The console `text` table flags failing thresholds and has an "Uncovered Line #s" column. Use it to pick target files, then work with scoped runs (step 4).
 
+Every unit lane script (`test:react`, `test:phaser`, `test:store`, `test:platform`, `test:electron`, `test:all`) collects coverage too. A lane run measures only its own layers (the `projectCoverageInclude` map in `vitest.config.ts`) and overwrites `coverage-final.json` with just those files, so a fresh lane report is enough when the gaps are all inside that lane.
+
 ### 2. List gaps for a file
 
 Report: `reports/unit-tests/coverage/coverage-final.json` (not the HTML). Use the helper instead of hand-parsing:
 
 ```sh
-node .claude/skills/coverage-analysis/scripts/uncovered.mjs src/ui/components/Hud/Hud.tsx
+node .claude/skills/coverage-analysis/scripts/uncovered.mjs src/ui/components/HUDOverlay/InputPanel.tsx
 ```
 
 It prints each unhit statement, branch path, and function with its line number. Keys in the JSON are absolute Windows paths (`E:\Dev\...\electron\main.ts`), so the script matches on a normalized path suffix.
@@ -90,7 +92,7 @@ Write the tests with the layer's skill from the table above.
 Run only the owning project and measure only the target file:
 
 ```sh
-cmd //c "cd /d E:\Dev\personal\mathDefenderGame && npx vitest run src/ui/components/Hud --project=react --coverage --coverage.include=src/ui/components/Hud/Hud.tsx"
+cmd //c "cd /d E:\Dev\personal\mathDefenderGame && npx vitest run src/ui/components/HUDOverlay --project=react --coverage --coverage.include=src/ui/components/HUDOverlay/InputPanel.tsx"
 ```
 
 - `--coverage.include` limits measurement to the target, so other files the tests load don't fail thresholds. The target's glob threshold still applies, which is the check you want.
