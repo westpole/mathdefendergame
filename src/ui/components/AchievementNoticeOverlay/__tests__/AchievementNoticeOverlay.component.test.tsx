@@ -43,6 +43,34 @@ describe('AchievementNoticeOverlay', () => {
     expect(screen.getByTestId('achievement-notice-dismiss')).toHaveFocus();
   });
 
+  it('renders a stable, varied confetti burst whose loops stop after the fall', () => {
+    seed({ achievementNotice: [bronze] });
+    const { unmount } = render(<AchievementNoticeOverlay />);
+
+    const readPieces = () => Array.from(
+      screen.getByTestId('achievement-confetti').querySelectorAll<HTMLElement>('.achievement-confetti__piece'),
+    ).map((piece) => ({
+      style: piece.getAttribute('style'),
+      flakeClass: piece.querySelector('.achievement-confetti__flake')?.className,
+    }));
+
+    const firstRender = readPieces();
+
+    expect(firstRender).toHaveLength(42);
+    expect(new Set(firstRender.map((piece) => piece.style)).size).toBe(42);
+
+    for (const piece of firstRender) {
+      expect(piece.flakeClass).toMatch(/achievement-confetti__flake--color-\d achievement-confetti__flake--(rect|strip|square|circle)/);
+      expect(piece.style).toMatch(/--confetti-sway-count: \d+/);
+      expect(piece.style).toMatch(/--confetti-flutter-count: \d+/);
+    }
+
+    unmount();
+    render(<AchievementNoticeOverlay />);
+
+    expect(readPieces()).toEqual(firstRender);
+  });
+
   it('uses the plural title for several awards', () => {
     seed({ achievementNotice: [bronze, silver] });
     render(<AchievementNoticeOverlay />);

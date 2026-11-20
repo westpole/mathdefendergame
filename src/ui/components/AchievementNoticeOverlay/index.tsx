@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useGameStore } from '@store/useGameStore';
@@ -9,7 +9,53 @@ import {
 } from '@ui/components/AchievementsOverlay/achievementDisplay';
 import { getAchievementKey } from '@store/selectors/achievements';
 
-const CONFETTI_PIECES = 24;
+const CONFETTI_PIECES = 42;
+const CONFETTI_SHAPES = ['rect', 'strip', 'square', 'circle'] as const;
+const CONFETTI_COLORS = 6;
+
+/** Stable pseudo-random value in [0, 1) so the burst looks organic but renders the same every time. */
+function seededRandom(index: number, salt: number): number {
+  const value = Math.sin(index * 12.9898 + salt * 78.233) * 43758.5453;
+  return value - Math.floor(value);
+}
+
+/** One confetti piece: a stable React key, its flake color/shape modifiers, and its motion variables. */
+interface ConfettiPiece {
+  id: string;
+  flakeClassName: string;
+  style: CSSProperties;
+}
+
+/** Per-piece motion and look, fed to the stylesheet as CSS custom properties. */
+const CONFETTI: ConfettiPiece[] = Array.from({ length: CONFETTI_PIECES }, (_, index) => {
+  const random = (salt: number) => seededRandom(index, salt);
+  const spinDirection = random(7) < 0.5 ? -1 : 1;
+  const shape = CONFETTI_SHAPES[Math.floor(random(1) * CONFETTI_SHAPES.length)];
+  const delay = random(4) * 1.4;
+  const fall = 2.8 + random(5) * 1.8;
+  const swayDuration = 0.7 + random(9) * 0.8;
+  const flutterDuration = 0.35 + random(11) * 0.5;
+
+  return {
+    id: `confetti-${index}`,
+    flakeClassName: `achievement-confetti__flake--color-${index % CONFETTI_COLORS} achievement-confetti__flake--${shape}`,
+    // CSSProperties has no index signature for custom properties, so the `--confetti-*` keys need the cast.
+    style: {
+      left: `${(random(2) * 104 - 2).toFixed(1)}%`,
+      '--confetti-scale': (0.7 + random(3) * 0.6).toFixed(2),
+      '--confetti-delay': `${delay.toFixed(2)}s`,
+      '--confetti-fall': `${fall.toFixed(2)}s`,
+      '--confetti-drift': `${Math.round((random(6) - 0.5) * 160)}px`,
+      '--confetti-sway': `${Math.round(14 + random(8) * 26)}px`,
+      '--confetti-sway-duration': `${swayDuration.toFixed(2)}s`,
+      // Finite loop counts stop the sway and flutter once the piece has fallen off-screen.
+      '--confetti-sway-count': Math.ceil(fall / swayDuration),
+      '--confetti-spin': `${spinDirection * Math.round(360 + random(10) * 720)}deg`,
+      '--confetti-flutter-duration': `${flutterDuration.toFixed(2)}s`,
+      '--confetti-flutter-count': Math.ceil((delay + fall) / flutterDuration),
+    } as CSSProperties,
+  };
+});
 
 /**
  * After-run celebration for newly earned awards. Waits until the grade notice is
@@ -49,8 +95,10 @@ export function AchievementNoticeOverlay() {
   return (
     <div className="overlay-screen overlay-screen--interactive achievement-notice-screen" data-testid="achievement-notice-overlay">
       <div aria-hidden="true" className="achievement-confetti" data-testid="achievement-confetti">
-        {Array.from({ length: CONFETTI_PIECES }, (_, index) => (
-          <span key={index} className={`achievement-confetti__piece achievement-confetti__piece--${index % 6}`} style={{ left: `${(index * 37) % 100}%`, animationDelay: `${(index % 8) * 0.12}s` }} />
+        {CONFETTI.map((piece) => (
+          <span key={piece.id} className="achievement-confetti__piece" style={piece.style}>
+            <span className={`achievement-confetti__flake ${piece.flakeClassName}`} />
+          </span>
         ))}
       </div>
 

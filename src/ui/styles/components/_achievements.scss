@@ -227,26 +227,93 @@
   pointer-events: none;
 }
 
+// Each piece has two layers: the outer one falls, drifts, and sways side to side;
+// the inner flake spins and flips in 3D like paper catching the air. Per-piece
+// timing and distances come from CSS custom properties set in the component.
 .achievement-confetti__piece {
   position: absolute;
-  top: -12px;
-  width: 8px;
-  height: 14px;
-  border-radius: 2px;
-  animation: achievement-confetti-fall 2.4s ease-in forwards;
+  top: -24px;
+  perspective: 240px;
+  animation:
+    achievement-confetti-fall var(--confetti-fall, 3.4s) cubic-bezier(0.45, 0.05, 0.75, 0.9) var(--confetti-delay, 0s) both,
+    achievement-confetti-sway var(--confetti-sway-duration, 1s) ease-in-out var(--confetti-delay, 0s) var(--confetti-sway-count, 4) alternate;
 }
 
-.achievement-confetti__piece--0 { background: $color-primary-yellow; }
-.achievement-confetti__piece--1 { background: $color-success-green; }
-.achievement-confetti__piece--2 { background: $color-primary-purple; }
-.achievement-confetti__piece--3 { background: $color-danger-red; }
-.achievement-confetti__piece--4 { background: $text-link; }
-.achievement-confetti__piece--5 { background: $text-primary; }
+.achievement-confetti__flake {
+  display: block;
+  width: calc(8px * var(--confetti-scale, 1));
+  height: calc(14px * var(--confetti-scale, 1));
+  border-radius: 2px;
+  animation:
+    achievement-confetti-spin var(--confetti-fall, 3.4s) linear var(--confetti-delay, 0s) both,
+    achievement-confetti-flutter var(--confetti-flutter-duration, 0.6s) linear var(--confetti-flutter-count, 8);
+}
+
+.achievement-confetti__flake--strip {
+  width: calc(4px * var(--confetti-scale, 1));
+  height: calc(18px * var(--confetti-scale, 1));
+  border-radius: 1px;
+}
+
+.achievement-confetti__flake--square {
+  width: calc(9px * var(--confetti-scale, 1));
+  height: calc(9px * var(--confetti-scale, 1));
+}
+
+.achievement-confetti__flake--circle {
+  width: calc(8px * var(--confetti-scale, 1));
+  height: calc(8px * var(--confetti-scale, 1));
+  border-radius: 50%;
+}
+
+.achievement-confetti__flake--color-0 { background: $color-primary-yellow; }
+.achievement-confetti__flake--color-1 { background: $color-success-green; }
+.achievement-confetti__flake--color-2 { background: $color-primary-purple; }
+.achievement-confetti__flake--color-3 { background: $color-danger-red; }
+.achievement-confetti__flake--color-4 { background: $text-link; }
+.achievement-confetti__flake--color-5 { background: $text-primary; }
 
 @keyframes achievement-confetti-fall {
-  to {
-    transform: translateY(110vh) rotate(540deg);
+  0% {
+    translate: 0 0;
+    opacity: 1;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  100% {
+    translate: var(--confetti-drift, 0) 110vh;
     opacity: 0;
+  }
+}
+
+@keyframes achievement-confetti-sway {
+  from { transform: translateX(calc(var(--confetti-sway, 24px) * -1)); }
+  to { transform: translateX(var(--confetti-sway, 24px)); }
+}
+
+@keyframes achievement-confetti-spin {
+  from { rotate: 0deg; }
+  to { rotate: var(--confetti-spin, 540deg); }
+}
+
+// Flipping around a tilted axis, with the far side shaded, reads as a paper flake.
+@keyframes achievement-confetti-flutter {
+  0% {
+    transform: rotate3d(1, 0.4, 0, 0deg);
+    filter: brightness(1);
+  }
+
+  50% {
+    transform: rotate3d(1, 0.4, 0, 180deg);
+    filter: brightness(0.6);
+  }
+
+  100% {
+    transform: rotate3d(1, 0.4, 0, 360deg);
+    filter: brightness(1);
   }
 }
 
