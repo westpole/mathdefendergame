@@ -70,7 +70,9 @@ Report: `reports/unit-tests/coverage/coverage-final.json` (not the HTML). Use th
 node .claude/skills/coverage-analysis/scripts/uncovered.mjs src/ui/components/HUDOverlay/InputPanel.tsx
 ```
 
-It prints each unhit statement, branch path, and function with its line number. Keys in the JSON are absolute Windows paths (`E:\Dev\...\electron\main.ts`), so the script matches on a normalized path suffix.
+It prints each unhit statement, branch path, and function with its line number.
+
+When a Bash Vitest run fails a threshold, the `PostToolUseFailure` hook (`.claude/hooks/coverage-gaps-on-failure.mjs`) already adds the uncovered items for the failing metrics of the affected files (up to 8 files, 20 items each) next to the tool result. Use that as the starting gap list; run this script for a file's full list. Keys in the JSON are absolute Windows paths (`E:\Dev\...\electron\main.ts`), so the script matches on a normalized path suffix.
 
 ### 3. Target the gaps
 

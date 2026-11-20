@@ -52,6 +52,18 @@
     "additionalDirectories": []
   },
   "hooks": {
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/coverage-gaps-on-failure.mjs\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
