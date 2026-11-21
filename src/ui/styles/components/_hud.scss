@@ -279,14 +279,24 @@
   .hud-panel--right {
     position: fixed;
     top: 0;
-    width: 49.3%;
   }
 
   .hud-panel--left {
     left: 0;
+    width: 40%;
   }
 
   .hud-panel--right {
     right: 0;
+    width: 60%;
+  }
+
+  .status-panel {
+    gap: 0;
+  }
+
+  .status-item {
+    border: none;
+    border-radius: 0;
   }
 }
